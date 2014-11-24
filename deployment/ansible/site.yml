@@ -1,3 +1,12 @@
 ---
 - hosts: app
   sudo: True
+
+  pre_tasks:
+    - name: Update APT cache
+      apt: update_cache=yes
+
+  roles:
+    - { role: "azavea.git" }
+    - { role: "azavea.java" }
+    - { role: "cac-tripplanner.otp"}

@@ -1,0 +1,13 @@
+---
+- name: Install maven
+  apt: pkg=maven state=present
+
+- name: Download OpenTripPlanner
+  git: repo=git://github.com/opentripplanner/OpenTripPlanner.git
+       dest=/opt/otp
+       version=0.11.x
+
+- name: Compile OpenTripPlanner
+  shell: cd /opt/otp/ && mvn clean package
+  args:
+    creates: /opt/otp/otp-core/target/otp.jar
