@@ -90,6 +90,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Web
     app.vm.network "forwarded_port", guest: 80, host: 8024
 
+    # OpenTripPlanner
+    app.vm.network "forwarded_port", guest: 8080, host: 9090
+
     app.ssh.forward_x11 = true
 
     app.vm.provision "ansible" do |ansible|
