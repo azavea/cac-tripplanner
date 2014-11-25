@@ -1,1 +1,6 @@
 ---
+otp_graph_dir: /usr/local/share/otp-graph
+otp_data_dir: /usr/local/share/otp-data
+otp_osm_source: https://s3.amazonaws.com/metro-extracts.mapzen.com/philadelphia_pennsylvania.osm.pbf
+otp_osm_filename: /usr/local/share/otp-data/philadelphia.osm.pbf
+

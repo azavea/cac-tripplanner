@@ -1,3 +1,4 @@
 ---
+otp_graph_dir: /usr/local/share/otp-graph
 otp_user: opentripplanner
 upstart_start_on: '(filesystem and net-device-up IFACE=lo)'

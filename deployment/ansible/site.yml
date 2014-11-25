@@ -8,3 +8,4 @@
 
   roles:
     - { role: "cac-tripplanner.otp"}
+    - { role: "cac-tripplanner.otp-data"}

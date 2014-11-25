@@ -5,5 +5,5 @@ stop on runlevel [!2345]
 
 chdir /opt/otp
 script
-    exec sudo -u {{ otp_user }} ./otp --server
+    exec sudo -u {{ otp_user }} ./otp --graphs {{ otp_graph_dir }} --server
 end script
