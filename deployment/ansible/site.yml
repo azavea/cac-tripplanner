@@ -7,6 +7,4 @@
       apt: update_cache=yes
 
   roles:
-    - { role: "azavea.git" }
-    - { role: "azavea.java" }
     - { role: "cac-tripplanner.otp"}

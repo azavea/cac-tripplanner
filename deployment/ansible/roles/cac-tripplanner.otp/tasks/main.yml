@@ -5,25 +5,20 @@
 - name: Download OpenTripPlanner
   git: repo=git://github.com/opentripplanner/OpenTripPlanner.git
        dest=/opt/otp
-       version=0.11.x
+       version=339c1deb1daaa5edb63cbcd738318591ad9a61c7 # 0.11.x branch
 
 - name: Compile OpenTripPlanner
-  shell: cd /opt/otp/ && mvn clean package
-  args:
-    creates: /opt/otp/otp-core/target/otp.jar
+  command: mvn clean package
+           chdir=/opt/otp/
+           creates=/opt/otp/otp-core/target/otp.jar
 
-- name: Create OTP User
+- name: Create service account for OpenTripPlanner
   user: name={{ otp_user }}
+        system=yes
+        home=/var/lib/{{ otp_user }}
+        shell=/bin/false
+        state=present
 
 - name: Install upstart service
-  template: src=otp.conf dest=/etc/init/otp.conf
+  template: src=otp.conf.j2 dest=/etc/init/otp.conf
   notify: Restart OpenTripPlanner
-
-- name: Create Directory for OSM and GTFS
-  file: path=/usr/local/share/osm_gtfs/ state=directory
-
-- name: Download Philadelphia OSM Data
-  get_url: url=https://s3.amazonaws.com/metro-extracts.mapzen.com/philadelphia_pennsylvania.osm.pbf dest=/usr/local/share/osm_gtfs/phila.osm.pdf
-
-#- name: Build OTP Graph
-#  shell: cd /opt/otp/ && ./otp --build /usr/local/share/osm_gtfs/

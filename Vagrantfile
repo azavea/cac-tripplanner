@@ -101,8 +101,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.raw_arguments = ["--timeout=60"]
     end
 
-    config.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--memory", MEMORY_MB, "--cpus", CPUS, "--pae", "on"]
+    config.vm.provider :virtualbox do |v|
+      v.memory = MEMORY_MB
+      v.cpus = CPUS
     end
   end
 end

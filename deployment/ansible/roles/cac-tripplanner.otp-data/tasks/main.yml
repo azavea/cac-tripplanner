@@ -1,0 +1,11 @@
+---
+- name: Create Directory for OSM and GTFS
+  file: path=/usr/local/share/osm_gtfs/ state=directory
+
+- name: Download Philadelphia OSM Data
+  get_url: url=https://s3.amazonaws.com/metro-extracts.mapzen.com/philadelphia_pennsylvania.osm.pbf
+           dest=/usr/local/share/osm_gtfs/phila.osm.pdf
+
+#- name: Build OTP Graph
+#  command: /opt/otp/otp --build /usr/local/share/osm_gtfs/
+#           chdir=/opt/otp/
