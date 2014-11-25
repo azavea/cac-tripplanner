@@ -4,6 +4,20 @@
 Vagrant.require_version ">= 1.5"
 require "yaml"
 
+if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
+  # OpenTripPlanner needs > 1GB to build and run
+  MEMORY_MB = "4096"
+else
+  MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
+end
+
+if ENV['CAC_TRIPPLANNER_CPU'].nil?
+  CPUS = "2"
+else
+  CPUS = ENV['CAC_TRIPPLANNER_CPU']
+end
+
+
 # Deserialize Ansible Galaxy installation metadata for a role
 def galaxy_install_info(role_name)
   role_path = File.join("deployment", "ansible", "roles", role_name)
@@ -76,12 +90,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Web
     app.vm.network "forwarded_port", guest: 80, host: 8024
 
+    # OpenTripPlanner
+    app.vm.network "forwarded_port", guest: 8080, host: 9090
+
     app.ssh.forward_x11 = true
 
     app.vm.provision "ansible" do |ansible|
       ansible.playbook = "deployment/ansible/site.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
+    end
+
+    config.vm.provider :virtualbox do |v|
+      v.memory = MEMORY_MB
+      v.cpus = CPUS
     end
   end
 end
