@@ -12,4 +12,5 @@ Development Installation
 ------------------------
 
 1. Make sure you have the development dependencies installed
-2. Run `vagrant up`
+2. Place septa_bus.zip and septa_rail.zip in the gtfs folder
+3. Run `vagrant up`

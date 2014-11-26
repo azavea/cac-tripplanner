@@ -6,7 +6,7 @@ require "yaml"
 
 if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
   # OpenTripPlanner needs > 1GB to build and run
-  MEMORY_MB = "4096"
+  MEMORY_MB = "8192"
 else
   MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
 end

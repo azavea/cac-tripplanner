@@ -1,2 +1,4 @@
-- name: Restart OpenTripPlanner
-  service: name=otp state=restarted
+- name: Build OTP Graph
+  command: /opt/otp/otp --build {{ otp_data_dir }}
+           chdir=/opt/otp/
+  notify: Restart OpenTripPlanner
