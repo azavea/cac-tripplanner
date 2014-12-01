@@ -1,4 +1,4 @@
 - name: Build OTP Graph
-  command: /opt/otp/otp --build {{ otp_data_dir }}
+  command: /opt/otp/build-old {{ otp_data_dir }}/graph-config.xml
            chdir=/opt/otp/
   notify: Restart OpenTripPlanner
