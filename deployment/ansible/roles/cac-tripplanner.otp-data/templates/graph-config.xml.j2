@@ -16,6 +16,11 @@
                             <property name="path" value="{{ otp_data_dir }}/septa_bus.zip" />
                             <property name="defaultAgencyId" value="SEPTA" />
                         </bean>
+                        <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
+                            <property name="path" value="{{ otp_data_dir }}/patco.zip" />
+                            <property name="defaultAgencyId" value="PATCO" />
+                            <property name="defaultBikesAllowed" value="true" />
+                        </bean>
                     </list>
                 </property>
             </bean>
