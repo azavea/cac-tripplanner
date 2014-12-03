@@ -4,13 +4,13 @@
 
 - name: Download OpenTripPlanner
   git: repo=git://github.com/opentripplanner/OpenTripPlanner.git
-       dest=/opt/otp
+       dest={{ otp_bin_dir }}
        version=339c1deb1daaa5edb63cbcd738318591ad9a61c7 # 0.11.x branch
 
 - name: Compile OpenTripPlanner
   command: mvn clean package -DskipTests
-           chdir=/opt/otp/
-           creates=/opt/otp/otp-core/target/otp.jar
+           chdir={{ otp_bin_dir }}
+           creates={{ otp_bin_dir }}/otp-core/target/otp.jar
 
 - name: Create service account for OpenTripPlanner
   user: name={{ otp_user }}
