@@ -1,3 +1,11 @@
+- name: Validate GTFS
+  command: feedvalidator.py -m -o CONSOLE {{ otp_data_dir }}/{{ item }}.zip
+  with_items: otp_gtfs_sources
+  register: command_result
+  failed_when: "'This feed expired on' in command_result.stdout or
+                'this feed is in the future,' in command_result.stdout"
+  notify: Build OTP Graph
+
 - name: Build OTP Graph
   command: /opt/otp/build-old {{ otp_data_dir }}/graph-config.xml
            chdir=/opt/otp/

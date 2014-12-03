@@ -2,3 +2,7 @@
 otp_data_dir: /var/opt/otp
 otp_osm_source: https://s3.amazonaws.com/metro-extracts.mapzen.com/philadelphia_pennsylvania.osm.pbf
 otp_osm_filename: /var/opt/otp/philadelphia.osm.pbf
+otp_gtfs_sources:
+  - septa_rail
+  - septa_bus
+  - patco
