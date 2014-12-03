@@ -1,0 +1,4 @@
+---
+  dependencies:
+    - { role: "cac-tripplanner.transitfeed" }
+    - { role: "cac-tripplanner.otp" }

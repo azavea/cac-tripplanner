@@ -1,0 +1,24 @@
+---
+- name: Install maven
+  apt: pkg=maven state=present
+
+- name: Download OpenTripPlanner
+  git: repo=git://github.com/opentripplanner/OpenTripPlanner.git
+       dest={{ otp_bin_dir }}
+       version=339c1deb1daaa5edb63cbcd738318591ad9a61c7 # 0.11.x branch
+
+- name: Compile OpenTripPlanner
+  command: mvn clean package -DskipTests
+           chdir={{ otp_bin_dir }}
+           creates={{ otp_bin_dir }}/otp-core/target/otp.jar
+
+- name: Create service account for OpenTripPlanner
+  user: name={{ otp_user }}
+        system=yes
+        home=/var/lib/{{ otp_user }}
+        shell=/bin/false
+        state=present
+
+- name: Install upstart service
+  template: src=otp.conf.j2 dest=/etc/init/otp.conf
+  notify: Restart OpenTripPlanner

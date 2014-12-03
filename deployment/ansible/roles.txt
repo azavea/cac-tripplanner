@@ -1,0 +1,3 @@
+azavea.git,0.1.0
+azavea.java,0.1.1
+azavea.pip,0.1.0

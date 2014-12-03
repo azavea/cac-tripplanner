@@ -1,0 +1,17 @@
+---
+- name: Create Directory for OSM and GTFS
+  file: path={{ otp_data_dir }} state=directory
+
+- name: Download Philadelphia OSM Data
+  get_url: url={{ otp_osm_source }}
+           dest={{ otp_osm_filename }}
+  notify: Build OTP Graph
+
+- name: Copy GTFS
+  copy: src=gtfs/{{ item }}.zip dest={{ otp_data_dir }}
+  with_items: otp_gtfs_sources
+  notify: Validate GTFS
+
+- name: Save graph-config.xml
+  template: src=graph-config.xml.j2 dest={{ otp_data_dir }}/graph-config.xml
+  notify: Build OTP Graph
