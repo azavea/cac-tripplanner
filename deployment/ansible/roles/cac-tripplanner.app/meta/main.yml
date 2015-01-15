@@ -1,0 +1,5 @@
+---
+  dependencies:
+    - { role: "azavea.git" }
+    - { role: "azavea.nginx" }
+    - { role: "azavea.virtualenv" }
