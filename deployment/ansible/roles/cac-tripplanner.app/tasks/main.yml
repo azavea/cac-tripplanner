@@ -9,12 +9,12 @@
     - python-psycopg2
 
 - name: Install pip packages
-  pip: name={{ item }}
+  pip: name={{ item.name }} version={{ item.version }}
        virtualenv=/app_env
   with_items:
-    - pyyaml
-    - django
-    - psycopg2
+    - { name: 'pyyaml', version: '3.11' }
+    - { name: 'django', version: '1.7.3' }
+    - { name: 'psycopg2', version: '2.5.4' }
 
 - name: Create postgres database
   postgresql_db: name={{ postgres_db }}
