@@ -1,0 +1,28 @@
+---
+- name: Install packages
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql-9.3
+    - postgresql-9.3-postgis-2.1
+    - libpq-dev
+    - python-dev
+    - python-psycopg2
+
+- name: Install pip packages
+  pip: name={{ item.name }} version={{ item.version }}
+       virtualenv=/app_env
+  with_items:
+    - { name: 'pyyaml', version: '3.11' }
+    - { name: 'django', version: '1.7.3' }
+    - { name: 'psycopg2', version: '2.5.4' }
+
+- name: Create postgres database
+  postgresql_db: name={{ postgres_db }}
+  sudo_user: postgres
+  notify: Enable PostGIS
+
+- name: Create postgres user
+  postgresql_user: db={{ postgres_db }}
+                   name={{ postgres_user }}
+                   password={{ postgres_password }}
+  sudo_user: postgres

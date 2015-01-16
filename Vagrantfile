@@ -85,10 +85,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
 
-    app.vm.synced_folder ".", "/vagrant", disabled: true
+    app.vm.synced_folder ".", "/vagrant", nfs: true
 
     # Web
-    app.vm.network "forwarded_port", guest: 80, host: 8024
+    app.vm.network "forwarded_port", guest: 8000, host: 8024
 
     # OpenTripPlanner
     app.vm.network "forwarded_port", guest: 8080, host: 9090
