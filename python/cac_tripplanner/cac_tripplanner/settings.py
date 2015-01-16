@@ -23,7 +23,7 @@ except (IOError, NameError):
             'NAME': 'cac_tripplanner',
             'USER': 'cac_tripplanner',
             'PASSWORD': 'cac_tripplanner',
-            'HOST': '127.0.0.1',
+            'HOST': '192.168.8.25',
             'PORT': '5432'
         },
         'production': False

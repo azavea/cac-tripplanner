@@ -1,0 +1,12 @@
+CONFIG = {
+    'working_dir': '/opt/app/python/cac_tripplanner/',
+    'user': 'www-data',
+    'group': 'www-data',
+    'args': (
+        '--bind=127.0.0.1:8000',
+        '--workers={{ django_workers }}',
+        # '--worker-class=egg:gunicorn#sync',
+        # '--timeout=30',
+        'cac_tripplanner.wsgi',
+    ),
+}
