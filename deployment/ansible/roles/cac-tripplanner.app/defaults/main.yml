@@ -7,4 +7,4 @@ django_workers: 1
 production: False
 
 app_sass_version: "3.4.9"
-gulp_dir: "/vagrant/src"
+gulp_dir: "/opt/app/src"
