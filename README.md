@@ -15,3 +15,4 @@ Development Installation
 2. Place `septa_bus.zip`, `septa_rail.zip`, and `patco.zip` in the gtfs folder
 3. Run `vagrant up`
 4. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
+5. During development, running 'gulp watch' will automatically collect static files together when changes are detected for Django template consumption.
