@@ -97,6 +97,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
 STATICFILES_DIRS = (
     '/vagrant/src/app/scripts',
-    '/vagrant/src/app/styles',
+    '/vagrant/src/.tmp/styles',
     '/vagrant/src/app/fonts'
 )
