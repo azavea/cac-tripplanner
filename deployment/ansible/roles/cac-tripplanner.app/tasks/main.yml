@@ -2,27 +2,36 @@
 - name: Install packages
   apt: name={{ item }} state=present
   with_items:
-    - postgresql-9.3
-    - postgresql-9.3-postgis-2.1
     - libpq-dev
     - python-dev
-    - python-psycopg2
+    - libproj-dev
+    - binutils
+    - gdal-bin
+    - gunicorn
 
 - name: Install pip packages
   pip: name={{ item.name }} version={{ item.version }}
-       virtualenv=/app_env
   with_items:
     - { name: 'pyyaml', version: '3.11' }
     - { name: 'django', version: '1.7.3' }
     - { name: 'psycopg2', version: '2.5.4' }
 
-- name: Create postgres database
-  postgresql_db: name={{ postgres_db }}
-  sudo_user: postgres
-  notify: Enable PostGIS
+- name: Delete example gunicorn config
+  file: name={{ item }} state=absent
+  with_items:
+    - /etc/gunicorn.d/django.example
+    - /etc/gunicorn.d/wsgi.example
+  notify: Restart gunicorn
 
-- name: Create postgres user
-  postgresql_user: db={{ postgres_db }}
-                   name={{ postgres_user }}
-                   password={{ postgres_password }}
-  sudo_user: postgres
+- name: Install gunicorn config
+  template: src=app.j2 dest=/etc/gunicorn.d/app
+  notify: Restart gunicorn
+
+- name: Run migrations
+  django_manage: command=migrate
+                 app_path=/opt/app/python/cac_tripplanner
+  notify: Restart gunicorn
+
+- name: Copy nginx config
+  copy: src=default dest=/etc/nginx/sites-available/default
+  notify: Restart nginx

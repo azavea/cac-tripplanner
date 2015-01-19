@@ -1,3 +1,6 @@
-- name: Enable PostGIS
-  command: "psql -d {{ postgres_db }} -c 'CREATE EXTENSION postgis;'"
-  sudo_user: postgres
+---
+- name: Restart gunicorn
+  service: name=gunicorn state=restarted
+
+- name: Restart nginx
+  service: name=nginx state=restarted

@@ -81,22 +81,63 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.proxy.no_proxy = "localhost,127.0.0.1"
   end
 
+  config.vm.define "database" do |database|
+    database.vm.hostname = "database"
+    database.vm.network "private_network", ip: "192.168.8.25"
+
+    database.vm.synced_folder ".", "/vagrant", disabled: true
+
+    database.ssh.forward_x11 = true
+
+    database.vm.provision "ansible" do |ansible|
+      ansible.playbook = "deployment/ansible/database.yml"
+      ansible.inventory_path = ANSIBLE_INVENTORY_PATH
+      ansible.raw_arguments = ["--timeout=60"]
+    end
+
+    config.vm.provider :virtualbox do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+  end
+
   config.vm.define "app" do |app|
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
 
-    app.vm.synced_folder ".", "/vagrant", nfs: true
+    app.vm.synced_folder ".", "/opt/app", nfs: true
 
     # Web
-    app.vm.network "forwarded_port", guest: 8000, host: 8024
+    app.vm.network "forwarded_port", guest: 80, host: 8024
 
-    # OpenTripPlanner
-    app.vm.network "forwarded_port", guest: 8080, host: 9090
 
     app.ssh.forward_x11 = true
 
     app.vm.provision "ansible" do |ansible|
-      ansible.playbook = "deployment/ansible/site.yml"
+      ansible.playbook = "deployment/ansible/app.yml"
+      ansible.inventory_path = ANSIBLE_INVENTORY_PATH
+      ansible.raw_arguments = ["--timeout=60"]
+    end
+
+    config.vm.provider :virtualbox do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+  end
+
+  config.vm.define "otp" do |otp|
+    otp.vm.hostname = "otp"
+    otp.vm.network "private_network", ip: "192.168.8.26"
+
+    otp.vm.synced_folder ".", "/vagrant", disabled: true
+
+    # OpenTripPlanner
+    otp.vm.network "forwarded_port", guest: 8080, host: 9090
+
+    otp.ssh.forward_x11 = true
+
+    otp.vm.provision "ansible" do |ansible|
+      ansible.playbook = "deployment/ansible/otp.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
     end
@@ -106,4 +147,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.cpus = CPUS
     end
   end
+
 end
