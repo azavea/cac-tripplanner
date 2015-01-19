@@ -1,4 +1,6 @@
 ---
+- { include: jslibs.yml }
+
 - name: Install packages
   apt: name={{ item }} state=present
   with_items:
@@ -15,6 +17,7 @@
     - { name: 'pyyaml', version: '3.11' }
     - { name: 'django', version: '1.7.3' }
     - { name: 'psycopg2', version: '2.5.4' }
+    - { name: 'pytz', version: '2014.10' }
 
 - name: Delete example gunicorn config
   file: name={{ item }} state=absent
@@ -35,3 +38,4 @@
 - name: Copy nginx config
   copy: src=default dest=/etc/nginx/sites-available/default
   notify: Restart nginx
+
