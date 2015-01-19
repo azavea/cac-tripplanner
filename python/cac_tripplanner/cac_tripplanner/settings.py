@@ -26,6 +26,7 @@ except (IOError, NameError):
             'HOST': '192.168.8.25',
             'PORT': '5432'
         },
+        'build_dir' = '/opt/app/src',
         'production': False
     }
 
@@ -94,3 +95,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
+STATICFILES_DIRS = (
+    os.path.join(secrets.build_dir, 'app', 'scripts'),
+    os.path.join(secrets.build_dir, '.tmp', 'styles'),
+    os.path.join(secrets.build_dir, 'app', 'fonts')
+)

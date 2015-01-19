@@ -5,3 +5,6 @@ postgres_password: "cac_tripplanner"
 postgres_host: "192.168.8.25"
 django_workers: 1
 production: False
+
+app_sass_version: "3.4.9"
+gulp_dir: "/opt/app/src"
