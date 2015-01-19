@@ -97,7 +97,32 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
 STATICFILES_DIRS = (
-    os.path.join(secrets['build_dir'], 'app', 'scripts'),
+    os.path.join(secrets['build_dir'], 'dist', 'scripts'),
     os.path.join(secrets['build_dir'], '.tmp', 'styles'),
-    os.path.join(secrets['build_dir'], 'app', 'fonts')
+    os.path.join(secrets['build_dir'], 'dist', 'fonts')
 )
+
+# TEMPLATE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.request',
+)
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
+TEMPLATE_DIRS = (
+    os.path.normpath(os.path.join(BASE_DIR, 'templates')),
+)
+
