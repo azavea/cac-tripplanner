@@ -78,26 +78,22 @@ gulp.task('wiredep', function () {
     .pipe(wiredep())
     .pipe(gulp.dest('app/styles'));
 
-  gulp.src('app/*.html')
-    .pipe(wiredep({exclude: ['bootstrap-sass-official']}))
-    .pipe(gulp.dest('app'));
 });
 
 gulp.task('watch', function () {
 
   // watch for changes
   gulp.watch([
-    'app/*.html',
-    '.tmp/styles/**/*.css',
+    'app/styles/**/*.css',
     'app/scripts/**/*.js',
-    'app/images/**/*'
-  ], ['collectstatic']);
+    '../python/cac_tripplanner/cac_tripplanner/static/*'
+  ], ['html', 'collectstatic']);
 
   gulp.watch('app/styles/**/*.scss', ['styles']);
   gulp.watch('bower.json', ['wiredep']);
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras', 'collectstatic'], function () {
   return gulp.src('dist/**/*')
     .pipe($.size({title: 'build', gzip: true}));
 });
