@@ -110,6 +110,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Web
     app.vm.network "forwarded_port", guest: 8024, host: 8024
 
+    # Django Dev
+    app.vm.network "forwarded_port", guest: 8026, host: 8026
+
 
     app.ssh.forward_x11 = true
 
