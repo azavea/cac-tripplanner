@@ -11,13 +11,14 @@
        state=present
 
 - name: Install bower and gulp
-  command: npm install -g bower gulp
+  npm: name={{ item }} state=present global=yes
+  with_items:
+    - bower
+    - gulp
 
 - name: Install npm prereqs
-  command: npm install
+  npm: path="{{ gulp_dir }}" state=present
   sudo: no
-  args:
-    chdir: "{{ gulp_dir }}"
 
 - name: Install application javascript dependencies (bower)
   command: bower install
