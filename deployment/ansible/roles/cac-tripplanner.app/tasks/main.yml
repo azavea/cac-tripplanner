@@ -1,6 +1,4 @@
 ---
-- { include: jslibs.yml }
-
 - name: Install packages
   apt: name={{ item }} state=present
   with_items:
@@ -39,4 +37,6 @@
 - name: Copy nginx config
   copy: src=default dest=/etc/nginx/sites-available/default
   notify: Restart nginx
+
+- { include: jslibs.yml }
 
