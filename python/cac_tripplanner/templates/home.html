@@ -122,3 +122,12 @@
 </section>
 {% include "footer-mixin.html" %}
 {% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+$(document).ready(function () {
+    var home = new CAC.Pages.Home();
+    home.initialize();
+});
+</script>
+{% endblock %}

@@ -99,9 +99,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
 STATICFILES_DIRS = (
-    os.path.join(secrets['build_dir'], 'dist', 'scripts'),
-    os.path.join(secrets['build_dir'], '.tmp', 'styles'),
-    os.path.join(secrets['build_dir'], 'dist', 'fonts')
+    os.path.join(secrets['build_dir'], 'dist'),
 )
 
 # TEMPLATE CONFIGURATION

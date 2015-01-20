@@ -9,7 +9,8 @@
 
     {% block cssimports %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <link href="{% static 'main.css' %}" rel="stylesheet">
+    <link href="{% static 'multiple-select.css' %}" rel="stylesheet">
+    <link href="{% static 'styles/main.css' %}" rel="stylesheet">
     {% endblock %}
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -22,9 +23,14 @@
     {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
 
     {% block jsimports %}
-    <script src="{% static 'main.js' %}"></script>
-    <script src="{% static 'vendor.js' %}"></script>
-    <script src="{% static 'plugins.js' %}"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="{% static 'lib/jquery.multiple.select.js' %}"></script>
+    <script src="{% static 'cac/cac.js' %}"></script>
+    <script src="{% static 'cac/cac-pages-home.js' %}"></script>
+    {% endblock %}
+
+    {% block jspage %}
     {% endblock %}
   </body>
+    }
 </html>
