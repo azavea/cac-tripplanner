@@ -1,54 +1,124 @@
 {% extends "base.html" %}
 {% block content %}
-<main>
-  <div class="container-fluid scroll">
-    {% include "header-mixin.html" %}
-    {% include "nav-mixin.html" %}
-    <article class="row">
-      <div class="majorcol-xs-4 col-md-4">
-        <h4>Name of destination</h4>
-        <p>Neighborhood name</p>
-      </div>
-      <div class="major col-xs-4 col-md-4">
-        <h4>Name of destination</h4>
-        <p>Neighborhood name</p>
-      </div>
-      <div class="col-xs-4 col-md-4">
-        <div class="minor row">
-        <h4>Name of destination</h4>
-        <p>Neighborhood name</p>
+<section class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                <h1 class="text-center">Eco-friendly exploration of Greater Philadelphia on <em>foot</em>, <em>bike</em>, and <em>public transit</em>.</h1>
+                <div class="text-center toggle-search">
+                    <button class="btn btn-lg" id="toggle-explore">Explore nearby locations</button>
+                    <small>or</small>
+                    <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
+                </div>
+            </div>
         </div>
-        <div class="minor row">
-        <h4>Name of destination</h4>
-        <p>Neighborhood name</p>
-        </div>
-      </div>
-    </article>
-    <article class="row">
-      <div class="spotlight col-xs-8 col-md-8">
-        <h4>Community Spotlight</h4>
-        <div class="major col-xs-6 col-md-6">
-          <h4>Getting to my next gig</h4>
-          <p>Community Profile</p>
-        </div>
-        <div class="major col-xs-6 col-md-6">
-          <h4>Using bus bike racks</h4>
-          <p>Tips & Tricks</p>
-        </div>
-      </div>
-      <div class="recent col-xs-4 col-md-4">
-        <div class="minor row">
-          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
-        </div>
-        <div class="minor row">
-          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
-        </div>
-        <div class="minor row">
-          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
-        </div>
-      </div>
     </div>
-  </div>
-</main>
+    <div class="search text-center hidden-xs hidden-sm">
+        <div id="explore">
+            <span class="text">Where can I go in</span>
+            <input type="number" placeholder="20" />
+            <span class="text">minutes from</span>
+            <input type="text" placeholder="City Hall" />
+            <span class="text">using</span>
+            <select multiple="multiple">
+                <option value="walk" selected>Walk</option>
+                <option value="bike" selected>Bike</option>
+                <option value="bus" selected>Bus</option>
+                <option value="rail" selected>Rail</option>
+            </select>
+            <button type="submit">&rarr;</button>
+        </div>
+        <div id="directions" class="hidden">
+            <span class="text">How do I get from</span>
+            <input type="text" placeholder="Current location" />
+            <span class="text">to</span>
+            <input type="text" placeholder="City Hall" />
+            <span class="text">using</span>
+            <select multiple="multiple">
+                <option value="walk" selected>Walk</option>
+                <option value="bike" selected>Bike</option>
+                <option value="bus" selected>Bus</option>
+                <option value="rail" selected>Rail</option>
+            </select>
+            <button type="submit">&rarr;</button>
+        </div>
+    </div>
+</section>
+<section class="content content-gray">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <a class="block block-destination" href="#">
+                    <h3>Name of desination</h3>
+                    <h5>Neighborhood name</h5>
+                    <img src="http://placehold.it/400x400.jpg" />
+                </a>
+            </div>
+            <div class="col-sm-4">
+                <a class="block block-destination" href="#">
+                    <h3>Name of desination</h3>
+                    <h5>Neighborhood name</h5>
+                    <img src="http://placehold.it/400x400.jpg" />
+                </a>
+            </div>
+            <div class="col-sm-4">
+                <a class="block block-destination block-half" href="#">
+                    <h3>Name of desination</h3>
+                    <h5>Neighborhood name</h5>
+                    <img src="http://placehold.it/400x200.jpg" />
+                </a>
+                <a class="block block-destination block-half" href="#">
+                    <h3>Name of desination</h3>
+                    <h5>Neighborhood name</h5>
+                    <img src="http://placehold.it/400x200.jpg" />
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 text-center">
+                <h3>Community Spotlight</h3>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <a class="block block-spotlight" href="#">
+                            <h3>Getting to my next gig</h3>
+                            <h5>Community Profile</h5>
+                            <img src="http://placehold.it/400x600.jpg" />
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a class="block block-spotlight" href="#">
+                            <h3>Getting to my next gig</h3>
+                            <h5>Tips & Tricks</h5>
+                            <img src="http://placehold.it/400x600.jpg" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 hidden-xs hidden-sm">
+                <h3 class="text-center">Recent Routes</h3>
+                <a class="block block-recent" href="#">
+                    <h5>20 minutes via</h5>
+                    <h3>1400 Spruce to 2135 Callowhill</h3>
+                    <img src="http://placehold.it/400x200.jpg" />
+                </a>
+                <a class="block block-recent" href="#">
+                    <h5>20 minutes via</h5>
+                    <h3>1400 Spruce to 2135 Callowhill</h3>
+                    <img src="http://placehold.it/400x200.jpg" />
+                </a>
+                <a class="block block-recent" href="#">
+                    <h5>20 minutes via</h5>
+                    <h3>1400 Spruce to 2135 Callowhill</h3>
+                    <img src="http://placehold.it/400x200.jpg" />
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
 {% include "footer-mixin.html" %}
 {% endblock %}
