@@ -26,9 +26,14 @@
   args:
     chdir: "{{ gulp_dir }}"
 
+- name: Create Static Directories
+  file: path="{{ gulp_dir }}/{{ item }}" state=directory mode=0666
+  sudo: no
+  with_items:
+    - "dist/scripts"
+
 - name: Create static files (staging/production)
   command: gulp build
   sudo: no
   args:
     chdir: "{{ gulp_dir }}"
-
