@@ -39,4 +39,3 @@
   notify: Restart nginx
 
 - { include: jslibs.yml }
-

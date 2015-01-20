@@ -108,7 +108,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.synced_folder ".", "/opt/app", nfs: true
 
     # Web
-    app.vm.network "forwarded_port", guest: 8024, host: 8024
+    app.vm.network "forwarded_port", guest: 80, host: 8024
 
     # Django Dev
     app.vm.network "forwarded_port", guest: 8026, host: 8026

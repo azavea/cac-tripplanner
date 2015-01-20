@@ -10,24 +10,25 @@
        user_install=no
        state=present
 
-- name: Install bower and gulp
-  command: npm install -g bower gulp
-
-- name: Install npm prereqs
-  command: npm install
+- name: Install NPM dependencies
+  npm: path="{{ gulp_dir }}" state=present
   sudo: no
-  args:
-    chdir: "{{ gulp_dir }}"
 
-- name: Install application javascript dependencies (bower)
-  command: bower install
+- name: Create Static Directories
+  file: path="{{ gulp_dir }}/{{ item }}" state=directory mode=0755
+  sudo: no
+  with_items:
+    - "dist/scripts"
+    - ".tmp/styles"
+
+- name: Install application javascript dependencies with bower
+  command: npm run bower-install
   sudo: no
   args:
     chdir: "{{ gulp_dir }}"
 
 - name: Create static files (staging/production)
-  command: gulp build
+  command: npm run gulp-build
   sudo: no
   args:
     chdir: "{{ gulp_dir }}"
-
