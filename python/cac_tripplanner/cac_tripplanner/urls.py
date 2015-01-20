@@ -6,10 +6,8 @@ from django.contrib.staticfiles import views as staticviews
 
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'cac_tripplanner.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
     url(r'^$', 'cac_tripplanner.views.home', name='home'),
+    url(r'^map/', 'cac_tripplanner.views.map', name='map'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
