@@ -5,7 +5,7 @@ var gulp = require('gulp');
 var shell = require('gulp-shell');
 var $ = require('gulp-load-plugins')();
 
-gulp.task('collectstatic', shell.task(['python /vagrant/python/cac_tripplanner/manage.py collectstatic --noinput']));
+gulp.task('collectstatic', shell.task(['python ../python/cac_tripplanner/manage.py collectstatic --noinput']));
 
 gulp.task('styles', function () {
   return gulp.src('app/styles/main.scss')

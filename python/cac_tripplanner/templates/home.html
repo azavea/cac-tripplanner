@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+  <div class="container-fluid scroll">
+    {% include "header-mixin.html" %}
+    {% include "nav-mixin.html" %}
+    <article class="row">
+      <div class="majorcol-xs-4 col-md-4">
+        <h4>Name of destination</h4>
+        <p>Neighborhood name</p>
+      </div>
+      <div class="major col-xs-4 col-md-4">
+        <h4>Name of destination</h4>
+        <p>Neighborhood name</p>
+      </div>
+      <div class="col-xs-4 col-md-4">
+        <div class="minor row">
+        <h4>Name of destination</h4>
+        <p>Neighborhood name</p>
+        </div>
+        <div class="minor row">
+        <h4>Name of destination</h4>
+        <p>Neighborhood name</p>
+        </div>
+      </div>
+    </article>
+    <article class="row">
+      <div class="spotlight col-xs-8 col-md-8">
+        <h4>Community Spotlight</h4>
+        <div class="major col-xs-6 col-md-6">
+          <h4>Getting to my next gig</h4>
+          <p>Community Profile</p>
+        </div>
+        <div class="major col-xs-6 col-md-6">
+          <h4>Using bus bike racks</h4>
+          <p>Tips & Tricks</p>
+        </div>
+      </div>
+      <div class="recent col-xs-4 col-md-4">
+        <div class="minor row">
+          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
+        </div>
+        <div class="minor row">
+          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
+        </div>
+        <div class="minor row">
+          <span>20 minutes via<span class="glyphicon glyphicon-shopping-cart"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% include "footer-mixin.html" %}
+{% endblock %}

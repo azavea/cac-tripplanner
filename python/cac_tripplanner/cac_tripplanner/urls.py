@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'cac_tripplanner.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-    url(r'^$', 'cac_tripplanner.views.base', name='base'),
+    url(r'^$', 'cac_tripplanner.views.home', name='home'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
@@ -18,3 +18,4 @@ if settings.DEBUG:
     urlpatterns += [
         url(r'^static/(?P<path>.*)$', staticviews.serve),
     ]
+
