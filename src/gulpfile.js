@@ -80,6 +80,14 @@ gulp.task('wiredep', function () {
 
 });
 
+gulp.task('copy', function() {
+    gulp.src([
+        'app/styles/**/*.css',
+        'app/scripts/**/*.js',
+        '../python/cac_tripplanner/cac_tripplanner/static/*'
+    ]).pipe(gulp.dest('./dist'));
+});
+
 gulp.task('watch', function () {
 
   // watch for changes
@@ -93,7 +101,7 @@ gulp.task('watch', function () {
   gulp.watch('bower.json', ['wiredep']);
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras', 'collectstatic'], function () {
+gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras', 'collectstatic', 'copy'], function () {
   return gulp.src('dist/**/*')
     .pipe($.size({title: 'build', gzip: true}));
 });
