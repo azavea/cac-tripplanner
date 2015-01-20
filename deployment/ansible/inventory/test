@@ -1,4 +1,4 @@
-[development]
+[test]
 app ansible_ssh_host=192.168.8.24
 database ansible_ssh_host=192.168.8.25
 otp ansible_ssh_host=192.168.8.26

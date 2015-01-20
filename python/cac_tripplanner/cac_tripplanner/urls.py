@@ -7,7 +7,7 @@ from .views import FindReachableDestinations
 import settings
 
 urlpatterns = patterns('',
-    url(r'^$', 'cac_tripplanner.views.home', name='home'),
+    url(r'^$', 'cac_tripplanner.views.home', name='home'),  # NOQA
     url(r'^map/$', 'cac_tripplanner.views.map', name='map'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^admin/', include(admin.site.urls)),
@@ -18,4 +18,3 @@ if settings.DEBUG:
     urlpatterns += [
         url(r'^static/(?P<path>.*)$', staticviews.serve),
     ]
-

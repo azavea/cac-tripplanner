@@ -7,6 +7,7 @@ var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var karma = require('karma').server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
@@ -112,12 +113,33 @@ gulp.task('sass', function () {
         .pipe(gulp.dest(stat.styles));
 });
 
+// Since jQuery is loaded from a CDN, we need to pull it in manually here.
+gulp.task('test:copy-jquery', function() {
+    return copyBowerFiles('jquery.js', [])
+        .pipe(gulp.dest(stat.scripts));
+});
+
+gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
+    function(done) {
+        karma.start({
+            configFile: __dirname + '/karma/karma.conf.js'
+        }, done);
+    }
+);
+
+gulp.task('test:development', ['copy:scripts', 'copy:vendor-scripts'],
+    function(done) {
+        karma.start({
+            configFile: __dirname + '/karma/karma-dev.conf.js'
+        }, done);
+    }
+);
+
 gulp.task('common:build', ['clean'], function() {
     return gulp.start('copy:vendor-css', 'copy:vendor-images', 'sass', 'collectstatic');
 });
 
-// TODO: when tests are added, they may be added to here in addition to jshint
-gulp.task('test', ['jshint']);
+gulp.task('test', ['jshint', 'test:production']);
 
 gulp.task('development', ['common:build', 'copy:scripts', 'copy:vendor-scripts']);
 
