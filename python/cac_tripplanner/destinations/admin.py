@@ -8,6 +8,9 @@ class DestinationAdmin(admin.OSMGeoAdmin):
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
 
+    default_lon, default_lat = -8370000.00, 4860000.00  # 3857
+    default_zoom = 12
+
     def make_published(self, request, queryset):
         queryset.update(published=True)
     make_published.short_description = 'Publish selected destinations'
