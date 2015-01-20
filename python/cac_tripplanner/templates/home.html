@@ -1,9 +1,9 @@
-{% extends "cac_tripplanner/base_cac_tripplanner.html" %}
+{% extends "base.html" %}
 {% block content %}
 <main>
   <div class="container-fluid scroll">
-    {% include "cac_tripplanner/cac_tripplanner_header.html" %}
-    {% include "cac_tripplanner/cac_tripplanner_nav.html" %}
+    {% include "header-mixin.html" %}
+    {% include "nav-mixin.html" %}
     <article class="row">
       <div class="majorcol-xs-4 col-md-4">
         <h4>Name of destination</h4>
@@ -50,5 +50,5 @@
     </div>
   </div>
 </main>
-{% include "cac_tripplanner/cac_tripplanner_footer.html" %}
+{% include "footer-mixin.html" %}
 {% endblock %}
