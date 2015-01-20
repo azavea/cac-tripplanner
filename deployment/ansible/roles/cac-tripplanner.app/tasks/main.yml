@@ -17,6 +17,7 @@
     - { name: 'psycopg2', version: '2.5.4' }
     - { name: 'pytz', version: '2014.10' }
     - { name: 'django-ckeditor', version: '4.4.7' }
+    - { name: 'django-wpadmin', version: '1.7.0'}
 
 - name: Delete example gunicorn config
   file: name={{ item }} state=absent
