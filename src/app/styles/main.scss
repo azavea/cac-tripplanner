@@ -1,4 +1,9 @@
-$icon-font-path: '../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/';
+$icon-font-path: '/static/';
+
+// The wireframes seem to only use sharp edges
+$border-radius-base: 0px;
+$border-radius-small: 0px;
+$border-radius-large: 0px;
 
 // bower:scss
 @import "../../bower_components/bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
@@ -91,3 +96,9 @@ body {
     border-bottom: 0;
   }
 }
+
+@import "layout/variables";
+@import "components/greeting";
+
+
+
