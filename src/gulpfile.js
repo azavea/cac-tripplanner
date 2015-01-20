@@ -68,7 +68,7 @@ gulp.task('extras', function () {
   }).pipe(gulp.dest('dist'));
 });
 
-gulp.task('clean', require('del').bind(null, ['.tmp/*', 'dist/*']));
+gulp.task('clean', require('del').bind(null, ['.tmp', 'dist/*']));
 
 // inject bower components
 gulp.task('wiredep', function () {
