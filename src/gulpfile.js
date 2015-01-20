@@ -19,7 +19,7 @@ gulp.task('styles', function () {
 });
 
 gulp.task('jshint', function () {
-  return gulp.src('app/scripts/**/*.js')
+  return gulp.src('app/scripts/cac/**/*.js')
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.jshint.reporter('fail'));
@@ -68,7 +68,7 @@ gulp.task('extras', function () {
   }).pipe(gulp.dest('dist'));
 });
 
-gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
+gulp.task('clean', require('del').bind(null, ['.tmp', 'dist/*']));
 
 // inject bower components
 gulp.task('wiredep', function () {
@@ -82,9 +82,9 @@ gulp.task('wiredep', function () {
 
 gulp.task('copy', function() {
     gulp.src([
-        'app/styles/**/*.css',
-        'app/scripts/**/*.js',
-        '../python/cac_tripplanner/cac_tripplanner/static/*'
+        '.tmp/**/*.css',
+        'app/styles/lib/*',
+        'app/scripts/**/*.js'
     ]).pipe(gulp.dest('./dist'));
 });
 
@@ -93,15 +93,14 @@ gulp.task('watch', function () {
   // watch for changes
   gulp.watch([
     'app/styles/**/*.css',
-    'app/scripts/**/*.js',
-    '../python/cac_tripplanner/cac_tripplanner/static/*'
-  ], ['html', 'collectstatic']);
+    'app/scripts/**/*.js'
+  ], ['html', 'copy', 'collectstatic']);
 
   gulp.watch('app/styles/**/*.scss', ['styles']);
   gulp.watch('bower.json', ['wiredep']);
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras', 'collectstatic', 'copy'], function () {
+gulp.task('build', ['clean', 'jshint', 'html', 'images', 'fonts', 'extras', 'collectstatic', 'copy'], function () {
   return gulp.src('dist/**/*')
     .pipe($.size({title: 'build', gzip: true}));
 });

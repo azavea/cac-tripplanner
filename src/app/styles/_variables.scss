@@ -1,0 +1,14 @@
+// Media Queries
+$screen-xs			 : "(max-width: 767px)";
+$screen-sm			 : "(min-width: 768px) and (max-width: 991px)";
+$screen-md			 : "(min-width: 992px) and (max-width: 1199px)";
+$screen-lg			 : "(min-width: 1200px)";
+
+// Fonts
+$primary-font 	     : 'Open Sans', 'Helvetica Neue', sans-serif;
+
+// Colors
+$light-gray          : #F1F2F2;
+
+// Transition
+$transition          : all 0.5s;

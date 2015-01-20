@@ -1,0 +1,11 @@
+input {
+    &:focus {
+        outline: none;
+    }
+
+    &[type="search"] {
+        border: none;
+        background: none;
+        width: 100%;
+    }
+}

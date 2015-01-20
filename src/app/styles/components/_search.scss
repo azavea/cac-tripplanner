@@ -1,0 +1,47 @@
+.search {
+    background: #666;
+    margin: 0 -30px;
+    height: 60px;
+
+    span.text {
+        color: white;
+        display: inline-block;
+        padding: 17px 0;
+    }
+    input:not([type="checkbox"]) {
+        background: #999;
+        border: none;
+        color: white;
+        padding: 17px 14px;
+        margin: 0 15px;
+        height: 60px;
+
+        &::-webkit-input-placeholder {
+            color: white;
+            opacity: 0.75;
+            font-style: italic;
+        }
+        &:-moz-placeholder,
+        &::-moz-placeholder
+        &:-ms-input-placeholder {
+            color: white;
+        }
+
+        &[type="number"] {
+            width: 70px;
+        }
+        &[type="text"] {
+            width: 260px;
+        }
+    }
+    button[type="submit"] {
+        border: none;
+        background: none;
+        color: white;
+        font-size: 3rem;
+        font-weight: 300;
+        display: inline-block;
+        padding: 8px 7px 10px;
+        vertical-align: top;
+    }
+}
