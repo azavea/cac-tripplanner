@@ -38,6 +38,7 @@
   },
   "scripts": {
     "gulp-build": "gulp build",
+    "gulp-watch": "gulp watch",
     "bower-install": "bower install"
   }
 }
