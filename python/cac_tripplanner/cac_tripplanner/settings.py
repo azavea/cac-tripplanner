@@ -47,14 +47,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'wpadmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'ckeditor',
     'cms',
+    'destinations',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -133,3 +136,13 @@ CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 # TODO: delete later.
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
+WPADMIN = {
+    'admin': {
+        'title': 'Clean Air Council Content Management System',
+        'menu': {
+            'top': 'wpadmin.menu.menus.BasicTopMenu',
+            'left': 'wpadmin.menu.menus.BasicLeftMenu'
+        }
+    }
+}

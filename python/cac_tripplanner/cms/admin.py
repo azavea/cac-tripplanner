@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from . import models
 
+
 @admin.register(models.Article)
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'published', 'created', 'modified')
@@ -18,6 +19,3 @@ class ArticleAdmin(admin.ModelAdmin):
     def make_unpublished(self, request, queryset):
         queryset.update(published=False)
     make_unpublished.short_description = 'Unpublish selected articles'
-
-
-
