@@ -26,6 +26,8 @@ except (IOError, NameError):
             'HOST': '192.168.8.25',
             'PORT': '5432'
         },
+        'allowed_hosts': ['127.0.0.1', 'localhost'],
+        'internal_ips': ('0.0.0.0', '127.0.0.1',),
         'build_dir': '/opt/app/src',
         'production': False
     }
@@ -41,8 +43,9 @@ DEBUG = not secrets['production']
 
 TEMPLATE_DEBUG = not secrets['production']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = secrets['allowed_hosts']
 
+INTERNAL_IPS = secrets['internal_ips']
 
 # Application definition
 
@@ -100,10 +103,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
-STATICFILES_DIRS = (
-    os.path.join(secrets['build_dir'], 'dist'),
-)
+STATIC_ROOT = '/srv/cac'
+STATICFILES_DIRS = ()
 
 # TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors

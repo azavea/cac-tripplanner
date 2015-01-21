@@ -7,4 +7,6 @@ django_workers: 1
 production: False
 
 app_sass_version: "3.4.9"
-gulp_dir: "/opt/app/src"
+
+root_src_dir: "/opt/app/src"
+root_static_dir: "/srv/cac"
