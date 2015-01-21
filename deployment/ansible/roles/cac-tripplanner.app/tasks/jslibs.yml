@@ -11,24 +11,29 @@
        state=present
 
 - name: Install NPM dependencies
-  npm: path="{{ gulp_dir }}" state=present
+  npm: path="{{ root_src_dir }}" state=present
   sudo: no
 
-- name: Create Static Directories
-  file: path="{{ gulp_dir }}/{{ item }}" state=directory mode=0755
-  sudo: no
-  with_items:
-    - "dist/scripts"
-    - ".tmp/styles"
+- name: Create Static Directory
+  file: path="{{ root_static_dir }}" state=directory mode=0755 owner="{{ app_username }}"
+  sudo: yes
 
 - name: Install application javascript dependencies with bower
   command: npm run bower-install
   sudo: no
   args:
-    chdir: "{{ gulp_dir }}"
+    chdir: "{{ root_src_dir }}"
 
-- name: Create static files (staging/production)
-  command: npm run gulp-build
+- name: Create static files -- development
+  command: npm run gulp-development
   sudo: no
   args:
-    chdir: "{{ gulp_dir }}"
+    chdir: "{{ root_src_dir }}"
+  when: not production
+
+- name: Create static files -- production
+  command: npm run gulp-production
+  sudo: no
+  args:
+    chdir: "{{ root_src_dir }}"
+  when: production

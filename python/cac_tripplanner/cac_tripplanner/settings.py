@@ -41,8 +41,10 @@ DEBUG = not secrets['production']
 
 TEMPLATE_DEBUG = not secrets['production']
 
-ALLOWED_HOSTS = []
+# TODO: add the load balancer DNS to this list when in production
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+INTERNAL_IPS = ('0.0.0.0', )
 
 # Application definition
 
@@ -100,10 +102,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'cac_tripplanner', 'static')
-STATICFILES_DIRS = (
-    os.path.join(secrets['build_dir'], 'dist'),
-)
+STATIC_ROOT = '/srv/cac'
+STATICFILES_DIRS = ()
 
 # TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
