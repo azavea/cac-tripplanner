@@ -76,3 +76,12 @@
     </div>
 </section>
 {% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+$(document).ready(function () {
+    var map = new CAC.Pages.Map();
+    map.initialize();
+});
+</script>
+{% endblock %}
