@@ -2,8 +2,12 @@
     display: inline-block;
     position: relative;
     vertical-align: top;
-    min-width: 160px;
+    min-width: 160px !important;
     margin: 0 15px;
+
+    > button {
+        min-width: 160px !important;
+    }
 
     > .ms-choice {
         background: #999;
@@ -31,6 +35,7 @@
     }
     > .ms-drop {
         margin-top: 0;
+        min-width: 160px !important;
         border: 1px solid $light-gray;
         box-shadow: none;
         text-align: left;
