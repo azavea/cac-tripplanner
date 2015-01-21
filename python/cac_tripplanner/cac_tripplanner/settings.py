@@ -27,6 +27,7 @@ except (IOError, NameError):
             'PORT': '5432'
         },
         'allowed_hosts': ['127.0.0.1', 'localhost'],
+        'internal_ips': ('0.0.0.0', '127.0.0.1',),
         'build_dir': '/opt/app/src',
         'production': False
     }
@@ -42,10 +43,9 @@ DEBUG = not secrets['production']
 
 TEMPLATE_DEBUG = not secrets['production']
 
-# TODO: add the load balancer DNS to this list when in production
 ALLOWED_HOSTS = secrets['allowed_hosts']
 
-INTERNAL_IPS = ('0.0.0.0', )
+INTERNAL_IPS = secrets['internal_ips']
 
 # Application definition
 
