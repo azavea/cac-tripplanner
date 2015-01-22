@@ -59,7 +59,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+
+    # Third Party Apps
     'ckeditor',
+    'django_extensions',
+
+    # Project Apps
     'cms',
     'destinations',
 )
