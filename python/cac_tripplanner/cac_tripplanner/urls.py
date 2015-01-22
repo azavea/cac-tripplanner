@@ -6,10 +6,25 @@ from django.contrib.staticfiles import views as staticviews
 from .views import FindReachableDestinations
 import settings
 
-urlpatterns = patterns('',
-    url(r'^$', 'cac_tripplanner.views.home', name='home'),  # NOQA
-    url(r'^map/$', 'cac_tripplanner.views.map', name='map'),
+urlpatterns = patterns(
+    '',
+    # Home
+    url(r'^$', 'cac_tripplanner.views.home', name='home'),
+
+    # Map
+    url(r'^map/', 'cac_tripplanner.views.map', name='map'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
+
+    ## Community Profiles
+    url(r'^community-profile/(?P<slug>[\w-]+)/$',
+        'cms.views.community_profile_detail',
+        name='community-profile-detail'),
+
+    ## Tips and Tricks
+    url(r'^tips-and-tricks/(?P<slug>[\w-]+)/$',
+        'cms.views.tips_and_tricks_detail',
+        name='tips-and-tricks-detail'),
+
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
