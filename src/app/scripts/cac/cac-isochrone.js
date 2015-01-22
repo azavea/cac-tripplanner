@@ -5,8 +5,7 @@ CAC.Isochrone = (function ($) {
     var isochroneUrl = '/reachable';
     var module = {
         payload: payload,
-        fetchReachable: fetchReachable,
-        testFetch: testFetch
+        fetchReachable: fetchReachable
     };
 
     return module;
@@ -29,7 +28,6 @@ CAC.Isochrone = (function ($) {
             maxWalkDistance: 5000
         };
         fetchReachable(testParams).then(function(data) {
-            console.log(data);
         });
     }
 
@@ -50,7 +48,6 @@ CAC.Isochrone = (function ($) {
                 contentType: 'application/json'
             }).then(deferred.resolve);
         } else {
-            console.log('INCOMPLETE PAYLOAD: UNABLE TO CALCULATE ISOCHRONE');
             return deferred.fail();
         }
         return deferred.promise();
