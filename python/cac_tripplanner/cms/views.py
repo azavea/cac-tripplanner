@@ -9,7 +9,7 @@ def community_profile_detail(request, slug):
 
     :param slug: article slug to lookup profile
     """
-    community_profile = get_object_or_404(Article, slug=slug)
+    community_profile = get_object_or_404(Article, slug=slug, published=True)
     context = RequestContext(request, {'article': community_profile})
     return render_to_response('community-profile-detail.html',
                               context_instance=context)
@@ -21,6 +21,7 @@ def tips_and_tricks_detail(request, slug):
     """
     tips_and_tricks = get_object_or_404(Article,
                                         slug=slug,
+                                        published=True,
                                         content_type=Article.ArticleTypes.tips_and_tricks)
     context = RequestContext(request, {'article': tips_and_tricks})
     return render_to_response('tips-and-tricks-detail.html',
