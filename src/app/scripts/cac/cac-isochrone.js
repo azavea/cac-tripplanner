@@ -11,27 +11,6 @@ CAC.Isochrone = (function ($) {
     return module;
 
     /**
-     * Use test values to attempt a call to the isochrone endpoint
-     *
-     * @return undefined Use side effects to print data out
-     */
-    function testFetch() {
-        var testParams = {
-            coords: {
-                lat: 39.954688,
-                lng: -75.204677
-            },
-            mode: ['WALK', 'TRANSIT'],
-            date: '01-21-2015',
-            time: '7:30am',
-            maxTravelTime: 5000,
-            maxWalkDistance: 5000
-        };
-        fetchReachable(testParams).then(function(data) {
-        });
-    }
-
-    /**
      * Fetch all the reachable destinations within our destination database
      *
      * @return {object} (promise) which will ultimately be a list of reachable destinations
