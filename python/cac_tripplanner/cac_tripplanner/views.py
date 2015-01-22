@@ -40,7 +40,6 @@ class Reachable(View):
             'algorithm': self.algorithm
         }
         isochrone_response = get(self.otp_url, params=payload)
-        print('pay', payload)
 
         # Parse and traverse JSON from OTP so that we return only geometries
         json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']

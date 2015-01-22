@@ -13,6 +13,7 @@
   postgresql_user: db={{ postgres_db }}
                    name={{ postgres_user }}
                    password={{ postgres_password }}
+                   role_attr_flags=CREATEDB,SUPERUSER
   sudo_user: postgres
 
 - name: Add PostGIS extension

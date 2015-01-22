@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($) {
+CAC.Isochrone = (function ($) {
     'use strict';
 
     var payload = {};
@@ -39,20 +39,21 @@ CAC.Pages.Home = (function ($) {
      * @return {object} (promise) which will ultimately be a list of reachable destinations
      */
     function fetchReachable() {
+        var deferred = $.Deferred();
         if (payload.coords && payload.mode && payload.date &&
             payload.time && payload.maxTravelTime && payload.maxWalkDistance) {
             var urlParams = $.param(payload);
             var requestUrl = isochroneUrl + urlParams;
-            var promise = $.ajax({
+            $.ajax({
                 type: 'GET',
                 url: requestUrl,
                 contentType: 'application/json'
-            });
-            return promise;
+            }).then(deferred.resolve);
         } else {
-            console.log("INCOMPLETE PAYLOAD: UNABLE TO CALCULATE ISOCHRONE")
-            return false;
+            console.log('INCOMPLETE PAYLOAD: UNABLE TO CALCULATE ISOCHRONE');
+            return deferred.fail();
         }
+        return deferred.promise();
     }
 
 })(jQuery);
