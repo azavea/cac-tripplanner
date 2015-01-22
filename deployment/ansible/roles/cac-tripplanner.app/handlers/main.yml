@@ -1,6 +1,6 @@
 ---
-- name: Restart gunicorn
-  service: name=gunicorn state=restarted
+- name: Restart cac-tripplanner-app
+  service: name=cac-tripplanner-app state=restarted
 
 - name: Restart nginx
   service: name=nginx state=restarted

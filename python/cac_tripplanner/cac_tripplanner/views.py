@@ -68,5 +68,3 @@ class FindReachableDestinations(View):
 
         matched_objects = Destination.objects.filter(point__within=iso, published=True)
         return HttpResponse('{{"matched": "{0}"}}'.format(matched_objects), 'application/json')
-
-

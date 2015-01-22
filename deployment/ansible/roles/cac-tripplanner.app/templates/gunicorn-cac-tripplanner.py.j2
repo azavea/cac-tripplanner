@@ -1,0 +1,12 @@
+bind = '127.0.0.1:8000'
+workers = {{ django_workers }}
+accesslog = '-'
+errorlog = '{{ app_log }}'
+
+{% if develop or test -%}
+reload = True
+loglevel = 'debug'
+{% else %}
+reload = False
+loglevel = 'info'
+{% endif %}

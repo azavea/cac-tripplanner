@@ -8,15 +8,20 @@ production: False
 
 app_sass_version: "3.4.9"
 
+app_log: "/var/log/cac-tripplanner-app.log"
+
+root_app_dir: "/opt/app/python/cac_tripplanner"
+root_conf_dir: "/etc/cac_tripplanner.d"
 root_src_dir: "/opt/app/src"
 root_static_dir: "/srv/cac"
 
 cac_python_dependencies:
-    - { name: 'pyyaml', version: '3.11' }
     - { name: 'django', version: '1.7.3' }
-    - { name: 'psycopg2', version: '2.5.4' }
-    - { name: 'pytz', version: '2014.10' }
     - { name: 'django-ckeditor', version: '4.4.7' }
     - { name: 'django-extensions', version: '1.4.9' }
-    - { name: 'ipython', version: '2.3.1' }
     - { name: 'django-wpadmin', version: '1.7.0'}
+    - { name: 'gunicorn', version: '19.1.1'}
+    - { name: 'ipython', version: '2.3.1' }
+    - { name: 'psycopg2', version: '2.5.4' }
+    - { name: 'pytz', version: '2014.10' }
+    - { name: 'pyyaml', version: '3.11' }
