@@ -1,2 +1,0 @@
-- name: Restart OpenTripPlanner
-  service: name=otp state=restarted

@@ -1,9 +1,0 @@
-description "start OpenTripPlanner process"
-
-start on {{ upstart_start_on }}
-stop on runlevel [!2345]
-
-chdir {{ otp_bin_dir }}
-script
-    exec sudo -u {{ otp_user }} ./otp -a --graphs {{ otp_data_dir }} --server
-end script
