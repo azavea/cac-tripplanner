@@ -1,13 +1,15 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.gis import admin
 
-import settings
 from django.contrib.staticfiles import views as staticviews
 
+from .views import FindReachableDestinations
+import settings
 
 urlpatterns = patterns('',
     url(r'^$', 'cac_tripplanner.views.home', name='home'),
-    url(r'^map/', 'cac_tripplanner.views.map', name='map'),
+    url(r'^map/$', 'cac_tripplanner.views.map', name='map'),
+    url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
