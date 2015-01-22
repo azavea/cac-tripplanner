@@ -19,7 +19,7 @@ def map(request):
     return render_to_response('map.html', context_instance=RequestContext(request))
 
 
-class Reachable(View):
+class FindReachableDestinations(View):
     """Class based view for finding destinations of interest within the calculated isochrone"""
     # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
@@ -67,7 +67,7 @@ class Reachable(View):
             max_walk_distance=params.get('maxWalkDistance')
         )
 
-        matched_objects = Destination.objects.filter(point__within=iso)
+        matched_objects = Destination.objects.filter(point__within=iso, published=True)
         return HttpResponse('{{"matched": "{0}"}}'.format(matched_objects), 'application/json')
 
 
