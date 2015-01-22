@@ -26,6 +26,7 @@ except (IOError, NameError):
             'HOST': '192.168.8.25',
             'PORT': '5432'
         },
+        'otp_url': 'http://192.168.8.26:8080/otp/routers/{router}/',
         'allowed_hosts': ['127.0.0.1', 'localhost'],
         'internal_ips': ('0.0.0.0', '127.0.0.1',),
         'build_dir': '/opt/app/src',

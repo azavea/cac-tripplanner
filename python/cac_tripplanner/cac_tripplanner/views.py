@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 import requests
 
+from .settings import secrets as context_dependent_config
 from destinations.models import Destination
 
 def home(request):
@@ -24,7 +25,7 @@ class FindReachableDestinations(View):
     # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
     otp_router = 'default'
-    otp_url = 'http://192.168.8.26:8080/otp/routers/{router}/isochrone'.format(router=otp_router)
+    isochrone_url = context_dependent_config['otp_url'].format(router=otp_router) + 'isochrone'
     algorithm = 'accSampling'
 
     def isochrone(self, lat, lng, mode, date, time, max_travel_time, max_walk_distance):
@@ -40,7 +41,7 @@ class FindReachableDestinations(View):
             'maxWalkDistance': max_walk_distance,
             'algorithm': self.algorithm
         }
-        isochrone_response = requests.get(self.otp_url, params=payload)
+        isochrone_response = requests.get(self.isochrone_url, params=payload)
 
         # Parse and traverse JSON from OTP so that we return only geometries
         json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']

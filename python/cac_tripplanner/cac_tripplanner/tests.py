@@ -59,10 +59,3 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         response = self.client.get(isochrone_url)
         self.assertEqual('{"matched": "[<Destination: testWithin>]"}', response.content)
 
-
-
-
-
-
-
-
