@@ -1,5 +1,0 @@
----
-otp_bin_dir: /opt/opentripplanner
-otp_data_dir: /var/otp
-otp_user: opentripplanner
-upstart_start_on: '(filesystem and net-device-up IFACE=lo)'

@@ -1,4 +1,0 @@
----
-  dependencies:
-    - { role: "azavea.git" }
-    - { role: "azavea.java" }
