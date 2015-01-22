@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
-from requests import get
+import requests
 
 from destinations.models import Destination
 
@@ -28,7 +28,8 @@ class FindReachableDestinations(View):
     algorithm = 'accSampling'
 
     def isochrone(self, lat, lng, mode, date, time, max_travel_time, max_walk_distance):
-        """Make request to Open Trip Planner for isochrone geometry - convert it to GDAL Polygon"""
+        """Make request to Open Trip Planner for isochrone geometry with the provided args
+        Take OTP JSON and convert it to GDAL MultiPolygon and return it"""
         payload = {
             'routerId': self.otp_router,
             'fromPlace': lat + ',' + lng,
@@ -39,15 +40,12 @@ class FindReachableDestinations(View):
             'maxWalkDistance': max_walk_distance,
             'algorithm': self.algorithm
         }
-        isochrone_response = get(self.otp_url, params=payload)
+        isochrone_response = requests.get(self.otp_url, params=payload)
 
         # Parse and traverse JSON from OTP so that we return only geometries
         json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']
+        polygons = [GEOSGeometry(json.dumps(poly)) for poly in json_poly]
 
-        # Iterate through the returned geometries and convert them to proper OGR geoms
-        polygons = []
-        for _, poly in enumerate(json_poly):
-            polygons.append(GEOSGeometry(json.dumps(poly)))
         # Coerce to multipolygon
         isochrone_multipoly = MultiPolygon(polygons)
         return isochrone_multipoly
