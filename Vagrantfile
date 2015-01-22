@@ -17,6 +17,9 @@ else
   CPUS = ENV['CAC_TRIPPLANNER_CPU']
 end
 
+def testing?
+  !ENV["VAGRANT_ENV"].nil? && ENV["VAGRANT_ENV"] == "TEST"
+end
 
 # Deserialize Ansible Galaxy installation metadata for a role
 def galaxy_install_info(role_name)
@@ -57,7 +60,7 @@ if [ "up", "provision" ].include?(ARGV.first)
   install_dependent_roles
 end
 
-ANSIBLE_INVENTORY_PATH = if !ENV["VAGRANT_ENV"].nil? && ENV["VAGRANT_ENV"] == "TEST"
+ANSIBLE_INVENTORY_PATH = if testing?
   "deployment/ansible/inventory/test"
 else
   "deployment/ansible/inventory/development"
@@ -105,7 +108,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
 
-    app.vm.synced_folder ".", "/opt/app", nfs: true
+    app.vm.synced_folder ".", "/opt/app"
 
     # Web
     app.vm.network "forwarded_port", guest: 80, host: 8024

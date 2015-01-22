@@ -40,3 +40,5 @@
   notify: Restart nginx
 
 - { include: jslibs.yml }
+
+- { include: dev-test-dependencies.yml, when: develop or test }

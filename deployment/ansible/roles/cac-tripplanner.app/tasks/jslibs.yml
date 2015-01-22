@@ -11,7 +11,7 @@
        state=present
 
 - name: Install NPM dependencies
-  npm: path="{{ root_src_dir }}" state=present
+  command: npm install chdir="{{ root_src_dir }}"
   sudo: no
 
 - name: Create Static Directory
@@ -29,11 +29,11 @@
   sudo: no
   args:
     chdir: "{{ root_src_dir }}"
-  when: not production
+  when: not production and not test
 
 - name: Create static files -- production
   command: npm run gulp-production
   sudo: no
   args:
     chdir: "{{ root_src_dir }}"
-  when: production
+  when: production or test

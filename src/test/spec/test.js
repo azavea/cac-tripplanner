@@ -1,13 +1,9 @@
-/* global describe, it */
+(function() {
+    'use strict';
 
-(function () {
-  'use strict';
-
-  describe('Give it some context', function () {
-    describe('maybe a bit more context here', function () {
-      it('should run here few assertions', function () {
-
-      });
+    describe('CAC Trip Planner test stub', function() {
+        it('Should successfully run a trivial test', function() {
+            expect(true).toBe(true);
+        });
     });
-  });
 })();
