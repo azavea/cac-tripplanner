@@ -108,7 +108,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
 
-    app.vm.synced_folder ".", "/opt/app"
+    if testing?
+        app.vm.synced_folder ".", "/opt/app"
+    else
+        app.vm.synced_folder ".", "/opt/app", :nfs => true, :mount_options => ['actimeo=2']
+    end
 
     # Web
     app.vm.network "forwarded_port", guest: 80, host: 8024
