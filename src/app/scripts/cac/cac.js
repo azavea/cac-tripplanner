@@ -3,7 +3,8 @@ CAC = (function () {
 
     var module = {
         Map: {},
-        Pages: {}
+        Pages: {},
+        Mock: {}
     };
 
     return module;

@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, MapControl) {
+CAC.Pages.Map = (function ($, MapControl, MockDestinations) {
     'use strict';
 
     var defaults = {
@@ -13,6 +13,8 @@ CAC.Pages.Map = (function ($, MapControl) {
     Map.prototype.initialize = function () {
 
         mapControl = new MapControl();
+        mapControl.plotLocations(MockDestinations);
+        mapControl.locateUser();
 
         $('select').multipleSelect();
 
@@ -44,4 +46,4 @@ CAC.Pages.Map = (function ($, MapControl) {
 
     return Map;
 
-})(jQuery, CAC.Map.Control);
+})(jQuery, CAC.Map.Control, CAC.Mock.Destinations);

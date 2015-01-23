@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.css' rel='stylesheet' />
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
     <link href="{% static 'styles/main.css' %}" rel="stylesheet">
 
@@ -29,6 +30,8 @@
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js'></script>
+
 
     {% if debug %}
 
@@ -37,11 +40,13 @@
     <script src="{% static 'scripts/vendor/ramda.js' %}"></script>
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-map-control.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-map-overlays.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-pages-home.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-pages-map.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-isochrone.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-control.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-overlays.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-isochrone.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-routing.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/mock/cac-mock-destinations.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/pages/cac-pages-home.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/pages/cac-pages-map.js' %}"></script>
 
     {% else %}
 

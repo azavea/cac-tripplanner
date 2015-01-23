@@ -7,6 +7,7 @@ CAC.Map.Control = (function ($, L) {
         zoom: 14
     };
     var map = null;
+    var userMarker = null;
 
     var overlaysControl = null;
 
@@ -30,10 +31,14 @@ CAC.Map.Control = (function ($, L) {
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
 
+
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
     }
+
+    MapControl.prototype.locateUser = locateUser;
+    MapControl.prototype.plotLocations = plotLocations;
 
     return MapControl;
 
@@ -58,6 +63,40 @@ CAC.Map.Control = (function ($, L) {
         L.control.layers(basemaps, overlays, {
             position: 'bottomright'
         }).addTo(map);
+    }
+
+    /**
+     * Use HTML5 navigator to locate user and place a circle at their estimated location
+     */
+    function locateUser() {
+        var options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        };
+        var success = function(pos) {
+            var latlng = [pos.coords.latitude, pos.coords.longitude];
+            if (userMarker) {
+                userMarker.setLatLng(latlng);
+            } else {
+                userMarker = new L.Circle(latlng);
+                userMarker.setRadius(50);
+                map.addLayer(userMarker);
+            }
+        };
+        var failure = function(error) {
+            return 'ERROR(' + error.code + '): ' + error.message;
+        };
+
+        navigator.geolocation.getCurrentPosition(success, failure, options);
+    }
+
+    /**
+     * Plot an array of geojson points onto the map
+     */
+    function plotLocations(locationGeoJSON) {
+        var features = L.geoJson(locationGeoJSON);
+        map.addLayer(features);
     }
 
 })(jQuery, L);
