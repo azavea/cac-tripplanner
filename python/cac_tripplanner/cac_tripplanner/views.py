@@ -1,19 +1,31 @@
 import json
 
 from django.views.generic import View
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
+
 import requests
 
 from .settings import secrets as context_dependent_config
 from destinations.models import Destination
 
+from cms.models import Article
+
+
 def home(request):
-    print request.META['REMOTE_ADDR']
-    return render_to_response('home.html', context_instance=RequestContext(request))
+
+    # get randomized community profile
+    community_profile = Article.profiles.random()
+
+    # get randomized tips and tricks
+    tips_and_tricks = Article.tips.random()
+
+    context = RequestContext(request,
+                             dict(community_profile=community_profile,
+                                  tips_and_tricks=tips_and_tricks))
+    return render_to_response('home.html', context_instance=context)
 
 
 def map(request):

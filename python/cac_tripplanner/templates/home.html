@@ -82,20 +82,26 @@
             <div class="col-sm-8 text-center">
                 <h3>Community Spotlight</h3>
                 <div class="row">
+                  {% if community_profile %}
                     <div class="col-sm-6">
-                        <a class="block block-spotlight" href="#">
-                            <h3>Getting to my next gig</h3>
+                      <a class="block block-spotlight"
+                         href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
+                            <h3>{{ community_profile.title }}</h3>
                             <h5>Community Profile</h5>
                             <img src="http://placehold.it/400x600.jpg" />
                         </a>
                     </div>
+                    {% endif %}
+                    {% if tips_and_tricks %}
                     <div class="col-sm-6">
-                        <a class="block block-spotlight" href="#">
-                            <h3>Getting to my next gig</h3>
+                      <a class="block block-spotlight"
+                         href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
+                            <h3>{{ tips_and_tricks.title }}</h3>
                             <h5>Tips & Tricks</h5>
                             <img src="http://placehold.it/400x600.jpg" />
                         </a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-sm-4 hidden-xs hidden-sm">
