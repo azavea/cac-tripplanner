@@ -69,6 +69,7 @@ CAC.Map.Control = (function ($, L) {
      * Use HTML5 navigator to locate user and place a circle at their estimated location
      */
     function locateUser() {
+        var deferred = $.Deferred();
         var options = {
             enableHighAccuracy: true,
             timeout: 5000,
@@ -83,19 +84,27 @@ CAC.Map.Control = (function ($, L) {
                 userMarker.setRadius(50);
                 map.addLayer(userMarker);
             }
+            deferred.resolve(latlng);
         };
         var failure = function(error) {
-            return 'ERROR(' + error.code + '): ' + error.message;
+            deferred.fail(function(){return 'ERROR(' + error.code + '): ' + error.message; });
         };
 
         navigator.geolocation.getCurrentPosition(success, failure, options);
+        return deferred.promise();
     }
 
     /**
      * Plot an array of geojson points onto the map
      */
     function plotLocations(locationGeoJSON) {
-        var features = L.geoJson(locationGeoJSON);
+        var features = L.geoJson(locationGeoJSON, {
+            onEachFeature: function(feature, layer) {
+                layer.on('click', function(){
+                    $(document).trigger('MOS.Map.Control.DestinationClicked', feature);
+                });
+            }
+        });
         map.addLayer(features);
     }
 

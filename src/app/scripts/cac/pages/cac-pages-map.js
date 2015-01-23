@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, MapControl, MockDestinations) {
+CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
     'use strict';
 
     var defaults = {
@@ -12,9 +12,20 @@ CAC.Pages.Map = (function ($, MapControl, MockDestinations) {
 
     Map.prototype.initialize = function () {
 
+        // Map initialization logic and event binding
         mapControl = new MapControl();
         mapControl.plotLocations(MockDestinations);
         mapControl.locateUser();
+
+        $(document).bind('MOS.Map.Control.DestinationClicked', function(e, feature) {
+            var coords = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
+            console.log('This is ', feature.properties.name,
+                        ', and it lives at', coords);
+            mapControl.locateUser().then(function(data) {
+                MapRouting.planTrip(data, coords).then(function(d){console.log(d)});
+
+            });
+        });
 
         $('select').multipleSelect();
 
@@ -46,4 +57,4 @@ CAC.Pages.Map = (function ($, MapControl, MockDestinations) {
 
     return Map;
 
-})(jQuery, CAC.Map.Control, CAC.Mock.Destinations);
+})(jQuery, CAC.Map.Control, CAC.Map.Routing, CAC.Mock.Destinations);
