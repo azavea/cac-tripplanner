@@ -3,9 +3,6 @@
 set -e
 set -x
 
-# Python linting
-vagrant ssh app -c "flake8 /opt/app/python --exclude migrations"
-
 # Run the Django test suite with --noinput flag.
 vagrant ssh app -c "cd /opt/app/python/cac_tripplanner && ./manage.py test --noinput"
 

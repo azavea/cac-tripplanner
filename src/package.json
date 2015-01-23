@@ -51,6 +51,7 @@
     "gulp-production": "gulp production",
     "gulp-test": "gulp test",
     "gulp-test-dev": "gulp test:development",
+    "gulp-lint": "gulp jshint",
     "gulp-watch": "gulp watch"
   }
 }
