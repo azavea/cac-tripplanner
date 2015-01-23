@@ -5,7 +5,8 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "The Circus!"
+            "name": "The Circus!",
+            "description": " Neelix: I don't suppose you've ever heard of the Vulcan Rumarie?  Tuvok: The Rumarie is an ancient pagan festival.  Neelix: Full of barely-clothed Vulcan men and women, covered in slippery Rillan grease, chasing one another.  Tuvok: That has not been observed for a millennium.  Neelix: Well, it's time to bring it back!  B'Elanna Torres: [over the com] Lieutenant Tuvok, report to engineering.  Tuvok: Acknowledged.  [walks away]  Neelix: [shouting after Tuvok] I've been thinking of a Rumarie theme for the mess hall next week. Lots of high-fat, greasy foods, and if people want to take off their clothes and chase one another... Well, it certainly wouldn't hurt morale around here."
           },
           "geometry": {
             "type": "Point",
@@ -18,7 +19,9 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "A Dungeon"
+            "name": "A Dungeon",
+            "description": "[to Seska about lying]  The Doctor: I was inspired by the presence of a Master."
+
           },
           "geometry": {
             "type": "Point",
@@ -31,7 +34,8 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "Mordor"
+            "name": "Mordor",
+            "description": "Harry Kim: That'll tear the ship apart.  Chakotay: Then tear her apart!"
           },
           "geometry": {
             "type": "Point",
@@ -44,7 +48,8 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "I am an accident"
+            "name": "a horrible mistake",
+            "description": "Captain Janeway: [tapping her comm badge after the ship shakes] Janeway to Bridge.  Chakotay: We're under attack, Captain.  Captain Janeway: I'm on my way.  Leonardo da Vinci hologram: Earthquakes... and idiots.  Leonardo da Vinci hologram: Florence be damned."
           },
           "geometry": {
             "type": "Point",
@@ -57,7 +62,8 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "Tralfamadore"
+            "name": "Tralfamadore",
+            "description": " Seska: I won't play these games with the trick of light.  The Doctor: Sticks and stones won't break my bones, so you can imagine how I feel about being called names."
           },
           "geometry": {
             "type": "Point",
@@ -70,7 +76,9 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "Camden"
+            "name": "Camden",
+            "description": "Doctor Gaius Baltar: [after finding out that he's being forced into becoming a politician while testing blood samples] Politics is the only thing more boring than blood samples.
+ Number Six: Life has a melody, Gaius. A rhythm of notes which become your existence once played in harmony with God's plan."
           },
           "geometry": {
             "type": "Point",
@@ -83,7 +91,8 @@ CAC.Mock.Destinations = (function() {
         {
           "type": "Feature",
           "properties": {
-            "name": "(╯°□°）╯︵ ┻━┻"
+            "name": "(╯°□°）╯︵ ┻━┻",
+            "description": "Seven of Nine: You are hurting me. One: You will adapt. "
           },
           "geometry": {
             "type": "Point",
