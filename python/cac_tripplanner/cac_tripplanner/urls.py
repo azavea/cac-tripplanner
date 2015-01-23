@@ -25,6 +25,9 @@ urlpatterns = patterns(
         'cms.views.tips_and_tricks_detail',
         name='tips-and-tricks-detail'),
 
+    # Link Shortening
+    url(r'^link/', include('shortlinks.urls')),
+
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
