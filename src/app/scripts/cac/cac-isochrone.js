@@ -5,33 +5,10 @@ CAC.Isochrone = (function ($) {
     var isochroneUrl = '/reachable';
     var module = {
         payload: payload,
-        fetchReachable: fetchReachable,
-        testFetch: testFetch
+        fetchReachable: fetchReachable
     };
 
     return module;
-
-    /**
-     * Use test values to attempt a call to the isochrone endpoint
-     *
-     * @return undefined Use side effects to print data out
-     */
-    function testFetch() {
-        var testParams = {
-            coords: {
-                lat: 39.954688,
-                lng: -75.204677
-            },
-            mode: ['WALK', 'TRANSIT'],
-            date: '01-21-2015',
-            time: '7:30am',
-            maxTravelTime: 5000,
-            maxWalkDistance: 5000
-        };
-        fetchReachable(testParams).then(function(data) {
-            console.log(data);
-        });
-    }
 
     /**
      * Fetch all the reachable destinations within our destination database
@@ -50,7 +27,6 @@ CAC.Isochrone = (function ($) {
                 contentType: 'application/json'
             }).then(deferred.resolve);
         } else {
-            console.log('INCOMPLETE PAYLOAD: UNABLE TO CALCULATE ISOCHRONE');
             return deferred.fail();
         }
         return deferred.promise();
