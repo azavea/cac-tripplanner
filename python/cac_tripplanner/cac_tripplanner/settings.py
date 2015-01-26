@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     # Project Apps
     'cms',
     'destinations',
+    'shortlinks',
 )
 
 MIDDLEWARE_CLASSES = (
