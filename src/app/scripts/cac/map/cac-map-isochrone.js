@@ -1,4 +1,4 @@
-CAC.Isochrone = (function ($) {
+CAC.Map.Isochrone = (function ($) {
     'use strict';
 
     var payload = {};
@@ -50,8 +50,7 @@ CAC.Isochrone = (function ($) {
                 contentType: 'application/json'
             }).then(deferred.resolve);
         } else {
-            console.log('INCOMPLETE PAYLOAD: UNABLE TO CALCULATE ISOCHRONE');
-            return deferred.fail();
+            deferred.fail();
         }
         return deferred.promise();
     }

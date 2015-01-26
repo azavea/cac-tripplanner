@@ -30,18 +30,23 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
+
     {% if debug %}
 
     <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
     <script src="{% static 'scripts/vendor/jquery.multiple.select.js' %}"></script>
-    <script src="{% static 'scripts/vendor/ramda.js' %}"></script>
+    <script src="{% static 'scripts/vendor/moment.js' %}"></script>
+    <script src="{% static 'scripts/vendor/lodash.js' %}"></script>
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-map-control.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-map-overlays.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-pages-home.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-pages-map.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/cac-isochrone.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/user/cac-user-modes.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-control.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-overlays.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-isochrone.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-routing.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/mock/cac-mock-destinations.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/pages/cac-pages-home.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/pages/cac-pages-map.js' %}"></script>
 
     {% else %}
 

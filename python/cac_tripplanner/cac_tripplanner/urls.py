@@ -12,8 +12,8 @@ urlpatterns = patterns(
     url(r'^$', 'cms.views.home', name='home'),
 
     # Map
-    url(r'^map/', 'destinations.views.map', name='map'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
+    url(r'^map/', 'destinations.views.map', name='map'),
 
     ## Community Profiles
     url(r'^community-profile/(?P<slug>[\w-]+)/$',
