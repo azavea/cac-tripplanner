@@ -1,4 +1,4 @@
-CAC.Map.Routing = (function($, moment, UserPreferences) {
+CAC.Map.Routing = (function($, moment, UserModes) {
     'use strict'
 
     var planMode = ['WALK', 'TRANSIT'];
@@ -43,14 +43,14 @@ CAC.Map.Routing = (function($, moment, UserPreferences) {
         var formattedTime = currentTime.format('hh:mma');
         var formattedDate = currentTime.format('MM-DD-YYYY');
         var paramObj = {
-            fromPlace: coordsFrom[0] + ',' + coordsFrom[1],
-            toPlace: coordsTo[0] + ',' + coordsTo[1],
+            fromPlace: coordsFrom,
+            toPlace: coordsTo,
             time: formattedTime,
             date: formattedDate,
-            mode: UserPreferences.makeModeString()
+            mode: UserModes.makeModeString()
         };
         return $.param(paramObj);
     }
 
 
-})(jQuery, moment, CAC.User.Preferences);
+})(jQuery, moment, CAC.User.Modes);

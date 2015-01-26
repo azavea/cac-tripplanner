@@ -1,4 +1,4 @@
-CAC.User.Preferences = (function($, _) {
+CAC.User.Modes = (function($, _) {
     'use strict';
 
     var modePreferences = {WALK: true, TRANSIT: true, BUS: true};

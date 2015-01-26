@@ -17,13 +17,22 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
         mapControl.plotLocations(MockDestinations);
         mapControl.locateUser();
 
+        // Register events to catch location clicks and autocomplete direction dialog
+        $(document).bind('MOS.Map.Control.CurrentLocationClicked', function(e, lat, lng) {
+            var coords = lat + ',' + lng;
+            $('section.directions input.origin').val(coords);
+        });
         $(document).bind('MOS.Map.Control.DestinationClicked', function(e, feature) {
-            var coords = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
-            console.log('This is ', feature.properties.name,
-                        ', and it lives at', coords);
-            mapControl.locateUser().then(function(data) {
-                MapRouting.planTrip(data, coords).then(function(d){console.log(d)});
+            var coords = feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0];
+            $('section.directions input.destination').val(coords);
+        });
 
+        // Plan a trip using information provided
+        $('section.directions button[type=submit]').click(function() {
+            var origin = $('section.directions input.origin').val();
+            var destination= $('section.directions input.destination').val();
+            MapRouting.planTrip(origin, destination).then(function(d){
+              console.log(d);
             });
         });
 

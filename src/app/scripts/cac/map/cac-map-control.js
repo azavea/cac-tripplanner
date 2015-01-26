@@ -80,7 +80,10 @@ CAC.Map.Control = (function ($, L) {
             if (userMarker) {
                 userMarker.setLatLng(latlng);
             } else {
-                userMarker = new L.Circle(latlng);
+                userMarker = new L.CircleMarker(latlng)
+                  .on('click', function() {
+                      $(document).trigger('MOS.Map.Control.CurrentLocationClicked', latlng);
+                  });
                 userMarker.setRadius(50);
                 map.addLayer(userMarker);
             }
