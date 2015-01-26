@@ -152,3 +152,6 @@ WPADMIN = {
         }
     }
 }
+
+# OTP CONFIGURATION
+OTP_URL = secrets['otp_url']

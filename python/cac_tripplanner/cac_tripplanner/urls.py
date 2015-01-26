@@ -3,16 +3,16 @@ from django.contrib.gis import admin
 
 from django.contrib.staticfiles import views as staticviews
 
-from .views import FindReachableDestinations
+from destinations.views import FindReachableDestinations
 import settings
 
 urlpatterns = patterns(
     '',
     # Home
-    url(r'^$', 'cac_tripplanner.views.home', name='home'),
+    url(r'^$', 'cms.views.home', name='home'),
 
     # Map
-    url(r'^map/', 'cac_tripplanner.views.map', name='map'),
+    url(r'^map/', 'destinations.views.map', name='map'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
 
     ## Community Profiles
