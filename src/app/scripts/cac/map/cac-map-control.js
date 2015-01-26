@@ -13,6 +13,7 @@ CAC.Map.Control = (function ($, L) {
 
     var overlaysControl = null;
 
+    var events = $({});
     var basemaps = {};
     var overlays = {};
     var stamenTonerAttribution = [
@@ -29,6 +30,7 @@ CAC.Map.Control = (function ($, L) {
     ].join('');
 
     function MapControl(options) {
+        this.events = events;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
@@ -88,7 +90,7 @@ CAC.Map.Control = (function ($, L) {
             } else {
                 userMarker = new L.CircleMarker(latlng)
                   .on('click', function() {
-                      $(document).trigger('MOS.Map.Control.CurrentLocationClicked', latlng);
+                      events.trigger('MOS.Map.Control.CurrentLocationClicked', latlng);
                   });
                 userMarker.setRadius(50);
                 map.addLayer(userMarker);
@@ -117,7 +119,7 @@ CAC.Map.Control = (function ($, L) {
         var features = L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
-                    $(document).trigger('MOS.Map.Control.DestinationClicked', feature);
+                    events.trigger('MOS.Map.Control.DestinationClicked', feature);
                 });
             }
         });

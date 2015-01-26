@@ -18,15 +18,13 @@ CAC.Map.Routing = (function($, moment, UserModes) {
      *                              geoJSON representation of a trip
      */
     function planTrip(coordsFrom, coordsTo) {
-        var deferred = $.Deferred();
         var urlParams = prepareParamString(coordsFrom, coordsTo);
         var requestUrl = routingUrl + '?' + urlParams;
-        $.ajax({
+        return $.ajax({
             url: requestUrl,
             type: 'GET',
             contentType: 'application/json'
-        }).then(deferred.resolve);
-        return deferred.promise();
+        });
     }
 
 

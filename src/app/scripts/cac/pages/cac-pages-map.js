@@ -16,25 +16,17 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
         mapControl = new MapControl();
         mapControl.plotLocations(MockDestinations);
         mapControl.locateUser();
-
-        // Register events to catch location clicks and autocomplete direction dialog
-        $(document).bind('MOS.Map.Control.CurrentLocationClicked', function(e, lat, lng) {
+        mapControl.events.on('MOS.Map.Control.CurrentLocationClicked', function(e, lat, lng) {
             var coords = lat + ',' + lng;
             $('section.directions input.origin').val(coords);
         });
-        $(document).bind('MOS.Map.Control.DestinationClicked', function(e, feature) {
+        mapControl.events.on('MOS.Map.Control.DestinationClicked', function(e, feature) {
             var coords = feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0];
             $('section.directions input.destination').val(coords);
         });
 
         // Plan a trip using information provided
-        $('section.directions button[type=submit]').click(function() {
-            var origin = $('section.directions input.origin').val();
-            var destination= $('section.directions input.destination').val();
-            MapRouting.planTrip(origin, destination).then(function(d){
-              console.log(d);
-            });
-        });
+        $('section.directions button[type=submit]').click($.proxy(logTrip, this));
 
         $('select').multipleSelect();
 
@@ -42,16 +34,7 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
             $('.explore').addClass('show-results');
         });
 
-        $('.sidebar-options .view-more').on('click', function(){
-            var moreOpt = '.sidebar-options .more-options';
-
-            $(moreOpt).toggleClass('active');
-            if($(moreOpt).hasClass('active')){
-                $(this).text('View less options');
-            } else {
-                $(this).text('View more options');
-            }
-        });
+        $('.sidebar-options .view-more').click($.proxy(showOptions, this));
 
         $('#sidebar-toggle-directions').on('click', function(){
             $('.explore').addClass('hidden');
@@ -65,5 +48,26 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
     };
 
     return Map;
+
+
+    function showOptions() {
+        var moreOpt = '.sidebar-options .more-options';
+
+        $(moreOpt).toggleClass('active');
+        $(moreOpt).parent().find('a.view-more').text(function() {
+            if($(moreOpt).hasClass('active')){
+                return 'View less options';
+            } else {
+                return 'View more options';
+            }
+        });
+    }
+    function logTrip() {
+        var origin = $('section.directions input.origin').val();
+        var destination= $('section.directions input.destination').val();
+        MapRouting.planTrip(origin, destination).then(function(d){
+          console.log(d);
+        });
+    }
 
 })(jQuery, CAC.Map.Control, CAC.Map.Routing, CAC.Mock.Destinations);
