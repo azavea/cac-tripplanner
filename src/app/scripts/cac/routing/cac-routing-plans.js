@@ -2,7 +2,8 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
     'use strict';
 
     var planMode = ['WALK', 'TRANSIT'];
-    var routingUrl = '/otp/routers/default/plan';
+    // TODO: Template hostname via django settings
+    var routingUrl = 'http://localhost:9090/otp/routers/default/plan';
 
     var module = {
         planTrip: planTrip
@@ -26,7 +27,8 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
         $.ajax({
             url: requestUrl,
             type: 'GET',
-            contentType: 'application/json'
+            contentType: 'application/json',
+            dataType: 'jsonp'
         }).then(function(data) {
             var itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
             deferred.resolve(itineraries);
