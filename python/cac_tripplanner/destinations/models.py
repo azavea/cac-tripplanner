@@ -13,5 +13,7 @@ class Destination(models.Model):
     zip = models.CharField(max_length=5, null=True)
     published = models.BooleanField(default=False)
 
+    objects = models.GeoManager()
+
     def __unicode__(self):
         return self.name
