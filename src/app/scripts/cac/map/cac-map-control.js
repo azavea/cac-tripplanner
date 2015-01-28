@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, L) {
+CAC.Map.Control = (function ($, L, _, Routing) {
     'use strict';
 
     var defaults = {
@@ -12,6 +12,7 @@ CAC.Map.Control = (function ($, L) {
     var userMarker = null;
 
     var overlaysControl = null;
+    var itineraries = {};
 
     var events = $({});
     var basemaps = {};
@@ -35,7 +36,6 @@ CAC.Map.Control = (function ($, L) {
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
 
-
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
@@ -43,6 +43,8 @@ CAC.Map.Control = (function ($, L) {
 
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.plotLocations = plotLocations;
+    MapControl.prototype.plotItineraries = plotItineraries;
+    MapControl.prototype.planTrip = planTrip;
 
     return MapControl;
 
@@ -67,6 +69,15 @@ CAC.Map.Control = (function ($, L) {
         L.control.layers(basemaps, overlays, {
             position: 'bottomright'
         }).addTo(map);
+    }
+
+    function planTrip(origin, destination) {
+        var deferred = $.Deferred();
+        Routing.planTrip(origin, destination, map).then(function(d) {
+            plotItineraries(0);
+            deferred.resolve();
+        });
+        return deferred.promise();
     }
 
     /**
@@ -126,4 +137,13 @@ CAC.Map.Control = (function ($, L) {
         map.addLayer(features);
     }
 
-})(jQuery, L);
+    /**
+     * Plot a set of itineraries, highlight given itinerary ID
+     */
+    function plotItineraries(itineraryId) {
+        _.forIn(Routing.itineraries, function(itinerary) {
+            itinerary.plotOnMap(map, itineraryId);
+            events.trigger('CAC.Map.Control.ItinerariesReturned', Routing.itineraries);
+        });
+    };
+})(jQuery, L, _, CAC.Routing.Plans);

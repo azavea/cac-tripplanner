@@ -10,6 +10,7 @@
     {% block cssimports %}
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
     <link href="{% static 'styles/main.css' %}" rel="stylesheet">
@@ -37,13 +38,17 @@
     <script src="{% static 'scripts/vendor/jquery.multiple.select.js' %}"></script>
     <script src="{% static 'scripts/vendor/moment.js' %}"></script>
     <script src="{% static 'scripts/vendor/lodash.js' %}"></script>
+    <script src="{% static 'scripts/vendor/handlebars.js' %}"></script>
+    <script src="{% static 'scripts/vendor/Polyline.encoded.js' %}"></script>
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
     <script src="{% static 'scripts/main/cac/user/cac-user-modes.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/routing/cac-routing-itinerary.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/routing/cac-routing-plans.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-control.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-overlays.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-isochrone.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/map/cac-map-routing.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-templates.js' %}"></script>
     <script src="{% static 'scripts/main/cac/mock/cac-mock-destinations.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-home.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-map.js' %}"></script>

@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
+CAC.Pages.Map = (function ($, Handlebars, MapControl, Routing, MockDestinations, MapTemplates) {
     'use strict';
 
     var defaults = {
@@ -25,8 +25,27 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
             $('section.directions input.destination').val(coords);
         });
 
+
+        /**
+         * Handles click events to highlight a given itinerary
+         */
+        function itineraryHandler( event ) {
+            var itineraryId = this.getAttribute("data-itinerary");
+            Routing.setItineraryStyles(itineraryId);
+        }
+
+        /**
+         * Populates sidebar with itinerary summaries
+         */
+        mapControl.events.on('CAC.Map.Control.ItinerariesReturned', function(e, itineraries) {
+            var html = MapTemplates.itinerarySummaries(itineraries);
+            $('.itineraries').html(html);
+            $('a.itinerary').on("click", itineraryHandler);
+            $('.block-itinerary').on("click", itineraryHandler);
+        });
+
         // Plan a trip using information provided
-        $('section.directions button[type=submit]').click($.proxy(logTrip, this));
+        $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
         $('select').multipleSelect();
 
@@ -62,12 +81,13 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
             }
         });
     }
-    function logTrip() {
+
+    function planTrip() {
         var origin = $('section.directions input.origin').val();
         var destination= $('section.directions input.destination').val();
-        MapRouting.planTrip(origin, destination).then(function(d){
-          console.log(d);
+        mapControl.planTrip(origin, destination).then(function() {
+            $('.directions').addClass('show-results');
         });
     }
 
-})(jQuery, CAC.Map.Control, CAC.Map.Routing, CAC.Mock.Destinations);
+})(jQuery, Handlebars, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);
