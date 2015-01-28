@@ -9,10 +9,9 @@
             height: 100%;
         }
     }
-
     .sidebar-search {
         height: 44px;
-        
+
         input[type="search"] {
             padding-right: 30px;
         }
@@ -28,7 +27,7 @@
     .sidebar-options {
         height: auto;
         padding: 10px 14px 0;
-        
+
         .address {
             height: 60px;
             padding: 5px 15px 15px;
@@ -59,7 +58,7 @@
                 padding-left: 15px;
                 width: 78px;
                 margin-top: 1px;
-            
+
                 span {
                     display: block;
                     font-size: 1.8rem;
@@ -84,7 +83,7 @@
                 margin: 0 15px 0 12px;
                 height: 44px;
                 vertical-align: top;
-        
+
                 &::-webkit-input-placeholder {
                     color: gray;
                 }
@@ -93,14 +92,14 @@
                 &:-ms-input-placeholder {
                     color: gray;
                 }
-        
+
                 &[type="number"] {
                     width: 70px;
                 }
             }
             .ms-parent {
                 margin: 0 12px 0 15px;
-                
+
                 button {
                     background: darken($light-gray, 5%);
                     color: black;
