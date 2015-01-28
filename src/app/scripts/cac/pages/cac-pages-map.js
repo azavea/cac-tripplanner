@@ -1,10 +1,11 @@
-CAC.Pages.Map = (function ($, Handlebars, MapControl, Routing, MockDestinations, MapTemplates) {
+CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates) {
     'use strict';
 
     var defaults = {
         map: {}
     };
     var mapControl = null;
+    var currentItinerary = null;
 
     function Map(options) {
         this.options = $.extend({}, defaults, options);
@@ -23,25 +24,6 @@ CAC.Pages.Map = (function ($, Handlebars, MapControl, Routing, MockDestinations,
         mapControl.events.on('MOS.Map.Control.DestinationClicked', function(e, feature) {
             var coords = feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0];
             $('section.directions input.destination').val(coords);
-        });
-
-
-        /**
-         * Handles click events to highlight a given itinerary
-         */
-        function itineraryHandler( event ) {
-            var itineraryId = this.getAttribute("data-itinerary");
-            Routing.setItineraryStyles(itineraryId);
-        }
-
-        /**
-         * Populates sidebar with itinerary summaries
-         */
-        mapControl.events.on('CAC.Map.Control.ItinerariesReturned', function(e, itineraries) {
-            var html = MapTemplates.itinerarySummaries(itineraries);
-            $('.itineraries').html(html);
-            $('a.itinerary').on("click", itineraryHandler);
-            $('.block-itinerary').on("click", itineraryHandler);
         });
 
         // Plan a trip using information provided
@@ -85,9 +67,41 @@ CAC.Pages.Map = (function ($, Handlebars, MapControl, Routing, MockDestinations,
     function planTrip() {
         var origin = $('section.directions input.origin').val();
         var destination= $('section.directions input.destination').val();
-        mapControl.planTrip(origin, destination).then(function() {
+
+        Routing.planTrip(origin, destination).then(function (itineraries) {
+            // Add the itineraries to the map, highlighting the first one
+            var highlight = true;
+            mapControl.clearItineraries();
+            _.forIn(itineraries, function (itinerary) {
+                mapControl.plotItinerary(itinerary);
+                itinerary.highlight(highlight);
+                if (highlight) {
+                    currentItinerary = itinerary;
+                    highlight = false;
+                }
+            });
+
+            // Show the directions div and populate with itineraries
+            var html = MapTemplates.itinerarySummaries(itineraries);
+            $('.itineraries').html(html);
+            $('a.itinerary').on('click', onItineraryClicked);
+            $('.block-itinerary').on('click', onItineraryClicked);
             $('.directions').addClass('show-results');
         });
     }
 
-})(jQuery, Handlebars, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);
+    /**
+     * Handles click events to highlight a given itinerary
+     * Event handler, so this is set to the clicked event
+     */
+    function onItineraryClicked() {
+        var itineraryId = this.getAttribute('data-itinerary');
+        var itinerary = mapControl.getItineraryById(itineraryId);
+        if (itinerary) {
+            currentItinerary.highlight(false);
+            itinerary.highlight(true);
+            currentItinerary = itinerary;
+        }
+    }
+
+})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);

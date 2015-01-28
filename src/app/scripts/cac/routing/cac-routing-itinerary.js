@@ -1,4 +1,5 @@
 CAC.Routing.Itinerary = (function ($, L, _) {
+    'use strict';
 
     /**
      * Class represents an itinerary between two points
@@ -15,12 +16,16 @@ CAC.Routing.Itinerary = (function ($, L, _) {
 
         this.geojson = L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
-    };
+        this.geojson.setStyle(getStyle());
+    }
 
-    Itinerary.prototype.getStyle = getStyle;
-    Itinerary.prototype.plotOnMap = plotOnMap;
+    Itinerary.prototype.highlight = highlight;
 
     return Itinerary;
+
+    function highlight(isHighlighted) {
+        this.geojson.setStyle(getStyle(isHighlighted));
+    }
 
     /**
      * Helper function to get label/via summary for an itinerary.
@@ -39,7 +44,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         return steps.max(function(step) {
             return step.distance;
         }).streetName;
-    };
+    }
 
     /**
      * Helper function to get label/via summary for an itinerary
@@ -53,7 +58,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
             return leg.mode;
         });
         return modes.uniq().value();
-    };
+    }
 
     /**
      * Helper function to get label/via summary for an itinerary
@@ -80,7 +85,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
      */
     function getDurationMinutes(otpItinerary) {
         return parseInt(otpItinerary.duration / 60.0);
-    };
+    }
 
     /**
      * Helper function to get label/via summary for an itinerary
@@ -95,7 +100,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
             linestringGeoJson.properties = leg;
             return linestringGeoJson;
         });
-    };
+    }
 
     /**
      * Helper function to construct style object for an itinerary
@@ -105,28 +110,15 @@ CAC.Routing.Itinerary = (function ($, L, _) {
      *
      * @return {object} Leaflet style object to apply to geojson
      */
-    function getStyle(id) {
-        id = id.toString() || "0";
-        var defaultStyle = {color: "Black",
+    function getStyle(highlighted) {
+        var defaultStyle = {color: 'Black',
                             dashArray: null};
-        if (this.id === id) {
+        if (highlighted) {
             defaultStyle.dashArray = null;
         } else {
             defaultStyle.dashArray = [5, 15];
         }
         return defaultStyle;
     }
-
-    /**
-     * Plots an itinerary on a map
-     *
-     * @param {object} map Leaflet map object
-     * @param {integer} id id of itinerary to highlight
-     */
-    function plotOnMap(map, id) {
-        var style = this.getStyle(id);
-        this.geojson.setStyle(style);
-        this.geojson.addTo(map);
-    };
 
 })(jQuery, L, _);

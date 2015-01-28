@@ -5,11 +5,7 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
     var routingUrl = '/otp/routers/default/plan';
 
     var module = {
-        planTrip: planTrip,
-        getItineraryById: getItineraryById,
-        itineraries: {},
-        setItineraryStyles: setItineraryStyles,
-        removeItineraryLayers: removeItineraryLayers
+        planTrip: planTrip
     };
 
     return module;
@@ -23,18 +19,19 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
      * @return {promise} The promise object which - if successful - resolves to a
      *                   an object with itineraries
      */
-    function planTrip(coordsFrom, coordsTo, map) {
+    function planTrip(coordsFrom, coordsTo) {
         var deferred = $.Deferred();
         var urlParams = prepareParamString(coordsFrom, coordsTo);
         var requestUrl = routingUrl + '?' + urlParams;
-        return $.ajax({
+        $.ajax({
             url: requestUrl,
             type: 'GET',
             contentType: 'application/json'
         }).then(function(data) {
-            removeItineraryLayers(map);
-            module.itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
-            deferred.resolve(module.itineraries);
+            var itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
+            deferred.resolve(itineraries);
+        }, function (error) {
+            deferred.reject(error);
         });
         return deferred.promise();
     }
@@ -62,18 +59,6 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
     }
 
     /**
-     * Helper function to remove itineraries from map, called before adding new itineraries
-     *
-     * @param {object} map leaflet map object
-     */
-    function removeItineraryLayers(map) {
-        _.forIn(module.itineraries, function(itinerary) {
-            map.removeLayer(itinerary.geojson);
-        });
-    };
-
-
-    /**
      * Helper function to create a new Itinerary object
      *
      * @param {object} otpItinerary Itinerary object returned from OTP
@@ -83,27 +68,6 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
      */
     function createItinerary(otpItinerary, index) {
         return new Itinerary(otpItinerary, index);
-    }
-
-    /**
-     * Helper function to return an itinerary object
-     *
-     * @param {integer} ID for itinerary to return
-     */
-    function getItineraryById(id) {
-        return module.itineraries[id];
-    }
-
-    /**
-     * Helper function to set itinerary styles
-     *
-     * @param {integer} id Itinerary ID to highlight
-     */
-    function setItineraryStyles(id) {
-        _.forIn(module.itineraries, function(itinerary) {
-            var style = itinerary.getStyle(id);
-            itinerary.geojson.setStyle(style);
-        });
     }
 
 })(jQuery, L, moment, _, CAC.User.Modes, CAC.Routing.Itinerary);

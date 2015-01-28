@@ -43,8 +43,9 @@ CAC.Map.Control = (function ($, L, _, Routing) {
 
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.plotLocations = plotLocations;
-    MapControl.prototype.plotItineraries = plotItineraries;
-    MapControl.prototype.planTrip = planTrip;
+    MapControl.prototype.getItineraryById = getItineraryById;
+    MapControl.prototype.plotItinerary = plotItinerary;
+    MapControl.prototype.clearItineraries = clearItineraries;
 
     return MapControl;
 
@@ -69,15 +70,6 @@ CAC.Map.Control = (function ($, L, _, Routing) {
         L.control.layers(basemaps, overlays, {
             position: 'bottomright'
         }).addTo(map);
-    }
-
-    function planTrip(origin, destination) {
-        var deferred = $.Deferred();
-        Routing.planTrip(origin, destination, map).then(function(d) {
-            plotItineraries(0);
-            deferred.resolve();
-        });
-        return deferred.promise();
     }
 
     /**
@@ -137,13 +129,27 @@ CAC.Map.Control = (function ($, L, _, Routing) {
         map.addLayer(features);
     }
 
+    function getItineraryById(id) {
+        return itineraries[id];
+    }
+
     /**
-     * Plot a set of itineraries, highlight given itinerary ID
+     * Plots an itinerary on a map
+     *
+     * @param {object} map Leaflet map object
+     * @param {integer} id id of itinerary to highlight
      */
-    function plotItineraries(itineraryId) {
-        _.forIn(Routing.itineraries, function(itinerary) {
-            itinerary.plotOnMap(map, itineraryId);
-            events.trigger('CAC.Map.Control.ItinerariesReturned', Routing.itineraries);
+    function plotItinerary(itinerary) {
+        itineraries[itinerary.id] = itinerary;
+        itinerary.geojson.addTo(map);
+    }
+
+
+    function clearItineraries() {
+        _.forIn(itineraries, function (itinerary) {
+            map.removeLayer(itinerary.geojson);
         });
-    };
+        itineraries = {};
+    }
+
 })(jQuery, L, _, CAC.Routing.Plans);
