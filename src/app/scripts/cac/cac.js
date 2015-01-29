@@ -4,6 +4,7 @@ CAC = (function () {
     var module = {
         Map: {},
         Pages: {},
+        Routing: {},
         User: {},
         Mock: {}
     };

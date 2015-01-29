@@ -1,10 +1,11 @@
-CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
+CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates) {
     'use strict';
 
     var defaults = {
         map: {}
     };
     var mapControl = null;
+    var currentItinerary = null;
 
     function Map(options) {
         this.options = $.extend({}, defaults, options);
@@ -26,7 +27,7 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
         });
 
         // Plan a trip using information provided
-        $('section.directions button[type=submit]').click($.proxy(logTrip, this));
+        $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
         $('select').multipleSelect();
 
@@ -62,12 +63,45 @@ CAC.Pages.Map = (function ($, MapControl, MapRouting, MockDestinations) {
             }
         });
     }
-    function logTrip() {
+
+    function planTrip() {
         var origin = $('section.directions input.origin').val();
         var destination= $('section.directions input.destination').val();
-        MapRouting.planTrip(origin, destination).then(function(d){
-          console.log(d);
+
+        Routing.planTrip(origin, destination).then(function (itineraries) {
+            // Add the itineraries to the map, highlighting the first one
+            var highlight = true;
+            mapControl.clearItineraries();
+            _.forIn(itineraries, function (itinerary) {
+                mapControl.plotItinerary(itinerary);
+                itinerary.highlight(highlight);
+                if (highlight) {
+                    currentItinerary = itinerary;
+                    highlight = false;
+                }
+            });
+
+            // Show the directions div and populate with itineraries
+            var html = MapTemplates.itinerarySummaries(itineraries);
+            $('.itineraries').html(html);
+            $('a.itinerary').on('click', onItineraryClicked);
+            $('.block-itinerary').on('click', onItineraryClicked);
+            $('.directions').addClass('show-results');
         });
     }
 
-})(jQuery, CAC.Map.Control, CAC.Map.Routing, CAC.Mock.Destinations);
+    /**
+     * Handles click events to highlight a given itinerary
+     * Event handler, so this is set to the clicked event
+     */
+    function onItineraryClicked() {
+        var itineraryId = this.getAttribute('data-itinerary');
+        var itinerary = mapControl.getItineraryById(itineraryId);
+        if (itinerary) {
+            currentItinerary.highlight(false);
+            itinerary.highlight(true);
+            currentItinerary = itinerary;
+        }
+    }
+
+})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);

@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, L) {
+CAC.Map.Control = (function ($, L, _, Routing) {
     'use strict';
 
     var defaults = {
@@ -12,6 +12,7 @@ CAC.Map.Control = (function ($, L) {
     var userMarker = null;
 
     var overlaysControl = null;
+    var itineraries = {};
 
     var events = $({});
     var basemaps = {};
@@ -35,7 +36,6 @@ CAC.Map.Control = (function ($, L) {
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
 
-
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
@@ -43,6 +43,9 @@ CAC.Map.Control = (function ($, L) {
 
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.plotLocations = plotLocations;
+    MapControl.prototype.getItineraryById = getItineraryById;
+    MapControl.prototype.plotItinerary = plotItinerary;
+    MapControl.prototype.clearItineraries = clearItineraries;
 
     return MapControl;
 
@@ -126,4 +129,27 @@ CAC.Map.Control = (function ($, L) {
         map.addLayer(features);
     }
 
-})(jQuery, L);
+    function getItineraryById(id) {
+        return itineraries[id];
+    }
+
+    /**
+     * Plots an itinerary on a map
+     *
+     * @param {object} map Leaflet map object
+     * @param {integer} id id of itinerary to highlight
+     */
+    function plotItinerary(itinerary) {
+        itineraries[itinerary.id] = itinerary;
+        itinerary.geojson.addTo(map);
+    }
+
+
+    function clearItineraries() {
+        _.forIn(itineraries, function (itinerary) {
+            map.removeLayer(itinerary.geojson);
+        });
+        itineraries = {};
+    }
+
+})(jQuery, L, _, CAC.Routing.Plans);

@@ -17,6 +17,8 @@
   "jquery": true,
   "globals": {
     "CAC": true,
-    "L": true
+    "L": true,
+    "_": true,
+    "moment": true
   }
 }
