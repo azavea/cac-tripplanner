@@ -111,7 +111,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if testing?
         app.vm.synced_folder ".", "/opt/app"
     else
-        app.vm.synced_folder ".", "/opt/app", :nfs => true, :mount_options => ['actimeo=2']
+        app.vm.synced_folder ".", "/opt/app", :nfs => true, :mount_options => [
+            ("nfsvers=3" if ENV.fetch("CAC_NFS_VERSION_3", false)),
+            "noatime",
+            "actimeo=1",
+        ]
     end
 
     # Web
