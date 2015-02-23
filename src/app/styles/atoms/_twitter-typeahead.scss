@@ -1,0 +1,21 @@
+/**
+ * Dropdown structure looks like this:
+ * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#look-and-feel
+ */
+.twitter-typeahead {
+
+    .tt-dropdown-menu {
+        background-color: #999;
+        border: 1px solid black;
+        color: white;
+
+        .tt-cursor {
+            background-color: #666;
+        }
+
+        p {
+            padding: 2px 5px;
+            font-size: 1.6rem;
+        }
+    }
+}
