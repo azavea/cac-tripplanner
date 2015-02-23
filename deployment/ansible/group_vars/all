@@ -4,3 +4,5 @@ app_username: "vagrant"
 
 # open trip planner vars
 otp_process_mem: 4G
+
+postgresql_support_libpq_version: 9.4.*
