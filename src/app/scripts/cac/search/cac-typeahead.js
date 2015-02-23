@@ -11,7 +11,6 @@ CAC.Search.Typeahead = (function ($) {
         this.options = $.extend({}, defaults, options);
 
         this.suggestAdapter = suggestAdapterFactory();
-        this.destinationAdapter = destinationAdapterFactory();
         this.eventsAdapter = null;   // TODO: Add when we have an events search endpoint
 
         this.$element = $(selector).typeahead(this.options, {
@@ -23,6 +22,7 @@ CAC.Search.Typeahead = (function ($) {
 
     return CACTypeahead;
 
+    // Unused, but might add later?
     function destinationAdapterFactory() {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
