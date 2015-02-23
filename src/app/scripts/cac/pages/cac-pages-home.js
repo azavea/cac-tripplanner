@@ -20,8 +20,21 @@ CAC.Pages.Home = (function ($) {
                 $('#explore').removeClass('hidden');
             }
         });
+
+        this.typeahead = {
+            explore: new CAC.Search.Typeahead('#typeahead-explore'),
+            to: new CAC.Search.Typeahead('#typeahead-to'),
+            from: new CAC.Search.Typeahead('#typeahead-from'),
+        };
+        this.typeaheads.explore.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        this.typeaheads.to.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        this.typeaheads.from.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
     };
 
     return Home;
+
+    function onTypeaheadSelected(event, suggestion, dataset) {
+        console.log(suggestion);
+    }
 
 })(jQuery);
