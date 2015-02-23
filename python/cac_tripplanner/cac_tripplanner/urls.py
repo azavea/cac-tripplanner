@@ -3,7 +3,7 @@ from django.contrib.gis import admin
 
 from django.contrib.staticfiles import views as staticviews
 
-from destinations.views import FindReachableDestinations
+from destinations.views import FindReachableDestinations, SearchDestinations
 import settings
 
 urlpatterns = patterns(
@@ -12,6 +12,7 @@ urlpatterns = patterns(
     url(r'^$', 'cms.views.home', name='home'),
 
     # Map
+    url(r'^api/destinations/search$', SearchDestinations.as_view(), name='api_destinations_search'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^map/', 'destinations.views.map', name='map'),
 

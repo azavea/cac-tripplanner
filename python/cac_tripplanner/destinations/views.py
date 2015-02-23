@@ -1,10 +1,11 @@
 import json
 
-from django.views.generic import View
+from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Point
+from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
+from django.views.generic import View
 
 import requests
 
@@ -63,3 +64,55 @@ class FindReachableDestinations(View):
 
         matched_objects = Destination.objects.filter(point__within=iso, published=True)
         return HttpResponse('{{"matched": "{0}"}}'.format(matched_objects), 'application/json')
+
+class SearchDestinations(View):
+    """ View for searching destinations via an http endpoint """
+
+
+    def get(self, request, *args, **kwargs):
+        """ GET destinations that match search queries
+
+        Must pass either:
+          - lat + lon params
+          - text param
+        Optional:
+          - limit param
+
+        A search via text will return destinations that match the destination name
+        A search via lat/lon will return destinations that are closest to the search point
+
+        """
+        params = request.GET
+        lat = params.get('lat', None)
+        lon = params.get('lon', None)
+        text = params.get('text', None)
+        limit = params.get('limit', None)
+        output_fields = ('name', 'description', 'point', 'address', 'city', 'state', 'zip')
+
+        results = []
+        if lat and lon:
+            try:
+                searchPoint = Point(float(lon), float(lat))
+            except ValueError as e:
+                error = json.dumps({
+                    'msg': 'Invalid latitude/longitude pair',
+                    'error': str(e),
+                })
+                return HttpResponse(error, 'application/json')
+            results = (Destination.objects.filter(published=True)
+                .distance(searchPoint)
+                .order_by('distance'))
+        elif text is not None:
+            results = Destination.objects.filter(published=True, name__icontains=text)
+        if limit:
+            try:
+                limit_int = int(limit)
+            except ValueError as e:
+                error = json.dumps({
+                    'msg': 'Invalid limit, must be an integer',
+                    'error': str(e),
+                })
+                return HttpResponse(error, 'application/json')
+            results = results[:limit_int]
+        data = serializers.serialize('json', results, fields=output_fields)
+        return HttpResponse(data, 'application/json')
