@@ -113,6 +113,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/srv/cac'
 STATICFILES_DIRS = ()
 
+MEDIA_ROOT = '/media/cac/'
+MEDIA_URL = '/media/'
+
 # TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
 TEMPLATE_CONTEXT_PROCESSORS = (

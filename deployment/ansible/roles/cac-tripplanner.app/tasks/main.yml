@@ -26,6 +26,13 @@
         mode=0750
         state=directory
 
+- name: Create app media directory
+  file: path={{ root_media_dir }}
+        owner={{ app_username }}
+        group={{ app_username }}
+        mode=0775
+        state=directory
+
 - name: Configure Gunicorn settings
   template: src=gunicorn-cac-tripplanner.py.j2 dest={{ root_conf_dir }}/gunicorn.py
   notify: Restart cac-tripplanner-app

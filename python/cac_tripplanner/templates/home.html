@@ -49,28 +49,44 @@
         <div class="row">
             <div class="col-sm-4">
                 <a class="block block-destination" href="#">
-                    <h3>Name of desination</h3>
-                    <h5>Neighborhood name</h5>
+                    <h3>{{ destinations.0.name }}</h3>
+                    <h5>{{ destinations.0.address }}</h5>
+                    {% if destinations.0.image %}
+                    <img src="{{ destinations.0.image.url }}" width="400" height="400"/>
+                    {% else %}
                     <img src="http://placehold.it/400x400.jpg" />
+                    {% endif %}
                 </a>
             </div>
             <div class="col-sm-4">
                 <a class="block block-destination" href="#">
-                    <h3>Name of desination</h3>
-                    <h5>Neighborhood name</h5>
+                    <h3>{{ destinations.1.name }}</h3>
+                    <h5>{{ destinations.1.address }}</h5>
+                    {% if destinations.1.image %}
+                    <img src="{{ destinations.1.image.url }}" width="400" height="400"/>
+                    {% else %}
                     <img src="http://placehold.it/400x400.jpg" />
+                    {% endif %}
                 </a>
             </div>
             <div class="col-sm-4">
                 <a class="block block-destination block-half" href="#">
-                    <h3>Name of desination</h3>
-                    <h5>Neighborhood name</h5>
-                    <img src="http://placehold.it/400x200.jpg" />
+                    <h3>{{ destinations.2.name }}</h3>
+                    <h5>{{ destinations.2.address }}</h5>
+                    {% if destinations.2.image %}
+                    <img src="{{ destinations.2.image.url }}" width="400" height="200"/>
+                    {% else %}
+                    <img src="http://placehold.it/400x400.jpg" />
+                    {% endif %}
                 </a>
                 <a class="block block-destination block-half" href="#">
-                    <h3>Name of desination</h3>
-                    <h5>Neighborhood name</h5>
-                    <img src="http://placehold.it/400x200.jpg" />
+                    <h3>{{ destinations.3.name }}</h3>
+                    <h5>{{ destinations.3.address }}</h5>
+                    {% if destinations.3.image %}
+                    <img src="{{ destinations.3.image.url }}" width="400" height="200"/>
+                    {% else %}
+                    <img src="http://placehold.it/400x400.jpg" />
+                    {% endif %}
                 </a>
             </div>
         </div>

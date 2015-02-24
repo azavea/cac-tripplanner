@@ -1,7 +1,10 @@
+from random import shuffle
+
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
 from .models import Article
+from destinations.models import Destination
 
 
 def home(request):
@@ -12,9 +15,16 @@ def home(request):
     # get randomized tips and tricks
     tips_and_tricks = Article.tips.random()
 
+    # get a few randomized destinations
+    # TODO: Investigate performance, as this creates a list of every destination
+    #       before shuffling and slicing
+    destinations = list(Destination.objects.published())
+    shuffle(destinations)
+
     context = RequestContext(request,
                              dict(community_profile=community_profile,
-                                  tips_and_tricks=tips_and_tricks))
+                                  tips_and_tricks=tips_and_tricks,
+                                  destinations=destinations[:4]))
     return render_to_response('home.html', context_instance=context)
 
 
