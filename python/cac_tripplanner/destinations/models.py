@@ -1,6 +1,15 @@
 from django.contrib.gis.db import models
 from ckeditor.fields import RichTextField
 
+class DestinationManager(models.GeoManager):
+    """Custom manager for Destinations allows filtering on published"""
+
+    def published(self):
+        return self.get_queryset().filter(published=True)
+
+    def get_queryset(self):
+        return super(DestinationManager, self).get_queryset()
+
 
 class Destination(models.Model):
 
@@ -13,7 +22,7 @@ class Destination(models.Model):
     zip = models.CharField(max_length=5, null=True)
     published = models.BooleanField(default=False)
 
-    objects = models.GeoManager()
+    objects = DestinationManager()
 
     def __unicode__(self):
         return self.name
