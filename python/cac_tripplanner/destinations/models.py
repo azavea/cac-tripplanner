@@ -20,6 +20,7 @@ class Destination(models.Model):
     city = models.CharField(max_length=40)
     state = models.CharField(max_length=20)
     zip = models.CharField(max_length=5, null=True)
+    image = models.ImageField(upload_to='destinations/', null=True)
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
