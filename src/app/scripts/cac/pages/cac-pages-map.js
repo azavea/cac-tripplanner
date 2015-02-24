@@ -7,6 +7,11 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     var mapControl = null;
     var currentItinerary = null;
 
+    var directions = {
+        origin: null,
+        destination: null
+    };
+
     function Map(options) {
         this.options = $.extend({}, defaults, options);
     }
@@ -17,14 +22,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         mapControl = new MapControl();
         mapControl.plotLocations(MockDestinations);
         mapControl.locateUser();
-        mapControl.events.on('MOS.Map.Control.CurrentLocationClicked', function(e, lat, lng) {
-            var coords = lat + ',' + lng;
-            $('section.directions input.origin').val(coords);
-        });
-        mapControl.events.on('MOS.Map.Control.DestinationClicked', function(e, feature) {
-            var coords = feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0];
-            $('section.directions input.destination').val(coords);
-        });
 
         // Plan a trip using information provided
         $('section.directions button[type=submit]').click($.proxy(planTrip, this));
@@ -68,8 +65,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     }
 
     function planTrip() {
-        var origin = $('section.directions input.origin').val();
-        var destination= $('section.directions input.destination').val();
+        if (!(directions.origin && directions.destination)) {
+            // TODO: Error handle
+            return;
+        }
+        var origin = directions.origin;
+        var destination= directions.destination;
 
         Routing.planTrip(origin, destination).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
@@ -108,7 +109,17 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     }
 
     function onTypeaheadSelected(event, key, location) {
-        console.log(key, location);
+        if (key === 'destination') {
+            directions.destination = [location.feature.geometry.y, location.feature.geometry.x];
+        } else if (key === 'origin') {
+            directions.origin = [location.feature.geometry.y, location.feature.geometry.x];
+        } else if (key === 'search') {
+            setAddress(location);
+        }
+    }
+
+    function setAddress(location) {
+        $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
     }
 
 })(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);

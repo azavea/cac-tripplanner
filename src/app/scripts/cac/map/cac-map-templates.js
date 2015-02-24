@@ -2,7 +2,8 @@ CAC.Map.Templates = (function (Handlebars) {
     'use strict';
 
     var module = {
-        itinerarySummaries: itinerarySummaries
+        itinerarySummaries: itinerarySummaries,
+        addressText: addressText
     };
 
     return module;
@@ -35,6 +36,13 @@ CAC.Map.Templates = (function (Handlebars) {
                 '{{/each}}';
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
+        return html;
+    }
+
+    function addressText(address) {
+        var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
+        var template = Handlebars.compile(source);
+        var html = template({address: address});
         return html;
     }
 

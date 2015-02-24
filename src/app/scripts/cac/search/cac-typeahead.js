@@ -91,10 +91,15 @@ CAC.Search.Typeahead = (function ($) {
                     }
                 }];
                 callback(list);
-            }, null, {
+            }, function (error) {
+                console.error('geolocation', error);
+            }, {
                 enableHighAccuracy: true,
+                timeout: 1000,
                 maximumAge: 0
             });
+        } else {
+            console.error('geolocation not supported');
         }
     }
 
