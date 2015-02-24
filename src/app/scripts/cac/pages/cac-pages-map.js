@@ -48,7 +48,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         });
 
         this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
-        this.typeahead.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
     };
 
     return Map;
@@ -107,15 +107,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         }
     }
 
-    function onTypeaheadSelected(event, suggestion) {
-        // TODO: Use this to determine which input the search came from
-        var type = $(event.currentTarget).data('type');
-
-        CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(onGeocodeSuccess);
-    }
-
-    function onGeocodeSuccess(location) {
-        console.log(location);
+    function onTypeaheadSelected(event, key, location) {
+        console.log(key, location);
     }
 
 })(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);
