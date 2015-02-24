@@ -7,9 +7,8 @@
            dest={{ otp_osm_filename }}
   notify: Build OTP Graph
 
-- name: Copy GTFS
-  copy: src=gtfs/{{ item }}.zip dest={{ otp_data_dir }}
-  with_items: otp_gtfs_sources
+- name: Copy OTP Data
+  copy: src=./ dest="{{ otp_data_dir }}/" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
   notify: Validate GTFS
 
 - name: Save graph-config.xml
