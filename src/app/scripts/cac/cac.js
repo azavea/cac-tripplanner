@@ -5,6 +5,7 @@ CAC = (function () {
         Map: {},
         Pages: {},
         Routing: {},
+        Search: {},
         User: {},
         Mock: {}
     };
