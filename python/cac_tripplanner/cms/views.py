@@ -18,7 +18,7 @@ def home(request):
     # get a few randomized destinations
     # TODO: Investigate performance, as this creates a list of every destination
     #       before shuffling and slicing
-    destinations = list(Destination.objects.values('name', 'address'))
+    destinations = list(Destination.objects.published().values('name', 'address'))
     shuffle(destinations)
 
     context = RequestContext(request,
