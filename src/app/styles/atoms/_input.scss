@@ -8,4 +8,8 @@ input {
         background: none;
         width: 100%;
     }
+
+    &.error {
+        border: solid 1px red;
+    }
 }

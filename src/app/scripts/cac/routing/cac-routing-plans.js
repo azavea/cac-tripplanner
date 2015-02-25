@@ -51,8 +51,8 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
         var formattedTime = currentTime.format('hh:mma');
         var formattedDate = currentTime.format('MM-DD-YYYY');
         var paramObj = {
-            fromPlace: coordsFrom,
-            toPlace: coordsTo,
+            fromPlace: coordsFrom.join(','),
+            toPlace: coordsTo.join(','),
             time: formattedTime,
             date: formattedDate,
             mode: UserModes.makeModeString()

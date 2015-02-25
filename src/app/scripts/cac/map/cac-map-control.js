@@ -74,8 +74,6 @@ CAC.Map.Control = (function ($, L, _, Routing) {
 
     /**
      * Use HTML5 navigator to locate user and place a circle at their estimated location.
-     *  Modify the target variable (instantiated above) to enable the killing of this watch job
-     *  once a target location has been reached
      *
      * @return {object} (promise) which should resolve to the current coordinates of a user
      */
@@ -95,11 +93,8 @@ CAC.Map.Control = (function ($, L, _, Routing) {
                   .on('click', function() {
                       events.trigger('MOS.Map.Control.CurrentLocationClicked', latlng);
                   });
-                userMarker.setRadius(50);
+                userMarker.setRadius(5);
                 map.addLayer(userMarker);
-            }
-            if (targetLocation.lat === latlng[0] && targetLocation.lng === latlng[1]) {
-                navigator.geolocation.clearWatch(watchID);
             }
             deferred.resolve(latlng);
         };
@@ -108,7 +103,7 @@ CAC.Map.Control = (function ($, L, _, Routing) {
         };
 
         if ('geolocation' in navigator) {
-            watchID = navigator.geolocation.watchPosition(success, failure, options);
+            navigator.geolocation.getCurrentPosition(success, failure, options);
         } else {
             deferred.fail(function() { return 'geolocation not supported on this device'; });
         }

@@ -22,20 +22,13 @@ CAC.Pages.Home = (function ($) {
         });
 
         this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
-        this.typeahead.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
     };
 
     return Home;
 
-    function onTypeaheadSelected(event, suggestion) {
-        // TODO: Use this to determine which input the search came from
-        var type = $(event.currentTarget).data('type');
-
-        CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(onGeocodeSuccess);
-    }
-
-    function onGeocodeSuccess(location) {
-        console.log(location);
+    function onTypeaheadSelected(event, key, location) {
+        console.log(key, location);
     }
 
 })(jQuery);
