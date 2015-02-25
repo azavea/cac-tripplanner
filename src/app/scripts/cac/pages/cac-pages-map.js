@@ -66,11 +66,11 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
     function planTrip() {
         if (!(directions.origin && directions.destination)) {
-            // TODO: Error handle
+            setDirectionsError();
             return;
         }
         var origin = directions.origin;
-        var destination= directions.destination;
+        var destination = directions.destination;
 
         Routing.planTrip(origin, destination).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
@@ -109,6 +109,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     }
 
     function onTypeaheadSelected(event, key, location) {
+        // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'destination') {
             directions.destination = [location.feature.geometry.y, location.feature.geometry.x];
         } else if (key === 'origin') {
@@ -120,6 +121,22 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
     function setAddress(location) {
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
+    }
+
+    function setDirectionsError() {
+        var errorClass = 'error';
+        var $inputOrigin = $('section.directions input.origin');
+        var $inputDestination = $('section.directions input.destination');
+        if (directions.origin) {
+            $inputOrigin.removeClass(errorClass);
+        } else {
+            $inputOrigin.addClass(errorClass);
+        }
+        if (directions.destination) {
+            $inputDestination.removeClass(errorClass);
+        } else {
+            $inputDestination.addClass(errorClass);
+        }
     }
 
 })(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);
