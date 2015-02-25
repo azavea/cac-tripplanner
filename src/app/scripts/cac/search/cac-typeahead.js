@@ -70,7 +70,7 @@ CAC.Search.Typeahead = (function ($) {
             remote: {
                 url: '/api/destinations/search?text=%QUERY',
                 filter: function (list) {
-                    return $.map(list, function (item) { return item.fields; });
+                    return list && list.length ? $.map(list, function (item) { return item.fields; }) : [];
                 }
             }
         });
