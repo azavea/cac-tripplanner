@@ -28,8 +28,8 @@ CAC.Map.Isochrone = (function ($) {
             maxTravelTime: 5000,
             maxWalkDistance: 5000
         };
-        fetchReachable(testParams).then(function(data) {
-            console.log(data);
+        fetchReachable(testParams).then(function() {
+            //console.log(data);
         });
     }
 

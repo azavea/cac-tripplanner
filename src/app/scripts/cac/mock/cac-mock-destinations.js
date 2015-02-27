@@ -1,5 +1,8 @@
 CAC.Mock.Destinations = (function() {
+    'use strict';
+
     return {
+      /* jshint ignore:start */
       "type": "FeatureCollection",
       "features": [
         {
@@ -109,5 +112,6 @@ CAC.Mock.Destinations = (function() {
           }
         }
       ]
+      /* jshint ignore:end */
     };
-})();
+}());

@@ -1,7 +1,7 @@
 CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
     'use strict';
 
-    var planMode = ['WALK', 'TRANSIT'];
+    //var planMode = ['WALK', 'TRANSIT'];
     // TODO: Template hostname via django settings
     var routingUrl = 'http://localhost:9090/otp/routers/default/plan';
 

@@ -24,6 +24,7 @@ CAC.Search.Typeahead = (function ($) {
         minLength: 2
     };
     var defaultTypeaheadKey = 'default';
+    var self = this;
 
     function CACTypeahead(selector, options) {
 
@@ -50,7 +51,6 @@ CAC.Search.Typeahead = (function ($) {
     return CACTypeahead;
 
     function onTypeaheadSelected(event, suggestion, dataset) {
-        var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'currentlocation') {
@@ -63,6 +63,7 @@ CAC.Search.Typeahead = (function ($) {
     }
 
     // Unused, but might add later?
+    /*
     function destinationAdapterFactory() {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -77,6 +78,7 @@ CAC.Search.Typeahead = (function ($) {
         adapter.initialize();
         return adapter;
     }
+    */
 
     function locationAdapter(query, callback) {
         if ('geolocation' in navigator) {
