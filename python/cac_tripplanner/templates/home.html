@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% include "header-mixin.html" %}
 <section class="jumbotron">
     <div class="container">
         <div class="row">
@@ -16,11 +17,11 @@
     <div class="search text-center hidden-xs hidden-sm">
         <div id="explore">
             <span class="text">Where can I go in</span>
-            <input type="number" placeholder="20" />
+            <input type="number" value="20" min="5" step="5" max="120" />
             <span class="text">minutes from</span>
             <input class="typeahead" type="text" data-typeahead-key="explore" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple">
+            <select multiple="multiple" class="custom-select">
                 <option value="walk" selected>Walk</option>
                 <option value="bike" selected>Bike</option>
                 <option value="bus" selected>Bus</option>
@@ -34,7 +35,7 @@
             <span class="text">to</span>
             <input class="typeahead" type="text" data-typeahead-key="to" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple">
+            <select multiple="multiple" class="custom-select">
                 <option value="walk" selected>Walk</option>
                 <option value="bike" selected>Bike</option>
                 <option value="bus" selected>Bus</option>
@@ -46,6 +47,7 @@
 </section>
 <section class="content content-gray">
     <div class="container">
+        <h2>Featured Locations <small><a href="#">View all &raquo;</a></small></h2>
         <div class="row">
             <div class="col-sm-4">
                 <a class="block block-destination" href="#">
@@ -95,8 +97,8 @@
 <section class="content">
     <div class="container">
         <div class="row">
-            <div class="col-sm-8 text-center">
-                <h3>Community Spotlight</h3>
+            <div class="col-sm-8">
+                <h3>Community Spotlight <small><a href="#">View all &raquo;</a></small></h3>
                 <div class="row">
                   {% if community_profile %}
                     <div class="col-sm-6">
@@ -121,21 +123,18 @@
                 </div>
             </div>
             <div class="col-sm-4 hidden-xs hidden-sm">
-                <h3 class="text-center">Recent Routes</h3>
+                <h3>Recent Tweets</h3>
                 <a class="block block-recent" href="#">
-                    <h5>20 minutes via</h5>
-                    <h3>1400 Spruce to 2135 Callowhill</h3>
-                    <img src="http://placehold.it/400x200.jpg" />
+                    <h5>@mike_tedeschi</h5>
+                    <h3>Just used @opentransit to get to @waterworksphl! Check it out: http://ph.ly/aE35tz</h3>
                 </a>
                 <a class="block block-recent" href="#">
-                    <h5>20 minutes via</h5>
-                    <h3>1400 Spruce to 2135 Callowhill</h3>
-                    <img src="http://placehold.it/400x200.jpg" />
+                    <h5>@mike_tedeschi</h5>
+                    <h3>Just used @opentransit to get to @waterworksphl! Check it out: http://ph.ly/aE35tz</h3>
                 </a>
                 <a class="block block-recent" href="#">
-                    <h5>20 minutes via</h5>
-                    <h3>1400 Spruce to 2135 Callowhill</h3>
-                    <img src="http://placehold.it/400x200.jpg" />
+                    <h5>@mike_tedeschi</h5>
+                    <h3>Just used @opentransit to get to @waterworksphl! Check it out: http://ph.ly/aE35tz</h3>
                 </a>
             </div>
         </div>

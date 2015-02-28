@@ -21,9 +21,9 @@
                     </h4>
                 </div>
                 <div class="options search">
-                    <input type="number" placeholder="20" />
+                    <input type="number" value="20" min="5" step="5" max="120" />
                     <span class="text">minutes via</span>
-                    <select multiple="multiple">
+                    <select multiple="multiple" class="custom-select">
                         <option value="walk" selected>Walk</option>
                         <option value="bike" selected>Bike</option>
                         <option value="bus" selected>Bus</option>
@@ -31,7 +31,17 @@
                     </select>
                 </div>
                 <div class="more-options">
-                    This is a placeholder for a section with additional content in it, perhaps some other items from Open Trip Planner that we really like.
+                    <h6>What kind of walk/ride do you want?</h6>
+                    <select class="form-control">
+                        <option>Flatter</option>
+                        <option selected>Neutral</option>
+                        <option>Hillier</option>
+                    </select>
+                    <h6>Max biking distance</h6>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="0.5">
+                        <span class="input-group-addon">miles</span>
+                    </div>
                 </div>
                 <a class="view-more">View more options</a>
             </div>
