@@ -19,7 +19,7 @@ module.exports = function(config) {
       '/srv/cac/scripts/vendor.js',
       '/srv/cac/scripts/main.js',
       'test/spec/*.js',
-      'test/spec/**/*.js',
+      'test/spec/**/*.js'
     ],
 
 
