@@ -19,13 +19,11 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         this.geojson.setStyle(getStyle());
     }
 
-    Itinerary.prototype.highlight = highlight;
+    Itinerary.prototype.highlight = function (isHighlighted) {
+        this.geojson.setStyle(getStyle(isHighlighted));
+    };
 
     return Itinerary;
-
-    function highlight(isHighlighted) {
-        this.geojson.setStyle(getStyle(isHighlighted));
-    }
 
     /**
      * Helper function to get label/via summary for an itinerary.

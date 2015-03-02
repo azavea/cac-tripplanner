@@ -1,0 +1,31 @@
+{
+  "node": true,
+  "browser": true,
+  "esnext": true,
+  "bitwise": true,
+  "camelcase": true,
+  "curly": true,
+  "eqeqeq": true,
+  "immed": true,
+  "indent": 4,
+  "jquery": true,
+  "latedef": "nofunc",
+  "newcap": true,
+  "noarg": true,
+  "quotmark": "single",
+  "undef": true,
+  "unused": true,
+  "strict": true,
+  "trailing": true,
+  "smarttabs": true,
+  "globals": {
+    "CAC": true,
+    "Handlebars": true,
+    "Bloodhound": true,
+    "moment": true,
+    "$": true,
+    "_": true,
+    "L": true,
+    "turf": true
+  }
+}

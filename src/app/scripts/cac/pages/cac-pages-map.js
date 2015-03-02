@@ -1,6 +1,7 @@
 CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates) {
     'use strict';
 
+    var self = this;
     var defaults = {
         map: {}
     };
@@ -13,7 +14,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     };
 
     function Map(options) {
-        this.options = $.extend({}, defaults, options);
+        self.options = $.extend({}, defaults, options);
     }
 
     Map.prototype.initialize = function () {
@@ -44,8 +45,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             $('.explore').removeClass('hidden');
         });
 
-        this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
-        this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        self.typeahead  = new CAC.Search.Typeahead('input.typeahead');
+        self.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
     };
 
     return Map;
@@ -99,7 +100,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
      * Event handler, so this is set to the clicked event
      */
     function onItineraryClicked() {
-        var itineraryId = this.getAttribute('data-itinerary');
+        var itineraryId = self.getAttribute('data-itinerary');
         var itinerary = mapControl.getItineraryById(itineraryId);
         if (itinerary) {
             currentItinerary.highlight(false);

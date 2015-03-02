@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, L, _, Routing) {
+CAC.Map.Control = (function ($, L, _) {
     'use strict';
 
     var defaults = {
@@ -6,8 +6,7 @@ CAC.Map.Control = (function ($, L, _, Routing) {
         center: [39.95, -75.1667],
         zoom: 14
     };
-    var watchID;
-    var targetLocation = {};
+
     var map = null;
     var userMarker = null;
 
