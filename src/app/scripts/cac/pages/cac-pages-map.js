@@ -27,7 +27,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         // Plan a trip using information provided
         $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
-        $('select').multipleSelect();
+        $('select.custom-select').multipleSelect();
 
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
