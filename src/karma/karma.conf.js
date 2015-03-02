@@ -18,7 +18,8 @@ module.exports = function(config) {
       '/srv/cac/scripts/jquery.js',
       '/srv/cac/scripts/vendor.js',
       '/srv/cac/scripts/main.js',
-      'test/spec/test.js'
+      'test/spec/*.js',
+      'test/spec/**/*.js'
     ],
 
 
