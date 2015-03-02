@@ -11,10 +11,5 @@
     "moment": "^2.9.0",
     "lodash": "3.0.0",
     "typeahead.js": "~0.10.5"
-  },
-  "overrides": {
-    "leaflet": {
-      "ignore": true
-    }
   }
 }
