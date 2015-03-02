@@ -68,7 +68,6 @@ class FindReachableDestinations(View):
 class SearchDestinations(View):
     """ View for searching destinations via an http endpoint """
 
-
     def get(self, request, *args, **kwargs):
         """ GET destinations that match search queries
 
@@ -100,8 +99,8 @@ class SearchDestinations(View):
                 })
                 return HttpResponse(error, 'application/json')
             results = (Destination.objects.filter(published=True)
-                .distance(searchPoint)
-                .order_by('distance'))
+                       .distance(searchPoint)
+                       .order_by('distance'))
         elif text is not None:
             results = Destination.objects.filter(published=True, name__icontains=text)
         if limit:

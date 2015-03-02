@@ -133,7 +133,8 @@ class ShortenedLinkRedirectTestCase(TestCase):
         # We should start with a blank database
         self.assertEqual(ShortenedLinkHit.objects.all().count(), 0)
         # Create a new shortened link
-        data = json.loads(self.client.post('/link/shorten/', data=json.dumps({'destination': self.path}),
+        data = json.loads(self.client.post('/link/shorten/',
+                                           data=json.dumps({'destination': self.path}),
                                            content_type='application/json').content)
         short_path = urlparse.urlparse(data['shortened_url']).path
         # Navigate to the short link

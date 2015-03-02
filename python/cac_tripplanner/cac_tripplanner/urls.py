@@ -16,12 +16,12 @@ urlpatterns = patterns(
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^map/', 'destinations.views.map', name='map'),
 
-    ## Community Profiles
+    # Community Profiles
     url(r'^community-profile/(?P<slug>[\w-]+)/$',
         'cms.views.community_profile_detail',
         name='community-profile-detail'),
 
-    ## Tips and Tricks
+    # Tips and Tricks
     url(r'^tips-and-tricks/(?P<slug>[\w-]+)/$',
         'cms.views.tips_and_tricks_detail',
         name='tips-and-tricks-detail'),
