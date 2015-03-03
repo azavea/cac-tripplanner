@@ -5,4 +5,6 @@ app_username: "vagrant"
 # open trip planner vars
 otp_process_mem: 4G
 
+s3_otp_data: cleanair-otp-data
+
 postgresql_support_libpq_version: 9.4.*
