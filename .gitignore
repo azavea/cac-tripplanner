@@ -21,8 +21,6 @@ pip-log.txt
 
 # Unit test / coverage reports
 artifacts/
-.coverage
-coverage/
 violations.txt
 .tox
 nosetests.xml

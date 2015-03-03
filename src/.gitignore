@@ -6,3 +6,6 @@ bower_components
 test/bower_components
 
 app/index.html
+
+coverage/
+!*.gitkeep
