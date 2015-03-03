@@ -120,10 +120,17 @@ gulp.task('test:copy-jquery', function() {
 });
 
 gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
-    function(done) {
+    function() {
+        // run code coverage on non-minified files after tests run on minified files
+        var coverage = function(done) {
+            karma.start({
+                configFile: __dirname + '/karma/karma-coverage.conf.js'
+            }, done);
+        };
+
         karma.start({
             configFile: __dirname + '/karma/karma.conf.js'
-        }, done);
+        }, coverage);
     }
 );
 

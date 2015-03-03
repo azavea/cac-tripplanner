@@ -22,6 +22,7 @@ pip-log.txt
 # Unit test / coverage reports
 artifacts/
 .coverage
+coverage/
 .tox
 nosetests.xml
 .noseids
