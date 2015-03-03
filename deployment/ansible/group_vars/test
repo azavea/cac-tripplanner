@@ -2,3 +2,5 @@
 test: true
 develop: false
 production: false
+
+otp_process_mem: 2G
