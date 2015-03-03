@@ -6,7 +6,7 @@
   copy: src=validate_feed.py dest="{{ otp_data_dir }}"
 
 - name: Download OTP Data
-  local_action: command aws s3 sync s3://cleanair-otp-data "{{ otp_data_dir }}/"
+  local_action: command aws s3 sync s3://cleanair-otp-data ./otp_data/
   sudo: no
   when: production or test
 
