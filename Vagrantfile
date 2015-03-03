@@ -6,9 +6,9 @@ require "yaml"
 
 if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
   # OpenTripPlanner needs > 1GB to build and run
-  MEMORY_MB = "8192"
+  OTP_MEMORY_MB = "4096"
 else
-  MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
+  OTP_MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
 end
 
 if ENV['CAC_TRIPPLANNER_CPU'].nil?
@@ -98,8 +98,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.raw_arguments = ["--timeout=60"]
     end
 
+    if ENV['CAC_DATABASE_MEMORY'].nil?
+      DB_MEMORY_MB = "2048"
+    else
+      DB_MEMORY_MB = ENV['CAC_DATABASE_MEMORY']
+    end
+
     config.vm.provider :virtualbox do |v|
-      v.memory = 2048
+      v.memory = DB_MEMORY_MB
       v.cpus = 2
     end
   end
@@ -133,8 +139,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.raw_arguments = ["--timeout=60"]
     end
 
+    if ENV['CAC_APP_MEMORY'].nil?
+      APP_MEMORY_MB = "2048"
+    else
+      APP_MEMORY_MB = ENV['CAC_APP_MEMORY']
+    end
+
     config.vm.provider :virtualbox do |v|
-      v.memory = 2048
+      v.memory = APP_MEMORY_MB
       v.cpus = 2
     end
   end
@@ -157,7 +169,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.provider :virtualbox do |v|
-      v.memory = MEMORY_MB
+      v.memory = OTP_MEMORY_MB
       v.cpus = CPUS
     end
   end
