@@ -7,6 +7,7 @@ var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
 var karma = require('karma').server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
@@ -99,6 +100,17 @@ gulp.task('jshint', function () {
     return gulp.src('app/scripts/cac/**/*.js')
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
+        .pipe($.jshint.reporter('fail'));
+});
+
+gulp.task('jshint:jenkins', function () {
+    return gulp.src('app/scripts/cac/**/*.js')
+        .pipe($.jshint())
+        .pipe($.jshint.reporter(jshintXMLReporter))
+        .on('end', jshintXMLReporter.writeFile({
+            format: 'jslint_xml',
+            filePath: 'coverage/jshint-output.xml'
+        }))
         .pipe($.jshint.reporter('fail'));
 });
 

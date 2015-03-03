@@ -9,7 +9,7 @@
     "connect": "^3.0.1",
     "connect-livereload": "^0.5.0",
     "del": "^0.1.0",
-    "gulp": "^3.6.0",
+    "gulp": "^3.8.0",
     "gulp-add-src": "^0.2.0",
     "gulp-autoprefixer": "^1.0.1",
     "gulp-cache": "^0.2.2",
@@ -21,6 +21,7 @@
     "gulp-if": "^1.2.1",
     "gulp-imagemin": "^1.2.1",
     "gulp-jshint": "^1.5.3",
+    "gulp-jshint-xml-file-reporter": "^0.3.3",
     "gulp-karma": "0.0.4",
     "gulp-load-plugins": "^0.7.1",
     "gulp-order": "^1.1.1",
@@ -57,6 +58,7 @@
     "gulp-test": "gulp test",
     "gulp-test-dev": "gulp test:development",
     "gulp-lint": "gulp jshint",
+    "gulp-lint-jenkins": "gulp jshint:jenkins",
     "gulp-watch": "gulp watch"
   }
 }
