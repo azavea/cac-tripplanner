@@ -24,7 +24,6 @@ CAC.Search.Typeahead = (function ($) {
         minLength: 2
     };
     var defaultTypeaheadKey = 'default';
-    var self = this;
 
     function CACTypeahead(selector, options) {
 
@@ -54,10 +53,10 @@ CAC.Search.Typeahead = (function ($) {
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'currentlocation') {
-            self.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
+            this.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
         } else {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(function (location) {
-                self.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
+                this.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
             });
         }
     }
