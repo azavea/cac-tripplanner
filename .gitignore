@@ -23,6 +23,7 @@ pip-log.txt
 artifacts/
 .coverage
 coverage/
+violations.txt
 .tox
 nosetests.xml
 .noseids
