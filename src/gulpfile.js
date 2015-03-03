@@ -13,6 +13,7 @@ var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
 var run = require('gulp-run');
+var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
@@ -131,18 +132,19 @@ gulp.task('test:copy-jquery', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
-    function() {
-        // run code coverage on non-minified files after tests run on minified files
-        var coverage = function(done) {
-            karma.start({
-                configFile: __dirname + '/karma/karma-coverage.conf.js'
-            }, done);
-        };
-
+gulp.task('test:production',
+    function(done) {
         karma.start({
             configFile: __dirname + '/karma/karma.conf.js'
-        }, coverage);
+        }, done);
+    }
+);
+
+gulp.task('test:coverage', ['copy:scripts', 'copy:vendor-scripts'],
+    function(done) {
+        karma.start({
+            configFile: __dirname + '/karma/karma-coverage.conf.js'
+        }, done);
     }
 );
 
@@ -158,7 +160,15 @@ gulp.task('common:build', ['clean'], function() {
     return gulp.start('copy:vendor-css', 'copy:vendor-images', 'sass', 'collectstatic');
 });
 
-gulp.task('test', ['jshint', 'test:production']);
+gulp.task('test', sequence(['jshint',
+            'minify:scripts',
+            'minify:vendor-scripts',
+            'test:copy-jquery',
+            'test:production',
+            'copy:scripts',
+            'copy:vendor-scripts',
+            'test:coverage'])
+);
 
 gulp.task('development', ['common:build', 'copy:scripts', 'copy:vendor-scripts']);
 

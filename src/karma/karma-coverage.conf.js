@@ -15,12 +15,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test/spec/*.js',
-      'test/spec/**/*.js',
       '/srv/cac/scripts/vendor/jquery.js',
       '/srv/cac/scripts/vendor/*.js',
-      '/srv/cac/scripts/main/cac/cac.js',
-      '/srv/cac/scripts/main/**/*.js'
+      'app/scripts/cac/cac.js',
+      'app/scripts/**/*.js',
+      'test/spec/*.js',
+      'test/spec/**/*.js',
     ],
 
 
