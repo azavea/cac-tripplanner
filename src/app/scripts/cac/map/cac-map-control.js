@@ -16,6 +16,9 @@ CAC.Map.Control = (function ($, L, _) {
     var events = $({});
     var basemaps = {};
     var overlays = {};
+    var destinationsLayer = null;
+    var isochroneLayer = null;
+
     var stamenTonerAttribution = [
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
         'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
@@ -40,8 +43,10 @@ CAC.Map.Control = (function ($, L, _) {
         initializeLayerControl();
     }
 
+    MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
+    MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
-    MapControl.prototype.plotLocations = plotLocations;
+    MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.getItineraryById = getItineraryById;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
@@ -90,7 +95,8 @@ CAC.Map.Control = (function ($, L, _) {
             } else {
                 userMarker = new L.CircleMarker(latlng)
                   .on('click', function() {
-                      events.trigger('MOS.Map.Control.CurrentLocationClicked', latlng);
+                      // TODO: not implemented
+                      events.trigger('CAC.Map.Control.CurrentLocationClicked', latlng);
                   });
                 userMarker.setRadius(5);
                 map.addLayer(userMarker);
@@ -110,17 +116,103 @@ CAC.Map.Control = (function ($, L, _) {
     }
 
     /**
-     * Plot an array of geojson points onto the map
+     * Add isochrone outline to map
      */
-    function plotLocations(locationGeoJSON) {
-        var features = L.geoJson(locationGeoJSON, {
+    function drawIsochrone(isochrone) {
+        isochroneLayer = L.geoJson(isochrone, {
+            style: {
+                'color': 'red',
+                'opacity': 0.8
+            }
+        }).addTo(map);
+    }
+
+    /**
+     * Fetch all the reachable destinations within our destination database,
+     * and their enclosing isochrone (travelshed).
+     *
+     * @return {Object} Promise resolving to JSON with 'matched' and 'isochrone' properties
+     */
+    function fetchReachable(payload) {
+        var isochroneUrl = '/map/reachable';
+        var deferred = $.Deferred();
+        if (payload.coords && payload.mode && payload.date &&
+            payload.time && payload.maxTravelTime && payload.maxWalkDistance) {
+            $.ajax({
+                type: 'GET',
+                data: payload,
+                url: isochroneUrl,
+                contentType: 'application/json'
+            }).then(deferred.resolve);
+        } else {
+            deferred.fail();
+        }
+        return deferred.promise();
+    }
+
+    /**
+     * Get travelshed and destinations within it, then display results on map.
+    */
+    function fetchIsochrone() {
+        // clear results of last search
+        clearDiscoverPlaces();
+
+        var getIsochrone = function(params) {
+            fetchReachable(params).then(function(data) {
+                drawIsochrone(data.isochrone);
+                // also draw 'matched' list of locations
+                var matched = _.pluck(data.matched, 'point');
+                drawDestinations(matched);
+            }, function(error) {
+                console.error(error);
+            });
+        };
+
+        // default to current date and time
+        var now = new Date();
+        // months are zero-based
+        var dateStr = [(now.getMonth() + 1),
+                        now.getDate(),
+                        now.getFullYear()
+                      ].join('-');
+
+        // TODO: implement saving user preferences to fetch for params
+        var params = {
+            coords: {
+                lat: 39.954688,
+                lng: -75.204677
+            },
+            mode: ['WALK', 'TRANSIT'],
+            date: dateStr,
+            time: now.toTimeString(),
+            maxTravelTime: 1800,
+            maxWalkDistance: 1609
+        };
+
+        locateUser().then(function(data) {
+            params.coords.lat = data[0];
+            params.coords.lng = data[1];
+            getIsochrone(params);
+        }, function(error) {
+            console.log('Could not geolocate user');
+            console.error(error);
+            // use default location
+            getIsochrone(params);
+        });
+    }
+
+    /**
+     * Draw an array of geojson destination points onto the map
+     */
+    function drawDestinations(locationGeoJSON) {
+        destinationsLayer = L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
-                    events.trigger('MOS.Map.Control.DestinationClicked', feature);
+                    // TODO: not implemented
+                    events.trigger('CAC.Map.Control.DestinationClicked', feature);
                 });
             }
-        });
-        map.addLayer(features);
+        }).addTo(map);
     }
 
     function getItineraryById(id) {
@@ -146,4 +238,24 @@ CAC.Map.Control = (function ($, L, _) {
         itineraries = {};
     }
 
-})(jQuery, L, _, CAC.Routing.Plans);
+    /**
+     * Remove layers for isochrone and destinations within it.
+     */
+    function clearDiscoverPlaces() {
+        clearDestinations();
+        clearIsochrone();
+    }
+
+    function clearDestinations() {
+        if (destinationsLayer) {
+            map.removeLayer(destinationsLayer);
+        }
+    }
+
+    function clearIsochrone() {
+        if (isochroneLayer) {
+            map.removeLayer(isochroneLayer);
+        }
+    }
+
+})(jQuery, L, _);

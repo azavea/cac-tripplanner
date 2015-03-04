@@ -20,7 +20,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
         // Map initialization logic and event binding
         mapControl = new MapControl();
-        mapControl.plotLocations(MockDestinations);
+        mapControl.drawDestinations(MockDestinations);
         mapControl.locateUser();
 
         // Plan a trip using information provided
@@ -30,6 +30,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
+            // TODO: display loading status before results returned
+            mapControl.fetchIsochrone();
         });
 
         $('.sidebar-options .view-more').click($.proxy(showOptions, this));
@@ -37,6 +39,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         $('#sidebar-toggle-directions').on('click', function(){
             $('.explore').addClass('hidden');
             $('.directions').removeClass('hidden');
+            // remove isochrone and destination layers
+            mapControl.clearDiscoverPlaces();
         });
 
         $('#sidebar-toggle-explore').on('click', function(){
@@ -49,7 +53,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     };
 
     return Map;
-
 
     function showOptions() {
         var moreOpt = '.sidebar-options .more-options';
