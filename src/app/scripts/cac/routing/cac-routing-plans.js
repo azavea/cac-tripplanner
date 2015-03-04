@@ -1,4 +1,4 @@
-CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
+CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
     'use strict';
 
     //var planMode = ['WALK', 'TRANSIT'];
@@ -55,7 +55,7 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
             toPlace: coordsTo.join(','),
             time: formattedTime,
             date: formattedDate,
-            mode: UserModes.makeModeString()
+            mode: UserPreferences.getPreference('mode')
         };
         return $.param(paramObj);
     }
@@ -72,4 +72,4 @@ CAC.Routing.Plans = (function($, L, moment, _, UserModes, Itinerary) {
         return new Itinerary(otpItinerary, index);
     }
 
-})(jQuery, L, moment, _, CAC.User.Modes, CAC.Routing.Itinerary);
+})(jQuery, L, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary);
