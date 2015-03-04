@@ -2,6 +2,7 @@ import json
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Point
 from django.core import serializers
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -18,7 +19,7 @@ def map(request):
 
 
 class FindReachableDestinations(View):
-    """Class based view for finding destinations of interest within the calculated isochrone"""
+    """Class based view for fetching isochrone and finding destinations of interest within it"""
     # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
     otp_router = 'default'
@@ -27,7 +28,7 @@ class FindReachableDestinations(View):
 
     def isochrone(self, lat, lng, mode, date, time, max_travel_time, max_walk_distance):
         """Make request to Open Trip Planner for isochrone geometry with the provided args
-        Take OTP JSON and convert it to GDAL MultiPolygon and return it"""
+        and return OTP JSON"""
         payload = {
             'routerId': self.otp_router,
             'fromPlace': lat + ',' + lng,
@@ -42,17 +43,14 @@ class FindReachableDestinations(View):
 
         # Parse and traverse JSON from OTP so that we return only geometries
         json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']
-        polygons = [GEOSGeometry(json.dumps(poly)) for poly in json_poly]
-
-        # Coerce to multipolygon
-        isochrone_multipoly = MultiPolygon(polygons)
-        return isochrone_multipoly
+        return json_poly
 
     def get(self, request, *args, **kwargs):
-        """When a GET hits this endpoint, calculate an isochrone and find destinations within it"""
+        """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
+        Return both the isochrone GeoJSON and the list of matched destinations."""
         params = request.GET
 
-        iso = self.isochrone(
+        json_poly = self.isochrone(
             lat=params.get('coords[lat]'),
             lng=params.get('coords[lng]'),
             mode=params.getlist('mode[]'),
@@ -62,8 +60,21 @@ class FindReachableDestinations(View):
             max_walk_distance=params.get('maxWalkDistance')
         )
 
+        # Coerce to multipolygon
+        polygons = [GEOSGeometry(json.dumps(poly)) for poly in json_poly]
+        iso = MultiPolygon(polygons)
+
         matched_objects = Destination.objects.filter(point__within=iso, published=True)
-        return HttpResponse('{{"matched": "{0}"}}'.format(matched_objects), 'application/json')
+
+        # make locations JSON serializable
+        matched_objects = [model_to_dict(x) for x in matched_objects]
+        for obj in matched_objects:
+            pnt = obj['point']
+            obj['point'] = json.loads(pnt.json)
+            obj['image'] = obj['image'].url
+
+        response = {'matched': matched_objects, 'isochrone': json_poly}
+        return HttpResponse(json.dumps(response), 'application/json')
 
 class SearchDestinations(View):
     """ View for searching destinations via an http endpoint """
