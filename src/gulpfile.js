@@ -132,7 +132,7 @@ gulp.task('test:copy-jquery', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-gulp.task('test:production',
+gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
     function(done) {
         karma.start({
             configFile: __dirname + '/karma/karma.conf.js'
@@ -161,7 +161,6 @@ gulp.task('common:build', ['clean'], function() {
 });
 
 gulp.task('test', sequence([
-            'development',
             'production',
             'jshint',
             'minify:scripts',
