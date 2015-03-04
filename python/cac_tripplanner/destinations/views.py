@@ -71,7 +71,11 @@ class FindReachableDestinations(View):
         for obj in matched_objects:
             pnt = obj['point']
             obj['point'] = json.loads(pnt.json)
-            obj['image'] = obj['image'].url
+            img = obj.get('image')
+            if img:
+                obj['image'] = img.url
+            else:
+                obj.pop('image')
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
