@@ -24,7 +24,6 @@ CAC.Search.Typeahead = (function ($) {
         minLength: 2
     };
     var defaultTypeaheadKey = 'default';
-    var self = this;
 
     function CACTypeahead(selector, options) {
 
@@ -51,6 +50,7 @@ CAC.Search.Typeahead = (function ($) {
     return CACTypeahead;
 
     function onTypeaheadSelected(event, suggestion, dataset) {
+        var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'currentlocation') {
