@@ -134,17 +134,21 @@ gulp.task('test:copy-jquery', function() {
 
 gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
     function(done) {
-        karma.start({
-            configFile: __dirname + '/karma/karma.conf.js'
-        }, done);
+        setTimeout(function() {
+            karma.start({
+                configFile: __dirname + '/karma/karma.conf.js'
+            }, done);
+        }, 500);
     }
 );
 
 gulp.task('test:coverage', ['copy:scripts', 'copy:vendor-scripts'],
     function(done) {
-        karma.start({
-            configFile: __dirname + '/karma/karma-coverage.conf.js'
-        }, done);
+        setTimeout(function() {
+            karma.start({
+                configFile: __dirname + '/karma/karma-coverage.conf.js'
+            }, done);
+        }, 3000);
     }
 );
 
