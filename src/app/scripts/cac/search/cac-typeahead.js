@@ -50,13 +50,14 @@ CAC.Search.Typeahead = (function ($) {
     return CACTypeahead;
 
     function onTypeaheadSelected(event, suggestion, dataset) {
+        var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'currentlocation') {
-            this.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
+            self.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
         } else {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(function (location) {
-                this.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
+                self.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
             });
         }
     }
