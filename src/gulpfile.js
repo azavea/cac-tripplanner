@@ -160,7 +160,10 @@ gulp.task('common:build', ['clean'], function() {
     return gulp.start('copy:vendor-css', 'copy:vendor-images', 'sass', 'collectstatic');
 });
 
-gulp.task('test', sequence(['jshint',
+gulp.task('test', sequence([
+            'development',
+            'production',
+            'jshint',
             'minify:scripts',
             'minify:vendor-scripts',
             'test:copy-jquery',
