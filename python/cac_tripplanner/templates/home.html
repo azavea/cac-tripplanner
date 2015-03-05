@@ -21,11 +21,13 @@
             <span class="text">minutes from</span>
             <input class="typeahead" type="text" data-typeahead-key="explore" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple" class="custom-select">
-                <option value="walk" selected>Walk</option>
-                <option value="bike" selected>Bike</option>
-                <option value="bus" selected>Bus</option>
-                <option value="rail" selected>Rail</option>
+            <select class="custom-select">
+                <option value="TRANSIT,WALK" selected>Transit</option>
+                <option value="BICYCLE">Bike</option>
+                <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                <option value="WALK">Walk Only</option>
+                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
+                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
             </select>
             <button type="submit">&rarr;</button>
         </div>
@@ -35,11 +37,13 @@
             <span class="text">to</span>
             <input class="typeahead" type="text" data-typeahead-key="to" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple" class="custom-select">
-                <option value="walk" selected>Walk</option>
-                <option value="bike" selected>Bike</option>
-                <option value="bus" selected>Bus</option>
-                <option value="rail" selected>Rail</option>
+            <select class="custom-select">
+                <option value="TRANSIT,WALK" selected>Transit</option>
+                <option value="BICYCLE">Bike</option>
+                <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                <option value="WALK">Walk Only</option>
+                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
+                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
             </select>
             <button type="submit">&rarr;</button>
         </div>

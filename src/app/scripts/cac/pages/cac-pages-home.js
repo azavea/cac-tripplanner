@@ -8,7 +8,6 @@ CAC.Pages.Home = (function ($) {
     }
 
     Home.prototype.initialize = function () {
-        $('select.custom-select').multipleSelect();
         $('.toggle-search button').on('click', function(){
             var id = $(this).attr('id');
 
