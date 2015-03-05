@@ -27,3 +27,19 @@ class Destination(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class FeedEvent(models.Model):
+    """ Model for RSS Feed Events, currently served by Uwishunu """
+
+    guid = models.CharField(unique=True, max_length=64)
+    title = models.CharField(max_length=512, null=True)
+    link = models.CharField(max_length=512, null=True)
+    author = models.CharField(max_length=64, null=True)
+    publication_date = models.DateTimeField()
+    categories = models.CharField(max_length=512, null=True)
+    description = models.CharField(max_length=512, null=True)
+    content = RichTextField()
+    point = models.PointField()
+
+    objects = models.GeoManager()
