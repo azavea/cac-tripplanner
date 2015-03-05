@@ -9,12 +9,15 @@ production: False
 app_sass_version: "3.4.9"
 
 app_log: "/var/log/cac-tripplanner-app.log"
+app_cron_event_feed_log: "/var/log/event-feed.log"
 
 root_app_dir: "/opt/app/python/cac_tripplanner"
 root_conf_dir: "/etc/cac_tripplanner.d"
 root_src_dir: "/opt/app/src"
 root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
+
+app_cron_event_feed: "cd {{ root_app_dir }} && python manage.py load_events >> {{ app_cron_event_feed_log }} 2>&1"
 
 cac_python_dependencies:
     - { name: 'django', version: '1.7.3' }
