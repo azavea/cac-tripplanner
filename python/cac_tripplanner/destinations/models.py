@@ -28,6 +28,8 @@ class Destination(models.Model):
     point = models.PointField()
     image = models.ImageField(upload_to='destinations/', null=True,
                               help_text='The full-size image. Will be displayed at 400x400.')
+    wide_image = models.ImageField(upload_to='destinations/', null=True,
+                              help_text='The half-height image. Will be displayed at 400x200.')
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
