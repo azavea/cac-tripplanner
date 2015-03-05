@@ -1,4 +1,7 @@
+from datetime import datetime
 import json
+
+from pytz import timezone
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Point
 from django.core import serializers
@@ -11,7 +14,7 @@ from django.views.generic import View
 import requests
 
 from cac_tripplanner.settings import OTP_URL
-from .models import Destination
+from .models import Destination, FeedEvent
 
 
 def map(request):
@@ -130,3 +133,24 @@ class SearchDestinations(View):
             results = results[:limit_int]
         data = serializers.serialize('json', results, fields=output_fields)
         return HttpResponse(data, 'application/json')
+
+class FeedEvents(View):
+    """ API endpoint for the FeedEvent model """
+
+    def get(self, request, *args, **kwargs):
+        """ GET 20 most recent feed events that are published
+
+        TODO: Additional filtering, dynamic limits?
+
+        """
+        utc = timezone('UTC')
+        epoch = utc.localize(datetime(1970, 1, 1))
+
+        results = FeedEvent.objects.published().order_by('-publication_date')[:20]
+        response = [model_to_dict(x) for x in results]
+        for obj in response:
+            pnt = obj['point']
+            obj['point'] = json.loads(pnt.json)
+            dt = obj['publication_date']
+            obj['publication_date'] = (dt - epoch).total_seconds()
+        return HttpResponse(json.dumps(response), 'application/json')
