@@ -16,8 +16,8 @@ class Destination(models.Model):
 
     name = models.CharField(max_length=50)
     description = RichTextField()
-    city = models.CharField(max_length=40)
-    state = models.CharField(max_length=20)
+    city = models.CharField(max_length=40, default='Philadelphia')
+    state = models.CharField(max_length=20, default='PA')
     zip = models.CharField(max_length=5, null=True)
 
     # In the admin interface, display the address right above the map, since it triggers geocoding
