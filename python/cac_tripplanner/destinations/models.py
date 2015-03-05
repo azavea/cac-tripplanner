@@ -15,6 +15,7 @@ class DestinationManager(models.GeoManager):
 class Destination(models.Model):
 
     name = models.CharField(max_length=50)
+    website_url = models.URLField()
     description = RichTextField()
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
