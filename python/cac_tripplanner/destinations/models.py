@@ -26,7 +26,8 @@ class Destination(models.Model):
                                help_text=('The map automatically updates as the address is typed, '
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
-    image = models.ImageField(upload_to='destinations/', null=True)
+    image = models.ImageField(upload_to='destinations/', null=True,
+                              help_text='The full-size image. Will be displayed at 400x400.')
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
