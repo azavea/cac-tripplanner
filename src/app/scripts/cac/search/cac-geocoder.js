@@ -22,6 +22,8 @@ CAC.Search.Geocoder = (function ($) {
 
     return module;
 
+    // Note: this function is also used in the Django admin interface.
+    // If the interface changes, make sure to update accordingly.
     function search(text, magicKey) {
         var dfd = $.Deferred();
         var params = $.extend({}, defaults, {

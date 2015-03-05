@@ -15,11 +15,15 @@ class Destination(models.Model):
 
     name = models.CharField(max_length=50)
     description = RichTextField()
-    point = models.PointField()
-    address = models.CharField(max_length=40, null=True)
     city = models.CharField(max_length=40)
     state = models.CharField(max_length=20)
     zip = models.CharField(max_length=5, null=True)
+
+    # In the admin interface, display the address right above the map, since it triggers geocoding
+    address = models.CharField(max_length=40, null=True,
+                               help_text=('The map automatically updates as the address is typed, '
+                                          'but may be overridden manually if incorrect.'))
+    point = models.PointField()
     image = models.ImageField(upload_to='destinations/', null=True)
     published = models.BooleanField(default=False)
 
