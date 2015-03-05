@@ -10,7 +10,8 @@
         </div>
         <section class="explore">
             <div class="sidebar-block sidebar-search">
-                <input class="typeahead" data-typeahead-key="search" type="search" placeholder="Search by location" />
+                <input id="exploreOrigin" class="typeahead" data-typeahead-key="search" type="search"
+                placeholder="Search by location" />
                 <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
             </div>
             <div class="sidebar-block sidebar-options">
@@ -21,9 +22,9 @@
                     </h4>
                 </div>
                 <div class="options search">
-                    <input type="number" value="20" min="5" step="5" max="120" />
+                    <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
                     <span class="text">minutes via</span>
-                    <select class="custom-select">
+                    <select id="modeSelector" class="custom-select">
                         <option value="TRANSIT,WALK" selected>Transit</option>
                         <option value="BICYCLE">Bike</option>
                         <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
