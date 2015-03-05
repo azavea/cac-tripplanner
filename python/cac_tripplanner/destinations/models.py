@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.utils.timezone import now
 from ckeditor.fields import RichTextField
 
 class DestinationManager(models.GeoManager):
@@ -31,3 +32,40 @@ class Destination(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class FeedEventManager(models.GeoManager):
+    """Custom manager for FeedEvents allows filtering on publication_date"""
+
+    def published(self):
+        return self.get_queryset().filter(publication_date__lt=now())
+
+    def get_queryset(self):
+        return super(FeedEventManager, self).get_queryset()
+
+
+class FeedEvent(models.Model):
+    """ Model for RSS Feed Events, currently served by Uwishunu """
+
+    guid = models.CharField(unique=True, max_length=64)
+    title = models.CharField(max_length=512, null=True)
+    link = models.CharField(max_length=512, null=True)
+    author = models.CharField(max_length=64, null=True)
+    publication_date = models.DateTimeField()
+    categories = models.CharField(max_length=512, null=True)
+    description = models.CharField(max_length=512, null=True)
+    content = RichTextField()
+    point = models.PointField()
+
+    @property
+    def published(self):
+        """Helper property to easily determine if an article is published"""
+        if self.publication_date:
+            return self.publication_date < now()
+        else:
+            return False
+
+    def __unicode__(self):
+        return self.title
+
+    objects = FeedEventManager()
