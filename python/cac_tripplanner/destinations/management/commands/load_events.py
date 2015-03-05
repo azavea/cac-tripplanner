@@ -29,7 +29,9 @@ class Command(BaseCommand):
 
         url = 'http://www.uwishunu.com/category/events/feed/'
         # Get 403 forbidden without changing user-agent
-        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'
+        }
         request = urllib2.Request(url, None, headers)
         feed = minidom.parse(urllib2.urlopen(request))
 
@@ -52,7 +54,7 @@ class Command(BaseCommand):
         # Other fields
         author = self.get_property(item, 'dc:creator')
 
-        categories_list = [category.firstChild.data for category in item.getElementsByTagName('category')]
+        categories_list = [cat.firstChild.data for cat in item.getElementsByTagName('category')]
         categories = ','.join(categories_list)
 
         content = self.get_property(item, 'content:encoded')
