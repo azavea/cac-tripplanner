@@ -68,6 +68,8 @@ CAC.Map.Control = (function ($, L, _) {
     function initializeOverlays() {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
         overlays['Bike Parking'] = overlaysControl.bikeParkingOverlay();
+        overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
+        overlays['Nearby Events'].addTo(map);
     }
 
     function initializeLayerControl() {
@@ -205,12 +207,20 @@ CAC.Map.Control = (function ($, L, _) {
      * Draw an array of geojson destination points onto the map
      */
     function drawDestinations(locationGeoJSON) {
+        var icon = L.AwesomeMarkers.icon({
+            icon: 'plane',
+            prefix: 'fa',
+            markerColor: 'cadetblue'
+        });
         destinationsLayer = L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
                     // TODO: not implemented
                     events.trigger('CAC.Map.Control.DestinationClicked', feature);
                 });
+            },
+            pointToLayer: function (geojson, latLng) {
+                return new L.marker(latLng, {icon: icon});
             }
         }).addTo(map);
     }

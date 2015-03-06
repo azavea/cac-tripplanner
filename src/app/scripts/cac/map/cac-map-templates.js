@@ -3,7 +3,8 @@ CAC.Map.Templates = (function (Handlebars) {
 
     var module = {
         itinerarySummaries: itinerarySummaries,
-        addressText: addressText
+        addressText: addressText,
+        eventPopup: eventPopup
     };
 
     return module;
@@ -43,6 +44,18 @@ CAC.Map.Templates = (function (Handlebars) {
         var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
         var template = Handlebars.compile(source);
         var html = template({address: address});
+        return html;
+    }
+
+    function eventPopup(event) {
+        var source = [
+            '<h4>{{ event.title }}</h4>',
+            '<p>{{{ event.description }}}</p>',
+            '<a href="{{ event.link }}" target="_blank">More Info</a>',
+            '<small class="pull-right">Events by <a href="http://www.uwishunu.com">Uwishunu</a>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({event: event});
         return html;
     }
 
