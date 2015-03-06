@@ -30,6 +30,7 @@ var stat = {
 
 // The multiple-select module needs special treatment, because its bower.json file is incomplete
 var multiSelectRoot = 'bower_components/multiple-select';
+var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -90,6 +91,11 @@ gulp.task('copy:vendor-css', function() {
 gulp.task('copy:vendor-images', function() {
     return copyBowerFiles('**/*.png', [multiSelectRoot + '/multiple-select.png'])
         .pipe(gulp.dest(stat.images + '/vendor'));
+});
+
+gulp.task('copy:style-images', function() {
+    return copyBowerFiles('**/*.png', [awesomeIconsRoot + '/*.png'])
+        .pipe(gulp.dest(stat.styles + '/images'));
 });
 
 gulp.task('copy:vendor-scripts', function() {
@@ -161,7 +167,7 @@ gulp.task('test:development', ['copy:scripts', 'copy:vendor-scripts'],
 );
 
 gulp.task('common:build', ['clean'], function() {
-    return gulp.start('copy:vendor-css', 'copy:vendor-images', 'sass', 'collectstatic');
+    return gulp.start('copy:vendor-css', 'copy:vendor-images', 'copy:style-images', 'sass', 'collectstatic');
 });
 
 gulp.task('test', sequence([
