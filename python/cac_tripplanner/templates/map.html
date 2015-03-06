@@ -79,11 +79,38 @@
                 <input class="typeahead destination" data-typeahead-key="destination" type="search" placeholder="Select a destination" />
                 <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
             </div>
-            <div class="sidebar-clip sidebar-options">
-              <div class="sidebar-block sidebar-details">
-                <div class="itineraries">
+            <div class="sidebar-block sidebar-options">
+                <div class="options search">
+                    <span class="text">via</span>
+                    <select id="modeSelector" class="custom-select">
+                        <option value="TRANSIT,WALK" selected>Transit</option>
+                        <option value="BICYCLE">Bike</option>
+                        <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                        <option value="WALK">Walk Only</option>
+                        <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
+                        <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
+                    </select>
                 </div>
-              </div>
+                <div class="more-options">
+                    <h6>What kind of walk/ride do you want?</h6>
+                    <select class="form-control">
+                        <option>Flatter</option>
+                        <option selected>Neutral</option>
+                        <option>Hillier</option>
+                    </select>
+                    <h6>Max biking distance</h6>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="0.5">
+                        <span class="input-group-addon">miles</span>
+                    </div>
+                </div>
+                <a class="view-more">View more options</a>
+            </div>
+            <div class="sidebar-clip">
+                <div class="sidebar-block sidebar-details">
+                    <div class="itineraries">
+                </div>
+            </div>
             </div>
         </section>
     </aside>
