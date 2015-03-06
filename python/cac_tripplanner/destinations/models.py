@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.utils.timezone import now
 from ckeditor.fields import RichTextField
+import os, uuid
 
 class DestinationManager(models.GeoManager):
     """Custom manager for Destinations allows filtering on published"""
@@ -13,6 +14,12 @@ class DestinationManager(models.GeoManager):
 
 
 class Destination(models.Model):
+    """Represents a destination"""
+
+    def generate_filename(instance, filename):
+        """Helper for creating unique filenames"""
+        _, ext = os.path.splitext(filename)
+        return 'destinations/{0}{1}'.format(uuid.uuid4().hex, ext)
 
     name = models.CharField(max_length=50)
     website_url = models.URLField()
@@ -26,9 +33,9 @@ class Destination(models.Model):
                                help_text=('The map automatically updates as the address is typed, '
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
-    image = models.ImageField(upload_to='destinations/', null=True,
+    image = models.ImageField(upload_to=generate_filename, null=True,
                               help_text='The full-size image. Will be displayed at 400x400.')
-    wide_image = models.ImageField(upload_to='destinations/', null=True,
+    wide_image = models.ImageField(upload_to=generate_filename, null=True,
                               help_text='The half-height image. Will be displayed at 400x200.')
     published = models.BooleanField(default=False)
 

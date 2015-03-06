@@ -20,9 +20,11 @@ root_media_dir: "/media/cac"
 app_cron_event_feed: "cd {{ root_app_dir }} && python manage.py load_events >> {{ app_cron_event_feed_log }} 2>&1"
 
 cac_python_dependencies:
+    - { name: 'boto', version: '2.36.0' }
     - { name: 'django', version: '1.7.3' }
     - { name: 'django-ckeditor', version: '4.4.7' }
     - { name: 'django-extensions', version: '1.4.9' }
+    - { name: 'django-storages-redux', version: '1.2.2' }
     - { name: 'django-wpadmin', version: '1.7.0'}
     - { name: 'gunicorn', version: '19.1.1'}
     - { name: 'ipython', version: '2.3.1' }
