@@ -148,7 +148,7 @@ gulp.task('test:coverage', ['copy:scripts', 'copy:vendor-scripts'],
             karma.start({
                 configFile: __dirname + '/karma/karma-coverage.conf.js'
             }, done);
-        }, 3000);
+        }, 4000);
     }
 );
 
