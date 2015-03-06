@@ -158,6 +158,7 @@ CAC.Map.Control = (function ($, L, _) {
      * Get travelshed and destinations within it, then display results on map.
     */
     function fetchIsochrone() {
+        var deferred = $.Deferred();
         // clear results of last search
         clearDiscoverPlaces();
 
@@ -167,6 +168,7 @@ CAC.Map.Control = (function ($, L, _) {
                 // also draw 'matched' list of locations
                 var matched = _.pluck(data.matched, 'point');
                 drawDestinations(matched);
+                deferred.resolve(data.matched);
             }, function(error) {
                 console.error(error);
             });
@@ -203,6 +205,7 @@ CAC.Map.Control = (function ($, L, _) {
             // use default location
             getIsochrone(params);
         });
+        return deferred.promise();
     }
 
     /**
@@ -272,9 +275,15 @@ CAC.Map.Control = (function ($, L, _) {
 
     function setGeocodeMarker(latLng) {
         if (latLng === null) {
-            map.removeLayer(geocodeMarker);
+            if (geocodeMarker) {
+                map.removeLayer(geocodeMarker);
+            }
             geocodeMarker = null;
-        } else if (!geocodeMarker) {
+            return;
+        }
+        if (geocodeMarker) {
+            geocodeMarker.setLatLng(latLng);
+        } else {
             var icon = L.AwesomeMarkers.icon({
                 icon: 'dot-circle-o',
                 prefix: 'fa',
@@ -282,11 +291,8 @@ CAC.Map.Control = (function ($, L, _) {
             });
             geocodeMarker = new L.marker(latLng, { icon: icon });
             geocodeMarker.addTo(map);
-            map.panTo(latLng);
-        } else {
-            geocodeMarker.setLatLng(latLng);
-            map.panTo(latLng);
         }
+        map.panTo(latLng);
     }
 
 })(jQuery, L, _);
