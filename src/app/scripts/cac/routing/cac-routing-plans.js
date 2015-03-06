@@ -16,13 +16,15 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
      *
      * @param {array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {array} coordsTo The coords in lat-lng which we would like to travel to
+     * @param {Object} moment.js date/time object for when the trip should be
+     * @param {String} Modes of travel to use for this trip
      *
      * @return {promise} The promise object which - if successful - resolves to a
      *                   an object with itineraries
      */
-    function planTrip(coordsFrom, coordsTo) {
+    function planTrip(coordsFrom, coordsTo, when, mode) {
         var deferred = $.Deferred();
-        var urlParams = prepareParamString(coordsFrom, coordsTo);
+        var urlParams = prepareParamString(coordsFrom, coordsTo, when, mode);
         var requestUrl = routingUrl + '?' + urlParams;
         $.ajax({
             url: requestUrl,
@@ -46,16 +48,15 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
      *
      * @return {string} A set of get params, ready for consumption
      */
-    function prepareParamString(coordsFrom, coordsTo) {
-        var currentTime = moment();
-        var formattedTime = currentTime.format('hh:mma');
-        var formattedDate = currentTime.format('MM-DD-YYYY');
+    function prepareParamString(coordsFrom, coordsTo, when, mode) {
+        var formattedTime = when.format('hh:mma');
+        var formattedDate = when.format('MM-DD-YYYY');
         var paramObj = {
             fromPlace: coordsFrom.join(','),
             toPlace: coordsTo.join(','),
             time: formattedTime,
             date: formattedDate,
-            mode: UserPreferences.getPreference('mode')
+            mode: mode
         };
         return $.param(paramObj);
     }

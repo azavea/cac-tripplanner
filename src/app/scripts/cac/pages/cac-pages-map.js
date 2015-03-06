@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
+CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -6,6 +6,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     };
     var mapControl = null;
     var currentItinerary = null;
+    var datepicker = null;
 
     var directions = {
         origin: null,
@@ -37,7 +38,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         $('.sidebar-options .view-more').click(showOptions);
 
         // initiallize date/time picker
-        $('#datetimeDirections').datetimepicker();
+        datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
 
         $('#sidebar-toggle-directions').on('click', function(){
             $('.explore').addClass('hidden');
@@ -79,10 +80,20 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             setDirectionsError();
             return;
         }
+
+        var picker = $('#datetimeDirections').data('DateTimePicker');
+        var date = picker.date();
+        if (!date) {
+            // use current date/time if none set
+            date = moment();
+        }
+
+        var mode = $('#directionsModeSelector').val();
+
         var origin = directions.origin;
         var destination = directions.destination;
 
-        Routing.planTrip(origin, destination).then(function (itineraries) {
+        Routing.planTrip(origin, destination, date, mode).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
             var highlight = true;
             mapControl.clearItineraries();
@@ -202,5 +213,5 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         }
     }
 
-})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
+})(jQuery, Handlebars, _, moment, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
    CAC.Map.Templates, CAC.User.Preferences);
