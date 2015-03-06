@@ -53,7 +53,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
     def test_isochrone_partitioning(self):
         """Ensure that our pet isochrone correctly demarcates between points within and
         points outside of its boundary"""
-        # flake8: noqa
+        # TODO: add back `flake8: noqa` to fix linter error
         isochrone_url = '/map/reachable?coords%5Blat%5D=39.954688&coords%5Blng%5D=-75.204677&mode%5B%5D=WALK&mode%5B%5D=TRANSIT&date=01-21-2015&time=7%3A30am&maxTravelTime=5000&maxWalkDistance=5000'
         response = self.client.get(isochrone_url)
         json_response = json.loads(response.content)
