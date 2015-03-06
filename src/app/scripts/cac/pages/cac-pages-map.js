@@ -29,7 +29,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
         // Show isochrone in discovery tab
-        $('section.explore button[type=submit]').click($.proxy(mapControl.fetchIsochrone, this));
+        $('section.explore button[type=submit]').click($.proxy(fetchIsochrone, this));
 
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
@@ -44,7 +44,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
             $('.explore').addClass('hidden');
             $('.directions').removeClass('hidden');
             // remove isochrone and destination layers
-            mapControl.clearDiscoverPlaces();
             mapControl.setGeocodeMarker(null);
         });
 
@@ -151,6 +150,19 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
     }
 
+    function setDestinationSidebar(destinations) {
+        var $container = $('<div></div>').addClass('destinations');
+        $.each(destinations, function (i, destination) {
+            var $destination = $(CAC.Map.Templates.destinationBlock(destination));
+            $destination.click(function (event) {
+                // TODO: What to do on click?!?!
+            });
+            $container.append($destination);
+        });
+        $('.explore div.sidebar-details').empty().append($container);
+        $('.explore .sidebar-clip').height(400);
+    }
+
     function setDirectionsError() {
         var errorClass = 'error';
         var $inputOrigin = $('section.directions input.origin');
@@ -165,6 +177,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         } else {
             $inputDestination.addClass(errorClass);
         }
+    }
+
+    function fetchIsochrone() {
+        mapControl.fetchIsochrone().then(function (destinations) {
+            setDestinationSidebar(destinations);
+        });
     }
 
     /**
@@ -214,7 +232,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
             setAddress(origin);
             $('#exploreTime').val(exploreTime);
             $('#exploreModeSelector').val(mode);
-            mapControl.fetchIsochrone();
+            fetchIsochrone();
         }
     }
 

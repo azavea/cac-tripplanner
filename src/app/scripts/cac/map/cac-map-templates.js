@@ -4,6 +4,7 @@ CAC.Map.Templates = (function (Handlebars) {
     var module = {
         itinerarySummaries: itinerarySummaries,
         addressText: addressText,
+        destinationBlock: destinationBlock,
         eventPopup: eventPopup
     };
 
@@ -44,6 +45,20 @@ CAC.Map.Templates = (function (Handlebars) {
         var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
         var template = Handlebars.compile(source);
         var html = template({address: address});
+        return html;
+    }
+
+    function destinationBlock(destination) {
+        var source = [
+            '<a class="block block-destination">',
+                '<div class="modes"></div>',
+                '<h3>{{ d.name }}</h3>',
+                '<h5>20 minutes away</h5>',
+                '<img src="{{ d.image }}" width="300px" height="200px" />',
+            '</a>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({d: destination});
         return html;
     }
 
