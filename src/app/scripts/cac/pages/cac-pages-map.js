@@ -93,7 +93,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         var origin = directions.origin;
         var destination = directions.destination;
 
-        Routing.planTrip(origin, destination, date, mode).then(function (itineraries) {
+        var arriveBy = true;
+        if ($('input[name="arriveBy"]:checked').val() !== 'arriveBy') {
+            arriveBy = false; // depart at time instead
+        }
+
+        Routing.planTrip(origin, destination, date, mode, arriveBy).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
             var highlight = true;
             mapControl.clearItineraries();

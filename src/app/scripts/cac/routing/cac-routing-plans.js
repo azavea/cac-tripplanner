@@ -22,9 +22,9 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
      * @return {promise} The promise object which - if successful - resolves to a
      *                   an object with itineraries
      */
-    function planTrip(coordsFrom, coordsTo, when, mode) {
+    function planTrip(coordsFrom, coordsTo, when, mode, arriveBy) {
         var deferred = $.Deferred();
-        var urlParams = prepareParamString(coordsFrom, coordsTo, when, mode);
+        var urlParams = prepareParamString(coordsFrom, coordsTo, when, mode, arriveBy);
         var requestUrl = routingUrl + '?' + urlParams;
         $.ajax({
             url: requestUrl,
@@ -48,7 +48,7 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
      *
      * @return {string} A set of get params, ready for consumption
      */
-    function prepareParamString(coordsFrom, coordsTo, when, mode) {
+    function prepareParamString(coordsFrom, coordsTo, when, mode, arriveBy) {
         var formattedTime = when.format('hh:mma');
         var formattedDate = when.format('MM-DD-YYYY');
         var paramObj = {
@@ -56,7 +56,8 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary) {
             toPlace: coordsTo.join(','),
             time: formattedTime,
             date: formattedDate,
-            mode: mode
+            mode: mode,
+            arriveBy: arriveBy
         };
         return $.param(paramObj);
     }
