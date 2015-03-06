@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
+CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -6,6 +6,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     };
     var mapControl = null;
     var currentItinerary = null;
+    var datepicker = null;
 
     var directions = {
         origin: null,
@@ -34,7 +35,10 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             $('.explore').addClass('show-results');
         });
 
-        $('.sidebar-options .view-more').click($.proxy(showOptions, this));
+        $('.sidebar-options .view-more').click(showOptions);
+
+        // initiallize date/time picker
+        datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
 
         $('#sidebar-toggle-directions').on('click', function(){
             $('.explore').addClass('hidden');
@@ -57,8 +61,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
     return Map;
 
-    function showOptions() {
-        var moreOpt = '.sidebar-options .more-options';
+    function showOptions(event) {
+        var parent = $(event.target).parent().parent();
+        var moreOpt = $('.sidebar-options .more-options', parent);
 
         $(moreOpt).toggleClass('active');
         $(moreOpt).parent().find('a.view-more').text(function() {
@@ -75,10 +80,25 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             setDirectionsError();
             return;
         }
+
+        var picker = $('#datetimeDirections').data('DateTimePicker');
+        var date = picker.date();
+        if (!date) {
+            // use current date/time if none set
+            date = moment();
+        }
+
+        var mode = $('#directionsModeSelector').val();
+
         var origin = directions.origin;
         var destination = directions.destination;
 
-        Routing.planTrip(origin, destination).then(function (itineraries) {
+        var arriveBy = true;
+        if ($('input[name="arriveBy"]:checked').val() !== 'arriveBy') {
+            arriveBy = false; // depart at time instead
+        }
+
+        Routing.planTrip(origin, destination, date, mode, arriveBy).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
             var highlight = true;
             mapControl.clearItineraries();
@@ -155,6 +175,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         if (!method) {
             return; // no user preferences set
         }
+
+        var mode = UserPreferences.getPreference('mode');
+
         if (method === 'directions') {
             // switch tabs
             $('.explore').addClass('hidden');
@@ -180,22 +203,20 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
             $('section.directions input.origin').val(fromText);
             $('section.directions input.destination').val(toText);
-            // TODO: directions tab does not have mode yet
-            //var mode = UserPreferences.getPreference('mode');
+            $('#directionsModeSelector').val(mode);
             planTrip();
         } else {
             // 'explore' tab
             var origin = UserPreferences.getPreference('origin');
             var originText = UserPreferences.getPreference('originText');
             var exploreTime = UserPreferences.getPreference('exploreTime');
-            var mode = UserPreferences.getPreference('mode');
             $('#exploreOrigin').val(originText);
             setAddress(origin);
             $('#exploreTime').val(exploreTime);
-            $('#modeSelector').val(mode);
+            $('#exploreModeSelector').val(mode);
             mapControl.fetchIsochrone();
         }
     }
 
-})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
+})(jQuery, Handlebars, _, moment, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
    CAC.Map.Templates, CAC.User.Preferences);
