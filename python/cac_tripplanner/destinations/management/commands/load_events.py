@@ -48,7 +48,6 @@ class Command(BaseCommand):
 
         # need a lat/lng to care about this item
         if not (self.property_exists(item, 'geo:lat') and self.property_exists(item, 'geo:long')):
-            self.stdout.write('No lat/lng for: %s, skipping' % guid)
             return
 
         # Other fields
@@ -67,7 +66,7 @@ class Command(BaseCommand):
             lat = float(self.get_property(item, 'geo:lat'))
             lon = float(self.get_property(item, 'geo:long'))
         except ValueError:
-            self.stdout.write('Unable to convert lat/lng for: %s' % guid)
+            self.stdout.write('Unable to convert lat/lng for: {0}'.format(guid))
             return
 
         point = Point(lon, lat)
@@ -92,4 +91,4 @@ class Command(BaseCommand):
 
         feed_event, created = FeedEvent.objects.update_or_create(guid=guid, defaults=updated_item)
         if created:
-            self.stdout.write('Added event with guid: "%s"' % guid)
+            self.stdout.write('{0}: Added event: "{1}"'.format(str(datetime.utcnow()), guid))
