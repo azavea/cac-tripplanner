@@ -45,7 +45,11 @@ class FindReachableDestinations(View):
         isochrone_response = requests.get(self.isochrone_url, params=payload)
 
         # Parse and traverse JSON from OTP so that we return only geometries
-        json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']
+        try:
+            json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']
+        except:
+            # No isochrone found.  Is GTFS loaded?  Is origin within the graph bounds?
+            json_poly = json.loads("{}")
         return json_poly
 
     def get(self, request, *args, **kwargs):
