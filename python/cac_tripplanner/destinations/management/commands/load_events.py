@@ -29,7 +29,9 @@ class Command(BaseCommand):
 
         url = 'http://www.uwishunu.com/category/events/feed/'
         # Get 403 forbidden without changing user-agent
-        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'
+        }
         request = urllib2.Request(url, None, headers)
         feed = minidom.parse(urllib2.urlopen(request))
 
@@ -46,13 +48,12 @@ class Command(BaseCommand):
 
         # need a lat/lng to care about this item
         if not (self.property_exists(item, 'geo:lat') and self.property_exists(item, 'geo:long')):
-            self.stdout.write('No lat/lng for: %s, skipping' % guid)
             return
 
         # Other fields
         author = self.get_property(item, 'dc:creator')
 
-        categories_list = [category.firstChild.data for category in item.getElementsByTagName('category')]
+        categories_list = [cat.firstChild.data for cat in item.getElementsByTagName('category')]
         categories = ','.join(categories_list)
 
         content = self.get_property(item, 'content:encoded')
@@ -65,7 +66,7 @@ class Command(BaseCommand):
             lat = float(self.get_property(item, 'geo:lat'))
             lon = float(self.get_property(item, 'geo:long'))
         except ValueError:
-            self.stdout.write('Unable to convert lat/lng for: %s' % guid)
+            self.stdout.write('Unable to convert lat/lng for: {0}'.format(guid))
             return
 
         point = Point(lon, lat)
@@ -90,4 +91,4 @@ class Command(BaseCommand):
 
         feed_event, created = FeedEvent.objects.update_or_create(guid=guid, defaults=updated_item)
         if created:
-            self.stdout.write('Added event with guid: "%s"' % guid)
+            self.stdout.write('{0}: Added event: "{1}"'.format(str(datetime.utcnow()), guid))
