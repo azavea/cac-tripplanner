@@ -34,7 +34,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             $('.explore').addClass('show-results');
         });
 
-        $('.sidebar-options .view-more').click($.proxy(showOptions, this));
+        $('.sidebar-options .view-more').click(showOptions);
 
         // initiallize date/time picker
         $('#datetimeDirections').datetimepicker();
@@ -60,8 +60,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
     return Map;
 
-    function showOptions() {
-        var moreOpt = '.sidebar-options .more-options';
+    function showOptions(event) {
+        var parent = $(event.target).parent().parent();
+        var moreOpt = $('.sidebar-options .more-options', parent);
 
         $(moreOpt).toggleClass('active');
         $(moreOpt).parent().find('a.view-more').text(function() {
