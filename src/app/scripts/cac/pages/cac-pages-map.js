@@ -159,6 +159,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         if (!method) {
             return; // no user preferences set
         }
+
+        var mode = UserPreferences.getPreference('mode');
+
         if (method === 'directions') {
             // switch tabs
             $('.explore').addClass('hidden');
@@ -184,19 +187,17 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
             $('section.directions input.origin').val(fromText);
             $('section.directions input.destination').val(toText);
-            // TODO: directions tab does not have mode yet
-            //var mode = UserPreferences.getPreference('mode');
+            $('#directionsModeSelector').val(mode);
             planTrip();
         } else {
             // 'explore' tab
             var origin = UserPreferences.getPreference('origin');
             var originText = UserPreferences.getPreference('originText');
             var exploreTime = UserPreferences.getPreference('exploreTime');
-            var mode = UserPreferences.getPreference('mode');
             $('#exploreOrigin').val(originText);
             setAddress(origin);
             $('#exploreTime').val(exploreTime);
-            $('#modeSelector').val(mode);
+            $('#exploreModeSelector').val(mode);
             mapControl.fetchIsochrone();
         }
     }
