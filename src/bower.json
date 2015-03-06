@@ -10,6 +10,7 @@
     "multiple-select": "~1.1.0",
     "moment": "^2.9.0",
     "lodash": "3.0.0",
-    "typeahead.js": "~0.10.5"
+    "typeahead.js": "~0.10.5",
+    "Leaflet.awesome-markers": "~2.0.2"
   }
 }
