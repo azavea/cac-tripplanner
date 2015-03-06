@@ -9,6 +9,7 @@ CAC.Map.Control = (function ($, L, _) {
 
     var map = null;
     var userMarker = null;
+    var geocodeMarker = null;
 
     var overlaysControl = null;
     var itineraries = {};
@@ -50,6 +51,7 @@ CAC.Map.Control = (function ($, L, _) {
     MapControl.prototype.getItineraryById = getItineraryById;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
+    MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
 
     return MapControl;
 
@@ -265,6 +267,25 @@ CAC.Map.Control = (function ($, L, _) {
     function clearIsochrone() {
         if (isochroneLayer) {
             map.removeLayer(isochroneLayer);
+        }
+    }
+
+    function setGeocodeMarker(latLng) {
+        if (latLng === null) {
+            map.removeLayer(geocodeMarker);
+            geocodeMarker = null;
+        } else if (!geocodeMarker) {
+            var icon = L.AwesomeMarkers.icon({
+                icon: 'dot-circle-o',
+                prefix: 'fa',
+                markerColor: 'darkred'
+            });
+            geocodeMarker = new L.marker(latLng, { icon: icon });
+            geocodeMarker.addTo(map);
+            map.panTo(latLng);
+        } else {
+            geocodeMarker.setLatLng(latLng);
+            map.panTo(latLng);
         }
     }
 

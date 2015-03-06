@@ -41,6 +41,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
             $('.directions').removeClass('hidden');
             // remove isochrone and destination layers
             mapControl.clearDiscoverPlaces();
+            mapControl.setGeocodeMarker(null);
         });
 
         $('#sidebar-toggle-explore').on('click', function(){
@@ -125,6 +126,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
     }
 
     function setAddress(location) {
+        var latLng = L.latLng(location.feature.geometry.y, location.feature.geometry.x);
+        mapControl.setGeocodeMarker(latLng);
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
     }
 
