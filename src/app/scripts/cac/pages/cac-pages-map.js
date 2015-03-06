@@ -36,6 +36,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
         $('.sidebar-options .view-more').click($.proxy(showOptions, this));
 
+        // initiallize date/time picker
+        $('#datetimeDirections').datetimepicker();
+
         $('#sidebar-toggle-directions').on('click', function(){
             $('.explore').addClass('hidden');
             $('.directions').removeClass('hidden');
