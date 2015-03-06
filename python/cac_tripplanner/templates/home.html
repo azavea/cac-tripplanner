@@ -15,34 +15,41 @@
         </div>
     </div>
     <div class="search text-center hidden-xs hidden-sm">
-        <div id="explore">
+        <form id="explore">
             <span class="text">Where can I go in</span>
-            <input type="number" value="20" min="5" step="5" max="120" />
+            <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
             <span class="text">minutes from</span>
-            <input class="typeahead" type="text" data-typeahead-key="explore" placeholder="City Hall" />
+            <input id="exploreOrigin" class="typeahead" type="text"
+                data-typeahead-key="origin" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple" class="custom-select">
-                <option value="walk" selected>Walk</option>
-                <option value="bike" selected>Bike</option>
-                <option value="bus" selected>Bus</option>
-                <option value="rail" selected>Rail</option>
+            <select id="exploreMode" class="custom-select">
+                <option value="TRANSIT,WALK" selected>Transit</option>
+                <option value="BICYCLE">Bike</option>
+                <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                <option value="WALK">Walk Only</option>
+                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
+                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
             </select>
             <button type="submit">&rarr;</button>
-        </div>
-        <div id="directions" class="hidden">
+        </form>
+        <form id="directions" class="hidden">
             <span class="text">How do I get from</span>
-            <input class="typeahead" type="text" data-typeahead-key="from" placeholder="Current location" />
+            <input id="directionsFrom" class="typeahead" type="text"
+                data-typeahead-key="from" placeholder="Current location" />
             <span class="text">to</span>
-            <input class="typeahead" type="text" data-typeahead-key="to" placeholder="City Hall" />
+            <input id="directionsTo" class="typeahead" type="text"
+                data-typeahead-key="to" placeholder="City Hall" />
             <span class="text">using</span>
-            <select multiple="multiple" class="custom-select">
-                <option value="walk" selected>Walk</option>
-                <option value="bike" selected>Bike</option>
-                <option value="bus" selected>Bus</option>
-                <option value="rail" selected>Rail</option>
+            <select id="directionsMode" class="custom-select">
+                <option value="TRANSIT,WALK" selected>Transit</option>
+                <option value="BICYCLE">Bike</option>
+                <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                <option value="WALK">Walk Only</option>
+                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
+                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
             </select>
             <button type="submit">&rarr;</button>
-        </div>
+        </form>
     </div>
 </section>
 <section class="content content-gray">

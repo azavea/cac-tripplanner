@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates) {
+CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -23,15 +23,15 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         mapControl.drawDestinations(MockDestinations);
         mapControl.locateUser();
 
+
         // Plan a trip using information provided
         $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
-        $('select.custom-select').multipleSelect();
+        // Show isochrone in discovery tab
+        $('section.explore button[type=submit]').click($.proxy(mapControl.fetchIsochrone, this));
 
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
-            // TODO: display loading status before results returned
-            mapControl.fetchIsochrone();
         });
 
         $('.sidebar-options .view-more').click($.proxy(showOptions, this));
@@ -50,6 +50,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
 
         this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
         this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
+
+        setFromUserPreferences();
     };
 
     return Map;
@@ -142,4 +144,55 @@ CAC.Pages.Map = (function ($, Handlebars, _, MapControl, Routing, MockDestinatio
         }
     }
 
-})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations, CAC.Map.Templates);
+    /**
+     * When first naviagting to this page, check for user preferences to load.
+     */
+    function setFromUserPreferences() {
+        var method = UserPreferences.getPreference('method');
+        if (!method) {
+            return; // no user preferences set
+        }
+        if (method === 'directions') {
+            // switch tabs
+            $('.explore').addClass('hidden');
+            $('.directions').removeClass('hidden');
+
+            var from = UserPreferences.getPreference('from');
+            var to = UserPreferences.getPreference('to');
+            var fromText = UserPreferences.getPreference('fromText');
+            var toText = UserPreferences.getPreference('toText');
+            if (from) {
+                directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+            } else {
+                // use current location if no directions origin set
+                MapControl.locateUser().then(function(data) {
+                    directions.destination = [data[1], data[0]];
+                }, function(error) {
+                    console.log('Could not geolocate user');
+                    console.error(error);
+                    return;
+                });
+            }
+
+            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+            $('section.directions input.origin').val(fromText);
+            $('section.directions input.destination').val(toText);
+            // TODO: directions tab does not have mode yet
+            //var mode = UserPreferences.getPreference('mode');
+            planTrip();
+        } else {
+            // 'explore' tab
+            var origin = UserPreferences.getPreference('origin');
+            var originText = UserPreferences.getPreference('originText');
+            var exploreTime = UserPreferences.getPreference('exploreTime');
+            var mode = UserPreferences.getPreference('mode');
+            $('#exploreOrigin').val(originText);
+            setAddress(origin);
+            $('#exploreTime').val(exploreTime);
+            $('#modeSelector').val(mode);
+            mapControl.fetchIsochrone();
+        }
+    }
+
+})(jQuery, Handlebars, _, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
+   CAC.Map.Templates, CAC.User.Preferences);
