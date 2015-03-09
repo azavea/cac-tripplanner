@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='destination',
             name='website_url',
-            field=models.URLField(default='http://github.com/azavea/cac-tripplanner'),
+            field=models.URLField(),
             preserve_default=False,
         ),
     ]

@@ -22,7 +22,7 @@ class Destination(models.Model):
         return 'destinations/{0}{1}'.format(uuid.uuid4().hex, ext)
 
     name = models.CharField(max_length=50)
-    website_url = models.URLField()
+    website_url = models.URLField(blank=True, null=True)
     description = RichTextField()
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
