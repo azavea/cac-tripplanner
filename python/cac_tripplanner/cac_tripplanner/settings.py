@@ -174,3 +174,6 @@ if secrets['use_s3_storage']:
     AWS_ACCESS_KEY_ID = secrets['aws_access_key_id']
     AWS_SECRET_ACCESS_KEY = secrets['aws_secret_access_key']
     AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
+
+# Application settings
+MAX_IMAGE_SIZE_MB = 1
