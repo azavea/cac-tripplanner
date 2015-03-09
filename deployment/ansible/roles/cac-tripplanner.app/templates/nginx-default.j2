@@ -8,6 +8,12 @@ server {
         proxy_pass http://127.0.0.1:8000;
     }
 
+    location /admin/destinations/destination/add/ {
+        proxy_set_header Host $http_host;
+        proxy_pass http://127.0.0.1:8000;
+        client_max_body_size 10M;
+    }
+
     location /static/ {
         alias {{ root_static_dir }}/;
     }

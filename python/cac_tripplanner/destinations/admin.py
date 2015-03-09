@@ -1,9 +1,12 @@
 from django.contrib.gis import admin
 
-from . import models
+from .forms import DestinationForm
+from .models import Destination
 
 
 class DestinationAdmin(admin.OSMGeoAdmin):
+    form = DestinationForm
+
     list_display = ('name', 'published', 'address', 'city', 'state', 'zip')
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
@@ -31,4 +34,4 @@ class DestinationAdmin(admin.OSMGeoAdmin):
     make_unpublished.short_description = 'Unpublish selected destinations'
 
 
-admin.site.register(models.Destination, DestinationAdmin)
+admin.site.register(Destination, DestinationAdmin)

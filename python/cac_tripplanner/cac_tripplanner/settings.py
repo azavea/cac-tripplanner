@@ -30,8 +30,16 @@ except (IOError, NameError):
         'allowed_hosts': ['127.0.0.1', 'localhost'],
         'internal_ips': ('0.0.0.0', '127.0.0.1',),
         'build_dir': '/opt/app/src',
-        'production': False
+        'production': False,
+
+        'use_s3_storage': False,
+
+        # Settings only needed if 'use_s3_storage' is set to True
+        'aws_access_key_id': '',
+        'aws_secret_access_key': '',
+        'aws_storage_bucket_name': ''
     }
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -63,6 +71,7 @@ INSTALLED_APPS = (
     # Third Party Apps
     'ckeditor',
     'django_extensions',
+    'storages',
 
     # Project Apps
     'cms',
@@ -158,3 +167,13 @@ WPADMIN = {
 
 # OTP CONFIGURATION
 OTP_URL = secrets['otp_url']
+
+# Settings for S3 storage
+if secrets['use_s3_storage']:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_ACCESS_KEY_ID = secrets['aws_access_key_id']
+    AWS_SECRET_ACCESS_KEY = secrets['aws_secret_access_key']
+    AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
+
+# Application settings
+MAX_IMAGE_SIZE_MB = 1

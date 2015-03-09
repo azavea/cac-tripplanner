@@ -52,6 +52,16 @@ class FindReachableDestinations(View):
             json_poly = json.loads("{}")
         return json_poly
 
+    def image_to_url(self, dest_dict, field_name):
+        """Helper for converting an image object to a url for a json response
+
+        :param dict_obj: Dictionary representation of a Destination object
+        :param field_name: String identifier for the image field
+        :returns: URL of the image, or an empty string if there is no image
+        """
+        image = dest_dict.get(field_name)
+        return image.url if image else ''
+
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
         Return both the isochrone GeoJSON and the list of matched destinations."""
@@ -76,13 +86,9 @@ class FindReachableDestinations(View):
         # make locations JSON serializable
         matched_objects = [model_to_dict(x) for x in matched_objects]
         for obj in matched_objects:
-            pnt = obj['point']
-            obj['point'] = json.loads(pnt.json)
-            img = obj.get('image')
-            if img:
-                obj['image'] = img.url
-            else:
-                obj.pop('image')
+            obj['point'] = json.loads(obj['point'].json)
+            obj['image'] = self.image_to_url(obj, 'image')
+            obj['wide_image'] = self.image_to_url(obj, 'wide_image')
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
