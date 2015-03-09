@@ -7,6 +7,7 @@
     - libpq-dev
     - libproj-dev
     - python-dev
+    - libjpeg-dev
 
 - name: Install pip packages
   pip: name={{ item.name }} version={{ item.version }}
