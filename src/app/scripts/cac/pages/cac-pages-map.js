@@ -154,8 +154,26 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         var $container = $('<div></div>').addClass('destinations');
         $.each(destinations, function (i, destination) {
             var $destination = $(CAC.Map.Templates.destinationBlock(destination));
+
             $destination.click(function () {
-                // TODO: What to do on click?!?!
+                // TODO: see issue #78 regarding refactors to improve this
+
+                showDirectionsTab();
+
+                // Set origin
+                var from = UserPreferences.getPreference('origin');
+                var originText = UserPreferences.getPreference('originText');
+                directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+                $('section.directions input.origin').val(originText);
+
+                // Set destination
+                var toCoords = destination.point.coordinates;
+                var destinationText = destination.address;
+                directions.destination = [toCoords[1], toCoords[0]];
+                $('section.directions input.destination').val(destinationText);
+
+                // Get directions
+                planTrip();
             });
             $container.append($destination);
         });
@@ -186,6 +204,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
     }
 
     /**
+     * Switch to the 'Get Directions' tab
+     */
+    function showDirectionsTab() {
+        $('.explore').addClass('hidden');
+        $('.directions').removeClass('hidden');
+    }
+
+    /**
      * When first naviagting to this page, check for user preferences to load.
      */
     function setFromUserPreferences() {
@@ -198,8 +224,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
 
         if (method === 'directions') {
             // switch tabs
-            $('.explore').addClass('hidden');
-            $('.directions').removeClass('hidden');
+            showDirectionsTab();
 
             var from = UserPreferences.getPreference('from');
             var to = UserPreferences.getPreference('to');
