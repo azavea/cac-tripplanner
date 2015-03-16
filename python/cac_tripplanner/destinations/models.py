@@ -1,7 +1,8 @@
 from django.contrib.gis.db import models
 from django.utils.timezone import now
 from ckeditor.fields import RichTextField
-import os, uuid
+import os
+import uuid
 
 
 def generate_filename(instance, filename):
@@ -50,7 +51,7 @@ class Destination(models.Model):
     image = models.ImageField(upload_to=generate_filename, null=True,
                               help_text='The full-size image. Will be displayed at 400x400.')
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                              help_text='The half-height image. Will be displayed at 400x200.')
+                                   help_text='The half-height image. Will be displayed at 400x200.')
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()

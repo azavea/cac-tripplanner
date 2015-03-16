@@ -9,6 +9,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
     var datepicker = null;
 
     var directions = {
+        exploreOrigin: null,
         origin: null,
         destination: null
     };
@@ -29,7 +30,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         $('section.directions button[type=submit]').click($.proxy(planTrip, this));
 
         // Show isochrone in discovery tab
-        $('section.explore button[type=submit]').click($.proxy(fetchIsochrone, this));
+        $('section.explore button[type=submit]').click($.proxy(clickedExplore, this));
 
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
@@ -91,11 +92,20 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
 
         var origin = directions.origin;
         var destination = directions.destination;
+        var fromText = $('#directionsFrom').val();
+        var toText = $('#directionsTo').val();
 
         var arriveBy = true;
         if ($('input[name="arriveBy"]:checked').val() !== 'arriveBy') {
             arriveBy = false; // depart at time instead
         }
+
+        // set user preferences
+        UserPreferences.setPreference('method', 'directions');
+        UserPreferences.setPreference('mode', mode);
+        UserPreferences.setPreference('arriveBy', arriveBy);
+        UserPreferences.setPreference('fromText', fromText);
+        UserPreferences.setPreference('toText', toText);
 
         Routing.planTrip(origin, destination, date, mode, arriveBy).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
@@ -136,10 +146,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
     function onTypeaheadSelected(event, key, location) {
         // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'destination') {
+            UserPreferences.setPreference('to', location);
             directions.destination = [location.feature.geometry.y, location.feature.geometry.x];
         } else if (key === 'origin') {
+            UserPreferences.setPreference('from', location);
             directions.origin = [location.feature.geometry.y, location.feature.geometry.x];
         } else if (key === 'search') {
+            UserPreferences.setPreference('origin', location);
+            directions.exploreOrigin = [location.feature.geometry.y, location.feature.geometry.x];
             setAddress(location);
         }
     }
@@ -197,10 +211,39 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         }
     }
 
-    function fetchIsochrone() {
-        mapControl.fetchIsochrone().then(function (destinations) {
-            setDestinationSidebar(destinations);
-        });
+    /**
+     * Set user preferences before fetching isochrone.
+     */
+    function clickedExplore() {
+        var exploreMinutes = $('#exploreTime').val();
+        var mode = $('#exploreModeSelector').val();
+
+        // TODO: add date/time selector to 'explore' extra options panel?
+        var when = moment();
+
+        // store search inputs to preferences
+        UserPreferences.setPreference('method', 'explore');
+        UserPreferences.setPreference('originText', $('#exploreOrigin').val());
+        UserPreferences.setPreference('exploreTime', exploreMinutes);
+        UserPreferences.setPreference('mode', mode);
+
+        fetchIsochrone(when, mode, exploreMinutes);
+    }
+
+    /**
+     * Fetch travelshed from OpenTripPlanner, then populate side bar with featured locations
+     * found within the travelshed.
+     *
+     * @param {Object} when Moment.js time for the search (default to now)
+     * @param {String} mode String for travel mode to pass to OTP (walk, transit, etc.)
+     * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
+     */
+    function fetchIsochrone(when, mode, exploreMinutes) {
+        mapControl.fetchIsochrone(directions.exploreOrigin, when, mode, exploreMinutes).then(
+            function (destinations) {
+                setDestinationSidebar(destinations);
+            }
+        );
     }
 
     /**
@@ -226,38 +269,49 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
             // switch tabs
             showDirectionsTab();
 
+            var arriveBy = UserPreferences.getPreference('arriveBy');
             var from = UserPreferences.getPreference('from');
             var to = UserPreferences.getPreference('to');
             var fromText = UserPreferences.getPreference('fromText');
             var toText = UserPreferences.getPreference('toText');
+
+            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+
+            $('section.directions input.origin').typeahead('val', fromText);
+            $('section.directions input.destination').typeahead('val', toText);
+            $('#directionsModeSelector').val(mode);
+            $('input[name="arriveBy"]:checked').val(arriveBy);
+
             if (from) {
                 directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+                planTrip();
             } else {
                 // use current location if no directions origin set
-                MapControl.locateUser().then(function(data) {
-                    directions.destination = [data[1], data[0]];
+                mapControl.locateUser().then(function(data) {
+                    directions.origin = [data[0], data[1]];
+                    planTrip();
                 }, function(error) {
-                    console.log('Could not geolocate user');
+                    console.error('Could not geolocate user');
                     console.error(error);
                     return;
                 });
             }
-
-            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-            $('section.directions input.origin').val(fromText);
-            $('section.directions input.destination').val(toText);
-            $('#directionsModeSelector').val(mode);
-            planTrip();
         } else {
             // 'explore' tab
-            var origin = UserPreferences.getPreference('origin');
+            var exploreOrigin = UserPreferences.getPreference('origin');
+            directions.exploreOrigin = [exploreOrigin.feature.geometry.y,
+                                        exploreOrigin.feature.geometry.x];
             var originText = UserPreferences.getPreference('originText');
             var exploreTime = UserPreferences.getPreference('exploreTime');
-            $('#exploreOrigin').val(originText);
-            setAddress(origin);
+            setAddress(exploreOrigin);
+
+            $('#exploreOrigin').typeahead('val', originText);
             $('#exploreTime').val(exploreTime);
             $('#exploreModeSelector').val(mode);
-            fetchIsochrone();
+
+            var when = moment(); // TODO: add date/time selector for 'explore' options?
+
+            fetchIsochrone(when, mode, exploreTime);
         }
     }
 
