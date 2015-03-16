@@ -16,6 +16,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 try:
     secrets = yaml.safe_load(open('/etc/cac_secrets', 'r'))
 except (IOError, NameError):
+    # Note: secrets are read in via a YAML file, so make sure nothing is added
+    # here that cannot be represented in YAML. One example is a tuple: represent
+    # it as a list here, and then convert to a tuple later on (see internal_ips).
     secrets = {
         'secret_key': '%&_DEVELOPMENT_SECRET_KEY_#42*pk!3y6lvk&1psyk=e=pr',
         'database': {
@@ -28,7 +31,7 @@ except (IOError, NameError):
         },
         'otp_url': 'http://192.168.8.26:8080/otp/routers/{router}/',
         'allowed_hosts': ['127.0.0.1', 'localhost'],
-        'internal_ips': ('0.0.0.0', '127.0.0.1',),
+        'internal_ips': ['0.0.0.0', '127.0.0.1'],
         'build_dir': '/opt/app/src',
         'production': False,
 
@@ -54,7 +57,7 @@ TEMPLATE_DEBUG = not secrets['production']
 
 ALLOWED_HOSTS = secrets['allowed_hosts']
 
-INTERNAL_IPS = secrets['internal_ips']
+INTERNAL_IPS = tuple(secrets['internal_ips'])
 
 # Application definition
 
