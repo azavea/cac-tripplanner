@@ -146,10 +146,13 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
     function onTypeaheadSelected(event, key, location) {
         // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'destination') {
+            UserPreferences.setPreference('to', location);
             directions.destination = [location.feature.geometry.y, location.feature.geometry.x];
         } else if (key === 'origin') {
+            UserPreferences.setPreference('from', location);
             directions.origin = [location.feature.geometry.y, location.feature.geometry.x];
         } else if (key === 'search') {
+            UserPreferences.setPreference('origin', location);
             directions.exploreOrigin = [location.feature.geometry.y, location.feature.geometry.x];
             setAddress(location);
         }
@@ -271,7 +274,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         } else {
             // 'explore' tab
             var exploreOrigin = UserPreferences.getPreference('origin');
-            directions.exploreOrigin = [exploreOrigin.feature.geometry.y, exploreOrigin.feature.geometry.x];
+            directions.exploreOrigin = [exploreOrigin.feature.geometry.y,
+                                        exploreOrigin.feature.geometry.x];
             var originText = UserPreferences.getPreference('originText');
             var exploreTime = UserPreferences.getPreference('exploreTime');
             setAddress(exploreOrigin);
