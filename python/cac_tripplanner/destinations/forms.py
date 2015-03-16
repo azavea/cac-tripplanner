@@ -23,12 +23,12 @@ class DestinationForm(ModelForm):
 
         if len(image) > 1024 * 1024 * settings.MAX_IMAGE_SIZE_MB:
             raise ValidationError('Image file too large (maximum {}mb)'
-                                        .format(settings.MAX_IMAGE_SIZE_MB))
+                                  .format(settings.MAX_IMAGE_SIZE_MB))
 
         width, height = get_image_dimensions(image)
         if width / height != aspect_ratio:
             raise ValidationError('Image has incorrect dimensions, expected {0}:1'
-                                        .format(aspect_ratio))
+                                  .format(aspect_ratio))
         return image
 
     def clean_image(self):
