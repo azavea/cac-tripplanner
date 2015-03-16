@@ -145,6 +145,7 @@ CAC.Map.Control = (function ($, L, _) {
             $.ajax({
                 type: 'GET',
                 data: payload,
+                cache: false,
                 url: isochroneUrl,
                 contentType: 'application/json'
             }).then(deferred.resolve);
@@ -157,7 +158,7 @@ CAC.Map.Control = (function ($, L, _) {
     /**
      * Get travelshed and destinations within it, then display results on map.
     */
-    function fetchIsochrone() {
+    function fetchIsochrone(coordsOrigin, when, mode, exploreMinutes) {
         var deferred = $.Deferred();
         // clear results of last search
         clearDiscoverPlaces();
@@ -174,37 +175,37 @@ CAC.Map.Control = (function ($, L, _) {
             });
         };
 
-        // default to current date and time
-        var now = new Date();
-        // months are zero-based
-        var dateStr = [(now.getMonth() + 1),
-                        now.getDate(),
-                        now.getFullYear()
-                      ].join('-');
+        var formattedTime = when.format('hh:mma');
+        var formattedDate = when.format('MM-DD-YYYY');
 
-        // TODO: implement saving user preferences to fetch for params
         var params = {
             coords: {
-                lat: 39.954688,
-                lng: -75.204677
+                lat: coordsOrigin[0],
+                lng: coordsOrigin[1]
             },
-            mode: ['WALK', 'TRANSIT'],
-            date: dateStr,
-            time: now.toTimeString(),
-            maxTravelTime: 1800,
+            time: formattedTime,
+            date: formattedDate,
+            mode: mode,
+            maxTravelTime: exploreMinutes * 60, // API expects seconds
+            // TODO: add maxWalkDistance as user setting?
             maxWalkDistance: 1609
         };
 
-        locateUser().then(function(data) {
-            params.coords.lat = data[0];
-            params.coords.lng = data[1];
-            getIsochrone(params);
-        }, function(error) {
-            console.log('Could not geolocate user');
-            console.error(error);
-            // use default location
-            getIsochrone(params);
-        });
+        if (coordsOrigin) {
+            deferred.resolve(getIsochrone(params));
+        } else {
+            locateUser().then(function(data) {
+                params.coords.lat = data[0];
+                params.coords.lng = data[1];
+                getIsochrone(params);
+            }, function(error) {
+                console.error('Could not geolocate user');
+                console.error(error);
+                // use default location
+                getIsochrone(params);
+            });
+        }
+
         return deferred.promise();
     }
 

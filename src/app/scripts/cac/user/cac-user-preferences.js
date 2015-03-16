@@ -30,14 +30,16 @@ CAC.User.Preferences = (function($) {
     };
 
     var defaults = {
-        mode: 'WALK,TRANSIT',
-        origin: cityHall,
-        from: null, // use current location for directions origin if none set
-        to: cityHall,
+        arriveBy: false, // depart at set time, by default
+        exploreTime: 20,
+        from: undefined, // use current location for directions origin if none set
         fromText: 'Current Location',
-        toText: 'City Hall, Philadelphia, Pennsylvania, USA',
+        method: 'explore',
+        mode: 'TRANSIT,WALK',
+        origin: cityHall,
         originText: 'City Hall, Philadelphia, Pennsylvania, USA',
-        exploreTime: 20
+        to: cityHall,
+        toText: 'City Hall, Philadelphia, Pennsylvania, USA'
     };
 
     var module = {
@@ -57,9 +59,8 @@ CAC.User.Preferences = (function($) {
         if (val) {
             val = JSON.parse(val);
         } else {
-            var useDefault = defaults[preference];
-            val = useDefault;
-            setPreference(preference, useDefault);
+            val = defaults[preference];
+            setPreference(preference, val);
         }
         return val;
     }

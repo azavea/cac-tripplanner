@@ -35,7 +35,7 @@ class FindReachableDestinations(View):
         payload = {
             'routerId': self.otp_router,
             'fromPlace': lat + ',' + lng,
-            'mode': (',').join(mode),
+            'mode': mode,
             'date': date,
             'time': time,
             'cutoffSec': max_travel_time,
@@ -70,7 +70,7 @@ class FindReachableDestinations(View):
         json_poly = self.isochrone(
             lat=params.get('coords[lat]'),
             lng=params.get('coords[lng]'),
-            mode=params.getlist('mode[]'),
+            mode=params.get('mode'),
             date=params.get('date'),
             time=params.get('time'),
             max_travel_time=params.get('maxTravelTime'),
