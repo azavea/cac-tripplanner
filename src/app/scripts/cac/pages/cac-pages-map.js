@@ -154,7 +154,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         var $container = $('<div></div>').addClass('destinations');
         $.each(destinations, function (i, destination) {
             var $destination = $(CAC.Map.Templates.destinationBlock(destination));
-            $destination.click(function (event) {
+            $destination.click(function () {
                 // TODO: What to do on click?!?!
             });
             $container.append($destination);
