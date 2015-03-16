@@ -54,7 +54,7 @@ CAC.Map.Templates = (function (Handlebars) {
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<h5>20 minutes away</h5>',
-                '<img src="{{ d.image }}" width="300px" height="200px" />',
+                '<img src="{{ d.wide_image }}" width="300px" height="150px" />',
             '</a>'
         ].join('');
         var template = Handlebars.compile(source);

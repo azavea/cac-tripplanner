@@ -5,10 +5,11 @@
 
     &.block-destination {
         height: 360px;
+        cursor: pointer;
 
         &.block-half {
             height: 172px;
-            
+
             &:first-of-type {
                 margin-bottom: 15px;
             }
@@ -35,7 +36,7 @@
         height: 155px;
         margin-bottom: 15px;
         background: $light-gray;
-        
+
         &:last-of-type {
             margin-bottom: 0;
         }
