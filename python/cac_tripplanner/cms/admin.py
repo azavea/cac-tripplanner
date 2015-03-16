@@ -1,10 +1,13 @@
 from django.contrib import admin
 
-from . import models
+from .forms import ArticleForm
+from .models import Article
 
 
-@admin.register(models.Article)
+@admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
+    form = ArticleForm
+
     list_display = ('title', 'author', 'published', 'created', 'modified')
     readonly_fields = ('created', 'modified')
     date_hierarchy = ('created')
