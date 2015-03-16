@@ -5,6 +5,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         map: {}
     };
     var mapControl = null;
+    var sidebarTabControl = null;
     var currentItinerary = null;
     var datepicker = null;
 
@@ -41,17 +42,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         // initiallize date/time picker
         datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
 
-        $('#sidebar-toggle-directions').on('click', function(){
-            $('.explore').addClass('hidden');
-            $('.directions').removeClass('hidden');
-            // remove isochrone and destination layers
-            mapControl.setGeocodeMarker(null);
-        });
-
-        $('#sidebar-toggle-explore').on('click', function(){
-            $('.directions').addClass('hidden');
-            $('.explore').removeClass('hidden');
-        });
+        sidebarTabControl = new CAC.Control.SidebarTab();
+        sidebarTabControl.events.on('cac:control:sidebartab:shown', $.proxy(onSidebarTabShown, this));
 
         this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
         this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
@@ -143,6 +135,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         }
     }
 
+    function onSidebarTabShown(event, tabId) {
+        if (tabId === 'directions') {
+            mapControl.setGeocodeMarker(null);
+        }
+    }
+
     function onTypeaheadSelected(event, key, location) {
         // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'destination') {
@@ -172,7 +170,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
             $destination.click(function () {
                 // TODO: see issue #78 regarding refactors to improve this
 
-                showDirectionsTab();
+                sidebarTabControl.setTab('directions');
 
                 // Set origin
                 var from = UserPreferences.getPreference('origin');
@@ -247,14 +245,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
     }
 
     /**
-     * Switch to the 'Get Directions' tab
-     */
-    function showDirectionsTab() {
-        $('.explore').addClass('hidden');
-        $('.directions').removeClass('hidden');
-    }
-
-    /**
      * When first naviagting to this page, check for user preferences to load.
      */
     function setFromUserPreferences() {
@@ -267,7 +257,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
 
         if (method === 'directions') {
             // switch tabs
-            showDirectionsTab();
+            sidebarTabControl.setTab('directions');
 
             var arriveBy = UserPreferences.getPreference('arriveBy');
             var from = UserPreferences.getPreference('from');
