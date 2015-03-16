@@ -144,21 +144,21 @@ gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:c
             karma.start({
                 configFile: __dirname + '/karma/karma.conf.js'
             }, done);
-        }, 500);
+        }, 1000);
     }
 );
 
-gulp.task('test:coverage', ['copy:scripts', 'copy:vendor-scripts'],
+gulp.task('test:coverage', ['copy:vendor-scripts', 'copy:scripts'],
     function(done) {
         setTimeout(function() {
             karma.start({
                 configFile: __dirname + '/karma/karma-coverage.conf.js'
             }, done);
-        }, 4000);
+        }, 6000);
     }
 );
 
-gulp.task('test:development', ['copy:scripts', 'copy:vendor-scripts'],
+gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
     function(done) {
         karma.start({
             configFile: __dirname + '/karma/karma-dev.conf.js'
@@ -176,12 +176,13 @@ gulp.task('test', sequence([
             'minify:vendor-scripts',
             'test:copy-jquery',
             'test:production',
-            'copy:scripts',
+            'development',
             'copy:vendor-scripts',
+            'copy:scripts',
             'test:coverage'])
 );
 
-gulp.task('development', ['common:build', 'copy:scripts', 'copy:vendor-scripts']);
+gulp.task('development', ['common:build', 'copy:vendor-scripts', 'copy:scripts']);
 
 gulp.task('production', ['common:build', 'minify:scripts', 'minify:vendor-scripts']);
 

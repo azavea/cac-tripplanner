@@ -16,11 +16,13 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       '/srv/cac/scripts/vendor/jquery.js',
+      // load moment before other vendor scripts; is requirement for bootstrap datetime picker
+      '/srv/cac/scripts/vendor/moment.js',
       '/srv/cac/scripts/vendor/*.js',
       'app/scripts/cac/cac.js',
       'app/scripts/**/*.js',
       'test/spec/*.js',
-      'test/spec/**/*.js',
+      'test/spec/**/*.js'
     ],
 
 
