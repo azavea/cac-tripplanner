@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='destination',
             name='website_url',
-            field=models.URLField(),
+            field=models.URLField(blank=True, null=True),
             preserve_default=False,
         ),
     ]
