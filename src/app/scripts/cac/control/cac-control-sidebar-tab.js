@@ -1,5 +1,13 @@
-
+/**
+ *  Controls the sidebar tab switching for the map page
+ *
+ *  Events:
+ *  @event cac:control:sidebartab:shown
+ *  @property {string} tabId The tab id that was selected
+ */
 CAC.Control.SidebarTab = (function ($) {
+
+    'use strict';
 
     var defaults = {
         tabWrapperSelector: '.sidebar-tabs'
