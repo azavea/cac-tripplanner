@@ -3,6 +3,25 @@ from django.utils.timezone import now
 from ckeditor.fields import RichTextField
 import os, uuid
 
+
+def generate_filename(instance, filename):
+    """ Helper for creating unique filenames
+
+    Must be outside the Destination class because makemigrations throws the following error if not:
+        ValueError: Could not find function generate_filename in destinations.models.
+        Please note that due to Python 2 limitations, you cannot serialize unbound method functions
+        (e.g. a method declared and used in the same class body). Please move the function into the
+        main module body to use migrations. For more information, see
+        https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values
+
+    Also cannot be a class method of Destination because the function signature must exactly match:
+    https://docs.djangoproject.com/en/1.7/ref/models/fields/#django.db.models.FileField.upload_to
+
+    """
+    _, ext = os.path.splitext(filename)
+    return 'destinations/{0}{1}'.format(uuid.uuid4().hex, ext)
+
+
 class DestinationManager(models.GeoManager):
     """Custom manager for Destinations allows filtering on published"""
 
@@ -15,11 +34,6 @@ class DestinationManager(models.GeoManager):
 
 class Destination(models.Model):
     """Represents a destination"""
-
-    def generate_filename(instance, filename):
-        """Helper for creating unique filenames"""
-        _, ext = os.path.splitext(filename)
-        return 'destinations/{0}{1}'.format(uuid.uuid4().hex, ext)
 
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
