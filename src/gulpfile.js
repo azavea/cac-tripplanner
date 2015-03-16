@@ -172,7 +172,6 @@ gulp.task('common:build', ['clean'], function() {
 
 gulp.task('test', sequence([
             'production',
-            'jshint',
             'minify:scripts',
             'minify:vendor-scripts',
             'test:copy-jquery',
@@ -184,7 +183,7 @@ gulp.task('test', sequence([
 
 gulp.task('development', ['common:build', 'copy:scripts', 'copy:vendor-scripts']);
 
-gulp.task('production', ['common:build', 'minify:scripts', 'minify:vendor-scripts', 'jshint']);
+gulp.task('production', ['common:build', 'minify:scripts', 'minify:vendor-scripts']);
 
 gulp.task('watch', function () {
     return gulp.watch([
