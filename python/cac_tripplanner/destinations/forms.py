@@ -9,6 +9,7 @@ class DestinationForm(ModelForm):
     """Validate image dimensions"""
     class Meta:
         model = Destination
+        exclude = []
 
     def validate_image(self, field_name, aspect_ratio):
         """Helper function for validating an image
