@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDestinations, MapTemplates, UserPreferences) {
+CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTemplates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -23,7 +23,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
 
         // Map initialization logic and event binding
         mapControl = new MapControl();
-        mapControl.drawDestinations(MockDestinations);
         mapControl.locateUser();
 
 
@@ -305,5 +304,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MockDe
         }
     }
 
-})(jQuery, Handlebars, _, moment, CAC.Map.Control, CAC.Routing.Plans, CAC.Mock.Destinations,
-   CAC.Map.Templates, CAC.User.Preferences);
+})(
+    jQuery, Handlebars, _, moment,
+    CAC.Map.Control, CAC.Routing.Plans, CAC.Map.Templates, CAC.User.Preferences
+);
