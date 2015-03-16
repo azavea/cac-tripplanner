@@ -179,10 +179,6 @@ CAC.Map.Control = (function ($, L, _) {
         var formattedDate = when.format('MM-DD-YYYY');
 
         var params = {
-            coords: {
-                lat: coordsOrigin[0],
-                lng: coordsOrigin[1]
-            },
             time: formattedTime,
             date: formattedDate,
             mode: mode,
@@ -192,11 +188,17 @@ CAC.Map.Control = (function ($, L, _) {
         };
 
         if (coordsOrigin) {
-            deferred.resolve(getIsochrone(params));
+            params.coords = {
+                lat: coordsOrigin[0],
+                lng: coordsOrigin[1]
+            };
+            getIsochrone(params);
         } else {
             locateUser().then(function(data) {
-                params.coords.lat = data[0];
-                params.coords.lng = data[1];
+                params.coords = {
+                    lat: data[0],
+                    lng: data[1]
+                };
                 getIsochrone(params);
             }, function(error) {
                 console.error('Could not geolocate user');
