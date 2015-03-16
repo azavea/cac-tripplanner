@@ -5,6 +5,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
         map: {}
     };
     var mapControl = null;
+    var sidebarExploreControl = null;
     var sidebarTabControl = null;
     var currentItinerary = null;
     var datepicker = null;
@@ -36,10 +37,11 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
             $('.explore').addClass('show-results');
         });
 
-        $('.sidebar-options .view-more').click(showOptions);
-
         // initiallize date/time picker
         datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
+
+        sidebarExploreControl = new CAC.Control.SidebarExplore();
+        sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationselected', $.proxy(onDestinationSelected, this));
 
         sidebarTabControl = new CAC.Control.SidebarTab();
         sidebarTabControl.events.on('cac:control:sidebartab:shown', $.proxy(onSidebarTabShown, this));
@@ -51,20 +53,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
     };
 
     return Map;
-
-    function showOptions(event) {
-        var parent = $(event.target).closest('section');
-        var moreOpt = $('.sidebar-options .more-options', parent);
-
-        $(moreOpt).toggleClass('active');
-        $(moreOpt).parent().find('a.view-more').text(function() {
-            if($(moreOpt).hasClass('active')){
-                return 'View fewer options';
-            } else {
-                return 'View more options';
-            }
-        });
-    }
 
     function planTrip() {
         if (!(directions.origin && directions.destination)) {
@@ -120,6 +108,25 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
         });
     }
 
+    function onDestinationSelected(event, destination) {
+        sidebarTabControl.setTab('directions');
+
+        // Set origin
+        var from = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
+        directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+        $('section.directions input.origin').val(originText);
+
+        // Set destination
+        var toCoords = destination.point.coordinates;
+        var destinationText = destination.address;
+        directions.destination = [toCoords[1], toCoords[0]];
+        $('section.directions input.destination').val(destinationText);
+
+        // Get directions
+        planTrip();
+    }
+
     /**
      * Handles click events to highlight a given itinerary
      * Event handler, so this is set to the clicked event
@@ -159,37 +166,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
         var latLng = L.latLng(location.feature.geometry.y, location.feature.geometry.x);
         mapControl.setGeocodeMarker(latLng);
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
-    }
-
-    function setDestinationSidebar(destinations) {
-        var $container = $('<div></div>').addClass('destinations');
-        $.each(destinations, function (i, destination) {
-            var $destination = $(CAC.Map.Templates.destinationBlock(destination));
-
-            $destination.click(function () {
-                // TODO: see issue #78 regarding refactors to improve this
-
-                sidebarTabControl.setTab('directions');
-
-                // Set origin
-                var from = UserPreferences.getPreference('origin');
-                var originText = UserPreferences.getPreference('originText');
-                directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-                $('section.directions input.origin').val(originText);
-
-                // Set destination
-                var toCoords = destination.point.coordinates;
-                var destinationText = destination.address;
-                directions.destination = [toCoords[1], toCoords[0]];
-                $('section.directions input.destination').val(destinationText);
-
-                // Get directions
-                planTrip();
-            });
-            $container.append($destination);
-        });
-        $('.explore div.sidebar-details').empty().append($container);
-        $('.explore .sidebar-clip').height(400);
     }
 
     function setDirectionsError() {
@@ -238,7 +214,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, Routing, MapTem
     function fetchIsochrone(when, mode, exploreMinutes) {
         mapControl.fetchIsochrone(directions.exploreOrigin, when, mode, exploreMinutes).then(
             function (destinations) {
-                setDestinationSidebar(destinations);
+                sidebarExploreControl.setDestinationSidebar(destinations);
             }
         );
     }
