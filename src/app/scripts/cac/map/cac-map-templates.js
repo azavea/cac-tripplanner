@@ -1,4 +1,4 @@
-CAC.Map.Templates = (function (Handlebars) {
+CAC.Map.Templates = (function (Handlebars, Utils) {
     'use strict';
 
     var module = {
@@ -63,8 +63,10 @@ CAC.Map.Templates = (function (Handlebars) {
     }
 
     function eventPopup(event) {
+        event.uwishunuLogo = Utils.getImageUrl('uwishunu_logo.png');
         var source = [
-            '<h4>{{ event.title }}</h4>',
+            '',
+            '<h4><img src="{{ event.uwishunuLogo }}" width="30px" height="30px" /> {{ event.title }}</h4>',
             '<p>{{{ event.description }}}</p>',
             '<a href="{{ event.link }}" target="_blank">More Info</a>',
             '<small class="pull-right">Events by <a href="http://www.uwishunu.com">Uwishunu</a>'
@@ -74,4 +76,4 @@ CAC.Map.Templates = (function (Handlebars) {
         return html;
     }
 
-})(Handlebars);
+})(Handlebars, CAC.Utils);

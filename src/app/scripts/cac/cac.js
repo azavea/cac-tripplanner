@@ -8,7 +8,8 @@ CAC = (function () {
         Routing: {},
         Search: {},
         Settings: {},
-        User: {}
+        User: {},
+        Utils: {}
     };
 
     return module;
