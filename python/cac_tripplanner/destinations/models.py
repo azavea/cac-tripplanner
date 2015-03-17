@@ -76,8 +76,8 @@ class FeedEvent(models.Model):
     @property
     def published(self):
         """Helper property to easily determine if an article is published"""
-        if self.publication_date:
-            return self.publication_date < now()
+        if self.publication_date and self.end_date:
+            return self.publication_date < now() and self.end_date > now()
         else:
             return False
 
