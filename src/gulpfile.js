@@ -115,7 +115,8 @@ gulp.task('jshint:jenkins', function () {
         .pipe($.jshint())
         .pipe($.jshint.reporter(jshintXMLReporter))
         .on('end', jshintXMLReporter.writeFile({
-            format: 'jslint_xml',
+            alwaysReport: true,
+            format: 'jslint',
             filePath: 'coverage/jshint-output.xml'
         }))
         .pipe($.jshint.reporter('fail'));
