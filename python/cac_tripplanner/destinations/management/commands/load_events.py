@@ -24,10 +24,18 @@ class Command(BaseCommand):
             return None
         return elements[0].firstChild.data
 
+    def parse_date(self, string_datetime):
+        """ Parse a date from the feed, return datetime localized to US/Eastern """
+        if not string_datetime:
+            return None
+        eastern = timezone('US/Eastern')
+        parsed_date = datetime.strptime(string_datetime, '%a, %d %b %Y %H:%M:%S +0000')
+        return eastern.localize(parsed_date)
+
     def handle(self, *args, **options):
         """ Retrieve and populate FeedEvent table from an RSS Feed """
 
-        url = 'http://www.uwishunu.com/category/events/feed/'
+        url = 'http://www.uwishunu.com/feed/google/'
         # Get 403 forbidden without changing user-agent
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'
@@ -41,13 +49,11 @@ class Command(BaseCommand):
     def handle_feed_item(self, item):
         """ Update or create a FeedEvent based on a unique identifier """
 
-        eastern = timezone('US/Eastern')
-
         # Unique field
         guid = self.get_property(item, 'guid')
 
         # need a lat/lng to care about this item
-        if not (self.property_exists(item, 'geo:lat') and self.property_exists(item, 'geo:long')):
+        if not self.property_exists(item, 'georss:point'):
             return
 
         # Other fields
@@ -63,17 +69,19 @@ class Command(BaseCommand):
         link = self.get_property(item, 'link')
 
         try:
-            lat = float(self.get_property(item, 'geo:lat'))
-            lon = float(self.get_property(item, 'geo:long'))
-        except ValueError:
+            georss = self.get_property(item, 'georss:point').split()
+            lat = float(georss[0])
+            lon = float(georss[1])
+        except (ValueError, IndexError) as e:
             self.stdout.write('Unable to convert lat/lng for: {0}'.format(guid))
             return
 
         point = Point(lon, lat)
 
-        pubdate = self.get_property(item, 'pubDate')
-        publication_date = datetime.strptime(pubdate, '%a, %d %b %Y %H:%M:%S +0000')
-        publication_date = eastern.localize(publication_date)
+        publication_date = self.parse_date(self.get_property(item, 'pubDate'))
+        end_date = self.parse_date(self.get_property(item, 'fieldtrip:endDate'))
+
+        image_url = self.get_property(item, 'url')
 
         title = self.get_property(item, 'title')
 
@@ -86,6 +94,8 @@ class Command(BaseCommand):
             'link': link,
             'point': point,
             'publication_date': publication_date,
+            'end_date': end_date,
+            'image_url': image_url,
             'title': title,
         }
 

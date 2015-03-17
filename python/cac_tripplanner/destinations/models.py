@@ -64,11 +64,13 @@ class FeedEvent(models.Model):
     guid = models.CharField(unique=True, max_length=64)
     title = models.CharField(max_length=512, null=True)
     link = models.CharField(max_length=512, null=True)
+    image_url = models.URLField(blank=True, null=True)
     author = models.CharField(max_length=64, null=True)
     publication_date = models.DateTimeField()
+    end_date = models.DateTimeField(default=now)
     categories = models.CharField(max_length=512, null=True)
     description = models.CharField(max_length=512, null=True)
-    content = RichTextField()
+    content = RichTextField(blank=True, null=True)
     point = models.PointField()
 
     @property
