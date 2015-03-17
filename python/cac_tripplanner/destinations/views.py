@@ -18,7 +18,9 @@ from .models import Destination, FeedEvent
 
 
 def map(request):
-    return render_to_response('map.html', context_instance=RequestContext(request))
+    routing_url = OTP_URL.format(router='default') + 'plan'
+    context = RequestContext(request, dict(routing_url=routing_url))
+    return render_to_response('map.html', context_instance=context)
 
 
 class FindReachableDestinations(View):
