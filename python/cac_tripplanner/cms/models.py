@@ -4,6 +4,12 @@ from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
 
+from cac_tripplanner.image_utils import generate_image_filename
+
+
+def generate_filename(instance, filename):
+    """Helper for generating image filenames"""
+    return generate_image_filename('cms', instance, filename)
 
 class ArticleManager(models.Manager):
 
@@ -57,6 +63,10 @@ class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
+    wide_image = models.ImageField(upload_to=generate_filename, null=True,
+                                   help_text='The wide image. Will be displayed at 600x300.')
+    narrow_image = models.ImageField(upload_to=generate_filename, null=True,
+                                     help_text='The narrow image. Will be displayed at 400x600.')
 
     @property
     def published(self):
