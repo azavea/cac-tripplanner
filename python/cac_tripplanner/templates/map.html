@@ -5,10 +5,10 @@
     <div id="map"></div>
     <aside class="sidebar">
         <div class="sidebar-tabs">
-            <button class="btn" id="sidebar-toggle-explore">Discover Places</button>
-            <button class="btn" id="sidebar-toggle-directions">Get Directions</button>
+            <button class="btn" data-tab="explore">Discover Places</button>
+            <button class="btn" data-tab="directions">Get Directions</button>
         </div>
-        <section class="explore">
+        <section class="explore" data-sidebar-tab="true">
             <div class="sidebar-block sidebar-search">
                 <input id="exploreOrigin" class="typeahead" data-typeahead-key="search" type="search"
                 placeholder="Search by location" />
@@ -73,7 +73,7 @@
                 </div>
             </div>
         </section>
-        <section class="directions hidden">
+        <section class="directions hidden" data-sidebar-tab="true">
             <div class="sidebar-block sidebar-search">
                 <input class="typeahead origin" data-typeahead-key="origin" type="search" placeholder="Select an origin " />
                 <input class="typeahead destination" data-typeahead-key="destination" type="search" placeholder="Select a destination" />
