@@ -8,7 +8,13 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
     var defaults = {
         selectors: {
-            typeahead: 'section.directions input.typeahead'
+            buttonPlanTrip: 'section.directions button[type=submit]',
+            checkboxArriveBy: 'input[name="arriveBy"]:checked',
+            datepicker: '#datetimeDirections',
+            modeSelector: '#directionsModeSelector',
+            typeahead: 'section.directions input.typeahead',
+            typeaheadOrigin: 'section.directions input.origin',
+            typeaheadDest: 'section.directions input.destination'
         }
     };
     var options = {};
@@ -31,10 +37,10 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         tabControl = options.tabControl;
 
         // Plan a trip using information provided
-        $('section.directions button[type=submit]').click($.proxy(planTrip, this));
+        $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
 
         // initiallize date/time picker
-        datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
+        datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
 
         typeahead  = new Typeahead(options.selectors.typeahead);
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
@@ -55,14 +61,14 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             return;
         }
 
-        var picker = $('#datetimeDirections').data('DateTimePicker');
+        var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
         if (!date) {
             // use current date/time if none set
             date = moment();
         }
 
-        var mode = $('#directionsModeSelector').val();
+        var mode = $(options.selectors.modeSelector).val();
 
         var origin = directions.origin;
         var destination = directions.destination;
@@ -70,7 +76,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var toText = $('#directionsTo').val();
 
         var arriveBy = true;
-        if ($('input[name="arriveBy"]:checked').val() !== 'arriveBy') {
+        if ($(options.selectors.checkboxArriveBy).val() !== 'arriveBy') {
             arriveBy = false; // depart at time instead
         }
 
@@ -131,13 +137,13 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var from = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
         directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-        $('section.directions input.origin').val(originText);
+        $(options.selectors.typeaheadOrigin).val(originText);
 
         // Set destination
         var toCoords = destination.point.coordinates;
         var destinationText = destination.address;
         directions.destination = [toCoords[1], toCoords[0]];
-        $('section.directions input.destination').val(destinationText);
+        $(options.selectors.typeaheadDest).val(destinationText);
 
         // Get directions
         planTrip();
@@ -151,8 +157,8 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
     function setDirectionsError() {
         var errorClass = 'error';
-        var $inputOrigin = $('section.directions input.origin');
-        var $inputDestination = $('section.directions input.destination');
+        var $inputOrigin = $();
+        var $inputDestination = $(options.selectors.typeaheadDest);
         if (directions.origin) {
             $inputOrigin.removeClass(errorClass);
         } else {
@@ -184,10 +190,10 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
 
-            $('section.directions input.origin').typeahead('val', fromText);
-            $('section.directions input.destination').typeahead('val', toText);
-            $('#directionsModeSelector').val(mode);
-            $('input[name="arriveBy"]:checked').val(arriveBy);
+            $(options.selectors.typeaheadOrigin).typeahead('val', fromText);
+            $(options.selectors.typeaheadDest).typeahead('val', toText);
+            $(options.selectors.modeSelector).val(mode);
+            $(options.selectors.checkboxArriveBy).val(arriveBy);
 
             if (from) {
                 directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
@@ -203,12 +209,6 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
                     return;
                 });
             }
-
-            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-            $('section.directions input.origin').val(fromText);
-            $('section.directions input.destination').val(toText);
-            $('#directionsModeSelector').val(mode);
-            planTrip();
         }
     }
 
