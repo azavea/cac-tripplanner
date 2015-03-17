@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences) {
+CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     'use strict';
 
     var defaults = {
@@ -32,9 +32,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
             mapControl: mapControl,
             tabControl: sidebarTabControl
         });
-
-        this.typeahead  = new CAC.Search.Typeahead('input.typeahead');
-        this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
     };
 
     return Map;
@@ -50,15 +47,4 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         }
     }
 
-    function onTypeaheadSelected(event, key, location) {
-        // TODO: Deleting text from input elements does not delete directions object values
-        if (key === 'origin' || key === 'destination') {
-            var prefKey = key === 'origin' ? 'from' : 'to';
-            UserPreferences.setPreference(prefKey, location);
-            sidebarDirectionsControl.setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
-        } else if (key === 'search') {
-            UserPreferences.setPreference('origin', location);
-            sidebarExploreControl.setAddress(location);
-        }
-    }
-})(jQuery, Handlebars, _, moment, CAC.Map.Control, CAC.User.Preferences);
+})(jQuery, Handlebars, _, moment, CAC.Map.Control);

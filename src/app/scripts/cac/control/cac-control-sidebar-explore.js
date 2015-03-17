@@ -2,11 +2,15 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
+CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferences) {
 
     'use strict';
 
-    var defaults = {};
+    var defaults = {
+        selectors: {
+            typeahead: 'section.explore input.typeahead'
+        }
+    };
     var options = {};
 
     var events = $({});
@@ -15,6 +19,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
     };
 
     var mapControl = null;
+    var typeahead = null;
     var exploreLatLng = [0,0];
 
     function SidebarExploreControl(params) {
@@ -29,6 +34,9 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
         $('.sidebar-search button[type="submit"]').on('click', function(){
             $('.explore').addClass('show-results');
         });
+
+        typeahead  = new Typeahead(options.selectors.typeahead);
+        typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
     }
@@ -74,6 +82,14 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
                 setDestinationSidebar(destinations);
             }
         );
+    }
+
+    function onTypeaheadSelected(event, key, location) {
+        // TODO: Deleting text from input elements does not delete directions object values
+        if (key === 'search') {
+            UserPreferences.setPreference('origin', location);
+            setAddress(location);
+        }
     }
 
     function showOptions(event) {
@@ -134,4 +150,4 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.User.Preferences);
+})(jQuery, CAC.Map.Templates, CAC.Search.Typeahead, CAC.User.Preferences);

@@ -2,11 +2,15 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, UserPreferences) {
+CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, UserPreferences) {
 
     'use strict';
 
-    var defaults = {};
+    var defaults = {
+        selectors: {
+            typeahead: 'section.directions input.typeahead'
+        }
+    };
     var options = {};
 
     var currentItinerary = null;
@@ -19,6 +23,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, UserPrefere
 
     var mapControl = null;
     var tabControl = null;
+    var typeahead = null;
 
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -30,6 +35,9 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, UserPrefere
 
         // initiallize date/time picker
         datepicker = $('#datetimeDirections').datetimepicker({useCurrent: true});
+
+        typeahead  = new Typeahead(options.selectors.typeahead);
+        typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
     }
@@ -106,6 +114,15 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, UserPrefere
             currentItinerary.highlight(false);
             itinerary.highlight(true);
             currentItinerary = itinerary;
+        }
+    }
+
+    function onTypeaheadSelected(event, key, location) {
+        // TODO: Deleting text from input elements does not delete directions object values
+        if (key === 'origin' || key === 'destination') {
+            var prefKey = key === 'origin' ? 'from' : 'to';
+            UserPreferences.setPreference(prefKey, location);
+            setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
         }
     }
 
@@ -195,4 +212,4 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, UserPrefere
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.Routing.Plans, CAC.User.Preferences);
+})(jQuery, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences);
