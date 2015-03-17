@@ -76,7 +76,8 @@ CAC.Map.Control = (function ($, L, _) {
 
     function initializeLayerControl() {
         L.control.layers(basemaps, overlays, {
-            position: 'bottomright'
+            position: 'bottomright',
+            collapsed: false
         }).addTo(map);
     }
 
