@@ -1,4 +1,3 @@
-
 /**
  *  View control for the sidebar explore tab
  *
@@ -16,6 +15,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
     };
 
     var mapControl = null;
+    var exploreLatLng = [0,0];
 
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -30,7 +30,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
             $('.explore').addClass('show-results');
         });
 
-        setFromUserPrefs();
+        setFromUserPreferences();
     }
 
     SidebarExploreControl.prototype = {
@@ -69,7 +69,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
     function fetchIsochrone(when, mode, exploreMinutes) {
-        mapControl.fetchIsochrone(directions.exploreOrigin, when, mode, exploreMinutes).then(
+        mapControl.fetchIsochrone(exploreLatLng, when, mode, exploreMinutes).then(
             function (destinations) {
                 setDestinationSidebar(destinations);
             }
@@ -92,6 +92,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
 
     function setAddress(location) {
         var latLng = L.latLng(location.feature.geometry.y, location.feature.geometry.x);
+        exploreLatLng = [location.feature.geometry.y, location.feature.geometry.x];
         mapControl.setGeocodeMarker(latLng);
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
     }
@@ -110,28 +111,27 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
         $('.explore .sidebar-clip').height(400);
     }
 
-    function setFromUserPrefs() {
+    function setFromUserPreferences() {
         var method = UserPreferences.getPreference('method');
-        if (!method) {
-            return; // no user preferences set
+        if (method === 'explore') {
+            var mode = UserPreferences.getPreference('mode');
+
+            // 'explore' tab
+            var exploreOrigin = UserPreferences.getPreference('origin');
+            exploreLatLng = [exploreOrigin.feature.geometry.y,
+                                        exploreOrigin.feature.geometry.x];
+            var originText = UserPreferences.getPreference('originText');
+            var exploreTime = UserPreferences.getPreference('exploreTime');
+            setAddress(exploreOrigin);
+
+            $('#exploreOrigin').typeahead('val', originText);
+            $('#exploreTime').val(exploreTime);
+            $('#exploreModeSelector').val(mode);
+
+            var when = moment(); // TODO: add date/time selector for 'explore' options?
+
+            fetchIsochrone(when, mode, exploreTime);
         }
-        var mode = UserPreferences.getPreference('mode');
-
-        // 'explore' tab
-        var exploreOrigin = UserPreferences.getPreference('origin');
-        directions.exploreOrigin = [exploreOrigin.feature.geometry.y,
-                                    exploreOrigin.feature.geometry.x];
-        var originText = UserPreferences.getPreference('originText');
-        var exploreTime = UserPreferences.getPreference('exploreTime');
-        setAddress(exploreOrigin);
-
-        $('#exploreOrigin').typeahead('val', originText);
-        $('#exploreTime').val(exploreTime);
-        $('#exploreModeSelector').val(mode);
-
-        var when = moment(); // TODO: add date/time selector for 'explore' options?
-
-        fetchIsochrone(when, mode, exploreTime);
     }
 
 })(jQuery, CAC.Map.Templates, CAC.User.Preferences);
