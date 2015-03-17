@@ -1,7 +1,8 @@
-from ckeditor.fields import RichTextField
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+
+from ckeditor.fields import RichTextField
 
 from cac_tripplanner.image_utils import generate_image_filename
 

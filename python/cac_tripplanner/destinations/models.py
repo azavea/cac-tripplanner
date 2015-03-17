@@ -1,6 +1,7 @@
-from ckeditor.fields import RichTextField
 from django.contrib.gis.db import models
 from django.utils.timezone import now
+
+from ckeditor.fields import RichTextField
 
 from cac_tripplanner.image_utils import generate_image_filename
 

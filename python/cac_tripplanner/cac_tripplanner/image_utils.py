@@ -7,7 +7,7 @@ from django.forms import ValidationError
 
 
 def generate_image_filename(prefix, instance, filename):
-    """ Helper for creating unique image filenames
+    """Helper for creating unique image filenames
 
     Must be outside the model class because makemigrations throws the following error if not:
         ValueError: Could not find function generate_filename in <module>.models.
