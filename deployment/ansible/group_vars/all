@@ -3,6 +3,9 @@ app_username: "vagrant"
 
 # open trip planner vars
 otp_process_mem: 2G
+otp_repo: "https://github.com/azavea/OpenTripPlanner.git"
+otp_version: "cac"
+otp_jarfile: "./target/otp-0.13.0.jar"
 
 s3_otp_data: cleanair-otp-data
 
