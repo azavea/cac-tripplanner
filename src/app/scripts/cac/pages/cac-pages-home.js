@@ -34,7 +34,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
-        loadFromPreferences();
+        $(document).ready(loadFromPreferences);
     };
 
     var submitDirections = function(event) {
@@ -79,14 +79,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         window.location = '/map';
     };
 
-    return Home;
-
-    function onTypeaheadSelected(event, key, location) {
-        event.preventDefault();  // do not submit form
-        UserPreferences.setPreference(key, location);
-    }
-
-    function loadFromPreferences() {
+    var loadFromPreferences = function loadFromPreferences() {
 
         // only load preferences if they are set
         if (!UserPreferences.havePreferences()) {
@@ -111,7 +104,13 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         $(options.selectors.directionsFrom).typeahead('val', fromText);
         $(options.selectors.directionsTo).typeahead('val', toText);
         $(options.selectors.directionsMode).val(mode);
+    };
 
+    return Home;
+
+    function onTypeaheadSelected(event, key, location) {
+        event.preventDefault();  // do not submit form
+        UserPreferences.setPreference(key, location);
     }
 
     function setTab(tab) {
