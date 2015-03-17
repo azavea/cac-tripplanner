@@ -173,7 +173,7 @@ OTP_URL = secrets['otp_url']
 
 # Settings for S3 storage
 if secrets['use_s3_storage']:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'cac_tripplanner.custom_storages.PublicS3BotoStorage'
     AWS_ACCESS_KEY_ID = secrets['aws_access_key_id']
     AWS_SECRET_ACCESS_KEY = secrets['aws_secret_access_key']
     AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
