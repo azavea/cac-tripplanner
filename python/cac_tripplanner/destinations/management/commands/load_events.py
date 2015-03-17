@@ -6,12 +6,14 @@ from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 from destinations.models import FeedEvent
 
-from pytz import timezone
+from pytz import utc
 
 
 class Command(BaseCommand):
     args = ''
     help = 'Load the current Uwishunu feed into the FeedEvent table'
+
+    now = utc.localize(datetime.utcnow())
 
     def property_exists(self, item, property_name):
         """ Check if a property exists as a child of the given element """
@@ -28,9 +30,8 @@ class Command(BaseCommand):
         """ Parse a date from the feed, return datetime localized to US/Eastern """
         if not string_datetime:
             return None
-        eastern = timezone('US/Eastern')
         parsed_date = datetime.strptime(string_datetime, '%a, %d %b %Y %H:%M:%S +0000')
-        return eastern.localize(parsed_date)
+        return utc.localize(parsed_date)
 
     def handle(self, *args, **options):
         """ Retrieve and populate FeedEvent table from an RSS Feed """
@@ -45,6 +46,8 @@ class Command(BaseCommand):
 
         for item in feed.getElementsByTagName('item'):
             self.handle_feed_item(item)
+
+        self.delete_expired()
 
     def handle_feed_item(self, item):
         """ Update or create a FeedEvent based on a unique identifier """
@@ -80,6 +83,9 @@ class Command(BaseCommand):
 
         publication_date = self.parse_date(self.get_property(item, 'pubDate'))
         end_date = self.parse_date(self.get_property(item, 'fieldtrip:endDate'))
+        if end_date < self.now:
+            # Skip event if in past
+            return
 
         image_url = self.get_property(item, 'url')
 
@@ -102,3 +108,12 @@ class Command(BaseCommand):
         feed_event, created = FeedEvent.objects.update_or_create(guid=guid, defaults=updated_item)
         if created:
             self.stdout.write('{0}: Added event: "{1}"'.format(str(datetime.utcnow()), guid))
+
+    def delete_expired(self):
+        """ Clear events with end_date < now """
+        expired_events = FeedEvent.objects.filter(end_date__lt=self.now)
+        num_expired_events = len(expired_events)
+        if num_expired_events > 0:
+            expired_events.delete()
+            self.stdout.write('{0}: Cleaned {1} expired events'.format(str(datetime.now()), num_expired_events))
+
