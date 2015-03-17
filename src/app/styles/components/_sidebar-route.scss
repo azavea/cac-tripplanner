@@ -2,12 +2,15 @@
     position: absolute;
     width: 100%;
     top: 32px;
-    bottom: 0;
 
     &.show-results {
         .sidebar-clip {
             height: 100%;
         }
+    }
+
+    .itineraries {
+        bottom: 35px;
     }
 
     .sidebar-options {
