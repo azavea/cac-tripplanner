@@ -44,6 +44,7 @@ CAC.User.Preferences = (function($) {
 
     var module = {
         getPreference: getPreference,
+        havePreferences: havePreferences,
         setPreference: setPreference
     };
     return module;
@@ -63,6 +64,15 @@ CAC.User.Preferences = (function($) {
             setPreference(preference, val);
         }
         return val;
+    }
+
+    /**
+     * Check if there are any settings on the browser.
+     *
+     * @return {Boolean} true if CAC settings found
+    */
+    function havePreferences() {
+        return !!(storage.get('method'));
     }
 
     /**

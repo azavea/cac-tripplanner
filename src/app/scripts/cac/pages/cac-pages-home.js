@@ -1,55 +1,47 @@
 CAC.Pages.Home = (function ($, UserPreferences) {
     'use strict';
 
-    var defaults = {};
+    var defaults = {
+        selectors: {
+            directionsForm: '#directions',
+            directionsFrom: '#directionsFrom',
+            directionsMode: '#directionsMode',
+            directionsTo: '#directionsTo',
+            exploreForm: '#explore',
+            exploreMode: '#exploreMode',
+            exploreOrigin: '#exploreOrigin',
+            exploreTime: '#exploreTime',
+            toggleButton: '.toggle-search button',
+            typeahead: 'input.typeahead'
+        }
+    };
+    var options = {};
 
-    function Home(options) {
-        this.options = $.extend({}, defaults, options);
+    function Home(params) {
+        options = $.extend({}, defaults, params);
     }
 
     Home.prototype.initialize = function () {
-        $('.toggle-search button').on('click', function(){
+        $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
-
-            if (id === 'toggle-directions') {
-                $('#explore').addClass('hidden');
-                $('#directions').removeClass('hidden');
-            } else {
-                $('#directions').addClass('hidden');
-                $('#explore').removeClass('hidden');
-            }
+            setTab(id);
         });
 
-        this.typeahead = new CAC.Search.Typeahead('input.typeahead');
+        this.typeahead = new CAC.Search.Typeahead(options.selectors.typeahead);
         this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
+
+        // save form data and redirect to map when 'go' button clicked
+        $(options.selectors.exploreForm).submit(submitExplore);
+        $(options.selectors.directionsForm).submit(submitDirections);
+
+        loadFromPreferences();
     };
 
-    // save form data and redirect to map when 'go' button clicked
-
-    $('#explore').submit(function(event) {
+    var submitDirections = function(event) {
         event.preventDefault();
-        var exploreTime = $('#exploreTime').val();
-        var mode = $('#exploreMode').val();
-        var originText = $('#exploreOrigin').val();
-
-        if (!originText) {
-            // unset stored origin and use default, if none entered
-            UserPreferences.setPreference('origin', undefined);
-        }
-
-        UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('exploreTime', exploreTime);
-        UserPreferences.setPreference('mode', mode);
-        UserPreferences.setPreference('originText', originText);
-
-        window.location = '/map';
-    });
-
-    $('#directions').submit(function(event) {
-        event.preventDefault();
-        var mode = $('#directionsMode').val();
-        var fromText = $('#directionsFrom').val();
-        var toText = $('#directionsTo').val();
+        var mode = $(options.selectors.directionsMode).val();
+        var fromText = $(options.selectors.directionsFrom).val();
+        var toText = $(options.selectors.directionsTo).val();
 
         // unset stored origin/destination and use defaults, if not entered
         if (!fromText) {
@@ -66,13 +58,70 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         UserPreferences.setPreference('toText', toText);
 
         window.location = '/map';
-    });
+    };
+
+    var submitExplore = function(event) {
+        event.preventDefault();
+        var exploreTime = $(options.selectors.exploreTime).val();
+        var mode = $(options.selectors.exploreMode).val();
+        var originText = $(options.selectors.exploreOrigin).val();
+
+        if (!originText) {
+            // unset stored origin and use default, if none entered
+            UserPreferences.setPreference('origin', undefined);
+        }
+
+        UserPreferences.setPreference('method', 'explore');
+        UserPreferences.setPreference('exploreTime', exploreTime);
+        UserPreferences.setPreference('mode', mode);
+        UserPreferences.setPreference('originText', originText);
+
+        window.location = '/map';
+    };
 
     return Home;
 
     function onTypeaheadSelected(event, key, location) {
         event.preventDefault();  // do not submit form
         UserPreferences.setPreference(key, location);
+    }
+
+    function loadFromPreferences() {
+
+        // only load preferences if they are set
+        if (!UserPreferences.havePreferences()) {
+            return;
+        }
+
+        var method = UserPreferences.getPreference('method');
+        var mode = UserPreferences.getPreference('mode');
+        setTab(method);
+
+        // 'explore' tab options
+        var originText = UserPreferences.getPreference('originText');
+        var exploreTime = UserPreferences.getPreference('exploreTime');
+
+        $(options.selectors.exploreOrigin).typeahead('val', originText);
+        $(options.selectors.exploreTime).val(exploreTime);
+        $(options.selectors.exploreMode).val(mode);
+
+        // 'directions' tab options
+        var fromText = UserPreferences.getPreference('fromText');
+        var toText = UserPreferences.getPreference('toText');
+        $(options.selectors.directionsFrom).typeahead('val', fromText);
+        $(options.selectors.directionsTo).typeahead('val', toText);
+        $(options.selectors.directionsMode).val(mode);
+
+    }
+
+    function setTab(tab) {
+        if (tab.indexOf('directions') > -1) {
+            $(options.selectors.exploreForm).addClass('hidden');
+            $(options.selectors.directionsForm).removeClass('hidden');
+        } else {
+            $(options.selectors.directionsForm).addClass('hidden');
+            $(options.selectors.exploreForm).removeClass('hidden');
+        }
     }
 
 })(jQuery, CAC.User.Preferences);
