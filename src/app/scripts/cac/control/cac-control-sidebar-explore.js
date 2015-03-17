@@ -2,11 +2,24 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
+CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferences) {
 
     'use strict';
 
-    var defaults = {};
+    var defaults = {
+        selectors: {
+            exploreMode: '#exploreModeSelector',
+            exploreOrigin: '#exploreOrigin',
+            exploreTime: '#exploreTime',
+            optionsMore: '.sidebar-options .more-options',
+            optionsViewMore: '.sidebar-options .view-more',
+            sidebarContainer: '.explore .sidebar-clip',
+            sidebarDetails: '.explore div.sidebar-details',
+            submitExplore: 'section.explore button[type=submit]',
+            submitSearch: '.sidebar-search button[type="submit"]',
+            typeahead: 'section.explore input.typeahead'
+        }
+    };
     var options = {};
 
     var events = $({});
@@ -15,20 +28,24 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
     };
 
     var mapControl = null;
+    var typeahead = null;
     var exploreLatLng = [0,0];
 
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
 
-        $('.sidebar-options .view-more').click(showOptions);
+        $(options.selectors.optionsViewMore).click(showOptions);
 
         // Show isochrone in discovery tab
-        $('section.explore button[type=submit]').click(clickedExplore);
+        $(options.selectors.submitExplore).click(clickedExplore);
 
-        $('.sidebar-search button[type="submit"]').on('click', function(){
+        $(options.selectors.submitSearch).on('click', function(){
             $('.explore').addClass('show-results');
         });
+
+        typeahead  = new Typeahead(options.selectors.typeahead);
+        typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
     }
@@ -45,15 +62,15 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
      * Set user preferences before fetching isochrone.
      */
     function clickedExplore() {
-        var exploreMinutes = $('#exploreTime').val();
-        var mode = $('#exploreModeSelector').val();
+        var exploreMinutes = $(options.selectors.exploreTime).val();
+        var mode = $(options.selectors.exploreMode).val();
 
         // TODO: add date/time selector to 'explore' extra options panel?
         var when = moment();
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('originText', $('#exploreOrigin').val());
+        UserPreferences.setPreference('originText', $(options.selectors.exploreOrigin).val());
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
@@ -76,9 +93,17 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
         );
     }
 
+    function onTypeaheadSelected(event, key, location) {
+        // TODO: Deleting text from input elements does not delete directions object values
+        if (key === 'search') {
+            UserPreferences.setPreference('origin', location);
+            setAddress(location);
+        }
+    }
+
     function showOptions(event) {
         var parent = $(event.target).closest('section');
-        var moreOpt = $('.sidebar-options .more-options', parent);
+        var moreOpt = $(options.selectors.optionsMore, parent);
 
         $(moreOpt).toggleClass('active');
         $(moreOpt).parent().find('a.view-more').text(function() {
@@ -107,8 +132,8 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
             });
             $container.append($destination);
         });
-        $('.explore div.sidebar-details').empty().append($container);
-        $('.explore .sidebar-clip').height(400);
+        $(options.selectors.sidebarDetails).empty().append($container);
+        $(options.selectors.sidebarContainer).height(400);
     }
 
     function setFromUserPreferences() {
@@ -124,9 +149,9 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
             var exploreTime = UserPreferences.getPreference('exploreTime');
             setAddress(exploreOrigin);
 
-            $('#exploreOrigin').typeahead('val', originText);
-            $('#exploreTime').val(exploreTime);
-            $('#exploreModeSelector').val(mode);
+            $(options.selectors.exploreOrigin).typeahead('val', originText);
+            $(options.selectors.exploreTime).val(exploreTime);
+            $(options.selectors.exploreMode).val(mode);
 
             var when = moment(); // TODO: add date/time selector for 'explore' options?
 
@@ -134,4 +159,4 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.User.Preferences);
+})(jQuery, CAC.Map.Templates, CAC.Search.Typeahead, CAC.User.Preferences);
