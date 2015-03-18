@@ -133,6 +133,9 @@
 {%block jspage %}
 <script type="text/javascript">
 $(document).ready(function () {
+    // Settings pulled in from server-side
+    CAC.Settings.routingUrl = '{{ routing_url }}';
+
     var map = new CAC.Pages.Map();
     map.initialize();
 });
