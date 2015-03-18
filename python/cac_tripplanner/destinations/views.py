@@ -48,7 +48,8 @@ class FindReachableDestinations(View):
 
         # Parse and traverse JSON from OTP so that we return only geometries
         try:
-            json_poly = json.loads(isochrone_response.content)[0]['geometry']['geometries']
+            # get a feature collection
+            json_poly = json.loads(isochrone_response.content)
         except:
             # No isochrone found.  Is GTFS loaded?  Is origin within the graph bounds?
             json_poly = json.loads("{}")
@@ -79,11 +80,15 @@ class FindReachableDestinations(View):
             max_walk_distance=params.get('maxWalkDistance')
         )
 
-        # Coerce to multipolygon
-        polygons = [GEOSGeometry(json.dumps(poly)) for poly in json_poly]
-        iso = MultiPolygon(polygons)
-
-        matched_objects = Destination.objects.filter(point__within=iso, published=True)
+        # Have a FeatureCollection of MultiPolygons
+        if 'features' in json_poly:
+            matched_objects = []
+            for poly in json_poly['features']:
+                geom_str = json.dumps(poly['geometry'])
+                geom = GEOSGeometry(geom_str)
+                matched_objects = Destination.objects.filter(point__within=geom, published=True)
+        else:
+            matched_objects = []
 
         # make locations JSON serializable
         matched_objects = [model_to_dict(x) for x in matched_objects]
