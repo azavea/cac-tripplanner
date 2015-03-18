@@ -52,7 +52,7 @@ class FeedEventManager(models.GeoManager):
     """Custom manager for FeedEvents allows filtering on publication_date"""
 
     def published(self):
-        return self.get_queryset().filter(publication_date__lt=now())
+        return self.get_queryset().filter(publication_date__lt=now()).filter(end_date__gt=now())
 
     def get_queryset(self):
         return super(FeedEventManager, self).get_queryset()

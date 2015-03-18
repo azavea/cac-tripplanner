@@ -22,24 +22,35 @@ class FeedEventTests(TestCase):
         past_published = now() - timedelta(hours=1)
         future_published = now() + timedelta(hours=1)
 
-        self.future_event = FeedEvent.objects.create(
+        self.pub_future_end_past = FeedEvent.objects.create(
             guid='1',
             publication_date=future_published,
+            end_date=past_published,
             **common_args)
-        self.past_event = FeedEvent.objects.create(
+        self.pub_past_end_future = FeedEvent.objects.create(
             guid='2',
             publication_date=past_published,
+            end_date=future_published,
             **common_args)
-        self.past_event_two = FeedEvent.objects.create(
+        self.pub_future_end_future = FeedEvent.objects.create(
             guid='3',
+            publication_date=future_published,
+            end_date=future_published,
+            **common_args)
+        self.pub_past_end_past = FeedEvent.objects.create(
+            guid='4',
             publication_date=past_published,
+            end_date=past_published,
             **common_args)
 
     def test_feed_event_manager(self):
 
         published_count = FeedEvent.objects.published().count()
-        self.assertEqual(published_count, 2)
+        self.assertEqual(published_count, 1)
 
     def test_published_property(self):
-        self.assertFalse(self.future_event.published)
-        self.assertTrue(self.past_event.published)
+        """ Only events that have published < now and end_date > now should be valid """
+        self.assertFalse(self.pub_future_end_past.published)
+        self.assertTrue(self.pub_past_end_future.published)
+        self.assertFalse(self.pub_future_end_future.published)
+        self.assertFalse(self.pub_past_end_past.published)
