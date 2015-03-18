@@ -158,11 +158,13 @@ class FeedEvents(View):
         utc = timezone('UTC')
         epoch = utc.localize(datetime(1970, 1, 1))
 
-        results = FeedEvent.objects.published().order_by('-publication_date')[:20]
+        results = FeedEvent.objects.published().order_by('end_date')[:20]
         response = [model_to_dict(x) for x in results]
         for obj in response:
             pnt = obj['point']
             obj['point'] = json.loads(pnt.json)
             dt = obj['publication_date']
             obj['publication_date'] = (dt - epoch).total_seconds()
+            dt = obj['end_date']
+            obj['end_date'] = (dt - epoch).total_seconds()
         return HttpResponse(json.dumps(response), 'application/json')

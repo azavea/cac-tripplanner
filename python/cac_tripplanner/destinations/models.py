@@ -52,7 +52,7 @@ class FeedEventManager(models.GeoManager):
     """Custom manager for FeedEvents allows filtering on publication_date"""
 
     def published(self):
-        return self.get_queryset().filter(publication_date__lt=now())
+        return self.get_queryset().filter(publication_date__lt=now()).filter(end_date__gt=now())
 
     def get_queryset(self):
         return super(FeedEventManager, self).get_queryset()
@@ -64,18 +64,20 @@ class FeedEvent(models.Model):
     guid = models.CharField(unique=True, max_length=64)
     title = models.CharField(max_length=512, null=True)
     link = models.CharField(max_length=512, null=True)
+    image_url = models.URLField(blank=True, null=True)
     author = models.CharField(max_length=64, null=True)
     publication_date = models.DateTimeField()
+    end_date = models.DateTimeField(default=now)
     categories = models.CharField(max_length=512, null=True)
     description = models.CharField(max_length=512, null=True)
-    content = RichTextField()
+    content = RichTextField(blank=True, null=True)
     point = models.PointField()
 
     @property
     def published(self):
         """Helper property to easily determine if an article is published"""
-        if self.publication_date:
-            return self.publication_date < now()
+        if self.publication_date and self.end_date:
+            return self.publication_date < now() and self.end_date > now()
         else:
             return False
 

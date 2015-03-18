@@ -98,6 +98,11 @@ gulp.task('copy:style-images', function() {
         .pipe(gulp.dest(stat.styles + '/images'));
 });
 
+gulp.task('copy:app-images', function() {
+    return gulp.src('app/images/**/*.png')
+        .pipe(gulp.dest(stat.images));
+});
+
 gulp.task('copy:vendor-scripts', function() {
     return copyBowerFiles('**/*.js', [multiSelectRoot + '/jquery.multiple.select.js'])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
@@ -168,7 +173,13 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 );
 
 gulp.task('common:build', ['clean'], function() {
-    return gulp.start('copy:vendor-css', 'copy:vendor-images', 'copy:style-images', 'sass', 'collectstatic');
+    return gulp.start(
+        'copy:vendor-css',
+        'copy:vendor-images',
+        'copy:style-images',
+        'copy:app-images',
+        'sass',
+        'collectstatic');
 });
 
 gulp.task('test', sequence([

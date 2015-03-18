@@ -6,12 +6,14 @@ from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 from destinations.models import FeedEvent
 
-from pytz import timezone
+from pytz import utc
 
 
 class Command(BaseCommand):
     args = ''
     help = 'Load the current Uwishunu feed into the FeedEvent table'
+
+    now = utc.localize(datetime.utcnow())
 
     def property_exists(self, item, property_name):
         """ Check if a property exists as a child of the given element """
@@ -24,10 +26,20 @@ class Command(BaseCommand):
             return None
         return elements[0].firstChild.data
 
+    def parse_date(self, string_datetime):
+        """ Parse a date from the feed, return datetime localized to US/Eastern """
+        if not string_datetime:
+            return None
+        try:
+            parsed_date = datetime.strptime(string_datetime, '%a, %d %b %Y %H:%M:%S +0000')
+        except ValueError:
+            return None
+        return utc.localize(parsed_date)
+
     def handle(self, *args, **options):
         """ Retrieve and populate FeedEvent table from an RSS Feed """
 
-        url = 'http://www.uwishunu.com/category/events/feed/'
+        url = 'http://www.uwishunu.com/feed/google/'
         # Get 403 forbidden without changing user-agent
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0'
@@ -38,16 +50,16 @@ class Command(BaseCommand):
         for item in feed.getElementsByTagName('item'):
             self.handle_feed_item(item)
 
+        self.delete_expired()
+
     def handle_feed_item(self, item):
         """ Update or create a FeedEvent based on a unique identifier """
-
-        eastern = timezone('US/Eastern')
 
         # Unique field
         guid = self.get_property(item, 'guid')
 
         # need a lat/lng to care about this item
-        if not (self.property_exists(item, 'geo:lat') and self.property_exists(item, 'geo:long')):
+        if not self.property_exists(item, 'georss:point'):
             return
 
         # Other fields
@@ -63,17 +75,22 @@ class Command(BaseCommand):
         link = self.get_property(item, 'link')
 
         try:
-            lat = float(self.get_property(item, 'geo:lat'))
-            lon = float(self.get_property(item, 'geo:long'))
-        except ValueError:
+            georss = self.get_property(item, 'georss:point').split()
+            lat = float(georss[0])
+            lon = float(georss[1])
+        except (ValueError, IndexError) as e:
             self.stdout.write('Unable to convert lat/lng for: {0}'.format(guid))
             return
 
         point = Point(lon, lat)
 
-        pubdate = self.get_property(item, 'pubDate')
-        publication_date = datetime.strptime(pubdate, '%a, %d %b %Y %H:%M:%S +0000')
-        publication_date = eastern.localize(publication_date)
+        publication_date = self.parse_date(self.get_property(item, 'pubDate'))
+        end_date = self.parse_date(self.get_property(item, 'fieldtrip:endDate'))
+        if end_date < self.now or publication_date is None or end_date is None:
+            # Skip event if in past or bad/empty dates
+            return
+
+        image_url = self.get_property(item, 'url')
 
         title = self.get_property(item, 'title')
 
@@ -86,9 +103,20 @@ class Command(BaseCommand):
             'link': link,
             'point': point,
             'publication_date': publication_date,
+            'end_date': end_date,
+            'image_url': image_url,
             'title': title,
         }
 
         feed_event, created = FeedEvent.objects.update_or_create(guid=guid, defaults=updated_item)
         if created:
             self.stdout.write('{0}: Added event: "{1}"'.format(str(datetime.utcnow()), guid))
+
+    def delete_expired(self):
+        """ Clear events with end_date < now """
+        expired_events = FeedEvent.objects.filter(end_date__lt=self.now)
+        num_expired_events = len(expired_events)
+        if num_expired_events > 0:
+            expired_events.delete()
+            self.stdout.write('{0}: Cleaned {1} expired events'.format(str(datetime.now()), num_expired_events))
+
