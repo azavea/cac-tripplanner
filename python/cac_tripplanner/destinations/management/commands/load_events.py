@@ -86,8 +86,8 @@ class Command(BaseCommand):
 
         publication_date = self.parse_date(self.get_property(item, 'pubDate'))
         end_date = self.parse_date(self.get_property(item, 'fieldtrip:endDate'))
-        if end_date < self.now:
-            # Skip event if in past
+        if end_date < self.now or publication_date is None or end_date is None:
+            # Skip event if in past or bad/empty dates
             return
 
         image_url = self.get_property(item, 'url')
