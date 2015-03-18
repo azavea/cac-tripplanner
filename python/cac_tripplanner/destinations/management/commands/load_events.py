@@ -30,7 +30,10 @@ class Command(BaseCommand):
         """ Parse a date from the feed, return datetime localized to US/Eastern """
         if not string_datetime:
             return None
-        parsed_date = datetime.strptime(string_datetime, '%a, %d %b %Y %H:%M:%S +0000')
+        try:
+            parsed_date = datetime.strptime(string_datetime, '%a, %d %b %Y %H:%M:%S +0000')
+        except ValueError:
+            return None
         return utc.localize(parsed_date)
 
     def handle(self, *args, **options):
