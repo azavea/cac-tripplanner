@@ -22,13 +22,13 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
      */
     function planTrip(coordsFrom, coordsTo, when, mode, arriveBy) {
         var deferred = $.Deferred();
-        var urlParams = prepareParamString(coordsFrom, coordsTo, when, mode, arriveBy);
-        var requestUrl = Settings.routingUrl + '?' + urlParams;
+        var urlParams = prepareParams(coordsFrom, coordsTo, when, mode, arriveBy);
         $.ajax({
-            url: requestUrl,
+            url: Settings.routingUrl,
             type: 'GET',
             contentType: 'application/json',
-            dataType: 'jsonp'
+            dataType: 'jsonp',
+            data: urlParams
         }).then(function(data) {
             var itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
             deferred.resolve(itineraries);
@@ -44,20 +44,17 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
      * @param {array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {array} coordsTo The coords in lat-lng which we would like to travel to
      *
-     * @return {string} A set of get params, ready for consumption
+     * @return {string} An object of get params, ready for consumption
      */
-    function prepareParamString(coordsFrom, coordsTo, when, mode, arriveBy) {
-        var formattedTime = when.format('hh:mma');
-        var formattedDate = when.format('MM-DD-YYYY');
-        var paramObj = {
+    function prepareParams(coordsFrom, coordsTo, when, mode, arriveBy) {
+        return {
             fromPlace: coordsFrom.join(','),
             toPlace: coordsTo.join(','),
-            time: formattedTime,
-            date: formattedDate,
+            time: when.format('hh:mma'),
+            date: when.format('MM-DD-YYYY'),
             mode: mode,
             arriveBy: arriveBy
         };
-        return $.param(paramObj);
     }
 
     /**
