@@ -58,13 +58,10 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         response = self.client.get(isochrone_url)
         json_response = json.loads(response.content)
         destinations = json_response['matched']
-        # should have at least one destination (maybe multiple with defautls loaded)
+        # should have at least one destination (maybe multiple with defaults loaded)
         self.assertGreater(len(destinations), 0)
         # check for our entry
-        destination = None
-        for dest in destinations:
-            if dest['city'] == 'Gotham':
-                destination = dest
+        destination = [dest for dest in destinations if dest['city'] == 'Gotham'][0]
         # did we get back our entry?
         self.assertEqual(destination['name'], 'testWithin')
         # did we get a pair of coordinates back?

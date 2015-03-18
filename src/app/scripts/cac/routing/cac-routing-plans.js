@@ -26,8 +26,7 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
         $.ajax({
             url: Settings.routingUrl,
             type: 'GET',
-            contentType: 'application/json',
-            dataType: 'jsonp',
+            crossDomain: true,
             data: urlParams
         }).then(function(data) {
             var itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
