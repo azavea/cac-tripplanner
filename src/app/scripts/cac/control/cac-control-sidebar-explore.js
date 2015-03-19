@@ -34,6 +34,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
+    var datepicker = null;
     var mapControl = null;
     var typeahead = null;
     var exploreLatLng = [0,0];
@@ -42,6 +43,9 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
+
+        // initiallize date/time picker
+        datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
 
         $(options.selectors.modeSelector).click($.proxy(changeMode, this));
 
@@ -80,8 +84,12 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         var exploreMinutes = $(options.selectors.exploreTime).val();
         var mode = $(options.selectors.modeSelector).val();
 
-        // TODO: add date/time selector to 'explore' extra options panel?
-        var when = moment();
+        var picker = $(options.selectors.datepicker).data('DateTimePicker');
+        var date = picker.date();
+        if (!date) {
+            // use current date/time if none set
+            date = moment();
+        }
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
@@ -89,7 +97,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
-        fetchIsochrone(when, mode, exploreMinutes);
+        fetchIsochrone(date, mode, exploreMinutes);
     }
 
     /**
@@ -156,7 +164,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     function setDestinationSidebarDetail(destination) {
         var $detail = $(MapTemplates.destinationDetail(destination));
         $detail.find('.back').on('click', onDestinationDetailBackClicked);
-        $detail.find('.getdirections').on('click', function (event) {
+        $detail.find('.getdirections').on('click', function() {
             events.trigger(eventNames.destinationDirections, destination);
         });
         $(options.selectors.sidebarDetails).empty().append($detail);
@@ -183,8 +191,8 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
             $(options.selectors.exploreTime).val(exploreTime);
             $(options.selectors.modeSelector).val(mode);
 
-            var when = moment(); // TODO: add date/time selector for 'explore' options?
-
+            // use current date/time when loading from preferences
+            var when = moment();
             fetchIsochrone(when, mode, exploreTime);
         }
     }
