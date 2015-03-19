@@ -6,6 +6,8 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
 
     'use strict';
 
+    var METERS_PER_MILE = 1609.34;
+
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#directionsBikeTriangle',
@@ -140,6 +142,19 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             var bikeTriangle = bikeTriangleOpt.val();
             $.extend(otpOptions, {optimize: 'TRIANGLE'}, options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+        } else {
+            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
+            if (maxWalk) {
+                UserPreferences.setPreference('maxWalk', maxWalk);
+                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            } else {
+                UserPreferences.setPreference('maxWalk', undefined);
+            }
+
+            // true if box checked
+            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
+            UserPreferences.setPreference('wheelchair', wheelchair);
+            $.extend(otpOptions, { wheelchair: wheelchair });
         }
 
         // set user preferences
@@ -267,6 +282,16 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             var to = UserPreferences.getPreference('to');
             var fromText = UserPreferences.getPreference('fromText');
             var toText = UserPreferences.getPreference('toText');
+            var maxWalk = UserPreferences.getPreference('maxWalk');
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+
+            if (wheelchair) {
+                $('input', options.selectors.wheelchairDiv).click();
+            }
+
+            if (maxWalk) {
+                $('input', options.selectors.maxWalkDiv).val(maxWalk);
+            }
 
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
 
