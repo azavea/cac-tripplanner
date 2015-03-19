@@ -141,7 +141,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             itinerary.highlight(true);
             directionsListControl.setItinerary(itinerary);
             currentItinerary = itinerary;
-            $itineraries.addClass('hidden');
+            //$itineraries.addClass('hidden');
             directionsListControl.show();
         }
     }
