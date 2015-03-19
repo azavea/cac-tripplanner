@@ -124,6 +124,16 @@
             top: 0;
             bottom: 0;
         }
+        .directions-list {
+            overflow-y: auto;
+            height: 100%;
+            left: 15px;
+            padding-right: 15px;
+            right: 0px;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+        }
         .block-itinerary {
             height: auto;
             margin-bottom: 10px;

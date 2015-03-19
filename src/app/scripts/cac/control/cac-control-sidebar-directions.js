@@ -177,7 +177,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
 
             directionsListControl.setItinerary(itinerary);
 
-            //itineraryListControl.hide();
+            itineraryListControl.hide();
             directionsListControl.show();
         }
     }
