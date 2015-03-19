@@ -48,7 +48,6 @@ CAC.Map.Control = (function ($, L, _) {
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.drawDestinations = drawDestinations;
-    MapControl.prototype.getItineraryById = getItineraryById;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
@@ -232,10 +231,6 @@ CAC.Map.Control = (function ($, L, _) {
                 return new L.marker(latLng, {icon: icon});
             }
         }).addTo(map);
-    }
-
-    function getItineraryById(id) {
-        return itineraries[id];
     }
 
     /**
