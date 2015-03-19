@@ -26,7 +26,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         sidebarExploreControl = new CAC.Control.SidebarExplore({
             mapControl: mapControl
         });
-        sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationselected', $.proxy(onDestinationSelected, this));
+        sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationselected',
+                                        $.proxy(onDestinationSelected, this));
 
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
@@ -36,6 +37,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     return Map;
 
+    // featured destination select
     function onDestinationSelected(event, destination) {
         sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);

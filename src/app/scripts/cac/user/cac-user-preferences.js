@@ -31,6 +31,7 @@ CAC.User.Preferences = (function($) {
 
     var defaults = {
         arriveBy: false, // depart at set time, by default
+        bikeTriangle: 'neutral',
         exploreTime: 20,
         from: undefined, // use current location for directions origin if none set
         fromText: 'Current Location',

@@ -19,6 +19,29 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             typeaheadOrigin: 'section.directions input.origin',
             typeaheadDest: 'section.directions input.destination',
             wheelchairDiv: '#directionsWheelchair'
+        },
+        // Note:  the three bike options must sum to 1, or OTP won't plan the trip
+        bikeTriangle: {
+            neutral: {
+                triangleSafetyFactor: 0.34,
+                triangleSlopeFactor: 0.33,
+                triangleTimeFactor: 0.33
+            },
+            flatter: {
+                triangleSafetyFactor: 0.17,
+                triangleSlopeFactor: 0.66,
+                triangleTimeFactor: 0.17
+            },
+            faster: {
+                triangleSafetyFactor: 0.17,
+                triangleSlopeFactor: 0.17,
+                triangleTimeFactor: 0.66
+            },
+            safer: {
+                triangleSafetyFactor: 0.66,
+                triangleSlopeFactor: 0.17,
+                triangleTimeFactor: 0.17
+            }
         }
     };
     var options = {};
@@ -84,6 +107,19 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             arriveBy = false; // depart at time instead
         }
 
+        // options to pass to OTP as-is
+        var otpOptions = {
+            mode: mode,
+            arriveBy: arriveBy
+        };
+
+        if (mode.indexOf('BICYCLE') > -1) {
+            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
+            var bikeTriangle = bikeTriangleOpt.val();
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, options.bikeTriangle[bikeTriangle]);
+            UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+        }
+
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
         UserPreferences.setPreference('mode', mode);
@@ -91,7 +127,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         UserPreferences.setPreference('fromText', fromText);
         UserPreferences.setPreference('toText', toText);
 
-        Routing.planTrip(origin, destination, date, mode, arriveBy).then(function (itineraries) {
+        Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
             var highlight = true;
             mapControl.clearItineraries();
@@ -145,6 +181,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         }
     }
 
+    // called when going to show directions from 'explore' origin to a selected feature
     function setDestination(destination) {
         // Set origin
         var from = UserPreferences.getPreference('origin');

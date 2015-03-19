@@ -20,9 +20,9 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
      * @return {promise} The promise object which - if successful - resolves to a
      *                   an object with itineraries
      */
-    function planTrip(coordsFrom, coordsTo, when, mode, arriveBy) {
+    function planTrip(coordsFrom, coordsTo, when, extraOptions) {
         var deferred = $.Deferred();
-        var urlParams = prepareParams(coordsFrom, coordsTo, when, mode, arriveBy);
+        var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
         $.ajax({
             url: Settings.routingUrl,
             type: 'GET',
@@ -40,20 +40,22 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
     /**
      * Helper function to prepare the parameter string for consumption by the OTP api
      *
-     * @param {array} coordsFrom The coords in lat-lng which we would like to travel from
-     * @param {array} coordsTo The coords in lat-lng which we would like to travel to
+     * @param {Array} coordsFrom The coords in lat-lng which we would like to travel from
+     * @param {Array} coordsTo The coords in lat-lng which we would like to travel to
+     * @param {Object} when Moment.js object for date/time of travel
+     * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner as-is
      *
-     * @return {string} An object of get params, ready for consumption
+     * @return {Object} Get parameters, ready for consumption
      */
-    function prepareParams(coordsFrom, coordsTo, when, mode, arriveBy) {
-        return {
+    function prepareParams(coordsFrom, coordsTo, when, extraOptions) {
+        var formattedOpts = {
             fromPlace: coordsFrom.join(','),
             toPlace: coordsTo.join(','),
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
-            mode: mode,
-            arriveBy: arriveBy
         };
+
+        return $.extend(formattedOpts, extraOptions);
     }
 
     /**

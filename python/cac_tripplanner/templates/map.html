@@ -27,7 +27,7 @@
                     <select id="exploreModeSelector" class="custom-select">
                         <option value="TRANSIT,WALK" selected>Transit</option>
                         <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
                         <option value="WALK">Walk Only</option>
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
@@ -46,7 +46,7 @@
                         <input type="text" class="form-control" />  <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span></span>
                     </div>
-                    <div id="#exploreBikeTriangle">
+                    <div id="exploreBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control">
                             <option selected>Neutral</option>
@@ -55,14 +55,14 @@
                             <option>Safer</option>
                         </select>
                     </div>
-                    <div id="#exploreMaxWalk">
+                    <div id="exploreMaxWalk">
                         <h6>Maximum walking distance</h6>
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="0.5">
                             <span class="input-group-addon">miles</span>
                         </div>
                     </div>
-                    <div id="#exploreWheelchair" class="input-group">
+                    <div id="exploreWheelchair" class="input-group">
                         <label class="checkbox-inline">
                             <input type="checkbox"> <h6>Wheelchair accessible</h6>
                         </label>
@@ -107,7 +107,7 @@
                     <select id="directionsModeSelector" class="custom-select">
                         <option value="TRANSIT,WALK" selected>Transit</option>
                         <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
                         <option value="WALK">Walk Only</option>
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
@@ -126,23 +126,23 @@
                         <input type="text" class="form-control" />  <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span></span>
                     </div>
-                    <div id="#directionsBikeTriangle">
+                    <div id="directionsBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control">
-                            <option selected>Neutral</option>
-                            <option>Faster</option>
-                            <option>Flatter</option>
-                            <option>Safer</option>
+                            <option selected value="neutral">Neutral</option>
+                            <option value="faster">Faster</option>
+                            <option value="flatter">Flatter</option>
+                            <option value="safer">Safer</option>
                         </select>
                     </div>
-                    <div id="#directionsMaxWalk">
+                    <div id="directionsMaxWalk">
                         <h6>Maximum walking distance</h6>
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="0.5">
                             <span class="input-group-addon">miles</span>
                         </div>
                     </div>
-                    <div id="#directionsWheelchair" class="input-group">
+                    <div id="directionsWheelchair" class="input-group">
                         <label class="checkbox-inline">
                             <input type="checkbox"> <h6>Wheelchair accessible</h6>
                         </label>
