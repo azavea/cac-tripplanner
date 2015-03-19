@@ -11,8 +11,8 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
             checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
-            departAtButton: 'input[name="arriveByDirections"]:eq(1)',
             datepicker: '#datetimeDirections',
+            departAtButton: 'input[name="arriveByDirections"]:eq(1)',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
             itineraryList: 'section.directions .itineraries',
@@ -61,8 +61,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     var itineraryListControl = null;
     var typeahead = null;
 
-    var $itineraries = null;
-
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
@@ -70,6 +68,8 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
 
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
+
+        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -92,6 +92,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
+        changeMode();
     }
 
     SidebarDirectionsControl.prototype = {
@@ -100,6 +101,10 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     };
 
     return SidebarDirectionsControl;
+
+    function changeMode() {
+        mapControl.changeMode(options.selectors);
+    }
 
     function planTrip() {
         if (!(directions.origin && directions.destination)) {

@@ -8,16 +8,22 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
 
     var defaults = {
         selectors: {
-            exploreMode: '#exploreModeSelector',
+            bikeTriangleDiv: '#exploreBikeTriangle',
+            checkboxArriveBy: 'input[name="arriveByExplore"]:checked',
+            datepicker: '#datetimeExplore',
+            departAtButton: 'input[name="arriveByExplore"]:eq(1)',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
+            maxWalkDiv: '#exploreMaxWalk',
+            modeSelector: '#exploreModeSelector',
             optionsMore: '.sidebar-options .more-options',
             optionsViewMore: '.sidebar-options .view-more',
             sidebarContainer: '.explore .sidebar-clip',
             sidebarDetails: '.explore div.sidebar-details',
             submitExplore: 'section.explore button[type=submit]',
             submitSearch: '.sidebar-search button[type="submit"]',
-            typeahead: 'section.explore input.typeahead'
+            typeahead: 'section.explore input.typeahead',
+            wheelchairDiv: '#exploreWheelchair'
         }
     };
     var options = {};
@@ -37,6 +43,8 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
 
+        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
+
         $(options.selectors.optionsViewMore).click(showOptions);
 
         // Show isochrone in discovery tab
@@ -50,6 +58,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
+        changeMode();
     }
 
     SidebarExploreControl.prototype = {
@@ -60,12 +69,16 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
 
     return SidebarExploreControl;
 
+    function changeMode() {
+        mapControl.changeMode(options.selectors);
+    }
+
     /**
      * Set user preferences before fetching isochrone.
      */
     function clickedExplore() {
         var exploreMinutes = $(options.selectors.exploreTime).val();
-        var mode = $(options.selectors.exploreMode).val();
+        var mode = $(options.selectors.modeSelector).val();
 
         // TODO: add date/time selector to 'explore' extra options panel?
         var when = moment();
@@ -168,7 +181,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
 
             $(options.selectors.exploreOrigin).typeahead('val', originText);
             $(options.selectors.exploreTime).val(exploreTime);
-            $(options.selectors.exploreMode).val(mode);
+            $(options.selectors.modeSelector).val(mode);
 
             var when = moment(); // TODO: add date/time selector for 'explore' options?
 

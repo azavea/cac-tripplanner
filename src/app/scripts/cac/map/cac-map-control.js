@@ -44,6 +44,7 @@ CAC.Map.Control = (function ($, L, _) {
         initializeLayerControl();
     }
 
+    MapControl.prototype.changeMode = changeMode;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
@@ -117,6 +118,23 @@ CAC.Map.Control = (function ($, L, _) {
             deferred.fail(function() { return 'geolocation not supported on this device'; });
         }
         return deferred.promise();
+    }
+
+    /**
+     * Show/hide sidebar options based on the selected mode.
+     * Expects both tabs to have the same selector names for the toggleable divs.
+     */
+    function changeMode(selectors) {
+        var mode = $(selectors.modeSelector).val();
+        if (mode.indexOf('BICYCLE') > -1) {
+            $(selectors.bikeTriangleDiv).removeClass('hidden');
+            $(selectors.maxWalkDiv).addClass('hidden');
+            $(selectors.wheelchairDiv).addClass('hidden');
+        } else {
+            $(selectors.bikeTriangleDiv).addClass('hidden');
+            $(selectors.maxWalkDiv).removeClass('hidden');
+            $(selectors.wheelchairDiv).removeClass('hidden');
+        }
     }
 
     /**
