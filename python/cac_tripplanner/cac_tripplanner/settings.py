@@ -183,4 +183,15 @@ if secrets['use_s3_storage']:
     AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
 
 # Application settings
+#
 MAX_IMAGE_SIZE_MB = 1
+
+# Directory for default featured destinations added in destinations 0012
+# subdir of MEDIA_ROOT
+# used in migration destinations 0016, DO NOT put any other files in this media folder
+# they will be deleted on a backwards migration from 0016 -> 0015
+# NOTE: If the images placed here are to be used in production as well, they will need to be copied
+# to the bucket specified in AWS_STORAGE_BUCKET_NAME
+DEFAULT_MEDIA_PATH = 'default_media'
+# src directory for default media images
+DEFAULT_MEDIA_SRC_PATH = os.path.join(BASE_DIR, DEFAULT_MEDIA_PATH)
