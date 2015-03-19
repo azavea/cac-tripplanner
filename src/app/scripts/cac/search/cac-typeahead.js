@@ -56,9 +56,13 @@ CAC.Search.Typeahead = (function ($) {
         if (dataset === 'currentlocation') {
             self.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
         } else {
-            CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(function (location) {
-                self.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
-            });
+            CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
+                function (location) {
+                    // location will be null if no results found
+                    self.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
+                }, function (error) {
+                    console.error(error);
+                });
         }
     }
 

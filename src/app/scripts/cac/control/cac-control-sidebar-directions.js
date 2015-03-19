@@ -61,7 +61,8 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
     function planTrip() {
         if (!(directions.origin && directions.destination)) {
-            setDirectionsError();
+            setDirectionsError('origin');
+            setDirectionsError('destination');
             return;
         }
 
@@ -73,7 +74,6 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         }
 
         var mode = $(options.selectors.modeSelector).val();
-
         var origin = directions.origin;
         var destination = directions.destination;
         var fromText = $('#directionsFrom').val();
@@ -131,8 +131,17 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'origin' || key === 'destination') {
             var prefKey = key === 'origin' ? 'from' : 'to';
+
+            if (!location) {
+                UserPreferences.setPreference(prefKey, undefined);
+                setDirections(key, null);
+                return;
+            }
+
             UserPreferences.setPreference(prefKey, location);
             setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
+        } else {
+            console.error('unrecognized key in onTypeaheadSelected: ' + key);
         }
     }
 
@@ -156,22 +165,25 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
     function setDirections(key, value) {
         if (key === 'origin' || key === 'destination') {
             directions[key] = value;
+            setDirectionsError(key);
+        } else {
+            console.error('Directions key ' + key + 'unrecognized!');
         }
     }
 
-    function setDirectionsError() {
+    function setDirectionsError(key) {
         var errorClass = 'error';
-        var $inputOrigin = $();
-        var $inputDestination = $(options.selectors.typeaheadDest);
-        if (directions.origin) {
-            $inputOrigin.removeClass(errorClass);
+        var $input = null;
+        if (key === 'origin') {
+            $input = $(options.selectors.typeaheadOrigin);
         } else {
-            $inputOrigin.addClass(errorClass);
+            $input = $(options.selectors.typeaheadDest);
         }
-        if (directions.destination) {
-            $inputDestination.removeClass(errorClass);
+
+        if (directions[key]) {
+            $input.removeClass(errorClass);
         } else {
-            $inputDestination.addClass(errorClass);
+            $input.addClass(errorClass);
         }
     }
 
