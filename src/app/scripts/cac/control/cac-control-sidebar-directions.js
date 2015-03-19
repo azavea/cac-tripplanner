@@ -16,8 +16,8 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
             typeahead: 'section.directions input.typeahead',
-            typeaheadOrigin: 'section.directions input.origin',
-            typeaheadDest: 'section.directions input.destination',
+            origin: 'section.directions input.origin',
+            destination: 'section.directions input.destination',
             wheelchairDiv: '#directionsWheelchair'
         },
         // Note:  the three bike options must sum to 1, or OTP won't plan the trip
@@ -99,8 +99,6 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var mode = $(options.selectors.modeSelector).val();
         var origin = directions.origin;
         var destination = directions.destination;
-        var fromText = $('#directionsFrom').val();
-        var toText = $('#directionsTo').val();
 
         var arriveBy = true;
         if ($(options.selectors.checkboxArriveBy).val() === 'departAt') {
@@ -124,8 +122,6 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         UserPreferences.setPreference('method', 'directions');
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
-        UserPreferences.setPreference('fromText', fromText);
-        UserPreferences.setPreference('toText', toText);
 
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
             // Add the itineraries to the map, highlighting the first one
@@ -169,12 +165,15 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             var prefKey = key === 'origin' ? 'from' : 'to';
 
             if (!location) {
+                console.log('no location!');
                 UserPreferences.setPreference(prefKey, undefined);
                 setDirections(key, null);
                 return;
             }
 
+            // save text for address to preferences
             UserPreferences.setPreference(prefKey, location);
+            UserPreferences.setPreference(prefKey + 'Text', location.name);
             setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
         } else {
             console.error('unrecognized key in onTypeaheadSelected: ' + key);
@@ -187,13 +186,13 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var from = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
         directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-        $(options.selectors.typeaheadOrigin).val(originText);
+        $(options.selectors.origin).val(originText);
 
         // Set destination
         var toCoords = destination.point.coordinates;
         var destinationText = destination.address;
         directions.destination = [toCoords[1], toCoords[0]];
-        $(options.selectors.typeaheadDest).val(destinationText);
+        $(options.selectors.destination).val(destinationText);
 
         // Get directions
         planTrip();
@@ -212,9 +211,9 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var errorClass = 'error';
         var $input = null;
         if (key === 'origin') {
-            $input = $(options.selectors.typeaheadOrigin);
+            $input = $(options.selectors.origin);
         } else {
-            $input = $(options.selectors.typeaheadDest);
+            $input = $(options.selectors.destination);
         }
 
         if (directions[key]) {
@@ -243,8 +242,8 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
 
-            $(options.selectors.typeaheadOrigin).typeahead('val', fromText);
-            $(options.selectors.typeaheadDest).typeahead('val', toText);
+            $(options.selectors.origin).typeahead('val', fromText);
+            $(options.selectors.destination).typeahead('val', toText);
             $(options.selectors.modeSelector).val(mode);
             if (!arriveBy) {
                 $(options.selectors.departAtButton).click();
