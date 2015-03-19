@@ -24,12 +24,14 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
 
     var events = $({});
     var eventNames = {
-        destinationSelected: 'cac:control:sidebarexplore:destinationselected'
+        destinationSelected: 'cac:control:sidebarexplore:destinationselected',
+        destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
     var mapControl = null;
     var typeahead = null;
     var exploreLatLng = [0,0];
+    var destinationsCache = [];
 
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -123,17 +125,32 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     }
 
     function setDestinationSidebar(destinations) {
+        destinationsCache = destinations;
         var $container = $('<div></div>').addClass('destinations');
         $.each(destinations, function (i, destination) {
             var $destination = $(MapTemplates.destinationBlock(destination));
 
             $destination.click(function () {
+                setDestinationSidebarDetail(destination);
                 events.trigger(eventNames.destinationSelected, destination);
             });
             $container.append($destination);
         });
         $(options.selectors.sidebarDetails).empty().append($container);
         $(options.selectors.sidebarContainer).height(400);
+    }
+
+    function setDestinationSidebarDetail(destination) {
+        var $detail = $(MapTemplates.destinationDetail(destination));
+        $detail.find('.back').on('click', onDestinationDetailBackClicked);
+        $detail.find('.getdirections').on('click', function (event) {
+            events.trigger(eventNames.destinationDirections, destination);
+        });
+        $(options.selectors.sidebarDetails).empty().append($detail);
+    }
+
+    function onDestinationDetailBackClicked() {
+        setDestinationSidebar(destinationsCache);
     }
 
     function setFromUserPreferences() {
