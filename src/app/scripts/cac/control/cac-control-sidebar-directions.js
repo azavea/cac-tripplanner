@@ -8,13 +8,17 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
     var defaults = {
         selectors: {
+            bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
-            checkboxArriveBy: 'input[name="arriveBy"]:checked',
+            checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
+            departAtButton: 'input[name="arriveByDirections"]:eq(1)',
             datepicker: '#datetimeDirections',
+            maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
             typeahead: 'section.directions input.typeahead',
             typeaheadOrigin: 'section.directions input.origin',
-            typeaheadDest: 'section.directions input.destination'
+            typeaheadDest: 'section.directions input.destination',
+            wheelchairDiv: '#directionsWheelchair'
         }
     };
     var options = {};
@@ -76,7 +80,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         var toText = $('#directionsTo').val();
 
         var arriveBy = true;
-        if ($(options.selectors.checkboxArriveBy).val() !== 'arriveBy') {
+        if ($(options.selectors.checkboxArriveBy).val() === 'departAt') {
             arriveBy = false; // depart at time instead
         }
 
@@ -193,7 +197,9 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             $(options.selectors.typeaheadOrigin).typeahead('val', fromText);
             $(options.selectors.typeaheadDest).typeahead('val', toText);
             $(options.selectors.modeSelector).val(mode);
-            $(options.selectors.checkboxArriveBy).val(arriveBy);
+            if (!arriveBy) {
+                $(options.selectors.departAtButton).click();
+             }
 
             if (from) {
                 directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
