@@ -27,23 +27,45 @@
                     <select id="exploreModeSelector" class="custom-select">
                         <option value="TRANSIT,WALK" selected>Transit</option>
                         <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
                         <option value="WALK">Walk Only</option>
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
                     </select>
                 </div>
                 <div id="moreExplore" class="more-options">
-                    <h6>What kind of walk/ride do you want?</h6>
-                    <select class="form-control">
-                        <option>Flatter</option>
-                        <option selected>Neutral</option>
-                        <option>Hillier</option>
-                    </select>
-                    <h6>Max biking distance</h6>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="0.5">
-                        <span class="input-group-addon">miles</span>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary active">
+                            <input type="radio" name="arriveByExplore" value="arriveBy"
+                                checked />Arrive By</label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="arriveByExplore" value="departAt" />Depart At</label>
+                    </div>
+                    <h6>Day and time</h6>
+                    <div class="input-group date" id="datetimeExplore">
+                        <input type="text" class="form-control" />  <span class="input-group-addon">
+                            <span class="glyphicon-calendar glyphicon"></span></span>
+                    </div>
+                    <div id="exploreBikeTriangle">
+                        <h6>What kind of ride do you want?</h6>
+                        <select class="form-control">
+                            <option selected>Neutral</option>
+                            <option>Faster</option>
+                            <option>Flatter</option>
+                            <option>Safer</option>
+                        </select>
+                    </div>
+                    <div id="exploreMaxWalk">
+                        <h6>Maximum walking distance</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="0.5">
+                            <span class="input-group-addon">miles</span>
+                        </div>
+                    </div>
+                    <div id="exploreWheelchair" class="input-group">
+                        <label class="checkbox-inline">
+                            <input type="checkbox"> <h6>Wheelchair accessible</h6>
+                        </label>
                     </div>
                 </div>
                 <a class="view-more">View more options</a>
@@ -85,7 +107,7 @@
                     <select id="directionsModeSelector" class="custom-select">
                         <option value="TRANSIT,WALK" selected>Transit</option>
                         <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT,WALK">Bike + Transit</option>
+                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
                         <option value="WALK">Walk Only</option>
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
@@ -93,20 +115,37 @@
                 </div>
                 <div id="moreDirections" class="more-options">
                     <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-primary active">
-                        <input type="radio" name="arriveBy" value="arriveBy" id="arrive" checked />Arrive By</label>
-                    <label class="btn btn-primary">
-                        <input type="radio" name="arriveBy" value="departAt" id="depart" />Depart At</label>
+                        <label class="btn btn-primary active">
+                            <input type="radio" name="arriveByDirections" value="arriveBy"
+                                checked />Arrive By</label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="arriveByDirections" value="departAt" />Depart At</label>
                     </div>
                     <h6>Day and time</h6>
                     <div class="input-group date" id="datetimeDirections">
                         <input type="text" class="form-control" />  <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span></span>
                     </div>
-                    <h6>Maximum walking distance</h6>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="0.5">
-                        <span class="input-group-addon">miles</span>
+                    <div id="directionsBikeTriangle">
+                        <h6>What kind of ride do you want?</h6>
+                        <select class="form-control">
+                            <option selected value="neutral">Neutral</option>
+                            <option value="faster">Faster</option>
+                            <option value="flatter">Flatter</option>
+                            <option value="safer">Safer</option>
+                        </select>
+                    </div>
+                    <div id="directionsMaxWalk">
+                        <h6>Maximum walking distance</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="0.5">
+                            <span class="input-group-addon">miles</span>
+                        </div>
+                    </div>
+                    <div id="directionsWheelchair" class="input-group">
+                        <label class="checkbox-inline">
+                            <input type="checkbox"> <h6>Wheelchair accessible</h6>
+                        </label>
                     </div>
                 </div>
                 <a class="view-more">View more options</a>

@@ -37,9 +37,8 @@ CAC.Search.Geocoder = (function ($) {
                 if (data && data.locations && data.locations.length) {
                     dfd.resolve(data.locations[0]);
                 } else {
-                    dfd.reject({
-                        msg: 'No data for request'
-                    });
+                    // no geocode result found; return null
+                    dfd.resolve(null);
                 }
             },
             error: function (error) {
