@@ -31,6 +31,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     var mapControl = null;
     var tabControl = null;
     var directionsListControl = null;
+    var itineraryListControl = null;
     var typeahead = null;
 
     var $itineraries = null;
@@ -53,8 +54,12 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         });
         directionsListControl.events.on('cac:control:directionslist:backbutton', onDirectionsBackClicked);
 
-        // TODO: Add an itineraries list control as well
-        $itineraries = $(options.selectors.itineraryList);
+        itineraryListControl = new Control.ItineraryList({
+            selectors: {
+                container: 'section.directions .itineraries'
+            }
+        });
+        itineraryListControl.events.on('cac:control:itinerarylist:itineraryclicked', onItineraryClicked);
 
         typeahead  = new Typeahead(options.selectors.typeahead);
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
@@ -114,34 +119,29 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
                 }
             });
 
-            // Show the directions div and populate with itineraries
-            var html = MapTemplates.itinerarySummaries(itineraries);
-            $itineraries.html(html);
-            $('a.itinerary').on('click', onItineraryClicked);
-            $('.block-itinerary').on('click', onItineraryClicked);
+            itineraryListControl.setItineraries(itineraries);
             $('.directions').addClass('show-results');
-            $itineraries.removeClass('hidden');
+            itineraryListControl.show();
         });
     }
 
     function onDirectionsBackClicked() {
-        $itineraries.removeClass('hidden');
         directionsListControl.hide();
+        itineraryListControl.show();
     }
 
     /**
      * Handles click events to highlight a given itinerary
-     * Event handler, so this is set to the clicked event
      */
-    function onItineraryClicked() {
-        var itineraryId = this.getAttribute('data-itinerary');
-        var itinerary = mapControl.getItineraryById(itineraryId);
+    function onItineraryClicked(event, itinerary) {
         if (itinerary) {
             currentItinerary.highlight(false);
             itinerary.highlight(true);
-            directionsListControl.setItinerary(itinerary);
             currentItinerary = itinerary;
-            //$itineraries.addClass('hidden');
+
+            directionsListControl.setItinerary(itinerary);
+
+            //itineraryListControl.hide();
             directionsListControl.show();
         }
     }
