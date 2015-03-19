@@ -2,7 +2,7 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, UserPreferences) {
+CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Typeahead, UserPreferences) {
 
     'use strict';
 
@@ -12,6 +12,7 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
             checkboxArriveBy: 'input[name="arriveBy"]:checked',
             datepicker: '#datetimeDirections',
             modeSelector: '#directionsModeSelector',
+            itineraryList: 'section.directions .itineraries',
             typeahead: 'section.directions input.typeahead',
             typeaheadOrigin: 'section.directions input.origin',
             typeaheadDest: 'section.directions input.destination'
@@ -29,7 +30,10 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
     var mapControl = null;
     var tabControl = null;
+    var directionsListControl = null;
     var typeahead = null;
+
+    var $itineraries = null;
 
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -41,6 +45,16 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
+
+        directionsListControl = new Control.DirectionsList({
+            selectors: {
+                container: 'section.directions .directions-list'
+            }
+        });
+        directionsListControl.events.on('cac:control:directionslist:backbutton', onDirectionsBackClicked);
+
+        // TODO: Add an itineraries list control as well
+        $itineraries = $(options.selectors.itineraryList);
 
         typeahead  = new Typeahead(options.selectors.typeahead);
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
@@ -102,11 +116,17 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
 
             // Show the directions div and populate with itineraries
             var html = MapTemplates.itinerarySummaries(itineraries);
-            $('.itineraries').html(html);
+            $itineraries.html(html);
             $('a.itinerary').on('click', onItineraryClicked);
             $('.block-itinerary').on('click', onItineraryClicked);
             $('.directions').addClass('show-results');
+            $itineraries.removeClass('hidden');
         });
+    }
+
+    function onDirectionsBackClicked() {
+        $itineraries.removeClass('hidden');
+        directionsListControl.hide();
     }
 
     /**
@@ -119,7 +139,10 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         if (itinerary) {
             currentItinerary.highlight(false);
             itinerary.highlight(true);
+            directionsListControl.setItinerary(itinerary);
             currentItinerary = itinerary;
+            $itineraries.addClass('hidden');
+            directionsListControl.show();
         }
     }
 
@@ -212,4 +235,4 @@ CAC.Control.SidebarDirections = (function ($, MapTemplates, Routing, Typeahead, 
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences);
+})(jQuery, CAC.Control, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences);
