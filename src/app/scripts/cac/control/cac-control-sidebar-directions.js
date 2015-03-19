@@ -61,8 +61,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     var itineraryListControl = null;
     var typeahead = null;
 
-    var $itineraries = null;
-
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
@@ -75,8 +73,12 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
 
         directionsListControl = new Control.DirectionsList({
+            showBackButton: true,
+            showShareButton: true,
             selectors: {
-                container: 'section.directions .directions-list'
+                container: 'section.directions .directions-list',
+                backButton: 'a.back',
+                shareButton: 'a.share'
             }
         });
         directionsListControl.events.on('cac:control:directionslist:backbutton', onDirectionsBackClicked);

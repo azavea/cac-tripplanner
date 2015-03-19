@@ -16,6 +16,7 @@ urlpatterns = patterns(
     url(r'^api/feedevents$', FeedEvents.as_view(), name='api_feedevents'),
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^map/', 'destinations.views.map', name='map'),
+    url(r'^directions/', 'destinations.views.directions', name='directions'),
 
     # Community Profiles
     url(r'^community-profile/(?P<slug>[\w-]+)/$',

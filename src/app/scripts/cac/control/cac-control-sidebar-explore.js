@@ -143,7 +143,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     function setDestinationSidebarDetail(destination) {
         var $detail = $(MapTemplates.destinationDetail(destination));
         $detail.find('.back').on('click', onDestinationDetailBackClicked);
-        $detail.find('.getdirections').on('click', function (event) {
+        $detail.find('.getdirections').on('click', function () {
             events.trigger(eventNames.destinationDirections, destination);
         });
         $(options.selectors.sidebarDetails).empty().append($detail);

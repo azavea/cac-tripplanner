@@ -1,12 +1,11 @@
-CAC.Utils = (function () {
+CAC.Utils = (function (_) {
     'use strict';
 
     var module = {
         getImageUrl: getImageUrl,
-        abbrevStreetName: abbrevStreetName
+        abbrevStreetName: abbrevStreetName,
+        getUrlParams: getUrlParams
     };
-
-    return module;
 
     var directions = {
         north: 'N',
@@ -60,6 +59,8 @@ CAC.Utils = (function () {
         wy: 'Wy',
     };
 
+    return module;
+
     // Source: https://github.com/azavea/nih-wayfinding/blob/develop/src/nih_wayfinding/app/scripts/routing/abbreviate-filter.js
     function abbrevStreetName(streetAddress) {
         if (!(_.isString(streetAddress) && streetAddress.length)) {
@@ -101,4 +102,25 @@ CAC.Utils = (function () {
         return '/static/images/' + imageName;
     }
 
-})();
+    // Parses URL parameters and returns them as an object
+    function getUrlParams() {
+        // Code borrowed from: http://www.timetler.com/2013/11/14/location-search-split-one-liner/
+        // Remove the '?' at the start of the string and split out each assignment
+        return _.chain(location.search.slice(1).split('&'))
+            // Split each array item into [key, value]
+            // ignore empty string if search is empty
+            .map(function(item) {
+                if (item) {
+                    return item.split('=');
+                }
+                return undefined;
+            })
+            // Remove undefined in the case the search is empty
+            .compact()
+            // Turn [key, value] arrays into object parameters
+            .object()
+            // Return the value of the chain operation
+            .value();
+    }
+
+})(_);

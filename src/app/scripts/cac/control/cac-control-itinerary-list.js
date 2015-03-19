@@ -22,7 +22,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
     var events = $({});
     var eventNames = {
         itineraryClicked: 'cac:control:itinerarylist:itineraryclicked'
-    }
+    };
 
     var $container = null;
     var itineraries = [];
@@ -110,7 +110,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
 
     function toggle() {
         if ($container.hasClass('hidden')) {
-            show()
+            show();
         } else {
             hide();
         }

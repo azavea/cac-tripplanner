@@ -15,7 +15,9 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
-            container: '.directions-list'
+            container: '.directions-list',
+            backButton: 'a.back',
+            shareButton: 'a.share'
         }
     };
     var options = {};
@@ -23,6 +25,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     var events = $({});
     var eventNames = {
         backButtonClicked: 'cac:control:directionslist:backbutton',
+        shareButtonClicked: 'cac:control:directionslist:sharebutton',
         listItemClicked: 'cac:control:directionslist:listitem'
     };
 
@@ -59,9 +62,23 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         itinerary = newItinerary;
 
         var $html = $(getTemplate(itinerary));
-        $html.find('a.back').on('click', function (event) {
-            events.trigger(eventNames.backButtonClicked);
-        });
+
+        if (options.showBackButton) {
+            $html.find(options.selectors.backButton).on('click', function () {
+                events.trigger(eventNames.backButtonClicked);
+            });
+        }
+        if (options.showShareButton) {
+            $html.find(options.selectors.shareButton).on('click', function () {
+                events.trigger(eventNames.shareButtonClicked);
+
+                // Note: this code is only here temporarily to demonstrate the directions page
+                var paramString = decodeURIComponent($.param(newItinerary.requestParameters));
+                var index = newItinerary.id;
+                var directionsUrl = '/directions/?' + paramString + '&itineraryIndex=' + index;
+                window.open(directionsUrl, '_blank');
+            });
+        }
         $container.empty().append($html);
     }
 
@@ -76,14 +93,16 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 time: new Date(itinerary.endTime).toLocaleTimeString()
             },
             steps: itinerary.steps
-        }
+        };
+
+        // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
             '<div class="block block-step">',
                 '<div class="col-xs-6">',
-                    '<a class="back">Back</a>',
+                    '<a class="back">' + (options.showBackButton ? 'Back' : '&nbsp;') + '</a>',
                 '</div>',
                 '<div class="col-xs-6">',
-                    '<a class="share">Share</a>',
+                    '<a class="share">' + (options.showShareButton ? 'Share' : '&nbsp;') + '</a>',
                 '</div>',
             '</div>',
             '<div class="block block-step">',
@@ -118,7 +137,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
 
     function toggle() {
         if ($container.hasClass('hidden')) {
-            show()
+            show();
         } else {
             hide();
         }

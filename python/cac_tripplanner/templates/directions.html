@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "header-mixin.html" %}
+<section class="directions">
+  <div class="directions-list">
+  </div>
+</section>
+{% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+$(document).ready(function () {
+    CAC.Settings.routingUrl = '{{ routing_url }}';
+
+    var directions = new CAC.Pages.Directions();
+    directions.initialize();
+});
+</script>
+{% endblock %}
