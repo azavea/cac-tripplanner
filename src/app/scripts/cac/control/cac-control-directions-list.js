@@ -51,15 +51,31 @@ CAC.Control.DirectionsList = (function ($, Handlebars) {
      */
     function setItinerary(newItinerary) {
         itinerary = newItinerary;
+
+        var $html = $(getTemplate([]));
+        $html.find('a.back').on('click', function (event) {
+            events.trigger(eventNames.backButtonClicked);
+        });
+        $container.empty().append($html);
     }
 
-    function listItemTemplate(step) {
+    function getTemplate(steps) {
         var source = [
-
-            // TODO: Add template here
+            '<div class="row">',
+                '<div class="col-xs-6">',
+                    '<a class="back">Back</a>',
+                '</div>',
+                '<div class="col-xs-6">',
+                    '<a class="share">Share</a>',
+                '</div>',
+            '</div>',
+            '{{#each steps}}',
+            '<div class="block block-step">',
+            '</div>',
+            '{{/each}}',
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({step: step});
+        var html = template({stesp: steps});
         return html;
     }
 
