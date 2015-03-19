@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function ($, Handlebars) {
+CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
 
     'use strict';
 
@@ -33,6 +33,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars) {
         options = $.extend({}, defaults, params);
 
         $container = $(options.selectors.container);
+
+        registerListItemHelpers();
     }
 
     DirectionsListControl.prototype = {
@@ -47,21 +49,36 @@ CAC.Control.DirectionsList = (function ($, Handlebars) {
 
     /**
      * Set the directions list from an OTP itinerary object
-     * @param {[object]} itinerary An open trip planner itinerary object, as returned from the plan endpoint
+     *
+     * Pulls the start/end text from UserPreference fromText and toText keys,
+     * ensure that these are set
+     *
+     * @param {[object]} itinerary An instance of Itinerary in cac-routing-itinerary
      */
     function setItinerary(newItinerary) {
         itinerary = newItinerary;
 
-        var $html = $(getTemplate([]));
+        var $html = $(getTemplate(itinerary));
         $html.find('a.back').on('click', function (event) {
             events.trigger(eventNames.backButtonClicked);
         });
         $container.empty().append($html);
     }
 
-    function getTemplate(steps) {
+    function getTemplate(itinerary) {
+        var templateData = {
+            start: {
+                text:  UserPreferences.getPreference('fromText'),
+                time: new Date(itinerary.startTime).toLocaleTimeString()
+            },
+            end: {
+                text:  UserPreferences.getPreference('toText'),
+                time: new Date(itinerary.endTime).toLocaleTimeString()
+            },
+            steps: itinerary.steps
+        }
         var source = [
-            '<div class="row">',
+            '<div class="block block-step">',
                 '<div class="col-xs-6">',
                     '<a class="back">Back</a>',
                 '</div>',
@@ -69,13 +86,25 @@ CAC.Control.DirectionsList = (function ($, Handlebars) {
                     '<a class="share">Share</a>',
                 '</div>',
             '</div>',
-            '{{#each steps}}',
             '<div class="block block-step">',
+                '<p>Starting at <strong>{{data.start.text}} at {{data.start.time}}</strong></p>',
+            '</div>',
+            '{{#each data.steps}}',
+            '<div class="block block-step">',
+                '<div class="col-xs-3">',
+                    '{{ directionIcon this.relativeDirection }}',
+                '</div>',
+                '<div class="col-xs-9">',
+                    '{{ directionText }}',
+                '</div>',
             '</div>',
             '{{/each}}',
+            '<div class="block block-step">',
+                '<p>Arrive at <strong>{{data.end.text}} at {{data.end.time}}</strong></p>',
+            '</div>',
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({stesp: steps});
+        var html = template({data: templateData});
         return html;
     }
 
@@ -94,4 +123,63 @@ CAC.Control.DirectionsList = (function ($, Handlebars) {
             hide();
         }
     }
-})(jQuery, Handlebars);
+
+    function registerListItemHelpers() {
+        // Only register these once, when the control loads
+        Handlebars.registerHelper('directionIcon', function(direction) {
+            return new Handlebars.SafeString('<span class="glyphicon '+ getTurnIconName(direction) + '"></span>');
+        });
+        Handlebars.registerHelper('directionText', function () {
+            var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
+            return new Handlebars.SafeString('<span>' + text + '</span>');
+        });
+    }
+
+    function getTurnIconName(turnType) {
+        switch (turnType) {
+            case 'DEPART':
+            case 'CONTINUE':
+                return 'glyphicon-arrow-up';
+            // Temporarily fall through to similar cases for left/right
+            case 'LEFT':
+            case 'SLIGHTLY_LEFT':
+            case 'HARD_LEFT':
+            case 'UTURN_LEFT':
+                return 'glyphicon-arrow-left';
+            case 'RIGHT':
+            case 'SLIGHTLY_RIGHT':
+            case 'HARD_RIGHT':
+            case 'UTURN_RIGHT':
+                return 'glyphicon-arrow-right';
+            case 'CIRCLE_CLOCKWISE':
+            case 'CIRCLE_COUNTERCLOCKWISE':
+                return 'glyphicon-repeat';
+            case 'ELEVATOR':
+                return 'glyphicon-cloud-upload';
+            default:
+                return 'glyphicon-remove-circle';
+        }
+    }
+
+    function turnText(turn, street, direction) {
+        var turnTextString = '';
+        var turnLower = turn.toLowerCase();
+        var turnSplit = turnLower.replace('_', ' ');
+        street = Utils.abbrevStreetName(street);
+        if (turn === 'DEPART') {
+            turnTextString = 'Head ' + direction.toLowerCase() + ' on ' + street;
+        } else if (turn === 'CONTINUE') {
+            turnTextString = 'Continue on to ' + street;
+        } else if (turn === 'ELEVATOR') {
+            turnTextString = 'Take the elevator to ' + street;
+        } else if (turn.indexOf('UTURN') !== -1) {
+            turnTextString = 'Take a U-turn on to ' + street;
+        } else if (turn.indexOf('LEFT') !== -1 || turn.indexOf('RIGHT') !== -1) {
+            turnTextString = 'Turn ' + turnSplit + ' on to ' + street;
+        } else if (turn.indexOf('CIRCLE') !== -1) {
+            turnTextString = 'Enter the traffic circle, then exit on to ' + street;
+        }
+        return turnTextString;
+    }
+
+})(jQuery, Handlebars, CAC.User.Preferences, CAC.Utils);

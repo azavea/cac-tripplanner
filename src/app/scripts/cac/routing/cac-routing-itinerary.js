@@ -13,6 +13,9 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         this.modes = getModes(otpItinerary);
         this.distanceMiles = getDistanceMiles(otpItinerary);
         this.durationMinutes = getDurationMinutes(otpItinerary);
+        this.startTime = otpItinerary.startTime;
+        this.endTime = otpItinerary.endTime;
+        this.steps = getDirectionsSteps(otpItinerary);
 
         this.geojson = L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
@@ -24,6 +27,10 @@ CAC.Routing.Itinerary = (function ($, L, _) {
     };
 
     return Itinerary;
+
+    function getDirectionsSteps(otpItinerary) {
+        return _(otpItinerary.legs).map('steps').flatten().value();
+    }
 
     /**
      * Helper function to get label/via summary for an itinerary.
