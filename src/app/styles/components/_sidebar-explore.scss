@@ -2,7 +2,6 @@
     position: absolute;
     width: 100%;
     top: 32px;
-    bottom: 0;
 
     &.show-results {
         .sidebar-clip {
@@ -117,6 +116,7 @@
             &.active {
                 max-height: 500px;
                 padding: 10px 0;
+                overflow: visible;
             }
         }
     }
@@ -129,14 +129,13 @@
         height: 100%;
 
         .destinations {
-            overflow-y: auto;
+            overflow: auto;
             height: 100%;
             left: 15px;
             padding-right: 15px;
             right: 0px;
             position: absolute;
             top: 0;
-            bottom: 0;
         }
         .block-destination {
             height: 175px;
