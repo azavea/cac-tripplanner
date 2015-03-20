@@ -2,7 +2,8 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Typeahead, UserPreferences) {
+CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates, Routing,
+                                 Typeahead, UserPreferences) {
 
     'use strict';
 
@@ -34,6 +35,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         destination: null
     };
 
+    var bikeOptions = null;
     var mapControl = null;
     var tabControl = null;
     var directionsListControl = null;
@@ -44,6 +46,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
+        bikeOptions = new BikeOptions();
 
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
@@ -82,7 +85,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     return SidebarDirectionsControl;
 
     function changeMode() {
-        mapControl.changeMode(options.selectors);
+        bikeOptions.changeMode(options.selectors);
     }
 
     function planTrip() {
@@ -117,7 +120,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -297,4 +300,5 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         }
     }
 
-})(jQuery, CAC.Control, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences);
+})(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans,
+   CAC.Search.Typeahead, CAC.User.Preferences);

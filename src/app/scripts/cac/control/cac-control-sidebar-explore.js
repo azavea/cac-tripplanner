@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferences) {
+CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead, UserPreferences) {
 
     'use strict';
 
@@ -34,6 +34,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
+    var bikeOptions = null;
     var datepicker = null;
     var mapControl = null;
     var typeahead = null;
@@ -43,6 +44,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
+        bikeOptions = new BikeOptions();
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -74,7 +76,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
     return SidebarExploreControl;
 
     function changeMode() {
-        mapControl.changeMode(options.selectors);
+        bikeOptions.changeMode(options.selectors);
     }
 
     /**
@@ -96,7 +98,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -223,7 +225,7 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
             var otpOptions = { mode: mode };
 
             if (mode.indexOf('BICYCLE') > -1) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
             } else {
                 if (maxWalk) {
                     $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
@@ -242,4 +244,4 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.Search.Typeahead, CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Search.Typeahead, CAC.User.Preferences);

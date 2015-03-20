@@ -4,30 +4,7 @@ CAC.Map.Control = (function ($, L, _) {
     var defaults = {
         id: 'map',
         center: [39.95, -75.1667],
-        zoom: 14,
-        // Note:  the three bike options must sum to 1, or OTP won't plan the trip
-        bikeTriangle: {
-            neutral: {
-                triangleSafetyFactor: 0.34,
-                triangleSlopeFactor: 0.33,
-                triangleTimeFactor: 0.33
-            },
-            flatter: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.66,
-                triangleTimeFactor: 0.17
-            },
-            faster: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.66
-            },
-            safer: {
-                triangleSafetyFactor: 0.66,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.17
-            }
-        }
+        zoom: 14
     };
 
     var map = null;
@@ -67,7 +44,6 @@ CAC.Map.Control = (function ($, L, _) {
         initializeLayerControl();
     }
 
-    MapControl.prototype.changeMode = changeMode;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
@@ -141,23 +117,6 @@ CAC.Map.Control = (function ($, L, _) {
             deferred.fail(function() { return 'geolocation not supported on this device'; });
         }
         return deferred.promise();
-    }
-
-    /**
-     * Show/hide sidebar options based on the selected mode.
-     * Expects both tabs to have the same selector names for the toggleable divs.
-     */
-    function changeMode(selectors) {
-        var mode = $(selectors.modeSelector).val();
-        if (mode.indexOf('BICYCLE') > -1) {
-            $(selectors.bikeTriangleDiv).removeClass('hidden');
-            $(selectors.maxWalkDiv).addClass('hidden');
-            $(selectors.wheelchairDiv).addClass('hidden');
-        } else {
-            $(selectors.bikeTriangleDiv).addClass('hidden');
-            $(selectors.maxWalkDiv).removeClass('hidden');
-            $(selectors.wheelchairDiv).removeClass('hidden');
-        }
     }
 
     /**
