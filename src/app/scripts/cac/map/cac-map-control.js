@@ -140,25 +140,20 @@ CAC.Map.Control = (function ($, L, _) {
     function fetchReachable(payload) {
         var isochroneUrl = '/map/reachable';
         var deferred = $.Deferred();
-        if (payload.coords && payload.mode && payload.date &&
-            payload.time && payload.maxTravelTime && payload.maxWalkDistance) {
-            $.ajax({
-                type: 'GET',
-                data: payload,
-                cache: false,
-                url: isochroneUrl,
-                contentType: 'application/json'
-            }).then(deferred.resolve);
-        } else {
-            deferred.fail();
-        }
+        $.ajax({
+            type: 'GET',
+            data: payload,
+            cache: false,
+            url: isochroneUrl,
+            contentType: 'application/json'
+        }).then(deferred.resolve);
         return deferred.promise();
     }
 
     /**
      * Get travelshed and destinations within it, then display results on map.
     */
-    function fetchIsochrone(coordsOrigin, when, mode, exploreMinutes) {
+    function fetchIsochrone(coordsOrigin, when, exploreMinutes, otpParams) {
         var deferred = $.Deferred();
         // clear results of last search
         clearDiscoverPlaces();
@@ -176,29 +171,22 @@ CAC.Map.Control = (function ($, L, _) {
         };
 
         var formattedTime = when.format('hh:mma');
-        var formattedDate = when.format('MM-DD-YYYY');
+        var formattedDate = when.format('YYYY/MM/DD');
 
         var params = {
             time: formattedTime,
             date: formattedDate,
-            mode: mode,
-            maxTravelTime: exploreMinutes * 60, // API expects seconds
-            // TODO: add maxWalkDistance as user setting?
-            maxWalkDistance: 1609
+            cutoffSec: exploreMinutes * 60, // API expects seconds
         };
 
+        params = $.extend(otpParams, params);
+
         if (coordsOrigin) {
-            params.coords = {
-                lat: coordsOrigin[0],
-                lng: coordsOrigin[1]
-            };
+            params.fromPlace = coordsOrigin.join(',');
             getIsochrone(params);
         } else {
             locateUser().then(function(data) {
-                params.coords = {
-                    lat: data[0],
-                    lng: data[1]
-                };
+                params.fromPlace = data.join(',');
                 getIsochrone(params);
             }, function(error) {
                 console.error('Could not geolocate user');

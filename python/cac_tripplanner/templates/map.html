@@ -34,14 +34,7 @@
                     </select>
                 </div>
                 <div id="moreExplore" class="more-options">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary active">
-                            <input type="radio" name="arriveByExplore" value="arriveBy"
-                                checked />Arrive By</label>
-                        <label class="btn btn-primary">
-                            <input type="radio" name="arriveByExplore" value="departAt" />Depart At</label>
-                    </div>
-                    <h6>Day and time</h6>
+                    <h6>Departure day and time</h6>
                     <div class="input-group date" id="datetimeExplore">
                         <input type="text" class="form-control" />  <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span></span>
@@ -49,10 +42,10 @@
                     <div id="exploreBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control">
-                            <option selected>Neutral</option>
-                            <option>Faster</option>
-                            <option>Flatter</option>
-                            <option>Safer</option>
+                            <option selected value="neutral">Neutral</option>
+                            <option value="faster">Faster</option>
+                            <option value="flatter">Flatter</option>
+                            <option value="safer">Safer</option>
                         </select>
                     </div>
                     <div id="exploreMaxWalk">
@@ -116,10 +109,9 @@
                 <div id="moreDirections" class="more-options">
                     <div class="btn-group" data-toggle="buttons">
                         <label class="btn btn-primary active">
-                            <input type="radio" name="arriveByDirections" value="arriveBy"
-                                checked />Arrive By</label>
-                        <label class="btn btn-primary">
                             <input type="radio" name="arriveByDirections" value="departAt" />Depart At</label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="arriveByDirections" value="arriveBy" />Arrive By</label>
                     </div>
                     <h6>Day and time</h6>
                     <div class="input-group date" id="datetimeDirections">

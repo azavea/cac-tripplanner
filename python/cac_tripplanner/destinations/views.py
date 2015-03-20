@@ -58,19 +58,13 @@ class FindReachableDestinations(View):
     isochrone_url = OTP_URL.format(router=otp_router) + 'isochrone'
     algorithm = 'accSampling'
 
-    def isochrone(self, lat, lng, mode, date, time, max_travel_time, max_walk_distance):
+    def isochrone(self, payload):
         """Make request to Open Trip Planner for isochrone geometry with the provided args
         and return OTP JSON"""
-        payload = {
-            'routerId': self.otp_router,
-            'fromPlace': lat + ',' + lng,
-            'mode': mode,
-            'date': date,
-            'time': time,
-            'cutoffSec': max_travel_time,
-            'maxWalkDistance': max_walk_distance,
-            'algorithm': self.algorithm
-        }
+
+        payload['routerId'] = self.otp_router
+        payload['algorithm'] = self.algorithm
+
         isochrone_response = requests.get(self.isochrone_url, params=payload)
 
         # Parse and traverse JSON from OTP so that we return only geometries
@@ -95,17 +89,9 @@ class FindReachableDestinations(View):
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
         Return both the isochrone GeoJSON and the list of matched destinations."""
-        params = request.GET
+        params = request.GET.copy() # make mutable
 
-        json_poly = self.isochrone(
-            lat=params.get('coords[lat]'),
-            lng=params.get('coords[lng]'),
-            mode=params.get('mode'),
-            date=params.get('date'),
-            time=params.get('time'),
-            max_travel_time=params.get('maxTravelTime'),
-            max_walk_distance=params.get('maxWalkDistance')
-        )
+        json_poly = self.isochrone(params)
 
         # Have a FeatureCollection of MultiPolygons
         if 'features' in json_poly:

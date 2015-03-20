@@ -35,12 +35,14 @@ CAC.User.Preferences = (function($) {
         exploreTime: 20,
         from: undefined, // use current location for directions origin if none set
         fromText: 'Current Location',
+        maxWalk: undefined, // no max
         method: 'explore',
         mode: 'TRANSIT,WALK',
         origin: cityHall,
         originText: 'City Hall, Philadelphia, Pennsylvania, USA',
         to: cityHall,
-        toText: 'City Hall, Philadelphia, Pennsylvania, USA'
+        toText: 'City Hall, Philadelphia, Pennsylvania, USA',
+        wheelchair: false
     };
 
     var module = {

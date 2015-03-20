@@ -2,17 +2,20 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Typeahead, UserPreferences) {
+CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates, Routing,
+                                 Typeahead, UserPreferences) {
 
     'use strict';
+
+    var METERS_PER_MILE = 1609.34;
 
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
             checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
-            departAtButton: 'input[name="arriveByDirections"]:eq(1)',
             datepicker: '#datetimeDirections',
+            arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
             itineraryList: 'section.directions .itineraries',
@@ -20,29 +23,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             origin: 'section.directions input.origin',
             destination: 'section.directions input.destination',
             wheelchairDiv: '#directionsWheelchair'
-        },
-        // Note:  the three bike options must sum to 1, or OTP won't plan the trip
-        bikeTriangle: {
-            neutral: {
-                triangleSafetyFactor: 0.34,
-                triangleSlopeFactor: 0.33,
-                triangleTimeFactor: 0.33
-            },
-            flatter: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.66,
-                triangleTimeFactor: 0.17
-            },
-            faster: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.66
-            },
-            safer: {
-                triangleSafetyFactor: 0.66,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.17
-            }
         }
     };
     var options = {};
@@ -55,6 +35,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         destination: null
     };
 
+    var bikeOptions = null;
     var mapControl = null;
     var tabControl = null;
     var directionsListControl = null;
@@ -65,9 +46,12 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
+        bikeOptions = new BikeOptions();
 
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
+
+        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -94,6 +78,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
 
         setFromUserPreferences();
+        changeMode();
     }
 
     SidebarDirectionsControl.prototype = {
@@ -102,6 +87,10 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
     };
 
     return SidebarDirectionsControl;
+
+    function changeMode() {
+        bikeOptions.changeMode(options.selectors);
+    }
 
     function planTrip() {
         if (!(directions.origin && directions.destination)) {
@@ -121,9 +110,9 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         var origin = directions.origin;
         var destination = directions.destination;
 
-        var arriveBy = true;
-        if ($(options.selectors.checkboxArriveBy).val() === 'departAt') {
-            arriveBy = false; // depart at time instead
+        var arriveBy = false; // depart at time by default
+        if ($(options.selectors.checkboxArriveBy).val() === 'arriveBy') {
+            arriveBy = true;
         }
 
         // options to pass to OTP as-is
@@ -135,8 +124,21 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+        } else {
+            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
+            if (maxWalk) {
+                UserPreferences.setPreference('maxWalk', maxWalk);
+                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            } else {
+                UserPreferences.setPreference('maxWalk', undefined);
+            }
+
+            // true if box checked
+            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
+            UserPreferences.setPreference('wheelchair', wheelchair);
+            $.extend(otpOptions, { wheelchair: wheelchair });
         }
 
         // set user preferences
@@ -190,7 +192,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             var prefKey = key === 'origin' ? 'from' : 'to';
 
             if (!location) {
-                console.log('no location!');
                 UserPreferences.setPreference(prefKey, undefined);
                 setDirections(key, null);
                 return;
@@ -258,20 +259,32 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             // switch tabs
             tabControl.setTab('directions');
             var mode = UserPreferences.getPreference('mode');
-
             var arriveBy = UserPreferences.getPreference('arriveBy');
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
             var from = UserPreferences.getPreference('from');
             var to = UserPreferences.getPreference('to');
             var fromText = UserPreferences.getPreference('fromText');
             var toText = UserPreferences.getPreference('toText');
+            var maxWalk = UserPreferences.getPreference('maxWalk');
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+
+            if (wheelchair) {
+                $('input', options.selectors.wheelchairDiv).click();
+            }
+
+            if (maxWalk) {
+                $('input', options.selectors.maxWalkDiv).val(maxWalk);
+            }
 
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
 
             $(options.selectors.origin).typeahead('val', fromText);
             $(options.selectors.destination).typeahead('val', toText);
             $(options.selectors.modeSelector).val(mode);
-            if (!arriveBy) {
-                $(options.selectors.departAtButton).click();
+            $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+
+            if (arriveBy) {
+                $(options.selectors.arriveByButton).click();
              }
 
             if (from) {
@@ -291,4 +304,5 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         }
     }
 
-})(jQuery, CAC.Control, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences);
+})(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans,
+   CAC.Search.Typeahead, CAC.User.Preferences);
