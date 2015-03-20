@@ -4,6 +4,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     var defaults = {
         map: {}
     };
+
     var mapControl = null;
     var sidebarExploreControl = null;
     var sidebarDirectionsControl = null;
@@ -15,13 +16,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     Map.prototype.initialize = function () {
 
-        // Map initialization logic and event binding
-        mapControl = new MapControl();
-        mapControl.locateUser();
-
-
         sidebarTabControl = new CAC.Control.SidebarTab();
         sidebarTabControl.events.on('cac:control:sidebartab:shown', $.proxy(onSidebarTabShown, this));
+
+        // Map initialization logic and event binding
+        mapControl = new MapControl({
+            tabControl: sidebarTabControl
+        });
+        mapControl.locateUser();
 
         sidebarExploreControl = new CAC.Control.SidebarExplore({
             mapControl: mapControl

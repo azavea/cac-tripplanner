@@ -135,6 +135,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
         mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions).then(
             function (destinations) {
+                if (!destinations) {
+                    return;
+                }
                 setDestinationSidebar(destinations);
             }
         );

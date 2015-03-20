@@ -21,6 +21,7 @@ CAC.Map.Control = (function ($, L, _) {
     var overlays = {};
     var destinationsLayer = null;
     var isochroneLayer = null;
+    var tabControl = null;
 
     var stamenTonerAttribution = [
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
@@ -40,6 +41,7 @@ CAC.Map.Control = (function ($, L, _) {
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
+        tabControl = options.tabControl;
 
         initializeBasemaps();
         initializeOverlays();
@@ -164,6 +166,11 @@ CAC.Map.Control = (function ($, L, _) {
 
         var getIsochrone = function(params) {
             fetchReachable(params).then(function(data) {
+                if (!tabControl.isTabShowing('explore')) {
+                    // if user has switched away from the explore tab, do not show results
+                    deferred.resolve();
+                    return;
+                }
                 drawIsochrone(data.isochrone);
                 // also draw 'matched' list of locations
                 var matched = _.pluck(data.matched, 'point');
@@ -288,10 +295,10 @@ CAC.Map.Control = (function ($, L, _) {
 
     /**
      * Show markers for trip origin/destination.
-     * Will unset the markers if either co-ordinate set is null/empty.
+     * Will unset the markers if either coordinate set is null/empty.
      *
-     * @param {Array} originCoords Start point co-ordinates [lat, lng]
-     * @param {Array} destinationCoords End point co-ordinates [lat, lng]
+     * @param {Array} originCoords Start point coordinates [lat, lng]
+     * @param {Array} destinationCoords End point coordinates [lat, lng]
      */
     function setOriginDestinationMarkers(originCoords, destinationCoords) {
 
