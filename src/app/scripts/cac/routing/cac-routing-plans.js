@@ -29,7 +29,9 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
             crossDomain: true,
             data: urlParams
         }).then(function(data) {
-            var itineraries = _(data.plan.itineraries).map(createItinerary).indexBy('id').value();
+            var itineraries = _(data.plan.itineraries).map(function(itinerary, i) {
+                return new Itinerary(itinerary, i, data.requestParameters);
+            }).value();
             deferred.resolve(itineraries);
         }, function (error) {
             deferred.reject(error);
@@ -56,18 +58,6 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
         };
 
         return $.extend(formattedOpts, extraOptions);
-    }
-
-    /**
-     * Helper function to create a new Itinerary object
-     *
-     * @param {object} otpItinerary Itinerary object returned from OTP
-     * @param {integer} index Unique ID for itinerary creating
-     *
-     * @return {Itinerary} Itinerary object
-     */
-    function createItinerary(otpItinerary, index) {
-        return new Itinerary(otpItinerary, index);
     }
 
 })(jQuery, L, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);

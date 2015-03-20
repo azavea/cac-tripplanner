@@ -17,10 +17,37 @@ from cac_tripplanner.settings import OTP_URL
 from .models import Destination, FeedEvent
 
 
-def map(request):
+def base_otp_view(request, page):
+    """
+    Base view that sets the OTP routing_url variable
+
+    :param request: Request object
+    :param page: String representation of the HTML template
+    :returns: A rendered response
+    """
     routing_url = OTP_URL.format(router='default') + 'plan'
     context = RequestContext(request, dict(routing_url=routing_url))
-    return render_to_response('map.html', context_instance=context)
+    return render_to_response(page, context_instance=context)
+
+
+def map(request):
+    """
+    The map view
+
+    :param request: Request object
+    :returns: A rendered response
+    """
+    return base_otp_view(request, 'map.html')
+
+
+def directions(request):
+    """
+    The directions view
+
+    :param request: Request object
+    :returns: A rendered response
+    """
+    return base_otp_view(request, 'directions.html')
 
 
 class FindReachableDestinations(View):
