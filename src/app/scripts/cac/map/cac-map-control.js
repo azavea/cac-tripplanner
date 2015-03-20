@@ -44,6 +44,7 @@ CAC.Map.Control = (function ($, L, _) {
         initializeLayerControl();
     }
 
+    MapControl.prototype.clearIsochrone = clearIsochrone;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
