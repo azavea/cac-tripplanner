@@ -14,6 +14,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
     Directions.prototype.initialize = function () {
         var params = Utils.getUrlParams();
         if (!_.has(params, 'itineraryIndex')) {
+            // TODO: show this error in the UI
             console.error('Must specify itineraryIndex URL parameter');
             return;
         }
