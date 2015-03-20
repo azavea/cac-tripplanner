@@ -10,6 +10,8 @@ CAC.Map.Control = (function ($, L, _) {
     var map = null;
     var userMarker = null;
     var geocodeMarker = null;
+    var originMarker = null;
+    var destinationMarker = null;
 
     var overlaysControl = null;
     var itineraries = {};
@@ -52,6 +54,7 @@ CAC.Map.Control = (function ($, L, _) {
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
+    MapControl.prototype.setOriginDestinationMarkers = setOriginDestinationMarkers;
 
     return MapControl;
 
@@ -281,6 +284,58 @@ CAC.Map.Control = (function ($, L, _) {
             geocodeMarker.addTo(map);
         }
         map.panTo(latLng);
+    }
+
+    /**
+     * Show markers for trip origin/destination.
+     * Will unset the markers if either co-ordinate set is null/empty.
+     *
+     * @param {Array} originCoords Start point co-ordinates [lat, lng]
+     * @param {Array} destinationCoords End point co-ordinates [lat, lng]
+     */
+    function setOriginDestinationMarkers(originCoords, destinationCoords) {
+
+        if (!originCoords || !destinationCoords) {
+
+            if (originMarker) {
+                map.removeLayer(originMarker);
+            }
+
+            if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+            }
+
+            originMarker = null;
+            destinationMarker = null;
+            return;
+        }
+
+        var origin = L.latLng(originCoords[0], originCoords[1]);
+        var destination = L.latLng(destinationCoords[0], destinationCoords[1]);
+
+        if (originMarker && destinationMarker) {
+            originMarker.setLatLng(origin);
+            destinationMarker.setLatLng(destination);
+        } else {
+            var originIcon = L.AwesomeMarkers.icon({
+                icon: 'home',
+                prefix: 'fa',
+                markerColor: 'green'
+            });
+
+            var destIcon = L.AwesomeMarkers.icon({
+                icon: 'flag-o',
+                prefix: 'fa',
+                markerColor: 'red'
+            });
+
+            originMarker = new L.marker(origin, {icon: originIcon }).bindPopup('<p>Origin</p>');
+            destinationMarker = new L.marker(destination, {icon: destIcon })
+                                            .bindPopup('<p>Destination</p>');
+            originMarker.addTo(map);
+            destinationMarker.addTo(map);
+        }
+        map.panTo(origin);
     }
 
 })(jQuery, L, _);

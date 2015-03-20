@@ -82,6 +82,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
     }
 
     SidebarDirectionsControl.prototype = {
+        clearDirections: clearDirections,
         setDestination: setDestination,
         setDirections: setDirections
     };
@@ -90,6 +91,14 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
 
     function changeMode() {
         bikeOptions.changeMode(options.selectors);
+    }
+
+    function clearDirections() {
+        mapControl.setOriginDestinationMarkers(null, null);
+        mapControl.clearItineraries();
+        itineraryListControl.hide();
+        directionsListControl.hide();
+        $('.directions').removeClass('show-results');
     }
 
     function planTrip() {
@@ -158,6 +167,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
                     highlight = false;
                 }
             });
+
+            // put markers at start and end
+            mapControl.setOriginDestinationMarkers(directions.origin, directions.destination);
 
             itineraryListControl.setItineraries(itineraries);
             $('.directions').addClass('show-results');

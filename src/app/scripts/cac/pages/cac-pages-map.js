@@ -47,6 +47,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         if (tabId === 'directions') {
             mapControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
+        } else {
+            sidebarDirectionsControl.clearDirections();
         }
     }
 
