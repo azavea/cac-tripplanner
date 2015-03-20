@@ -14,6 +14,9 @@ var geocodeThrottleMillis = 500;
 
 $address.on('input', _.debounce(function () {
     CAC.Search.Geocoder.search($address.val()).then(function (location) {
+        if (!location) {
+            return; // no result found
+        }
         var geom = location.feature.geometry;
         var point = new OpenLayers.Geometry.Point(geom.x, geom.y).transform(projLatLng, projWM);
         var vectorLayer = module.layers.vector;
