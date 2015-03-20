@@ -54,7 +54,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         """Ensure that our pet isochrone correctly demarcates between points within and
         points outside of its boundary"""
         # flake8: noqa
-        isochrone_url = '/map/reachable?coords%5Blat%5D=39.954688&coords%5Blng%5D=-75.204677&mode%5B%5D=WALK&mode%5B%5D=TRANSIT&date=01-21-2015&time=7%3A30am&maxTravelTime=5000&maxWalkDistance=5000'
+        isochrone_url = '/map/reachable?fromPlace=39.954688%2C-75.204677&mode%5B%5D=WALK%2DTRANSIT&date=03-21-2015&time=7%3A30am&cutoffSec=5000&maxWalkDistance=5000'
         response = self.client.get(isochrone_url)
         json_response = json.loads(response.content)
         destinations = json_response['matched']
@@ -69,7 +69,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
 
     def test_empty_isochrone(self):
         """Return empty results if no isochrone found (for example, if origin is outside graph bounds)"""
-        isochrone_url = '/map/reachable?coords%5Blat%5D=79.954688&coords%5Blng%5D=-45.204677&mode%5B%5D=WALK&mode%5B%5D=TRANSIT&date=01-21-2015&time=7%3A30am&maxTravelTime=5000&maxWalkDistance=5000'
+        isochrone_url = '/map/reachable?fromPlace=79.954688%2D-45.204677&mode%5B%5D=WALK&&date=03-21-2015&time=7%3A30am&cutoffSec=5000&maxWalkDistance=5000'
         response = self.client.get(isochrone_url)
         json_response = json.loads(response.content)
         matched = json_response['matched']

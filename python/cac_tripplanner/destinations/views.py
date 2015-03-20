@@ -37,7 +37,6 @@ class FindReachableDestinations(View):
 
         payload['routerId'] = self.otp_router
         payload['algorithm'] = self.algorithm
-        del payload['_']
 
         isochrone_response = requests.get(self.isochrone_url, params=payload)
 
