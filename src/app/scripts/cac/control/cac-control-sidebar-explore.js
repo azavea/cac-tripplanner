@@ -6,12 +6,12 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
 
     'use strict';
 
+    var METERS_PER_MILE = 1609.34;
+
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#exploreBikeTriangle',
-            checkboxArriveBy: 'input[name="arriveByExplore"]:checked',
             datepicker: '#datetimeExplore',
-            departAtButton: 'input[name="arriveByExplore"]:eq(1)',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             maxWalkDiv: '#exploreMaxWalk',
@@ -91,13 +91,35 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
             date = moment();
         }
 
+        var otpOptions = { mode: mode };
+
+        if (mode.indexOf('BICYCLE') > -1) {
+            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
+            var bikeTriangle = bikeTriangleOpt.val();
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
+            UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+        } else {
+            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
+            if (maxWalk) {
+                UserPreferences.setPreference('maxWalk', maxWalk);
+                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            } else {
+                UserPreferences.setPreference('maxWalk', undefined);
+            }
+
+            // true if box checked
+            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
+            UserPreferences.setPreference('wheelchair', wheelchair);
+            $.extend(otpOptions, { wheelchair: wheelchair });
+        }
+
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
         UserPreferences.setPreference('originText', $(options.selectors.exploreOrigin).val());
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
-        fetchIsochrone(date, mode, exploreMinutes);
+        fetchIsochrone(date, exploreMinutes, otpOptions);
     }
 
     /**
@@ -108,8 +130,8 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
      * @param {String} mode String for travel mode to pass to OTP (walk, transit, etc.)
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
-    function fetchIsochrone(when, mode, exploreMinutes) {
-        mapControl.fetchIsochrone(exploreLatLng, when, mode, exploreMinutes).then(
+    function fetchIsochrone(when, exploreMinutes, otpOptions) {
+        mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions).then(
             function (destinations) {
                 setDestinationSidebar(destinations);
             }
@@ -178,22 +200,45 @@ CAC.Control.SidebarExplore = (function ($, MapTemplates, Typeahead, UserPreferen
         var method = UserPreferences.getPreference('method');
         if (method === 'explore') {
             var mode = UserPreferences.getPreference('mode');
-
-            // 'explore' tab
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
             var exploreOrigin = UserPreferences.getPreference('origin');
             exploreLatLng = [exploreOrigin.feature.geometry.y,
                                         exploreOrigin.feature.geometry.x];
             var originText = UserPreferences.getPreference('originText');
             var exploreTime = UserPreferences.getPreference('exploreTime');
+            var maxWalk = UserPreferences.getPreference('maxWalk');
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+
             setAddress(exploreOrigin);
 
             $(options.selectors.exploreOrigin).typeahead('val', originText);
             $(options.selectors.exploreTime).val(exploreTime);
             $(options.selectors.modeSelector).val(mode);
+            $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
             // use current date/time when loading from preferences
             var when = moment();
-            fetchIsochrone(when, mode, exploreTime);
+
+            // build options for query
+            var otpOptions = { mode: mode };
+
+            if (mode.indexOf('BICYCLE') > -1) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
+            } else {
+                if (maxWalk) {
+                    $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+                }
+                $.extend(otpOptions, { wheelchair: wheelchair });
+            }
+
+            if (wheelchair) {
+                $('input', options.selectors.wheelchairDiv).click();
+            }
+
+            if (maxWalk) {
+                $('input', options.selectors.maxWalkDiv).val(maxWalk);
+            }
+            fetchIsochrone(when, exploreTime, otpOptions);
         }
     }
 

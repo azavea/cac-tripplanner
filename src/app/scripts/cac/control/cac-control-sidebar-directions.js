@@ -14,7 +14,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             buttonPlanTrip: 'section.directions button[type=submit]',
             checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
             datepicker: '#datetimeDirections',
-            departAtButton: 'input[name="arriveByDirections"]:eq(1)',
+            arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
             itineraryList: 'section.directions .itineraries',
@@ -22,29 +22,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             origin: 'section.directions input.origin',
             destination: 'section.directions input.destination',
             wheelchairDiv: '#directionsWheelchair'
-        },
-        // Note:  the three bike options must sum to 1, or OTP won't plan the trip
-        bikeTriangle: {
-            neutral: {
-                triangleSafetyFactor: 0.34,
-                triangleSlopeFactor: 0.33,
-                triangleTimeFactor: 0.33
-            },
-            flatter: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.66,
-                triangleTimeFactor: 0.17
-            },
-            faster: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.66
-            },
-            safer: {
-                triangleSafetyFactor: 0.66,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.17
-            }
         }
     };
     var options = {};
@@ -126,9 +103,9 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         var origin = directions.origin;
         var destination = directions.destination;
 
-        var arriveBy = true;
-        if ($(options.selectors.checkboxArriveBy).val() === 'departAt') {
-            arriveBy = false; // depart at time instead
+        var arriveBy = false; // depart at time by default
+        if ($(options.selectors.checkboxArriveBy).val() === 'arriveBy') {
+            arriveBy = true;
         }
 
         // options to pass to OTP as-is
@@ -140,7 +117,7 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, mapControl.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -208,7 +185,6 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             var prefKey = key === 'origin' ? 'from' : 'to';
 
             if (!location) {
-                console.log('no location!');
                 UserPreferences.setPreference(prefKey, undefined);
                 setDirections(key, null);
                 return;
@@ -276,8 +252,8 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             // switch tabs
             tabControl.setTab('directions');
             var mode = UserPreferences.getPreference('mode');
-
             var arriveBy = UserPreferences.getPreference('arriveBy');
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
             var from = UserPreferences.getPreference('from');
             var to = UserPreferences.getPreference('to');
             var fromText = UserPreferences.getPreference('fromText');
@@ -298,8 +274,10 @@ CAC.Control.SidebarDirections = (function ($, Control, MapTemplates, Routing, Ty
             $(options.selectors.origin).typeahead('val', fromText);
             $(options.selectors.destination).typeahead('val', toText);
             $(options.selectors.modeSelector).val(mode);
-            if (!arriveBy) {
-                $(options.selectors.departAtButton).click();
+            $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+
+            if (arriveBy) {
+                $(options.selectors.arriveByButton).click();
              }
 
             if (from) {
