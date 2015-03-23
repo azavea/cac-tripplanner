@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead, UserPreferences) {
+CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, Typeahead, UserPreferences) {
 
     'use strict';
 
@@ -12,6 +12,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
         selectors: {
             bikeTriangleDiv: '#exploreBikeTriangle',
             datepicker: '#datetimeExplore',
+            distanceMinutesText: '.distanceMinutes',
             errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
@@ -203,6 +204,47 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
         $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
     }
 
+    /**
+     * Query OTP for travel time to a destination, then put it in the side panel.
+     *
+     * @param {Object} destination Destination put in the sidebar
+     * @param {Object} $container jQuery-selected HTML snippet in the sidebar for the destination
+     */
+    function setDestinationDistance(destination, $container) {
+        var mode = $(options.selectors.modeSelector).val();
+        var picker = $(options.selectors.datepicker).data('DateTimePicker');
+        var date = picker.date();
+        if (!date) {
+            // use current date/time if none set
+            date = moment();
+        }
+        // only request one itinerary (first returned is the shortest)
+        var otpOptions = { mode: mode, numItineraries: 1 };
+        if (mode.indexOf('BICYCLE') > -1) {
+            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
+            var bikeTriangle = bikeTriangleOpt.val();
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
+        } else {
+            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
+            if (maxWalk) {
+                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            }
+            // true if box checked
+            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
+            $.extend(otpOptions, { wheelchair: wheelchair });
+        }
+
+        var dest = [destination.point.coordinates[1], destination.point.coordinates[0]];
+
+        Routing.planTrip(exploreLatLng, dest, date, otpOptions)
+            .then(function (itineraries) {
+            if (itineraries.length) {
+                var distance = itineraries[0].durationMinutes;
+                $container.find(options.selectors.distanceMinutesText).text(distance + ' minutes away');
+            }
+        });
+    }
+
     function setDestinationSidebar(destinations) {
         destinationsCache = destinations;
         var $container = $('<div></div>').addClass('destinations');
@@ -214,6 +256,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
                 events.trigger(eventNames.destinationSelected, destination);
             });
             $container.append($destination);
+            setDestinationDistance(destination, $destination);
         });
         $(options.selectors.sidebarDetails).empty().append($container);
         $(options.selectors.sidebarContainer).height(400);
@@ -278,4 +321,5 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
         }
     }
 
-})(jQuery, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Search.Typeahead, CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead,
+   CAC.User.Preferences);

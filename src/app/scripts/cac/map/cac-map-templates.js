@@ -22,7 +22,7 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
             '<a class="block block-destination">',
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
-                '<h5>20 minutes away</h5>',
+                '<h5 class="distanceMinutes"></h5>',
                 '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}http://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
             '</a>'
         ].join('');
