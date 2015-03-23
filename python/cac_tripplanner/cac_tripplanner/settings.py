@@ -44,7 +44,11 @@ except (IOError, NameError):
         # Settings only needed if 'use_s3_storage' is set to True
         'aws_access_key_id': '',
         'aws_secret_access_key': '',
-        'aws_storage_bucket_name': ''
+        'aws_storage_bucket_name': '',
+
+        'default_admin_username': 'admin',
+        'default_admin_password': 'admin',
+        'default_admin_email': 'systems+cac@azavea.com'
     }
 
 
@@ -181,6 +185,11 @@ if secrets['use_s3_storage']:
     AWS_ACCESS_KEY_ID = secrets['aws_access_key_id']
     AWS_SECRET_ACCESS_KEY = secrets['aws_secret_access_key']
     AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
+
+# Default user
+DEFAULT_ADMIN_USERNAME = secrets['default_admin_username']
+DEFAULT_ADMIN_PASSWORD = secrets['default_admin_password']
+DEFAULT_ADMIN_EMAIL = secrets['default_admin_email']
 
 # Application settings
 #
