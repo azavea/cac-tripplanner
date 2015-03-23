@@ -15,6 +15,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
             buttonPlanTrip: 'section.directions button[type=submit]',
             checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
             datepicker: '#datetimeDirections',
+            directions: '.directions',
             arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
@@ -22,6 +23,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
             typeahead: 'section.directions input.typeahead',
             origin: 'section.directions input.origin',
             destination: 'section.directions input.destination',
+            resultsClass: 'show-results',
             wheelchairDiv: '#directionsWheelchair'
         }
     };
@@ -82,6 +84,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
     }
 
     SidebarDirectionsControl.prototype = {
+        clearDirections: clearDirections,
         setDestination: setDestination,
         setDirections: setDirections
     };
@@ -90,6 +93,14 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
 
     function changeMode() {
         bikeOptions.changeMode(options.selectors);
+    }
+
+    function clearDirections() {
+        mapControl.setOriginDestinationMarkers(null, null);
+        mapControl.clearItineraries();
+        itineraryListControl.hide();
+        directionsListControl.hide();
+        $(options.selectors.directions).removeClass(options.selectors.resultsClass);
     }
 
     function planTrip() {
@@ -147,6 +158,10 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         UserPreferences.setPreference('arriveBy', arriveBy);
 
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
+            if (!tabControl.isTabShowing('directions')) {
+                // if user has switched away from the directions tab, do not show trip
+                return;
+            }
             // Add the itineraries to the map, highlighting the first one
             var highlight = true;
             mapControl.clearItineraries();
@@ -159,8 +174,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
                 }
             });
 
+            // put markers at start and end
+            mapControl.setOriginDestinationMarkers(directions.origin, directions.destination);
+
             itineraryListControl.setItineraries(itineraries);
-            $('.directions').addClass('show-results');
+            $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         });
     }

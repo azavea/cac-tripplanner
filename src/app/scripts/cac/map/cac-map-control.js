@@ -10,6 +10,8 @@ CAC.Map.Control = (function ($, L, _) {
     var map = null;
     var userMarker = null;
     var geocodeMarker = null;
+    var originMarker = null;
+    var destinationMarker = null;
 
     var overlaysControl = null;
     var itineraries = {};
@@ -19,6 +21,7 @@ CAC.Map.Control = (function ($, L, _) {
     var overlays = {};
     var destinationsLayer = null;
     var isochroneLayer = null;
+    var tabControl = null;
 
     var stamenTonerAttribution = [
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
@@ -38,12 +41,14 @@ CAC.Map.Control = (function ($, L, _) {
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
+        tabControl = options.tabControl;
 
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
     }
 
+    MapControl.prototype.clearIsochrone = clearIsochrone;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
     MapControl.prototype.locateUser = locateUser;
@@ -51,6 +56,7 @@ CAC.Map.Control = (function ($, L, _) {
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
+    MapControl.prototype.setOriginDestinationMarkers = setOriginDestinationMarkers;
 
     return MapControl;
 
@@ -160,6 +166,11 @@ CAC.Map.Control = (function ($, L, _) {
 
         var getIsochrone = function(params) {
             fetchReachable(params).then(function(data) {
+                if (!tabControl.isTabShowing('explore')) {
+                    // if user has switched away from the explore tab, do not show results
+                    deferred.resolve();
+                    return;
+                }
                 drawIsochrone(data.isochrone);
                 // also draw 'matched' list of locations
                 var matched = _.pluck(data.matched, 'point');
@@ -280,6 +291,58 @@ CAC.Map.Control = (function ($, L, _) {
             geocodeMarker.addTo(map);
         }
         map.panTo(latLng);
+    }
+
+    /**
+     * Show markers for trip origin/destination.
+     * Will unset the markers if either coordinate set is null/empty.
+     *
+     * @param {Array} originCoords Start point coordinates [lat, lng]
+     * @param {Array} destinationCoords End point coordinates [lat, lng]
+     */
+    function setOriginDestinationMarkers(originCoords, destinationCoords) {
+
+        if (!originCoords || !destinationCoords) {
+
+            if (originMarker) {
+                map.removeLayer(originMarker);
+            }
+
+            if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+            }
+
+            originMarker = null;
+            destinationMarker = null;
+            return;
+        }
+
+        var origin = L.latLng(originCoords[0], originCoords[1]);
+        var destination = L.latLng(destinationCoords[0], destinationCoords[1]);
+
+        if (originMarker && destinationMarker) {
+            originMarker.setLatLng(origin);
+            destinationMarker.setLatLng(destination);
+        } else {
+            var originIcon = L.AwesomeMarkers.icon({
+                icon: 'home',
+                prefix: 'fa',
+                markerColor: 'green'
+            });
+
+            var destIcon = L.AwesomeMarkers.icon({
+                icon: 'flag-o',
+                prefix: 'fa',
+                markerColor: 'red'
+            });
+
+            originMarker = new L.marker(origin, {icon: originIcon }).bindPopup('<p>Origin</p>');
+            destinationMarker = new L.marker(destination, {icon: destIcon })
+                                            .bindPopup('<p>Destination</p>');
+            originMarker.addTo(map);
+            destinationMarker.addTo(map);
+        }
+        map.panTo(origin);
     }
 
 })(jQuery, L, _);

@@ -9,6 +9,8 @@ CAC.Control.SidebarTab = (function ($) {
 
     'use strict';
 
+    var currentTab = 'explore';
+
     var defaults = {
         tabWrapperSelector: '.sidebar-tabs'
     };
@@ -33,11 +35,17 @@ CAC.Control.SidebarTab = (function ($) {
         });
     }
 
+    SidebarTabControl.prototype.isTabShowing = isTabShowing;
     SidebarTabControl.prototype.setTab = setTab;
 
     return SidebarTabControl;
 
+    function isTabShowing(tabId) {
+        return tabId === currentTab;
+    }
+
     function setTab(tabId) {
+        currentTab = tabId;
         var $tabs = $wrapper.siblings('[data-sidebar-tab]');
         $tabs.addClass('hidden');
         $wrapper.siblings('.' + tabId).removeClass('hidden');
