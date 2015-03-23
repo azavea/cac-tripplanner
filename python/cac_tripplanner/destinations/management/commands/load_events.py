@@ -78,7 +78,7 @@ class Command(BaseCommand):
             georss = self.get_property(item, 'georss:point').split()
             lat = float(georss[0])
             lon = float(georss[1])
-        except (ValueError, IndexError) as e:
+        except (ValueError, IndexError):
             self.stdout.write('Unable to convert lat/lng for: {0}'.format(guid))
             return
 
@@ -118,5 +118,5 @@ class Command(BaseCommand):
         num_expired_events = len(expired_events)
         if num_expired_events > 0:
             expired_events.delete()
-            self.stdout.write('{0}: Cleaned {1} expired events'.format(str(datetime.now()), num_expired_events))
-
+            self.stdout.write('{0}: Cleaned {1} expired events'.format(str(datetime.now()),
+                              num_expired_events))

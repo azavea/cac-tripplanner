@@ -11,19 +11,20 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
 
     var defaults = {
         selectors: {
+            arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
             checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
             datepicker: '#datetimeDirections',
+            destination: 'section.directions input.destination',
             directions: '.directions',
-            arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
+            errorClass: 'error',
+            itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelector: '#directionsModeSelector',
-            itineraryList: 'section.directions .itineraries',
-            typeahead: 'section.directions input.typeahead',
             origin: 'section.directions input.origin',
-            destination: 'section.directions input.destination',
             resultsClass: 'show-results',
+            typeahead: 'section.directions input.typeahead',
             wheelchairDiv: '#directionsWheelchair'
         }
     };
@@ -252,7 +253,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
     }
 
     function setDirectionsError(key) {
-        var errorClass = 'error';
         var $input = null;
         if (key === 'origin') {
             $input = $(options.selectors.origin);
@@ -261,9 +261,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         }
 
         if (directions[key]) {
-            $input.removeClass(errorClass);
+            $input.removeClass(options.selectors.errorClass);
         } else {
-            $input.addClass(errorClass);
+            $input.addClass(options.selectors.errorClass);
         }
     }
 
