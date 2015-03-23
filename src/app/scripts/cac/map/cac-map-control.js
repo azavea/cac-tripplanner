@@ -40,7 +40,12 @@ CAC.Map.Control = (function ($, L, _) {
         this.events = events;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
-        map = L.map(this.options.id).setView(this.options.center, this.options.zoom);
+        map = L.map(this.options.id,{ zoomControl: false })
+            .setView(this.options.center, this.options.zoom);
+
+        // put zoom control on top right
+        new L.Control.Zoom({ position: 'topright' }).addTo(map);
+
         tabControl = options.tabControl;
 
         initializeBasemaps();
