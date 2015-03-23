@@ -12,6 +12,8 @@ CAC.Pages.Home = (function ($, UserPreferences) {
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             toggleButton: '.toggle-search button',
+            toggleExploreButton: '#toggle-explore',
+            toggleDirectionsButton: '#toggle-directions',
             typeahead: 'input.typeahead'
         }
     };
@@ -117,9 +119,13 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         if (tab.indexOf('directions') > -1) {
             $(options.selectors.exploreForm).addClass('hidden');
             $(options.selectors.directionsForm).removeClass('hidden');
+            $(options.selectors.toggleDirectionsButton).addClass('active');
+            $(options.selectors.toggleExploreButton).removeClass('active');
         } else {
             $(options.selectors.directionsForm).addClass('hidden');
             $(options.selectors.exploreForm).removeClass('hidden');
+            $(options.selectors.toggleDirectionsButton).removeClass('active');
+            $(options.selectors.toggleExploreButton).addClass('active');
         }
     }
 
