@@ -48,7 +48,13 @@ CAC.Control.SidebarTab = (function ($) {
         currentTab = tabId;
         var $tabs = $wrapper.siblings('[data-sidebar-tab]');
         $tabs.addClass('hidden');
+        $tabs.removeClass('active');
         $wrapper.siblings('.' + tabId).removeClass('hidden');
+        $wrapper.siblings('.' + tabId).addClass('active');
+
+        var $buttons = $wrapper.children('button');
+        $buttons.removeClass('active');
+        $buttons.siblings('[data-tab=' + tabId + ']').addClass('active');
 
         this.events.trigger(events.tabShown, tabId);
     }
