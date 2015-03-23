@@ -277,46 +277,47 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     function setFromUserPreferences() {
         var method = UserPreferences.getPreference('method');
-        if (method === 'explore') {
-            var mode = UserPreferences.getPreference('mode');
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            var exploreOrigin = UserPreferences.getPreference('origin');
-            exploreLatLng = [exploreOrigin.feature.geometry.y,
-                                        exploreOrigin.feature.geometry.x];
-            var originText = UserPreferences.getPreference('originText');
-            var exploreTime = UserPreferences.getPreference('exploreTime');
-            var maxWalk = UserPreferences.getPreference('maxWalk');
-            var wheelchair = UserPreferences.getPreference('wheelchair');
+        var mode = UserPreferences.getPreference('mode');
+        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+        var exploreOrigin = UserPreferences.getPreference('origin');
+        exploreLatLng = [exploreOrigin.feature.geometry.y,
+                                    exploreOrigin.feature.geometry.x];
+        var originText = UserPreferences.getPreference('originText');
+        var exploreTime = UserPreferences.getPreference('exploreTime');
+        var maxWalk = UserPreferences.getPreference('maxWalk');
+        var wheelchair = UserPreferences.getPreference('wheelchair');
 
-            setAddress(exploreOrigin);
+        setAddress(exploreOrigin);
 
-            $(options.selectors.exploreOrigin).typeahead('val', originText);
-            $(options.selectors.exploreTime).val(exploreTime);
-            $(options.selectors.modeSelector).val(mode);
-            $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+        $(options.selectors.exploreOrigin).typeahead('val', originText);
+        $(options.selectors.exploreTime).val(exploreTime);
+        $(options.selectors.modeSelector).val(mode);
+        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
-            // use current date/time when loading from preferences
-            var when = moment();
+        // use current date/time when loading from preferences
+        var when = moment();
 
-            // build options for query
-            var otpOptions = { mode: mode };
+        // build options for query
+        var otpOptions = { mode: mode };
 
-            if (mode.indexOf('BICYCLE') > -1) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
-            } else {
-                if (maxWalk) {
-                    $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
-                }
-                $.extend(otpOptions, { wheelchair: wheelchair });
-            }
-
-            if (wheelchair) {
-                $('input', options.selectors.wheelchairDiv).click();
-            }
-
+        if (mode.indexOf('BICYCLE') > -1) {
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
+        } else {
             if (maxWalk) {
-                $('input', options.selectors.maxWalkDiv).val(maxWalk);
+                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
             }
+            $.extend(otpOptions, { wheelchair: wheelchair });
+        }
+
+        if (wheelchair) {
+            $('input', options.selectors.wheelchairDiv).click();
+        }
+
+        if (maxWalk) {
+            $('input', options.selectors.maxWalkDiv).val(maxWalk);
+        }
+
+        if (method === 'explore') {
             fetchIsochrone(when, exploreTime, otpOptions);
         }
     }

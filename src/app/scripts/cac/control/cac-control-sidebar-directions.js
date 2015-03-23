@@ -272,53 +272,56 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
      */
     function setFromUserPreferences() {
         var method = UserPreferences.getPreference('method');
-        if (method === 'directions') {
+        var mode = UserPreferences.getPreference('mode');
+        var arriveBy = UserPreferences.getPreference('arriveBy');
+        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+        var from = UserPreferences.getPreference('from');
+        var to = UserPreferences.getPreference('to');
+        var fromText = UserPreferences.getPreference('fromText');
+        var toText = UserPreferences.getPreference('toText');
+        var maxWalk = UserPreferences.getPreference('maxWalk');
+        var wheelchair = UserPreferences.getPreference('wheelchair');
 
+        if (wheelchair) {
+            $('input', options.selectors.wheelchairDiv).click();
+        }
+
+        if (maxWalk) {
+            $('input', options.selectors.maxWalkDiv).val(maxWalk);
+        }
+
+        directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+
+        $(options.selectors.origin).typeahead('val', fromText);
+        $(options.selectors.destination).typeahead('val', toText);
+        $(options.selectors.modeSelector).val(mode);
+        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+
+        if (arriveBy) {
+            $(options.selectors.arriveByButton).click();
+         }
+
+        if (method === 'directions') {
             // switch tabs
             tabControl.setTab('directions');
-            var mode = UserPreferences.getPreference('mode');
-            var arriveBy = UserPreferences.getPreference('arriveBy');
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            var from = UserPreferences.getPreference('from');
-            var to = UserPreferences.getPreference('to');
-            var fromText = UserPreferences.getPreference('fromText');
-            var toText = UserPreferences.getPreference('toText');
-            var maxWalk = UserPreferences.getPreference('maxWalk');
-            var wheelchair = UserPreferences.getPreference('wheelchair');
+        }
 
-            if (wheelchair) {
-                $('input', options.selectors.wheelchairDiv).click();
-            }
-
-            if (maxWalk) {
-                $('input', options.selectors.maxWalkDiv).val(maxWalk);
-            }
-
-            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-
-            $(options.selectors.origin).typeahead('val', fromText);
-            $(options.selectors.destination).typeahead('val', toText);
-            $(options.selectors.modeSelector).val(mode);
-            $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
-
-            if (arriveBy) {
-                $(options.selectors.arriveByButton).click();
-             }
-
-            if (from) {
-                directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+        if (from) {
+            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+            if (method === 'directions') {
                 planTrip();
-            } else {
-                // use current location if no directions origin set
-                mapControl.locateUser().then(function(data) {
-                    directions.origin = [data[0], data[1]];
-                    planTrip();
-                }, function(error) {
-                    console.error('Could not geolocate user');
-                    console.error(error);
-                    return;
-                });
             }
+        } else if (method === 'directions') {
+            // use current location if no directions origin set
+            mapControl.locateUser().then(function(data) {
+                directions.origin = [data[0], data[1]];
+                setDirectionsError('origin');
+                planTrip();
+            }, function(error) {
+                console.error('Could not geolocate user');
+                console.error(error);
+                return;
+            });
         }
     }
 
