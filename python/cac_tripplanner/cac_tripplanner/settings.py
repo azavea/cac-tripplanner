@@ -162,6 +162,18 @@ CKEDITOR_IMAGE_BACKEND = 'pillow'
 # TODO: delete later.
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': [
+            ["Styles", "Format", "Bold", "Italic", "Underline", "Strike", "SpellChecker", "Undo", "Redo"],
+            ["Link", "Unlink", "Anchor"],
+            ["Table", "HorizontalRule"],
+            ["SpecialChar"],
+            ["Source"]
+        ]
+    }
+}
+
 WPADMIN = {
     'admin': {
         'title': 'Clean Air Council Content Management System',
