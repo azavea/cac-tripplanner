@@ -12,6 +12,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
         selectors: {
             bikeTriangleDiv: '#exploreBikeTriangle',
             datepicker: '#datetimeExplore',
+            errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             maxWalkDiv: '#exploreMaxWalk',
@@ -38,7 +39,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
     var datepicker = null;
     var mapControl = null;
     var typeahead = null;
-    var exploreLatLng = [0,0];
+    var exploreLatLng = null;
     var destinationsCache = [];
 
     function SidebarExploreControl(params) {
@@ -83,6 +84,11 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
      * Set user preferences before fetching isochrone.
      */
     function clickedExplore() {
+
+        if (addressHasError(exploreLatLng)) {
+            return;
+        }
+
         var exploreMinutes = $(options.selectors.exploreTime).val();
         var mode = $(options.selectors.modeSelector).val();
 
@@ -148,6 +154,28 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
         if (key === 'search') {
             UserPreferences.setPreference('origin', location);
             setAddress(location);
+        } else {
+            console.error('Unrecognized typeahead key ' + key + ' in explore tab.');
+        }
+    }
+
+    /**
+     * Returns true if given location is missing (address is not valid)
+     *
+     * @params {Object} location Geocoded location object (truthy if ok)
+     * @returns {Boolean} true if location is falsy
+     */
+    function addressHasError(location) {
+        var $input = $(options.selectors.exploreOrigin);
+
+        if (location) {
+            $input.removeClass(options.selectors.errorClass);
+            return false;
+        } else {
+            exploreLatLng = null;
+            UserPreferences.setPreference('origin', undefined);
+            $input.addClass(options.selectors.errorClass);
+            return true;
         }
     }
 
@@ -166,6 +194,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Typeahead,
     }
 
     function setAddress(location) {
+        if (addressHasError(location)) {
+            return;
+        }
         var latLng = L.latLng(location.feature.geometry.y, location.feature.geometry.x);
         exploreLatLng = [location.feature.geometry.y, location.feature.geometry.x];
         mapControl.setGeocodeMarker(latLng);

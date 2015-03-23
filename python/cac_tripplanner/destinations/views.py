@@ -3,7 +3,7 @@ import json
 
 from pytz import timezone
 
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Point
+from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core import serializers
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
@@ -89,7 +89,7 @@ class FindReachableDestinations(View):
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
         Return both the isochrone GeoJSON and the list of matched destinations."""
-        params = request.GET.copy() # make mutable
+        params = request.GET.copy()  # make mutable
 
         json_poly = self.isochrone(params)
 
