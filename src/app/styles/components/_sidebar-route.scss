@@ -1,7 +1,7 @@
 .directions {
     position: absolute;
     width: 100%;
-    top: 32px;
+    top: 40px;
 
     &.show-results {
         .sidebar-clip {
@@ -9,9 +9,33 @@
         }
     }
 
+    .sidebar-search {
+        padding: 0;
+
+        span.twitter-typeahead {
+            width: 100%;
+            padding: 15px;
+            border-bottom: 1px solid #DDD;
+
+            &:last-of-type {
+                border: none;
+            }
+        }
+        button[type="submit"] {
+            position: absolute;
+            top: 50%;
+            margin-top: -20px;
+            height: 40px;
+            width: 40px;
+            right: 15px;
+            border: none;
+            background: white;
+            padding: 5px 6px;
+        }
+    }
     .sidebar-options {
         height: auto;
-        padding: 10px 14px 0;
+        padding: 0 14px;
 
         .address {
             height: 60px;
@@ -55,6 +79,7 @@
             height: 44px;
             background: $light-gray;
             margin: 0 -14px;
+            padding: 0;
 
             span.text {
                 color: #999;
@@ -100,7 +125,6 @@
             padding: 0;
 
             &.active {
-                overflow: visible;
                 max-height: 500px;
                 padding: 10px 0;
             }

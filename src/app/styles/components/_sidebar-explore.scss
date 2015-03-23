@@ -1,7 +1,7 @@
 .explore {
     position: absolute;
     width: 100%;
-    top: 32px;
+    top: 40px;
 
     &.show-results {
         .sidebar-clip {
@@ -9,10 +9,15 @@
         }
     }
     .sidebar-search {
-        height: 44px;
+        height: 50px;
+        padding: 0;
 
+        span.twitter-typeahead {
+            width: 100%;
+            height: 50px;
+        }
         input[type="search"] {
-            padding-right: 30px;
+            padding: 12px 45px 12px 12px;
         }
         button {
             border: none;
@@ -20,7 +25,12 @@
             position: absolute;
             right: 0;
             top: 0;
-            padding: 11px 14px;
+            padding: 14px 14px;
+            color: #AAA;
+
+            &:hover {
+                color: black;
+            }
         }
     }
     .sidebar-options {
@@ -69,6 +79,7 @@
             height: 44px;
             background: $light-gray;
             margin: 0 -14px;
+            padding: 0;
 
             span.text {
                 color: #999;
@@ -116,7 +127,6 @@
             &.active {
                 max-height: 500px;
                 padding: 10px 0;
-                overflow: visible;
             }
         }
     }
@@ -125,17 +135,12 @@
         padding: 0 15px;
         position: relative;
         width: 100%;
-        max-height: 400px;
-        height: 100%;
+        height: 0;
+        transition: height 1s;
 
         .destinations {
             overflow: auto;
             height: 100%;
-            left: 15px;
-            padding-right: 15px;
-            right: 0px;
-            position: absolute;
-            top: 0;
         }
         .block-destination {
             height: 175px;
@@ -144,6 +149,8 @@
             &:first-of-type {
                 margin-top: 15px;
             }
+            
+            h3 { margin: 0; }
         }
         .view-more {
             position: absolute;
