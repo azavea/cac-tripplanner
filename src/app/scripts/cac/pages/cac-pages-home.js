@@ -3,6 +3,8 @@ CAC.Pages.Home = (function ($, UserPreferences) {
 
     var defaults = {
         selectors: {
+            destinationAddress: '.destination-address',
+            destinationBlock: '.block-destination',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
             directionsMode: '#directionsMode',
@@ -14,7 +16,8 @@ CAC.Pages.Home = (function ($, UserPreferences) {
             toggleButton: '.toggle-search button',
             toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
-            typeahead: 'input.typeahead'
+            typeahead: 'input.typeahead',
+            viewAll: '#viewAll'
         }
     };
     var options = {};
@@ -35,6 +38,9 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
+
+        $(options.selectors.viewAll).click($.proxy(clickedViewAll, this));
+        $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
     };
@@ -109,6 +115,18 @@ CAC.Pages.Home = (function ($, UserPreferences) {
     };
 
     return Home;
+
+    function clickedViewAll() {
+        console.log('Implement me, please!');
+        return false;
+    }
+
+    function clickedDestination(event) {
+        var block = $(event.target).closest(options.selectors.destinationBlock);
+        var addr = block.children(options.selectors.destinationAddress).text();
+        console.log(addr);
+        return false;
+    }
 
     function onTypeaheadSelected(event, key, location) {
         event.preventDefault();  // do not submit form
