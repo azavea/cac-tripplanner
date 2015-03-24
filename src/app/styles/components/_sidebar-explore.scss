@@ -140,12 +140,12 @@
         }
     }
     .sidebar-details {
-        overflow: hidden;
+        overflow-y: auto;
         padding: 0 15px;
         position: relative;
         width: 100%;
-        height: 100%;      // TODO: remove and dynamically resize
-        max-height: 400px; // TODO: remove and dynamically resize
+        max-height: 250px;
+        height: 100%;
         transition: height 1s;
 
         .destinations {
