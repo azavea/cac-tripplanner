@@ -5,7 +5,8 @@
 
     &.show-results {
         .sidebar-clip {
-            height: 100%;
+            max-height: 400px; // TODO: dynamically resize
+            height: 400px; // TODO: dynamically resize
         }
     }
 
@@ -127,6 +128,7 @@
             &.active {
                 max-height: 500px;
                 padding: 10px 0;
+                overflow: visible;
             }
         }
     }

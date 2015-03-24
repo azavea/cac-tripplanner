@@ -26,7 +26,6 @@ CAC.Pages.Home = (function ($, UserPreferences) {
     Home.prototype.initialize = function () {
         $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
-            $(this).addClass('active');
             setTab(id);
         });
 
