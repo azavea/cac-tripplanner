@@ -29,6 +29,7 @@ var stat = {
 };
 
 // The multiple-select module needs special treatment, because its bower.json file is incomplete
+var boostrapSelectRoot = 'bower_components/bootstrap-select/dist/css';
 var multiSelectRoot = 'bower_components/multiple-select';
 var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
 
@@ -85,6 +86,12 @@ gulp.task('copy:scripts', function() {
 gulp.task('copy:vendor-css', function() {
     return copyBowerFiles('**/*.css', [multiSelectRoot + '/multiple-select.css'])
         .pipe(concat('vendor.css'))
+        .pipe(gulp.dest(stat.styles));
+});
+
+gulp.task('copy:bootstrap-select-map', function() {
+    return copyBowerFiles('**.*.map', [boostrapSelectRoot + '/bootstrap-select.css.map'])
+        .pipe(concat('bootstrap-select.css.map'))
         .pipe(gulp.dest(stat.styles));
 });
 
@@ -175,6 +182,7 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 gulp.task('common:build', ['clean'], function() {
     return gulp.start(
         'copy:vendor-css',
+        'copy:bootstrap-select-map',
         'copy:vendor-images',
         'copy:style-images',
         'copy:app-images',
