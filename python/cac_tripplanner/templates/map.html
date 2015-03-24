@@ -32,13 +32,14 @@
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
                     </select>
-                </div>
-                <div id="moreExplore" class="more-options">
                     <h6>Departure day and time</h6>
                     <div class="input-group date" id="datetimeExplore">
-                        <input type="text" class="form-control" />  <span class="input-group-addon">
+                        <input type="text" class="form-control"
+                            placeholder="Now" />  <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span></span>
                     </div>
+                </div>
+                <div id="moreExplore" class="more-options">
                     <div id="exploreBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control selectpicker">
@@ -103,6 +104,12 @@
                         <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
                         <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
                     </select>
+                    <h6>Day and time</h6>
+                    <div class="input-group date" id="datetimeDirections">
+                        <input type="text" class="form-control"
+                            placeholder="Now" />  <span class="input-group-addon">
+                            <span class="glyphicon-calendar glyphicon"></span></span>
+                    </div>
                 </div>
                 <div id="moreDirections" class="more-options">
                     <div class="btn-group" data-toggle="buttons">
@@ -110,11 +117,6 @@
                             <input type="radio" name="arriveByDirections" value="departAt" />Depart At</label>
                         <label class="btn btn-primary">
                             <input type="radio" name="arriveByDirections" value="arriveBy" />Arrive By</label>
-                    </div>
-                    <h6>Day and time</h6>
-                    <div class="input-group date" id="datetimeDirections">
-                        <input type="text" class="form-control" />  <span class="input-group-addon">
-                            <span class="glyphicon-calendar glyphicon"></span></span>
                     </div>
                     <div id="directionsBikeTriangle">
                         <h6>What kind of ride do you want?</h6>

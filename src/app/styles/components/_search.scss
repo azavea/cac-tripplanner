@@ -35,7 +35,7 @@
         &[type="number"] {
             width: 70px;
         }
-        &[type="text"] {
+        &[type="text"]:not(.form-control) {
             width: 260px;
         }
     }
