@@ -82,6 +82,9 @@
             margin: 0 -14px;
             padding: 0;
 
+            .date {
+            }
+
             span.text {
                 color: #999;
                 padding: 11px 0;
@@ -102,6 +105,11 @@
                 &::-moz-placeholder
                 &:-ms-input-placeholder {
                     color: gray;
+                }
+
+                &.form-control {
+                    padding: 10px 0px;
+                    margin: 0 15px 0 0;
                 }
 
                 &[type="number"] {
