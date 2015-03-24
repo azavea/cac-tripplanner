@@ -99,7 +99,7 @@ gulp.task('copy:style-images', function() {
 });
 
 gulp.task('copy:app-images', function() {
-    return gulp.src('app/images/**/*.png')
+    return gulp.src('app/images/**/*.*')
         .pipe(gulp.dest(stat.images));
 });
 
