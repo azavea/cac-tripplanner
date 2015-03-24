@@ -14,4 +14,20 @@
     left: 0;
     right: 0;
     background: $light-gray;
+
+    .leaflet-control-layers {
+        margin-right: 30px;
+        margin-bottom: 30px;
+        padding: 15px 20px;
+        border-radius: 0;
+        box-shadow: 0 0 12px rgba(0,0,0,0.35);
+
+        .leaflet-control-layers-separator {
+            margin: 15px -20px 15px -20px;
+        }
+        .leaflet-control-layers-selector {
+            margin-right: 8px;
+            top: 0;
+        }
+    }
 }

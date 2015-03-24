@@ -2,11 +2,25 @@
     z-index: 5;
     position: absolute;
     width: 380px;
-    top: 85px;
+    top: 75px;
     left: 35px;
 
     .sidebar-tabs {
+        .btn {
+            border-radius: 0;
+            padding: 8px 14px 12px;
+            color: #AAA;
+            background: #F1F1F2;
+            box-shadow: 0 0 8px rgba(0,0,0,0.25);
 
+            &:hover {
+                background: white;
+            }
+            &.active {
+                color: #27A9E1;
+                background: white;
+            }
+        }
     }
     .sidebar-block {
         background: white;
@@ -18,15 +32,5 @@
         &:last-of-type {
             margin: 0;
         }
-    }
-    .sidebar-clip {
-        position: absolute;
-        clip: rect(0 auto auto 0);
-        left: 0;
-        margin: 0 -15px;
-        padding: 0 15px;
-        right: 0;
-        transition: $transition ease-out;
-        height: 0;
     }
 }

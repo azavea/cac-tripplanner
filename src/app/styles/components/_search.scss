@@ -1,20 +1,25 @@
 .search {
-    background: #666;
-    margin: 0 -30px;
-    height: 60px;
+    background: rgba(0,0,0,0.6);
+    margin: 0;
+    height: 100px;
+    padding: 20px 0;
 
     span.text {
         color: white;
         display: inline-block;
         padding: 17px 0;
     }
+    span.twitter-typeahead {
+        vertical-align: top;
+    }
     input:not([type="checkbox"]) {
-        background: #999;
+        background: #444;
         border: none;
         color: white;
         padding: 17px 14px;
         margin: 0 15px;
         height: 60px;
+        border-radius: 9px;
 
         &::-webkit-input-placeholder {
             color: white;
@@ -38,10 +43,10 @@
         border: none;
         background: none;
         color: white;
-        font-size: 3rem;
+        font-size: 4.2rem;
         font-weight: 300;
         display: inline-block;
-        padding: 8px 7px 10px;
+        padding: 0 16px 10px;
         vertical-align: top;
     }
 }

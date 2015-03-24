@@ -1,8 +1,19 @@
 header {
     height: 50px;
-    padding: 12px 0;
-    background: white;
-    background: rgba(255,255,255,0.75);
+    padding: 22px 25px;
     position: relative;
     z-index: 99;
+    position: fixed;
+
+    a {
+        font-weight: 700;
+        text-transform: uppercase;
+        color: white;
+        
+        &:hover {
+            opacity: 0.75;
+            text-decoration: none;
+            color: white;
+        }
+    }
 }
