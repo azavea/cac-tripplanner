@@ -23,6 +23,11 @@ CAC.Map.Control = (function ($, L, _) {
     var isochroneLayer = null;
     var tabControl = null;
 
+    var esriSatelliteAttribution = [
+        '&copy; <a href="http://www.esri.com/">Esri</a> ',
+        'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, ',
+        'AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+    ].join('');
     var stamenTonerAttribution = [
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
         'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
@@ -66,15 +71,19 @@ CAC.Map.Control = (function ($, L, _) {
     return MapControl;
 
     function initializeBasemaps() {
-        basemaps.Streets = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-            attribution: stamenTonerAttribution
-        });
-
         basemaps.Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
             attribution: stamenAttribution
         });
 
-        basemaps.Streets.addTo(map);
+        basemaps.Satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: esriSatelliteAttribution
+        });
+
+        basemaps.Streets = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+            attribution: stamenTonerAttribution
+        });
+
+        basemaps.Terrain.addTo(map);
     }
 
     function initializeOverlays() {
