@@ -127,6 +127,7 @@
             &.active {
                 max-height: 500px;
                 padding: 10px 0;
+                overflow: visible;
             }
         }
     }
@@ -149,7 +150,7 @@
             &:first-of-type {
                 margin-top: 15px;
             }
-            
+
             h3 { margin: 0; }
         }
         .view-more {
