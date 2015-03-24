@@ -30,6 +30,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+
+            &.destination-address-2 {
+                bottom: 13px;
+            }
         }
     }
     &.block-spotlight {

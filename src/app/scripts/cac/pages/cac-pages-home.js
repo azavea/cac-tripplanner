@@ -4,6 +4,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
     var defaults = {
         selectors: {
             destinationAddress: '.destination-address',
+            destinationAddressLineTwo: '.destination-address-2',
             destinationBlock: '.block-destination',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
@@ -123,7 +124,9 @@ CAC.Pages.Home = (function ($, UserPreferences) {
 
     function clickedDestination(event) {
         var block = $(event.target).closest(options.selectors.destinationBlock);
-        var addr = block.children(options.selectors.destinationAddress).text();
+        var addr = [block.children(options.selectors.destinationAddress).text(),
+                    block.children(options.selectors.destinationAddressLineTwo).text()
+                    ].join(' ');
         console.log(addr);
         return false;
     }
