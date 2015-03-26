@@ -1,8 +1,13 @@
-CAC.Pages.Home = (function ($, UserPreferences) {
+CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     'use strict';
 
     var defaults = {
         selectors: {
+            destinationAddress: '.destination-address',
+            destinationAddressLineTwo: '.destination-address-2',
+            destinationName: '.destination-name',
+            destinationBlock: '.block-destination',
+            destinationsContainer: '.destinations',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
             directionsMode: '#directionsMode',
@@ -14,9 +19,11 @@ CAC.Pages.Home = (function ($, UserPreferences) {
             toggleButton: '.toggle-search button',
             toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
-            typeahead: 'input.typeahead'
+            typeahead: 'input.typeahead',
+            viewAll: '#viewAll'
         }
     };
+    var destinationSearchUrl = '/api/destinations/search';
     var options = {};
 
     function Home(params) {
@@ -24,6 +31,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
     }
 
     Home.prototype.initialize = function () {
+        this.destinations = null;
         $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
             setTab(id);
@@ -35,6 +43,9 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
+
+        $(options.selectors.viewAll).click($.proxy(clickedViewAll, this));
+        $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
     };
@@ -110,6 +121,69 @@ CAC.Pages.Home = (function ($, UserPreferences) {
 
     return Home;
 
+    function clickedViewAll() {
+        event.preventDefault();
+
+        var origin = UserPreferences.getPreference('origin');
+        var payload = {
+            'lat': origin.feature.geometry.y,
+            'lon': origin.feature.geometry.x
+        };
+
+        $.ajax({
+            type: 'GET',
+            data: payload,
+            cache: true,
+            url: destinationSearchUrl,
+            contentType: 'application/json'
+        }).then(function(data) {
+            if (data.destinations && data.destinations.length) {
+                var html = Templates.destinations(data.destinations);
+                $(options.selectors.destinationsContainer).html(html);
+
+                // set click event on added features
+                $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
+
+                // hide 'view all' button, once shown
+                $(options.selectors.viewAll).addClass('hidden');
+            } else {
+                console.error('Could not load all destinations');
+            }
+        });
+    }
+
+    /**
+     * When user clicks a destination, look it up, then redirect to show directions to it on map.
+     */
+    function clickedDestination(event) {
+        event.preventDefault();
+        var block = $(event.target).closest(options.selectors.destinationBlock);
+        var destName = block.children(options.selectors.destinationName).text();
+        var addr = [destName + ',',
+                    block.children(options.selectors.destinationAddress).text(),
+                    block.children(options.selectors.destinationAddressLineTwo).text()
+                    ].join(' ');
+        var payload = { 'text': destName };
+
+        $.ajax({
+            type: 'GET',
+            data: payload,
+            cache: true,
+            url: destinationSearchUrl,
+            contentType: 'application/json'
+        }).then(function(data) {
+            if (data.destinations && data.destinations.length) {
+                var destination = data.destinations[0];
+                UserPreferences.setPreference('toText', addr);
+                UserPreferences.setPreference('to', convertDestinationToFeature(destination));
+                UserPreferences.setPreference('method', 'directions');
+                window.location = '/map';
+            } else {
+                console.error('Could not find destination ' + destName);
+            }
+        });
+    }
+
     function onTypeaheadSelected(event, key, location) {
         event.preventDefault();  // do not submit form
         UserPreferences.setPreference(key, location);
@@ -129,4 +203,37 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.User.Preferences);
+    /**
+     * Convert destination from search endpoint into a feature formatted like typeahead results.
+     * TODO: Featured destinations should probably be in the typeahead, and this function
+     * moved or removed.
+     *
+     * @param {Object} destination JSON object returned from destination search endpoint
+     * @returns {Object} Feature object structured like the typahead results, for use on map page.
+     */
+    function convertDestinationToFeature(destination) {
+        var feature = {
+            name: destination.name,
+            extent: {
+                xmax: destination.point.coordinates[0],
+                xmin: destination.point.coordinates[0],
+                ymax: destination.point.coordinates[1],
+                ymin: destination.point.coordinates[1]
+            },
+            feature: {
+                attributes: {
+                    City: destination.city,
+                    Postal: destination.zip,
+                    Region: destination.state,
+                    StAddr: destination.address
+                },
+                geometry: {
+                    x: destination.point.coordinates[0],
+                    y: destination.point.coordinates[1]
+                }
+            }
+        };
+        return feature;
+    }
+
+})(jQuery, CAC.Home.Templates, CAC.User.Preferences);

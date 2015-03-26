@@ -4,7 +4,6 @@ import json
 from pytz import timezone
 
 from django.contrib.gis.geos import GEOSGeometry, Point
-from django.core import serializers
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -49,6 +48,16 @@ def directions(request):
     """
     return base_otp_view(request, 'directions.html')
 
+def image_to_url(dest_dict, field_name):
+    """Helper for converting an image object to a url for a json response
+
+    :param dict_obj: Dictionary representation of a Destination object
+    :param field_name: String identifier for the image field
+    :returns: URL of the image, or an empty string if there is no image
+    """
+    image = dest_dict.get(field_name)
+    return image.url if image else ''
+
 
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
@@ -79,16 +88,6 @@ class FindReachableDestinations(View):
             json_poly = json.loads("{}")
         return json_poly
 
-    def image_to_url(self, dest_dict, field_name):
-        """Helper for converting an image object to a url for a json response
-
-        :param dict_obj: Dictionary representation of a Destination object
-        :param field_name: String identifier for the image field
-        :returns: URL of the image, or an empty string if there is no image
-        """
-        image = dest_dict.get(field_name)
-        return image.url if image else ''
-
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
         Return both the isochrone GeoJSON and the list of matched destinations."""
@@ -110,8 +109,8 @@ class FindReachableDestinations(View):
         matched_objects = [model_to_dict(x) for x in matched_objects]
         for obj in matched_objects:
             obj['point'] = json.loads(obj['point'].json)
-            obj['image'] = self.image_to_url(obj, 'image')
-            obj['wide_image'] = self.image_to_url(obj, 'wide_image')
+            obj['image'] = image_to_url(obj, 'image')
+            obj['wide_image'] = image_to_url(obj, 'wide_image')
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
@@ -137,7 +136,6 @@ class SearchDestinations(View):
         lon = params.get('lon', None)
         text = params.get('text', None)
         limit = params.get('limit', None)
-        output_fields = ('name', 'description', 'point', 'address', 'city', 'state', 'zip')
 
         results = []
         if lat and lon:
@@ -164,8 +162,15 @@ class SearchDestinations(View):
                 })
                 return HttpResponse(error, 'application/json')
             results = results[:limit_int]
-        data = serializers.serialize('json', results, fields=output_fields)
-        return HttpResponse(data, 'application/json')
+
+        data = [model_to_dict(x) for x in results]
+        for obj in data:
+            obj['point'] = json.loads(obj['point'].json)
+            obj['image'] = image_to_url(obj, 'image')
+            obj['wide_image'] = image_to_url(obj, 'wide_image')
+
+        response = {'destinations': data}
+        return HttpResponse(json.dumps(response), 'application/json')
 
 class FeedEvents(View):
     """ API endpoint for the FeedEvent model """
