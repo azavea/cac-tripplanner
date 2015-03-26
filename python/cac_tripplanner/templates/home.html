@@ -60,10 +60,9 @@
         <div class="row">
             <div class="col-sm-4">
                 <a class="block block-destination" href="#">
-                    <h3>{{ destinations.0.name }}</h3>
+                    <h3 class="destination-name">{{ destinations.0.name }}</h3>
                     <h5 class="destination-address">{{ destinations.0.address }}</h5>
-                    <h5 class="destination-address-2">{{ destinations.0.city }},
-                        {{ destinations.0.state }} {{ destinations.0.zip }}</h5>
+                    <h5 class="destination-address-2">{{ destinations.0.city }}, {{ destinations.0.state }} {{ destinations.0.zip }}</h5>
                     {% if destinations.0.image %}
                     <img src="{{ destinations.0.image.url }}" width="400" height="400"/>
                     {% else %}
@@ -73,10 +72,9 @@
             </div>
             <div class="col-sm-4">
                 <a class="block block-destination" href="#">
-                    <h3>{{ destinations.1.name }}</h3>
+                    <h3 class="destination-name">{{ destinations.1.name }}</h3>
                     <h5 class="destination-address">{{ destinations.1.address }}</h5>
-                    <h5 class="destination-address-2">{{ destinations.1.city }},
-                        {{ destinations.1.state }} {{ destinations.1.zip }}</h5>
+                    <h5 class="destination-address-2">{{ destinations.1.city }}, {{ destinations.1.state }} {{ destinations.1.zip }}</h5>
                     {% if destinations.1.image %}
                     <img src="{{ destinations.1.image.url }}" width="400" height="400"/>
                     {% else %}
@@ -86,10 +84,9 @@
             </div>
             <div class="col-sm-4">
                 <a class="block block-destination block-half" href="#">
-                    <h3>{{ destinations.2.name }}</h3>
+                    <h3 class="destination-name">{{ destinations.2.name }}</h3>
                     <h5 class="destination-address">{{ destinations.2.address }}</h5>
-                    <h5 class="destination-address-2">{{ destinations.2.city }},
-                        {{ destinations.2.state }} {{ destinations.2.zip }}</h5>
+                    <h5 class="destination-address-2">{{ destinations.2.city }}, {{ destinations.2.state }} {{ destinations.2.zip }}</h5>
                     {% if destinations.2.image %}
                     <img src="{{ destinations.2.wide_image.url }}" width="400" height="200"/>
                     {% else %}
@@ -97,10 +94,9 @@
                     {% endif %}
                 </a>
                 <a class="block block-destination block-half" href="#">
-                    <h3>{{ destinations.3.name }}</h3>
+                    <h3 class="destination-name">{{ destinations.3.name }}</h3>
                     <h5 class="destination-address">{{ destinations.3.address }}</h5>
-                    <h5 class="destination-address-2">{{ destinations.3.city }},
-                        {{ destinations.3.state }} {{ destinations.3.zip }}</h5>
+                    <h5 class="destination-address-2">{{ destinations.3.city }}, {{ destinations.3.state }} {{ destinations.3.zip }}</h5>
                     {% if destinations.3.image %}
                     <img src="{{ destinations.3.wide_image.url }}" width="400" height="200"/>
                     {% else %}
@@ -121,7 +117,7 @@
                     <div class="col-sm-6">
                       <a class="block block-spotlight"
                          href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
-                            <h3>{{ community_profile.title }}</h3>
+                            <h3 class="destination-name">{{ community_profile.title }}</h3>
                             <h5>Community Profile</h5>
                             <img src="http://placehold.it/400x600.jpg" />
                         </a>
@@ -131,7 +127,7 @@
                     <div class="col-sm-6">
                       <a class="block block-spotlight"
                          href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
-                            <h3>{{ tips_and_tricks.title }}</h3>
+                            <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
                             <h5>Tips & Tricks</h5>
                             <img src="http://placehold.it/400x600.jpg" />
                         </a>
