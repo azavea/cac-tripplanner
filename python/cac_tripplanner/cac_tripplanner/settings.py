@@ -169,7 +169,15 @@ CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.j
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': [
-            ["Styles", "Format", "Bold", "Italic", "Underline", "Strike", "SpellChecker", "Undo", "Redo"],
+            ["Styles",
+             "Format",
+             "Bold",
+             "Italic",
+             "Underline",
+             "Strike",
+             "SpellChecker",
+             "Undo",
+             "Redo"],
             ["Link", "Unlink", "Anchor"],
             ["Table", "HorizontalRule"],
             ["SpecialChar"],
