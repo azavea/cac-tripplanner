@@ -3,6 +3,7 @@ CAC = (function () {
 
     var module = {
         Control: {},
+        Home: {},
         Map: {},
         Pages: {},
         Routing: {},

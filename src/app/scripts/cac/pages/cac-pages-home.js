@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, UserPreferences) {
+CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -7,6 +7,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
             destinationAddressLineTwo: '.destination-address-2',
             destinationName: '.destination-name',
             destinationBlock: '.block-destination',
+            destinationsContainer: '.destinations',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
             directionsMode: '#directionsMode',
@@ -22,6 +23,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
             viewAll: '#viewAll'
         }
     };
+    var destinationSearchUrl = '/api/destinations/search';
     var options = {};
 
     function Home(params) {
@@ -120,8 +122,34 @@ CAC.Pages.Home = (function ($, UserPreferences) {
     return Home;
 
     function clickedViewAll() {
-        console.log('Implement me, please!');
-        return false;
+        event.preventDefault();
+
+        var origin = UserPreferences.getPreference('origin');
+        var payload = {
+            'lat': origin.feature.geometry.y,
+            'lon': origin.feature.geometry.x
+        };
+
+        $.ajax({
+            type: 'GET',
+            data: payload,
+            cache: true,
+            url: destinationSearchUrl,
+            contentType: 'application/json'
+        }).then(function(data) {
+            if (data.destinations && data.destinations.length) {
+                var html = Templates.destinations(data.destinations);
+                $(options.selectors.destinationsContainer).html(html);
+
+                // set click event on added features
+                $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
+
+                // hide 'view all' button, once shown
+                $(options.selectors.viewAll).addClass('hidden');
+            } else {
+                console.error('Could not load all destinations');
+            }
+        });
     }
 
     /**
@@ -136,13 +164,12 @@ CAC.Pages.Home = (function ($, UserPreferences) {
                     block.children(options.selectors.destinationAddressLineTwo).text()
                     ].join(' ');
         var payload = { 'text': destName };
-        var url = '/api/destinations/search';
 
         $.ajax({
             type: 'GET',
             data: payload,
             cache: true,
-            url: url,
+            url: destinationSearchUrl,
             contentType: 'application/json'
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
@@ -186,7 +213,7 @@ CAC.Pages.Home = (function ($, UserPreferences) {
      */
     function convertDestinationToFeature(destination) {
         var feature = {
-            name: 'Philadelphia City Hall',
+            name: destination.name,
             extent: {
                 xmax: destination.point.coordinates[0],
                 xmin: destination.point.coordinates[0],
@@ -209,4 +236,4 @@ CAC.Pages.Home = (function ($, UserPreferences) {
         return feature;
     }
 
-})(jQuery, CAC.User.Preferences);
+})(jQuery, CAC.Home.Templates, CAC.User.Preferences);
