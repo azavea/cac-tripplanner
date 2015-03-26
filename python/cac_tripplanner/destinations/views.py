@@ -64,8 +64,11 @@ class FindReachableDestinations(View):
 
         payload['routerId'] = self.otp_router
         payload['algorithm'] = self.algorithm
+        headers = {'Accept': 'application/json'}
 
-        isochrone_response = requests.get(self.isochrone_url, params=payload)
+        # Need to set accept header for isochrone endpoint, or else it will occasionally decide to
+        # return a shapefile, although it's supposed to default to geojson.
+        isochrone_response = requests.get(self.isochrone_url, params=payload, headers=headers)
 
         # Parse and traverse JSON from OTP so that we return only geometries
         try:
