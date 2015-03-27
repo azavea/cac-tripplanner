@@ -22,6 +22,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             optionsViewMore: '.sidebar-options .view-more',
             sidebarContainer: '.explore .sidebar-clip',
             sidebarDetails: '.explore div.sidebar-details',
+            spinner: '.explore div.sidebar-details > .sk-spinner',
             submitExplore: 'section.explore button[type=submit]',
             submitSearch: '.sidebar-search button[type="submit"]',
             typeahead: 'section.explore input.typeahead',
@@ -140,8 +141,10 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
+        $(options.selectors.spinner).removeClass('hidden');
         mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions).then(
             function (destinations) {
+                $(options.selectors.spinner).addClass('hidden');
                 if (!destinations) {
                     return;
                 }
