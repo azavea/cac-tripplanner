@@ -51,7 +51,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
 
-        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
+        $(options.selectors.modeSelector).change($.proxy(changeMode, this));
 
         $(options.selectors.optionsViewMore).click(showOptions);
 

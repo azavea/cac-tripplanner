@@ -55,7 +55,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
 
-        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
+        $(options.selectors.modeSelector).change($.proxy(changeMode, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
