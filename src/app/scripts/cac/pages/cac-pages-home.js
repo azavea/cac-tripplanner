@@ -16,6 +16,7 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
             exploreMode: '#exploreMode',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
+            spinner: '.sk-spinner',
             toggleButton: '.toggle-search button',
             toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
@@ -124,6 +125,10 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     function clickedViewAll() {
         event.preventDefault();
 
+        // hide existing destinations list and show loading spinner
+        $(options.selectors.destinationsContainer).addClass('hidden');
+        $(options.selectors.spinner).removeClass('hidden');
+
         var origin = UserPreferences.getPreference('origin');
         var payload = {
             'lat': origin.feature.geometry.y,
@@ -144,8 +149,10 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
                 // set click event on added features
                 $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
 
-                // hide 'view all' button, once shown
+                // hide 'view all' button and spinner, and show features again
                 $(options.selectors.viewAll).addClass('hidden');
+                $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.destinationsContainer).removeClass('hidden');
             } else {
                 console.error('Could not load all destinations');
             }
