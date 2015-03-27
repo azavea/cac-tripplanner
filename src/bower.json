@@ -13,6 +13,7 @@
     "multiple-select": "~1.1.0",
     "moment": "^2.9.0",
     "lodash": "3.0.0",
+    "spinkit": "^1.0.1",
     "typeahead.js": "~0.10.5",
     "Leaflet.awesome-markers": "~2.0.2"
   }

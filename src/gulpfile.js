@@ -22,6 +22,8 @@ var $ = require('gulp-load-plugins')();
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
 
+var filterCSS = gulpFilter('**/*.css');
+
 var stat = {
     scripts: staticRoot + '/scripts',
     styles: staticRoot + '/styles',
@@ -86,6 +88,10 @@ gulp.task('copy:scripts', function() {
 gulp.task('copy:vendor-css', function() {
     return copyBowerFiles('**/*.css', [multiSelectRoot + '/multiple-select.css'])
         .pipe(concat('vendor.css'))
+        .pipe($.autoprefixer({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }))
         .pipe(gulp.dest(stat.styles));
 });
 
@@ -141,7 +147,9 @@ gulp.task('sass', function () {
             style: 'expanded',
             precision: 10
         }))
-        .pipe($.autoprefixer({browsers: ['last 1 version']}))
+        .pipe(filterCSS)
+        .pipe($.autoprefixer({browsers: ['last 2 versions'], cascade: false}))
+        .pipe(filterCSS.restore())
         .pipe(gulp.dest(stat.styles));
 });
 

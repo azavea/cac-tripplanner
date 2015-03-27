@@ -177,6 +177,11 @@
                 border-top-style: none;
             }
         }
+        .sk-spinner {
+            height: 80px;
+            padding-top: 20px;
+            overflow-y: auto;
+        }
         .view-more {
             position: absolute;
             bottom: 0;
