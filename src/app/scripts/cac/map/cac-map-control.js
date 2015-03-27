@@ -56,6 +56,10 @@ CAC.Map.Control = (function ($, L, _) {
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
+
+        $('.leaflet-control-layers').prepend(
+            '<div class="leaflet-minimize"><b>&#8210;</b></div>');
+        $('.leaflet-minimize').click(function() { console.log('yo!'); });
     }
 
     MapControl.prototype.clearIsochrone = clearIsochrone;
