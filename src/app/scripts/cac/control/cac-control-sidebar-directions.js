@@ -24,6 +24,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
             modeSelector: '#directionsModeSelector',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
+            spinner: 'section.directions div.sidebar-details > .sk-spinner',
             typeahead: 'section.directions input.typeahead',
             wheelchairDiv: '#directionsWheelchair'
         }
@@ -158,7 +159,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
+        // show spinner while loading
+        $(options.selectors.spinner).removeClass('hidden');
+
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
+            $(options.selectors.spinner).addClass('hidden');
             if (!tabControl.isTabShowing('directions')) {
                 // if user has switched away from the directions tab, do not show trip
                 return;

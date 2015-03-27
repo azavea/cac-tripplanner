@@ -155,6 +155,8 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
                 $(options.selectors.destinationsContainer).removeClass('hidden');
             } else {
                 console.error('Could not load all destinations');
+                $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.destinationsContainer).removeClass('hidden');
             }
         });
     }
