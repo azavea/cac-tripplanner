@@ -12,6 +12,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         selectors: {
             bikeTriangleDiv: '#exploreBikeTriangle',
             datepicker: '#datetimeExplore',
+            destinations: '.destinations',
             distanceMinutesText: '.distanceMinutes',
             errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
@@ -21,7 +22,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             optionsMore: '.sidebar-options .more-options',
             optionsViewMore: '.sidebar-options .view-more',
             sidebarContainer: '.explore .sidebar-clip',
-            sidebarDetails: '.explore div.sidebar-details',
             spinner: '.explore div.sidebar-details > .sk-spinner',
             submitExplore: 'section.explore button[type=submit]',
             submitSearch: '.sidebar-search button[type="submit"]',
@@ -141,10 +141,12 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
+        $(options.selectors.destinations).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
         mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions).then(
             function (destinations) {
                 $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.destinations).removeClass('hidden');
                 if (!destinations) {
                     return;
                 }
@@ -261,7 +263,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             $container.append($destination);
             setDestinationDistance(destination, $destination);
         });
-        $(options.selectors.sidebarDetails).empty().append($container);
+        $(options.selectors.destinations).html($container);
         $(options.selectors.sidebarContainer).height(400);
     }
 
@@ -271,7 +273,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         $detail.find('.getdirections').on('click', function() {
             events.trigger(eventNames.destinationDirections, destination);
         });
-        $(options.selectors.sidebarDetails).empty().append($detail);
+        $(options.selectors.destinations).html($detail);
     }
 
     function onDestinationDetailBackClicked() {

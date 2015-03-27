@@ -90,7 +90,7 @@ gulp.task('copy:vendor-css', function() {
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
-            cascade: true
+            cascade: false
         }))
         .pipe(gulp.dest(stat.styles));
 });

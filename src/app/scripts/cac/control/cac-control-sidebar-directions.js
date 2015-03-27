@@ -160,6 +160,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         UserPreferences.setPreference('arriveBy', arriveBy);
 
         // show spinner while loading
+        itineraryListControl.hide();
+        directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
