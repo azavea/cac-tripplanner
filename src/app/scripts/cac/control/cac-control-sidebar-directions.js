@@ -3,7 +3,7 @@
  *
  */
 CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates, Routing,
-                                 Typeahead, UserPreferences) {
+                                 Typeahead, UserPreferences, Utils) {
 
     'use strict';
 
@@ -235,16 +235,28 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
     // called when going to show directions from 'explore' origin to a selected feature
     function setDestination(destination) {
         // Set origin
-        var from = UserPreferences.getPreference('origin');
+        var origin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
-        directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-        $(options.selectors.origin).val(originText);
+        directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
 
         // Set destination
         var toCoords = destination.point.coordinates;
         var destinationText = destination.address;
         directions.destination = [toCoords[1], toCoords[0]];
-        $(options.selectors.destination).val(destinationText);
+
+        // set in UI
+        var mode = UserPreferences.getPreference('mode');
+        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+        $(options.selectors.origin).typeahead('val', originText);
+        $(options.selectors.destination).typeahead('val', destinationText);
+        $(options.selectors.modeSelector).val(mode);
+        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+
+        // Save selections to user preferences
+        UserPreferences.setPreference('from', origin);
+        UserPreferences.setPreference('fromText', originText);
+        UserPreferences.setPreference('to', Utils.convertDestinationToFeature(destination));
+        UserPreferences.setPreference('toText', destinationText);
 
         // Get directions
         planTrip();
@@ -333,4 +345,4 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
     }
 
 })(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans,
-   CAC.Search.Typeahead, CAC.User.Preferences);
+   CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

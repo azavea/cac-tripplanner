@@ -2,6 +2,7 @@ CAC.Utils = (function (_) {
     'use strict';
 
     var module = {
+        convertDestinationToFeature: convertDestinationToFeature,
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams
@@ -60,6 +61,38 @@ CAC.Utils = (function (_) {
     };
 
     return module;
+
+    /**
+     * Convert destination from search endpoint into a feature formatted like typeahead results.
+     * TODO: Featured destinations should probably be in the typeahead.
+     *
+     * @param {Object} destination JSON object returned from destination search endpoint
+     * @returns {Object} Feature object structured like the typahead results, for use on map page.
+     */
+    function convertDestinationToFeature(destination) {
+        var feature = {
+            name: destination.name,
+            extent: {
+                xmax: destination.point.coordinates[0],
+                xmin: destination.point.coordinates[0],
+                ymax: destination.point.coordinates[1],
+                ymin: destination.point.coordinates[1]
+            },
+            feature: {
+                attributes: {
+                    City: destination.city,
+                    Postal: destination.zip,
+                    Region: destination.state,
+                    StAddr: destination.address
+                },
+                geometry: {
+                    x: destination.point.coordinates[0],
+                    y: destination.point.coordinates[1]
+                }
+            }
+        };
+        return feature;
+    }
 
     // Source: https://github.com/azavea/nih-wayfinding/blob/develop/src/nih_wayfinding/app/scripts/routing/abbreviate-filter.js
     function abbrevStreetName(streetAddress) {

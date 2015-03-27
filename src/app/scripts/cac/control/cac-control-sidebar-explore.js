@@ -33,7 +33,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     var events = $({});
     var eventNames = {
-        destinationSelected: 'cac:control:sidebarexplore:destinationselected',
         destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
@@ -258,7 +257,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
             $destination.click(function () {
                 setDestinationSidebarDetail(destination);
-                events.trigger(eventNames.destinationSelected, destination);
             });
             $container.append($destination);
             setDestinationDistance(destination, $destination);
