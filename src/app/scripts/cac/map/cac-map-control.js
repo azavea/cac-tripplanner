@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, L, _) {
+CAC.Map.Control = (function ($, Handlebars, L, _) {
     'use strict';
 
     var defaults = {
@@ -144,6 +144,7 @@ CAC.Map.Control = (function ($, L, _) {
      */
     function drawIsochrone(isochrone) {
         isochroneLayer = L.geoJson(isochrone, {
+            clickable: false,
             style: {
                 'color': 'red',
                 'opacity': 0.8
@@ -187,8 +188,7 @@ CAC.Map.Control = (function ($, L, _) {
                 }
                 drawIsochrone(data.isochrone);
                 // also draw 'matched' list of locations
-                var matched = _.pluck(data.matched, 'point');
-                drawDestinations(matched);
+                drawDestinations(data.matched);
                 deferred.resolve(data.matched);
             }, function(error) {
                 console.error(error);
@@ -227,7 +227,13 @@ CAC.Map.Control = (function ($, L, _) {
     /**
      * Draw an array of geojson destination points onto the map
      */
-    function drawDestinations(locationGeoJSON) {
+    function drawDestinations(matched) {
+        // put destination details onto point geojson object's properties
+        var locationGeoJSON = _.map(matched, function(destination) {
+            var point = _.property('point')(destination);
+            point.properties = _.omit(destination, 'point');
+            return point;
+        });
         var icon = L.AwesomeMarkers.icon({
             icon: 'plane',
             prefix: 'fa',
@@ -241,7 +247,15 @@ CAC.Map.Control = (function ($, L, _) {
                 });
             },
             pointToLayer: function (geojson, latLng) {
-                return new L.marker(latLng, {icon: icon});
+                var popupOptions = { maxWidth: 300 };
+                var popupTemplate = ['<p><b>{{geojson.properties.name}}',
+                                    '</b></p><p>{{geojson.properties.description}}',
+                                    '</p><a href="{{geojson.properties.website_url}}" ',
+                                    'target="_blank">{{geojson.properties.website_url}}</a>'
+                                    ].join('');
+                var template = Handlebars.compile(popupTemplate);
+                var popupContent = template({geojson: geojson});
+                return new L.marker(latLng, {icon: icon}).bindPopup(popupContent, popupOptions);
             }
         }).addTo(map);
     }
@@ -359,4 +373,4 @@ CAC.Map.Control = (function ($, L, _) {
         map.panTo(origin);
     }
 
-})(jQuery, L, _);
+})(jQuery, Handlebars, L, _);
