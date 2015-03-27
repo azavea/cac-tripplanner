@@ -33,7 +33,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     var events = $({});
     var eventNames = {
-        destinationSelected: 'cac:control:sidebarexplore:destinationselected',
         destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
@@ -52,7 +51,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
 
-        $(options.selectors.modeSelector).click($.proxy(changeMode, this));
+        $(options.selectors.modeSelector).change($.proxy(changeMode, this));
 
         $(options.selectors.optionsViewMore).click(showOptions);
 
@@ -258,7 +257,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
             $destination.click(function () {
                 setDestinationSidebarDetail(destination);
-                events.trigger(eventNames.destinationSelected, destination);
             });
             $container.append($destination);
             setDestinationDistance(destination, $destination);
