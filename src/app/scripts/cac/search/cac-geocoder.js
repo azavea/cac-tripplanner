@@ -30,6 +30,11 @@ CAC.Search.Geocoder = (function ($) {
             text: text,
             magicKey: magicKey || null
         });
+        if (magicKey && params.bbox) {
+            // The find endpoint apparently dislikes returning previously found results with
+            //  suggest when bbox is supplied for a given text & magickey
+            delete params.bbox;
+        }
         $.ajax(url, {
             data: params,
             dataType: 'json',
