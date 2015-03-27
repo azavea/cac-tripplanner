@@ -148,6 +148,10 @@
         height: 100%;
         transition: height 1s;
 
+        a {
+            cursor: pointer;
+        }
+
         .destinations {
             overflow: auto;
             height: 100%;
