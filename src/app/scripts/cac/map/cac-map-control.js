@@ -144,6 +144,7 @@ CAC.Map.Control = (function ($, L, _) {
      */
     function drawIsochrone(isochrone) {
         isochroneLayer = L.geoJson(isochrone, {
+            clickable: false,
             style: {
                 'color': 'red',
                 'opacity': 0.8
