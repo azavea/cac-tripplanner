@@ -43,6 +43,7 @@ CAC.Map.OverlaysControl = (function ($, L) {
         var latLng = L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
         var icon = L.AwesomeMarkers.icon({
             icon: 'calendar',
+            markerColor: 'gray',
             prefix: 'fa'
         });
         var marker = new L.marker(latLng, { icon: icon });

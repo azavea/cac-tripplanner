@@ -257,6 +257,12 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
             $destination.click(function () {
                 setDestinationSidebarDetail(destination);
+                mapControl.highlightDestination(destination.id, { panTo: true });
+            });
+            $destination.hover(function () {
+                mapControl.highlightDestination(destination.id);
+            }, function () {
+                mapControl.highlightDestination(null);
             });
             $container.append($destination);
             setDestinationDistance(destination, $destination);
@@ -276,6 +282,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     function onDestinationDetailBackClicked() {
         setDestinationSidebar(destinationsCache);
+        mapControl.highlightDestination(null);
     }
 
     function setFromUserPreferences() {

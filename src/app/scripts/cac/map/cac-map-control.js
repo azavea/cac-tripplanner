@@ -21,8 +21,22 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var basemaps = {};
     var overlays = {};
     var destinationsLayer = null;
+    var destinationMarkers = {};
+    var lastHighlightedMarker = null;
     var isochroneLayer = null;
     var tabControl = null;
+
+    var destinationIcon = L.AwesomeMarkers.icon({
+        icon: 'plane',
+        prefix: 'fa',
+        markerColor: 'blue'
+    });
+    var highlightIcon = L.AwesomeMarkers.icon({
+        icon: 'plane',
+        prefix: 'fa',
+        iconColor: 'black',
+        markerColor: 'lightblue'
+    });
 
     var esriSatelliteAttribution = [
         '&copy; <a href="http://www.esri.com/">Esri</a> ',
@@ -69,6 +83,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     MapControl.prototype.clearItineraries = clearItineraries;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setOriginDestinationMarkers = setOriginDestinationMarkers;
+    MapControl.prototype.highlightDestination = highlightDestination;
 
     return MapControl;
 
@@ -236,11 +251,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             point.properties = _.omit(destination, 'point');
             return point;
         });
-        var icon = L.AwesomeMarkers.icon({
-            icon: 'plane',
-            prefix: 'fa',
-            markerColor: 'cadetblue'
-        });
+        destinationMarkers = {};
         destinationsLayer = L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
@@ -257,7 +268,10 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
-                return new L.marker(latLng, {icon: icon}).bindPopup(popupContent, popupOptions);
+                var markerId = geojson.properties.id;
+                destinationMarkers[markerId] = new L.marker(latLng, {icon: destinationIcon})
+                        .bindPopup(popupContent, popupOptions);
+                return destinationMarkers[markerId];
             }
         }).addTo(map);
     }
@@ -390,6 +404,27 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             destinationMarker.addTo(map);
         }
         map.panTo(origin);
+    }
+
+    function highlightDestination(destinationId, opts) {
+        var defaults = {
+            panTo: false
+        };
+        var options = $.extend({}, defaults, opts);
+        if (!destinationId) {
+            // revert to original marker if set
+            if (lastHighlightedMarker) {
+                lastHighlightedMarker.setIcon(destinationIcon);
+            }
+            return;
+        }
+        // Update icon for passed destination
+        var marker = destinationMarkers[destinationId];
+        marker.setIcon(highlightIcon);
+        if (options.panTo) {
+            map.panTo(marker.getLatLng());
+        }
+        lastHighlightedMarker = marker;
     }
 
 })(jQuery, Handlebars, L, _);
