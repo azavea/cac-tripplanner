@@ -185,6 +185,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
             // put markers at start and end
             mapControl.setOriginDestinationMarkers(directions.origin, directions.destination);
 
+            // Update map bounds
+            mapControl.setBounds(currentItinerary.getBounds(0.1));
+
             itineraryListControl.setItineraries(itineraries);
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();

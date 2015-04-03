@@ -6,6 +6,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         center: [39.95, -75.1667],
         zoom: 14
     };
+    var maxZoom = 18;
 
     var map = null;
     var userMarker = null;
@@ -61,6 +62,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     MapControl.prototype.clearIsochrone = clearIsochrone;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
+    MapControl.prototype.setBounds = setBounds;
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.plotItinerary = plotItinerary;
@@ -258,6 +260,23 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 return new L.marker(latLng, {icon: icon}).bindPopup(popupContent, popupOptions);
             }
         }).addTo(map);
+    }
+
+    /**
+     * Set the map bounds, optionally setting options
+     * @param {[L.LatLngBounds]} bounds
+     * @param {[L.fitBoundsOptions]} options
+     */
+    function setBounds(bounds, options) {
+        var defaults = {
+            // TODO: Figure out why allowing animation causes the map to get all weird
+            // test case: 450 market st -> 200 chestnut st
+            animate: false,
+            maxZoom: maxZoom,
+            // So that origin/dest don't show under the sidebar
+            paddingTopLeft: [400, 0]
+        };
+        map.fitBounds(bounds, $.extend({}, defaults, options));
     }
 
     /**

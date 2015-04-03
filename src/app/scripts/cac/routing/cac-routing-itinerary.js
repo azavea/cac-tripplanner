@@ -18,6 +18,8 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.steps = getDirectionsSteps(otpItinerary);
+        this.from = _.first(otpItinerary.legs).from;
+        this.to = _.last(otpItinerary.legs).to;
 
         this.geojson = L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
@@ -26,6 +28,25 @@ CAC.Routing.Itinerary = (function ($, L, _) {
 
     Itinerary.prototype.highlight = function (isHighlighted) {
         this.geojson.setStyle(getStyle(isHighlighted));
+    };
+
+    /**
+     * Get Itinerary bounds, based on the origin/dest lat/lngs
+     * @param  {[number]} bufferRatio optionally buffer the returned bounds object
+     * @return {[L.LatLngBounds]}
+     */
+    Itinerary.prototype.getBounds = function(bufferRatio) {
+        var sw = L.latLng(
+            Math.min(this.from.lat, this.to.lat),
+            Math.min(this.from.lon, this.to.lon)
+        );
+        var ne = L.latLng(
+            Math.max(this.from.lat, this.to.lat),
+            Math.max(this.from.lon, this.to.lon)
+        );
+        var bounds = L.latLngBounds(sw, ne);
+        bufferRatio = bufferRatio || 0;
+        return bounds.pad(bufferRatio);
     };
 
     return Itinerary;
