@@ -124,7 +124,6 @@ CAC.Routing.Itinerary = (function ($, L, _) {
      */
     function getFeatures(itineraryLegs) {
         return _.map(itineraryLegs, function(leg) {
-            console.log(L.Polyline, L.Polyline.fromEncoded);
             var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
             linestringGeoJson.properties = leg;
             return linestringGeoJson;
