@@ -24,6 +24,8 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var eventNames = {
         destinationPopupClick: 'cac:map:control:destinationpopup',
         currentLocationClick: 'cac:map:control:currentlocation',
+        originMoved: 'cac:map:control:originmoved',
+        destinationMoved: 'cac:map:control:destinationmoved'
     };
     var basemaps = {};
     var overlays = {};
@@ -384,6 +386,20 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      */
     function setOriginDestinationMarkers(originCoords, destinationCoords) {
 
+        // helper for when origin/destination dragged to new place
+        function markerDrag(event) {
+            var marker = event.target;
+            var position = marker.getLatLng();
+            var latlng = new L.LatLng(position.lat, position.lng);
+            marker.setLatLng(latlng);
+            map.panTo(latlng); // allow user to drag marker off map
+
+            var trigger = (marker.options.title === 'origin') ?
+                            eventNames.originMoved : eventNames.destinationMoved;
+
+            events.trigger(trigger, position);
+        }
+
         if (!originCoords || !destinationCoords) {
 
             if (originMarker) {
@@ -418,11 +434,18 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 markerColor: 'red'
             });
 
-            originMarker = new L.marker(origin, {icon: originIcon }).bindPopup('<p>Origin</p>');
-            destinationMarker = new L.marker(destination, {icon: destIcon })
+            var originOptions = {icon: originIcon, draggable: true, title: 'origin' };
+            originMarker = new L.marker(origin, originOptions).bindPopup('<p>Origin</p>');
+
+            var destOptions = {icon: destIcon, draggable: true, title: 'destination' };
+            destinationMarker = new L.marker(destination, destOptions)
                                             .bindPopup('<p>Destination</p>');
+
             originMarker.addTo(map);
             destinationMarker.addTo(map);
+
+            originMarker.on('dragend', markerDrag);
+            destinationMarker.on('dragend', markerDrag);
         }
         map.panTo(origin);
     }
