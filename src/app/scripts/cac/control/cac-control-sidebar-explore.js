@@ -13,7 +13,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             bikeTriangleDiv: '#exploreBikeTriangle',
             datepicker: '#datetimeExplore',
             destinations: '.destinations',
-            distanceMinutesText: '.distanceMinutes',
+            distanceMinutesText: '.distance-minutes',
             errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
