@@ -7,7 +7,13 @@ CAC.Home.Templates = (function (Handlebars) {
 
     return module;
 
-    function destinations(destinations) {
+    /**
+     * Take list of destination objects and return templated HTML snippet for sidebar.
+     *
+     * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
+     * @return html {String} Snippets for boxes to display on home page for each destination
+     */
+    function destinations(useDestinations) {
         var source = [
             '{{#each destinations}}',
             '<div class="col-sm-4">',
@@ -22,7 +28,7 @@ CAC.Home.Templates = (function (Handlebars) {
             '{{/each}}'
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({destinations: destinations});
+        var html = template({destinations: useDestinations});
         return html;
     }
 
