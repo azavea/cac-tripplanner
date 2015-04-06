@@ -13,7 +13,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             bikeTriangleDiv: '#exploreBikeTriangle',
             datepicker: '#datetimeExplore',
             destinations: '.destinations',
-            distanceMinutesText: '.distanceMinutes',
+            distanceMinutesText: '.distance-minutes',
             errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
@@ -244,6 +244,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             .then(function (itineraries) {
             if (itineraries.length) {
                 var distance = itineraries[0].durationMinutes;
+                destination.durationMinutes = distance;
                 $container.find(options.selectors.distanceMinutesText).text(distance + ' minutes away');
             }
         });

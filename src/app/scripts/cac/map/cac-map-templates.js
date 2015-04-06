@@ -22,7 +22,7 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
             '<a class="block block-destination">',
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
-                '<h5 class="distanceMinutes"></h5>',
+                '<h5 class="distance-minutes"></h5>',
                 '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}http://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
             '</a>'
         ].join('');
@@ -35,7 +35,7 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
         var source = [
             '<div class="block-detail">',
                 '<h3>{{ d.name }}</h3>',
-                '<h5>20 minutes away</h5>',
+                '<h5 class="distance-minutes">{{ d.durationMinutes }} minutes away</h5>',
                 '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}http://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
                 '{{{ d.description }}}',    // the parent element of whatever is put here is a <p> tag
                 '<div class="row">',
