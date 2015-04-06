@@ -215,6 +215,15 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
      * @param {Object} $container jQuery-selected HTML snippet in the sidebar for the destination
      */
     function setDestinationDistance(destination, $container) {
+
+        // first check if we have distance cached
+        if (destination.durationMinutes) {
+            $container.find(options.selectors.distanceMinutesText)
+                .text(destination.durationMinutes + ' minutes away');
+            return;
+        }
+
+        // distance not cached; go query for it
         var mode = $(options.selectors.modeSelector).val();
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
