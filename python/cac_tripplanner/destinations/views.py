@@ -101,7 +101,9 @@ class FindReachableDestinations(View):
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
                 geom = GEOSGeometry(geom_str)
-                matched_objects = Destination.objects.filter(point__within=geom, published=True)
+                matched_objects = (Destination.objects.filter(published=True)
+                                                      .distance(geom)
+                                                      .order_by('distance'))
         else:
             matched_objects = []
 
