@@ -31,6 +31,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationdirections',
                                         $.proxy(getDestinationDirections, this));
 
+        mapControl.events.on('cac:map:control:destinationpopup',
+                             $.proxy(getDestinationDirections, this));
+
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
             tabControl: sidebarTabControl
