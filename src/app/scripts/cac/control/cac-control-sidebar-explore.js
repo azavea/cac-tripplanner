@@ -244,6 +244,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             .then(function (itineraries) {
             if (itineraries.length) {
                 var distance = itineraries[0].durationMinutes;
+                destination.durationMinutes = distance;
                 $container.find(options.selectors.distanceMinutesText).text(distance + ' minutes away');
             }
         });
