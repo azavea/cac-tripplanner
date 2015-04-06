@@ -58,13 +58,11 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     }
 
     function moveOrigin(event, position) {
-        console.log('new origin:');
-        console.log(position);
+        sidebarDirectionsControl.moveOriginDestination('origin', position);
     }
 
     function moveDestination(event, position) {
-        console.log('new destination:');
-        console.log(position);
+        sidebarDirectionsControl.moveOriginDestination('destination', position);
     }
 
     function onSidebarTabShown(event, tabId) {

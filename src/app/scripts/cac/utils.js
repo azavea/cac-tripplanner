@@ -3,6 +3,7 @@ CAC.Utils = (function (_) {
 
     var module = {
         convertDestinationToFeature: convertDestinationToFeature,
+        convertReverseGeocodeToFeature: convertReverseGeocodeToFeature,
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams
@@ -88,6 +89,39 @@ CAC.Utils = (function (_) {
                 geometry: {
                     x: destination.point.coordinates[0],
                     y: destination.point.coordinates[1]
+                }
+            }
+        };
+        return feature;
+    }
+
+    /**
+     * Convert ESRI reverse geocode response into feature formatted like typeahead results.
+     *
+     * @param {Object} response JSON response from ESRI reverse geocode service
+     * @returns {Object} Feature object structured like the typeahead results, for use on map page.
+     */
+    function convertReverseGeocodeToFeature(response) {
+        var feature = {
+            /*jshint camelcase: false */
+            name: response.address.Match_addr,
+            /*jshint camelcase: true */
+            extent: {
+                xmax: response.location.x,
+                xmin: response.location.x,
+                ymax: response.location.y,
+                ymin: response.location.y
+            },
+            feature: {
+                attributes: {
+                    City: response.address.City,
+                    Postal: response.address.Postal,
+                    Region: response.address.Region,
+                    StAddr: response.address.Address,
+                },
+                geometry: {
+                    x: response.location.x,
+                    y: response.location.y
                 }
             }
         };

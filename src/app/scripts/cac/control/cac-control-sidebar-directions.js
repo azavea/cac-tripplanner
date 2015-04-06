@@ -2,7 +2,7 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates, Routing,
+CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, MapTemplates, Routing,
                                  Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -87,6 +87,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
 
     SidebarDirectionsControl.prototype = {
         clearDirections: clearDirections,
+        moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
         setDirections: setDirections
     };
@@ -242,6 +243,38 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         }
     }
 
+    /**
+     * Change the origin or destination, then requery for directions.
+     *
+     * @param {String} key Either 'origin' or 'destination'
+     * @param {Object} position Has coordinates for new spot as 'lat' and 'lng' properties
+     */
+    function moveOriginDestination(key, position) {
+        if (key === 'origin' || key === 'destination') {
+            var prefKey = key === 'origin' ? 'from' : 'to';
+        } else {
+            console.error('Unrecognized key in moveOriginDestination: ' + key);
+            return;
+        }
+
+        Geocoder.reverse(position.lat, position.lng).then(function (data) {
+            if (data && data.address) {
+                var location = Utils.convertReverseGeocodeToFeature(data);
+                UserPreferences.setPreference(prefKey, location);
+                /*jshint camelcase: false */
+                var fullAddress = data.address.Match_addr;
+                /*jshint camelcase: true */
+                UserPreferences.setPreference(prefKey + 'Text', fullAddress);
+                $(options.selectors[key]).typeahead('val', fullAddress);
+                setDirections(key, [position.lat, position.lng]);
+                planTrip();
+            } else {
+                console.error('Failed to reverse geocode position. Received response:');
+                console.error(data);
+            }
+        });
+    }
+
     // called when going to show directions from 'explore' origin to a selected feature
     function setDestination(destination) {
         // Set origin
@@ -354,5 +387,5 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
         }
     }
 
-})(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans,
-   CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
+    CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

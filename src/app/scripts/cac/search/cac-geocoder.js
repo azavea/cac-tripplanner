@@ -2,6 +2,7 @@ CAC.Search.Geocoder = (function ($) {
     'use strict';
 
     var url = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find';
+    var reverseUrl = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
 
     var defaults = {
         bbox: [
@@ -17,6 +18,7 @@ CAC.Search.Geocoder = (function ($) {
     };
 
     var module = {
+        reverse: reverse,
         search: search
     };
 
@@ -47,6 +49,29 @@ CAC.Search.Geocoder = (function ($) {
                 }
             },
             error: function (error) {
+                dfd.reject(error);
+            }
+        });
+
+        return dfd.promise();
+    }
+
+    function reverse(lat, lng) {
+        var dfd = $.Deferred();
+
+        var params = {
+            location: [lng, lat].join(','),
+            returnIntersection: true,
+            f: 'pjson'
+        };
+
+        $.ajax(reverseUrl, {
+            data: params,
+            success: function (data) {
+                dfd.resolve(JSON.parse(data));
+            },
+            error: function (error) {
+                console.error(error);
                 dfd.reject(error);
             }
         });

@@ -391,7 +391,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new L.LatLng(position.lat, position.lng);
-            marker.setLatLng(latlng);
+            marker.setLatLng(latlng, {draggable: true});
             map.panTo(latlng); // allow user to drag marker off map
 
             var trigger = (marker.options.title === 'origin') ?
