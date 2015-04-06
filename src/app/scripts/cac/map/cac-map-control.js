@@ -4,7 +4,10 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var defaults = {
         id: 'map',
         center: [39.95, -75.1667],
-        zoom: 14
+        zoom: 14,
+        selectors: {
+            destinationPopup: '.destination-directions-link'
+        }
     };
     var maxZoom = 18;
 
@@ -18,6 +21,10 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var itineraries = {};
 
     var events = $({});
+    var eventNames = {
+        destinationPopupClick: 'cac:map:control:destinationpopup',
+        currentLocationClick: 'cac:map:control:currentlocation',
+    };
     var basemaps = {};
     var overlays = {};
     var destinationsLayer = null;
@@ -60,7 +67,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         this.events = events;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
-        map = L.map(this.options.id,{ zoomControl: false })
+        map = L.map(this.options.id, { zoomControl: false })
             .setView(this.options.center, this.options.zoom);
 
         // put zoom control on top right
@@ -71,6 +78,12 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         initializeBasemaps();
         initializeOverlays();
         initializeLayerControl();
+
+        // set listener for click event on destination popup
+        $('#' + this.options.id).on('click', this.options.selectors.destinationPopup, function(event) {
+            events.trigger(eventNames.destinationPopupClick,
+                           destinationMarkers[event.currentTarget.id].destination);
+        });
     }
 
     MapControl.prototype.clearIsochrone = clearIsochrone;
@@ -137,7 +150,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 userMarker = new L.CircleMarker(latlng)
                   .on('click', function() {
                       // TODO: not implemented
-                      events.trigger('CAC.Map.Control.CurrentLocationClicked', latlng);
+                      events.trigger(eventNames.currentLocationClick, latlng);
                   });
                 userMarker.setRadius(5);
                 map.addLayer(userMarker);
@@ -246,7 +259,10 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      */
     function drawDestinations(matched) {
         // put destination details onto point geojson object's properties
+        // build map of unconverted destination objects
+        var destinations = {};
         var locationGeoJSON = _.map(matched, function(destination) {
+            destinations[destination.id] = destination;
             var point = _.property('point')(destination);
             point.properties = _.omit(destination, 'point');
             return point;
@@ -255,23 +271,28 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         destinationsLayer = L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
-                    // TODO: not implemented
-                    events.trigger('CAC.Map.Control.DestinationClicked', feature);
+                    // TODO: this triggers on marker click, not popup
                 });
             },
             pointToLayer: function (geojson, latLng) {
                 var popupOptions = { maxWidth: 300 };
-                var popupTemplate = ['<p><b>{{geojson.properties.name}}',
-                                    '</b></p><p>{{geojson.properties.description}}',
-                                    '</p><a href="{{geojson.properties.website_url}}" ',
-                                    'target="_blank">{{geojson.properties.website_url}}</a>'
+                var popupTemplate = ['<p><b>{{geojson.properties.name}}</b></p>',
+                                     '<p>{{geojson.properties.description}}',
+                                     '</p><a href="{{geojson.properties.website_url}}" ',
+                                     'target="_blank">{{geojson.properties.website_url}}</a>',
+                                     '<a href="#" class="destination-directions-link pull-right" ',
+                                     'id="{{geojson.properties.id}}">Get Directions</a>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
-                destinationMarkers[markerId] = new L.marker(latLng, {icon: destinationIcon})
+                var marker = new L.marker(latLng, {icon: destinationIcon})
                         .bindPopup(popupContent, popupOptions);
-                return destinationMarkers[markerId];
+                destinationMarkers[markerId] = {
+                    marker: marker,
+                    destination: destinations[geojson.properties.id]
+                };
+                return marker;
             }
         }).addTo(map);
     }
@@ -419,7 +440,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             return;
         }
         // Update icon for passed destination
-        var marker = destinationMarkers[destinationId];
+        var marker = destinationMarkers[destinationId].marker;
         marker.setIcon(highlightIcon);
         if (options.panTo) {
             map.panTo(marker.getLatLng());

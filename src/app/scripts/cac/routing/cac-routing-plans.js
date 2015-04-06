@@ -1,8 +1,6 @@
 CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Settings) {
     'use strict';
 
-    //var planMode = ['WALK', 'TRANSIT'];
-
     var module = {
         planTrip: planTrip
     };
@@ -29,10 +27,14 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
             crossDomain: true,
             data: urlParams
         }).then(function(data) {
-            var itineraries = _(data.plan.itineraries).map(function(itinerary, i) {
-                return new Itinerary(itinerary, i, data.requestParameters);
-            }).value();
-            deferred.resolve(itineraries);
+            if (data.plan) {
+                var itineraries = _(data.plan.itineraries).map(function(itinerary, i) {
+                    return new Itinerary(itinerary, i, data.requestParameters);
+                }).value();
+                deferred.resolve(itineraries);
+            } else {
+                deferred.reject(data.error);
+            }
         }, function (error) {
             deferred.reject(error);
         });

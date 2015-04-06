@@ -36,6 +36,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
     ItineraryListControl.prototype = {
         events: events,
         setItineraries: setItineraries,
+        setItinerariesError: setItinerariesError,
         show: show,
         hide: hide,
         toggle: toggle
@@ -85,6 +86,19 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
         return html;
+    }
+
+    /**
+     * Use in case OTP planner returns an error
+     * @param {Object} Error object returned from OTP
+     */
+    function setItinerariesError(error) {
+        var source = '<div class="block block-itinerary">' +
+                '<span class="short-description"><b>{{error.msg}}</b></span>' +
+                '</div>';
+        var template = Handlebars.compile(source);
+        var html = template({error: error});
+        $container.html(html);
     }
 
     function getItineraryById(id) {

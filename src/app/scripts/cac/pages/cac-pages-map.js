@@ -31,6 +31,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationdirections',
                                         $.proxy(getDestinationDirections, this));
 
+        mapControl.events.on('cac:map:control:destinationpopup',
+                             $.proxy(getDestinationDirections, this));
+
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
             tabControl: sidebarTabControl
@@ -41,6 +44,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     // featured destination select
     function getDestinationDirections(event, destination) {
+        mapControl.clearIsochrone();
+        sidebarDirectionsControl.clearDirections();
+        mapControl.setGeocodeMarker(null);
         sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);
     }
