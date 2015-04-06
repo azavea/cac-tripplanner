@@ -216,10 +216,15 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
      */
     function setDestinationDistance(destination, $container) {
 
+        // helper to set the text snippet
+        function setDestinationMinutesText(distanceMinutes) {
+            $container.find(options.selectors.distanceMinutesText)
+                .text(distanceMinutes + ' minutes away');
+        }
+
         // first check if we have distance cached
         if (destination.durationMinutes) {
-            $container.find(options.selectors.distanceMinutesText)
-                .text(destination.durationMinutes + ' minutes away');
+            setDestinationMinutesText(destination.durationMinutes);
             return;
         }
 
@@ -254,7 +259,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             if (itineraries.length) {
                 var distance = itineraries[0].durationMinutes;
                 destination.durationMinutes = distance;
-                $container.find(options.selectors.distanceMinutesText).text(distance + ' minutes away');
+                setDestinationMinutesText(distance);
             }
         });
     }
