@@ -191,6 +191,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, MapTemplates
             itineraryListControl.setItineraries(itineraries);
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
+        }, function (error) {
+            $(options.selectors.spinner).addClass('hidden');
+            mapControl.setOriginDestinationMarkers(null, null);
+            mapControl.clearItineraries();
+            itineraryListControl.setItinerariesError(error);
+            $(options.selectors.directions).addClass(options.selectors.resultsClass);
+            itineraryListControl.show();
         });
     }
 
