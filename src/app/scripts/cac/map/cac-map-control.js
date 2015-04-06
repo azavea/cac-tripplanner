@@ -6,7 +6,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         center: [39.95, -75.1667],
         zoom: 14,
         selectors: {
-            destinationPopup: '.destination-popup'
+            destinationPopup: '.destination-directions-link'
         }
     };
     var maxZoom = 18;
@@ -276,12 +276,12 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             },
             pointToLayer: function (geojson, latLng) {
                 var popupOptions = { maxWidth: 300 };
-                var popupTemplate = ['<span class="destination-popup" ',
-                                     'id="{{geojson.properties.id}}"><p><b>',
-                                     '{{geojson.properties.name}}</b></p>',
+                var popupTemplate = ['<p><b>{{geojson.properties.name}}</b></p>',
                                      '<p>{{geojson.properties.description}}',
                                      '</p><a href="{{geojson.properties.website_url}}" ',
-                                     'target="_blank">{{geojson.properties.website_url}}</a></span>'
+                                     'target="_blank">{{geojson.properties.website_url}}</a>',
+                                     '<a href="#" class="destination-directions-link pull-right" ',
+                                     'id="{{geojson.properties.id}}">Get Directions</a>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});

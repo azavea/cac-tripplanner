@@ -44,6 +44,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     // featured destination select
     function getDestinationDirections(event, destination) {
+        mapControl.clearIsochrone();
+        sidebarDirectionsControl.clearDirections();
+        mapControl.setGeocodeMarker(null);
         sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);
     }
