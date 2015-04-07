@@ -83,6 +83,14 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     }
 
     function getTemplate(itinerary) {
+        Handlebars.registerHelper('modeIcon', function(modeString) {
+            return new Handlebars.SafeString(Utils.modeStringHelper(modeString));
+        });
+
+        Handlebars.registerHelper('datetime', function(dateTime) {
+            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
+        });
+
         var templateData = {
             start: {
                 text:  UserPreferences.getPreference('fromText'),
@@ -92,7 +100,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 text:  UserPreferences.getPreference('toText'),
                 time: new Date(itinerary.endTime).toLocaleTimeString()
             },
-            steps: itinerary.steps
+            legs: itinerary.legs
         };
 
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
@@ -108,15 +116,28 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
             '<div class="block block-step">',
                 '<p>Starting at <strong>{{data.start.text}} at {{data.start.time}}</strong></p>',
             '</div>',
-            '{{#each data.steps}}',
-            '<div class="block block-step">',
-                '<div class="col-xs-3">',
-                    '{{ directionIcon this.relativeDirection }}',
+            '{{#each data.legs}}',
+                '<div class="block block-leg">',
+                    '<p>{{modeIcon this.mode}} ',
+                    '{{#if this.transitLeg}}',
+                        '{{this.agencyName}} {{this.route}} {{this.headsign}}',
+                    '{{else}}',
+                        'Depart {{datetime startTime}}, arrive {{datetime endTime}}',
+                    '{{/if}}',
+                    '</p>',
+                    '<p>From {{this.from.name}}</p>',
+                    '<p>To {{this.to.name}}</p>',
                 '</div>',
-                '<div class="col-xs-9">',
-                    '{{ directionText }}',
-                '</div>',
-            '</div>',
+                '{{#each steps}}',
+                    '<div class="block block-step">',
+                        '<div class="col-xs-3">',
+                            '{{ directionIcon this.relativeDirection }}',
+                        '</div>',
+                        '<div class="col-xs-9">',
+                            '{{ directionText }}',
+                        '</div>',
+                    '</div>',
+                '{{/each}}',
             '{{/each}}',
             '<div class="block block-step">',
                 '<p>Arrive at <strong>{{data.end.text}} at {{data.end.time}}</strong></p>',
