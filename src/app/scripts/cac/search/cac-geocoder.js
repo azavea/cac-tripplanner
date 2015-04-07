@@ -69,7 +69,7 @@ CAC.Search.Geocoder = (function ($) {
 
         var params = {
             location: [lng, lat].join(','),
-            distance: 600,  // radius, in meters, to search within; defaults to 100m
+            distance: 900,  // radius, in meters, to search within; defaults to 100m
             returnIntersection: true,
             f: 'pjson'
         };
