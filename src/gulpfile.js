@@ -25,6 +25,7 @@ var pythonRoot = '/opt/app/python/cac_tripplanner';
 var filterCSS = gulpFilter('**/*.css');
 
 var stat = {
+    fonts: staticRoot + '/fonts',
     scripts: staticRoot + '/scripts',
     styles: staticRoot + '/styles',
     images: staticRoot + '/images'
@@ -34,6 +35,7 @@ var stat = {
 var boostrapSelectRoot = 'bower_components/bootstrap-select/dist/css';
 var multiSelectRoot = 'bower_components/multiple-select';
 var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
+var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -106,9 +108,19 @@ gulp.task('copy:vendor-images', function() {
         .pipe(gulp.dest(stat.images + '/vendor'));
 });
 
-gulp.task('copy:style-images', function() {
+gulp.task('copy:fa-images', function() {
     return copyBowerFiles('**/*.png', [awesomeIconsRoot + '/*.png'])
         .pipe(gulp.dest(stat.styles + '/images'));
+});
+
+gulp.task('copy:md-images', function() {
+    return copyBowerFiles('**/*.svg', [materialIconsRoot + '/*.svg'])
+        .pipe(gulp.dest(stat.styles + '/images'));
+});
+
+gulp.task('copy:md-fonts', function() {
+    return copyBowerFiles('**/*.{woff,tiff,svg,eot}', [materialIconsRoot + '/*.{woff,tiff,svg,eot}'])
+        .pipe(gulp.dest(stat.fonts));
 });
 
 gulp.task('copy:app-images', function() {
@@ -192,7 +204,9 @@ gulp.task('common:build', ['clean'], function() {
         'copy:vendor-css',
         'copy:bootstrap-select-map',
         'copy:vendor-images',
-        'copy:style-images',
+        'copy:fa-images',
+        'copy:md-images',
+        'copy:md-fonts',
         'copy:app-images',
         'sass',
         'collectstatic');
