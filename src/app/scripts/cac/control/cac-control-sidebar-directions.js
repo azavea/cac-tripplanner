@@ -113,6 +113,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             return;
         }
 
+        // show spinner while loading
+        itineraryListControl.hide();
+        directionsListControl.hide();
+        $(options.selectors.spinner).removeClass('hidden');
+
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
         if (!date) {
@@ -159,11 +164,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         UserPreferences.setPreference('method', 'directions');
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
-
-        // show spinner while loading
-        itineraryListControl.hide();
-        directionsListControl.hide();
-        $(options.selectors.spinner).removeClass('hidden');
 
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
@@ -257,6 +257,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             return;
         }
 
+        // show spinner while loading
+        itineraryListControl.hide();
+        directionsListControl.hide();
+        $(options.selectors.spinner).removeClass('hidden');
+
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
                 var location = Utils.convertReverseGeocodeToFeature(data);
@@ -271,6 +276,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             } else {
                 console.error('Failed to reverse geocode position. Received response:');
                 console.error(data);
+                $(options.selectors.spinner).addClass('hidden');
+                itineraryListControl.setItinerariesError({
+                    msg: 'Could not find street address for location.'
+                });
+                $(options.selectors.directions).addClass(options.selectors.resultsClass);
+                itineraryListControl.show();
             }
         });
     }
