@@ -34,6 +34,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         mapControl.events.on('cac:map:control:destinationpopup',
                              $.proxy(getDestinationDirections, this));
 
+        mapControl.events.on('cac:map:control:originmoved',
+                             $.proxy(moveOrigin, this));
+
+        mapControl.events.on('cac:map:control:destinationmoved',
+                             $.proxy(moveDestination, this));
+
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
             tabControl: sidebarTabControl
@@ -49,6 +55,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         mapControl.setGeocodeMarker(null);
         sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);
+    }
+
+    function moveOrigin(event, position) {
+        sidebarDirectionsControl.moveOriginDestination('origin', position);
+    }
+
+    function moveDestination(event, position) {
+        sidebarDirectionsControl.moveOriginDestination('destination', position);
     }
 
     function onSidebarTabShown(event, tabId) {
