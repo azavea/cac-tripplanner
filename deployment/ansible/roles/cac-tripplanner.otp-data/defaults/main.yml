@@ -5,4 +5,4 @@
 otp_osm_source: https://s3.amazonaws.com/metro-extracts.mapzen.com/philadelphia_pennsylvania.osm.pbf
 otp_osm_filename: /var/otp/philadelphia.osm.pbf
 otp_repo: "https://github.com/opentripplanner/OpenTripPlanner.git"
-otp_version: "opentripplanner-0.13.0"
+otp_router: "default"

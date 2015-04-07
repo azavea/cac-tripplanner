@@ -5,6 +5,9 @@
 - name: Copy Feed Validator
   copy: src=validate_feed.py dest="{{ otp_data_dir }}"
 
+- name: Overwrite upstart service
+  template: src=otp.conf.j2 dest=/etc/init/otp.conf
+
 - name: Download OTP Data
   local_action: command aws s3 sync s3://cleanair-otp-data/ ../../otp_data/
   sudo: no
@@ -22,4 +25,10 @@
   command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_jarfile }} --build {{ otp_data_dir }}
   args:
     chdir: "{{ otp_bin_dir }}"
+
+- name: Create Graph Directory
+  file: path="{{ otp_data_dir}}/{{ otp_router }}" state=directory
+
+- name: Move Graph to Graph Directory
+  command: mv {{ otp_data_dir }}/Graph.obj {{ otp_data_dir }}/{{ otp_router }}
   notify: Restart OpenTripPlanner
