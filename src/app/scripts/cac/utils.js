@@ -6,7 +6,8 @@ CAC.Utils = (function (_) {
         convertReverseGeocodeToFeature: convertReverseGeocodeToFeature,
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
-        getUrlParams: getUrlParams
+        getUrlParams: getUrlParams,
+        modeStringHelper: modeStringHelper
     };
 
     var directions = {
@@ -188,6 +189,36 @@ CAC.Utils = (function (_) {
             .object()
             // Return the value of the chain operation
             .value();
+    }
+
+    function modeStringHelper(modeString) {
+        var modeIcons = {
+            BUS: {name: 'bus', font: 'fa'},
+            SUBWAY: {name: 'subway', font: 'fa'},
+            CAR: {name: 'car', font: 'fa'},
+            TRAIN: {name: 'train', font: 'fa'},
+            BICYCLE: {name: 'bicycle', font: 'fa'},
+            WALK: {name: 'directions-walk', font: 'md'},
+            TRAM: {name: 'directions-subway', font: 'md'},
+            FERRY: {name: 'directions-ferry', font: 'md'}
+        };
+
+        var mode = modeIcons[modeString];
+
+        if (!mode) {
+            mode = {name: 'md-directoins-transit', font: 'md'};
+            console.error('Unrecognized transit mode: ' + modeString + '. Using default icon.');
+        }
+
+        var modeStr = ['<i class="',
+                        mode.font,
+                        ' ',
+                        mode.font,
+                        '-',
+                        mode.name,
+                        '"></i>'
+                      ].join('');
+        return modeStr;
     }
 
 })(_);
