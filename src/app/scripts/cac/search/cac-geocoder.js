@@ -56,11 +56,20 @@ CAC.Search.Geocoder = (function ($) {
         return dfd.promise();
     }
 
+    /**
+     * Reverse geocode given coordinates.  Docs here:
+     * http://resources.arcgis.com/en/help/arcgis-rest-api/index.html#//02r30000000n000000
+     *
+     * @param {Double} lat Latitude to reverse geocode
+     * @param {Double} lon Longitude to reverse geocode
+     * @returns {Object} Promise that resovles to JSON response with `address` and `location`
+     */
     function reverse(lat, lng) {
         var dfd = $.Deferred();
 
         var params = {
             location: [lng, lat].join(','),
+            distance: 600,  // radius, in meters, to search within; defaults to 100m
             returnIntersection: true,
             f: 'pjson'
         };
