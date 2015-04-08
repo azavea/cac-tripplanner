@@ -14,6 +14,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         showBackButton: false,
         // Should the share button be shown in the control
         showShareButton: false,
+        // NB: if these selectors are overridden on list creation, these default values are ignored
         selectors: {
             container: '.directions-list',
             backButton: 'a.back',
@@ -64,7 +65,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     function setItinerary(newItinerary) {
         itinerary = newItinerary;
 
-        var $html = $(getTemplate(itinerary));
+        var template = getTemplate(itinerary);
+        var $html = $(template);
 
         if (options.showBackButton) {
             $html.find(options.selectors.backButton).on('click', function () {
@@ -84,16 +86,18 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         }
 
         // Wire up hover events on step-by-step directions
-        $($html, options.selectors.directionItem)
-            .mouseenter(function () {
+        $html.find(options.selectors.directionItem)
+            .mouseenter(function (e) {
                 var lon = $(this).data('lon');
                 var lat = $(this).data('lat');
                 if (lon && lat) {
                     events.trigger(eventNames.directionHovered, [lon, lat]);
                 }
+                e.stopPropagation();
             })
-            .mouseleave(function () {
+            .mouseleave(function (e) {
                 events.trigger(eventNames.directionHovered, null);
+                e.stopPropagation();
             });
 
         $container.empty().append($html);
@@ -142,20 +146,24 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                         'Depart {{datetime startTime}}, arrive {{datetime endTime}}',
                     '{{/if}}',
                     '</p>',
-                    '<p>From {{this.from.name}}</p>',
-                    '<p>To {{this.to.name}}</p>',
+                    '<div class="block direction-item"',
+                    ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
+                    'From {{this.from.name}}</div>',
+                    '<div class="block direction-item"',
+                    ' data-lat="{{this.to.lat}}" data-lon="{{this.to.lon}}" >',
+                    'To {{this.to.name}}</div>',
+                    '{{#each steps}}',
+                        '<div class="block block-step direction-item"',
+    						' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
+                            '<div class="col-xs-3">',
+                                '{{ directionIcon this.relativeDirection }}',
+                            '</div>',
+                            '<div class="col-xs-9">',
+                                '{{ directionText }}',
+                            '</div>',
+                        '</div>',
+                    '{{/each}}',
                 '</div>',
-                '{{#each steps}}',
-                    '<div class="block block-step direction-item"',
-						' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
-                        '<div class="col-xs-3">',
-                            '{{ directionIcon this.relativeDirection }}',
-                        '</div>',
-                        '<div class="col-xs-9">',
-                            '{{ directionText }}',
-                        '</div>',
-                    '</div>',
-                '{{/each}}',
             '{{/each}}',
             '<div class="block block-step">',
                 '<p>Arrive at <strong>{{data.end.text}} at {{data.end.time}}</strong></p>',

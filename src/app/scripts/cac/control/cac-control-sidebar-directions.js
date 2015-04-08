@@ -65,6 +65,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             showShareButton: true,
             selectors: {
                 container: 'section.directions .directions-list',
+                directionItem: '.direction-item',
                 backButton: 'a.back',
                 shareButton: 'a.share'
             }
