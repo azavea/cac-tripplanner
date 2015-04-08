@@ -78,10 +78,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
                 container: 'section.directions .itineraries'
             }
         });
-        itineraryListControl.events.on('cac:control:itinerarylist:itineraryclicked', onItineraryClicked);
+        itineraryListControl.events.on(itineraryListControl.eventNames.itineraryClicked,
+                                       onItineraryClicked);
 
-        typeahead  = new Typeahead(options.selectors.typeahead);
-        typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
+        typeahead = new Typeahead(options.selectors.typeahead);
+        typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
