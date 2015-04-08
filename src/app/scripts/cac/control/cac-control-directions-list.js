@@ -146,7 +146,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                     '<p>To {{this.to.name}}</p>',
                 '</div>',
                 '{{#each steps}}',
-                    '<div class="block block-step direction-item">',
+                    '<div class="block block-step direction-item"',
 						' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
                         '<div class="col-xs-3">',
                             '{{ directionIcon this.relativeDirection }}',
