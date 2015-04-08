@@ -112,6 +112,10 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
             return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
         });
 
+        Handlebars.registerHelper('inMiles', function(meters) {
+            return new Handlebars.SafeString(Math.round(((meters / 1000) * 0.621371) * 100) / 100);
+        });
+
         var templateData = {
             start: {
                 text:  UserPreferences.getPreference('fromText'),
@@ -141,11 +145,12 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 '<div class="block block-leg">',
                     '<p>{{modeIcon this.mode}} ',
                     '{{#if this.transitLeg}}',
-                        '{{this.agencyName}} {{this.route}} {{this.headsign}}',
+                        '{{this.agencyName}} {{this.route}} {{this.headsign}}</p>',
+                        '<p>Depart {{datetime startTime}}, arrive {{datetime endTime}}</p>',
                     '{{else}}',
-                        'Depart {{datetime startTime}}, arrive {{datetime endTime}}',
+                        'Depart {{datetime startTime}}, arrive {{datetime endTime}}</p>',
                     '{{/if}}',
-                    '</p>',
+                    '<p>{{inMiles this.distance}} miles</p>',
                     '<div class="block direction-item"',
                     ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
                     'From {{this.from.name}}</div>',
