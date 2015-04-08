@@ -69,7 +69,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
                 shareButton: 'a.share'
             }
         });
-        directionsListControl.events.on('cac:control:directionslist:backbutton', onDirectionsBackClicked);
+        directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
+                                        onDirectionsBackClicked);
 
         itineraryListControl = new Control.ItineraryList({
             selectors: {
@@ -80,6 +81,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         typeahead  = new Typeahead(options.selectors.typeahead);
         typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
+
+        // Listen to direction hovered events in order to show a point on the map
+        directionsListControl.events.on(
+            directionsListControl.eventNames.directionHovered,
+            function(e, lon, lat){
+                mapControl.displayPoint(lon, lat);
+            });
 
         setFromUserPreferences();
         changeMode();

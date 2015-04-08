@@ -32,6 +32,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var destinationsLayer = null;
     var destinationMarkers = {};
     var lastHighlightedMarker = null;
+    var lastDisplayPointMarker = null;
     var isochroneLayer = null;
     var tabControl = null;
 
@@ -99,6 +100,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setOriginDestinationMarkers = setOriginDestinationMarkers;
     MapControl.prototype.highlightDestination = highlightDestination;
+    MapControl.prototype.displayPoint = displayPoint;
 
     return MapControl;
 
@@ -469,6 +471,27 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             map.panTo(marker.getLatLng());
         }
         lastHighlightedMarker = marker;
+    }
+
+    /**
+     * Displays a simple point marker on the map.
+     * Currently only used while a leg of a direction is hovered over.
+     *
+     * Only one point can be displayed at a time.
+     * If this is called without lon/lat params, the current point is removed.
+     *
+     * @param {Int} Longitude
+     * @param {Int} Latitude
+     */
+    function displayPoint(lon, lat) {
+        if (lon && lat) {
+            var latlng = new L.LatLng(lat, lon);
+            lastDisplayPointMarker = new L.CircleMarker(latlng);
+            lastDisplayPointMarker.addTo(map);
+        } else if (lastDisplayPointMarker) {
+            map.removeLayer(lastDisplayPointMarker);
+            lastDisplayPointMarker = null;
+        }
     }
 
 })(jQuery, Handlebars, L, _);

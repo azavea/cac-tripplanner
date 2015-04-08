@@ -17,7 +17,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         selectors: {
             container: '.directions-list',
             backButton: 'a.back',
-            shareButton: 'a.share'
+            shareButton: 'a.share',
+            directionItem: '.direction-item'
         }
     };
     var options = {};
@@ -26,7 +27,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     var eventNames = {
         backButtonClicked: 'cac:control:directionslist:backbutton',
         shareButtonClicked: 'cac:control:directionslist:sharebutton',
-        listItemClicked: 'cac:control:directionslist:listitem'
+        listItemClicked: 'cac:control:directionslist:listitem',
+        directionHovered: 'cac:control:directionslist:directionhover'
     };
 
     var $container = null;
@@ -42,6 +44,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
 
     DirectionsListControl.prototype = {
         events: events,
+        eventNames: eventNames,
         setItinerary: setItinerary,
         show: show,
         hide: hide,
@@ -79,6 +82,20 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 window.open(directionsUrl, '_blank');
             });
         }
+
+        // Wire up hover events on step-by-step directions
+        $($html, options.selectors.directionItem)
+            .mouseenter(function () {
+                var lon = $(this).data('lon');
+                var lat = $(this).data('lat');
+                if (lon && lat) {
+                    events.trigger(eventNames.directionHovered, [lon, lat]);
+                }
+            })
+            .mouseleave(function () {
+                events.trigger(eventNames.directionHovered, null);
+            });
+
         $container.empty().append($html);
     }
 
@@ -109,7 +126,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 '<p>Starting at <strong>{{data.start.text}} at {{data.start.time}}</strong></p>',
             '</div>',
             '{{#each data.steps}}',
-            '<div class="block block-step">',
+            '<div class="block block-step direction-item"',
+                ' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
                 '<div class="col-xs-3">',
                     '{{ directionIcon this.relativeDirection }}',
                 '</div>',
