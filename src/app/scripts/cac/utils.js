@@ -197,6 +197,7 @@ CAC.Utils = (function (_) {
             SUBWAY: {name: 'subway', font: 'fa'},
             CAR: {name: 'car', font: 'fa'},
             TRAIN: {name: 'train', font: 'fa'},
+            RAIL: {name: 'train', font: 'fa'},
             BICYCLE: {name: 'bicycle', font: 'fa'},
             WALK: {name: 'directions-walk', font: 'md'},
             TRAM: {name: 'directions-subway', font: 'md'},
