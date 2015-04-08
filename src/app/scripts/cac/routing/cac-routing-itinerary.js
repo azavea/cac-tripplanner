@@ -17,7 +17,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         this.durationMinutes = getDurationMinutes(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.steps = getDirectionsSteps(otpItinerary);
+        this.legs = otpItinerary.legs;
         this.from = _.first(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
 
@@ -50,10 +50,6 @@ CAC.Routing.Itinerary = (function ($, L, _) {
     };
 
     return Itinerary;
-
-    function getDirectionsSteps(otpItinerary) {
-        return _(otpItinerary.legs).map('steps').flatten().value();
-    }
 
     /**
      * Helper function to get label/via summary for an itinerary.

@@ -2,7 +2,7 @@
  *  View control for the itinerary list
  *
  */
-CAC.Control.ItineraryList = (function ($, Handlebars) {
+CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
 
     'use strict';
 
@@ -60,16 +60,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
     // Template for itinerary summaries
     function getTemplate(itineraries) {
         Handlebars.registerHelper('modeIcon', function(modeString) {
-            var modeIcons = {
-                BUS: 'bus',
-                SUBWAY: 'subway',
-                CAR: 'car',
-                TRAIN: 'train',
-                BICYCLE: 'bicycle',
-                WALK: 'rocket'
-            };
-
-            return new Handlebars.SafeString('<i class="fa fa-'+ modeIcons[modeString] + '"></i>');
+            return new Handlebars.SafeString(Utils.modeStringHelper(modeString));
         });
 
         var source = '{{#each itineraries}}' +
@@ -129,4 +120,4 @@ CAC.Control.ItineraryList = (function ($, Handlebars) {
             hide();
         }
     }
-})(jQuery, Handlebars);
+})(jQuery, Handlebars, CAC.Utils);
