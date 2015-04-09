@@ -23,6 +23,7 @@ module.exports = function(config) {
       '/srv/cac/scripts/vendor/Polyline.encoded.js',
       '/srv/cac/scripts/vendor/!(leaflet|Polyline|moment).js',
       'app/scripts/cac/cac.js',
+      'app/scripts/cac/search/cac-search-params.js',
       'app/scripts/**/*.js',
       'test/spec/*.js',
       'test/spec/**/*.js'
