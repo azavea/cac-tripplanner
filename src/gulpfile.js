@@ -41,8 +41,7 @@ var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
 var scriptOrder = [
     // Needs to come first, since it defines the CAC global
     '**/cac.js',
-
-    // Order doesn't matter (yet) for any other files
+    '**/search/cac-search-params.js',
     '**/*.js'
 ];
 
