@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function ($) {
+CAC.Search.Typeahead = (function ($, SearchParams) {
     'use strict';
 
     var defaults = {
@@ -122,22 +122,9 @@ CAC.Search.Typeahead = (function ($) {
     function suggestAdapterFactory() {
         var url = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
 
-        // search categories from here:
-        // https://developers.arcgis.com/rest/geocode/api-reference/geocoding-category-filtering.htm
-        var searchCategories = ['Address',
-                                'Postal',
-                                'Coordinate System',
-                                'Populated Place',
-                                'POI'
-                                ].join(',');
         var params = {
-            searchExtent: [
-                '-75.243620',
-                '39.898295',
-                '-75.126531',
-                '39.967842'
-            ].join(','),
-            category: searchCategories,
+            searchExtent: SearchParams.searchBounds,
+            category: SearchParams.searchCategories,
             f: 'pjson'
         };
 
@@ -155,4 +142,4 @@ CAC.Search.Typeahead = (function ($) {
         return adapter;
     }
 
-})(jQuery);
+})(jQuery, CAC.Search.SearchParams);
