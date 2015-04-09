@@ -1,17 +1,12 @@
-CAC.Search.Geocoder = (function ($) {
+CAC.Search.Geocoder = (function ($, SearchParams) {
     'use strict';
 
     var url = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find';
     var reverseUrl = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
 
     var defaults = {
-        bbox: [
-            '-75.243620',
-            '39.898295',
-            '-75.126531',
-            '39.967842'
-        ].join(','),
-        category: 'Address,POI',
+        bbox: SearchParams.searchBounds,
+        category: SearchParams.searchCategories,
         outFields: 'StAddr,City,Region,Postal',
         f: 'pjson',
         maxLocations: 1
@@ -88,4 +83,4 @@ CAC.Search.Geocoder = (function ($) {
         return dfd.promise();
     }
 
-})(jQuery);
+})(jQuery, CAC.Search.SearchParams);
