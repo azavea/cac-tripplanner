@@ -123,7 +123,7 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences, Utils) {
 
     return Home;
 
-    function clickedViewAll() {
+    function clickedViewAll(event) {
         event.preventDefault();
 
         // hide existing destinations list and show loading spinner

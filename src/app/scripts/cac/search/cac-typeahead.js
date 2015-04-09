@@ -24,6 +24,7 @@ CAC.Search.Typeahead = (function ($) {
         minLength: 2
     };
     var defaultTypeaheadKey = 'default';
+    var thisLocation = null;
 
     function CACTypeahead(selector, options) {
 
@@ -88,27 +89,33 @@ CAC.Search.Typeahead = (function ($) {
     */
 
     function locationAdapter(query, callback) {
-        if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var list = [{
-                    name: 'Current Location',
-                    feature: {
-                        geometry: {
-                            x: position.coords.longitude,
-                            y: position.coords.latitude
-                        }
-                    }
-                }];
-                callback(list);
-            }, function (error) {
-                console.error('geolocation', error);
-            }, {
-                enableHighAccuracy: true,
-                timeout: 1000,
-                maximumAge: 0
-            });
+        if (thisLocation) {
+            callback(thisLocation);
         } else {
-            console.error('geolocation not supported');
+            if ('geolocation' in navigator) {
+                // set a watch on current location the first time it's requested
+                navigator.geolocation.watchPosition(function(position) {
+                    var list = [{
+                        name: 'Current Location',
+                        feature: {
+                            geometry: {
+                                x: position.coords.longitude,
+                                y: position.coords.latitude
+                            }
+                        }
+                    }];
+                    thisLocation = list;
+                    callback(thisLocation);
+                }, function (error) {
+                    console.error('geolocation', error);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 10000
+                });
+            } else {
+                console.error('geolocation not supported');
+            }
         }
     }
 
