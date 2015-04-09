@@ -4,11 +4,13 @@
 CAC.Search.SearchParams = (function () {
     'use strict';
 
+    // bounds to cover are the counties here:
+    // http://pecpa.org/wp-content/uploads/Recreation-The-Circuit-map-photo-Patrick-1260x979.jpg
     var searchBounds = [
-        '-75.243620',
-        '39.898295',
-        '-75.126531',
-        '39.967842'
+        '-76.209582',
+        '39.467695',
+        '-74.243725',
+        '40.725449'
     ].join(',');
 
     // search categories from here:
