@@ -35,6 +35,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
 
     ItineraryListControl.prototype = {
         events: events,
+        eventNames: eventNames,
         setItineraries: setItineraries,
         setItinerariesError: setItinerariesError,
         show: show,

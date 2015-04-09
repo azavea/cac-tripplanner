@@ -39,7 +39,8 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences, Utils) {
         });
 
         this.typeahead = new CAC.Search.Typeahead(options.selectors.typeahead);
-        this.typeahead.events.on('cac:typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        this.typeahead.events.on(this.typeahead.eventNames.selected,
+                                 $.proxy(onTypeaheadSelected, this));
 
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);

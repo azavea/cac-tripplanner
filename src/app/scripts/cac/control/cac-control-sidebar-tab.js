@@ -15,7 +15,8 @@ CAC.Control.SidebarTab = (function ($) {
         tabWrapperSelector: '.sidebar-tabs'
     };
 
-    var events = {
+    var events = $({});
+    var eventNames = {
         tabShown: 'cac:control:sidebartab:shown'
     };
 
@@ -26,7 +27,8 @@ CAC.Control.SidebarTab = (function ($) {
         var self = this;
 
         self.options = $.extend({}, defaults, options);
-        self.events = $({});
+        self.events = events;
+        self.eventNames = eventNames;
         $wrapper = $(self.options.tabWrapperSelector);
 
         $wrapper.find('button').on('click', function () {
@@ -56,7 +58,7 @@ CAC.Control.SidebarTab = (function ($) {
         $buttons.removeClass('active');
         $buttons.siblings('[data-tab=' + tabId + ']').addClass('active');
 
-        this.events.trigger(events.tabShown, tabId);
+        this.events.trigger(eventNames.tabShown, tabId);
     }
 
 })(jQuery);

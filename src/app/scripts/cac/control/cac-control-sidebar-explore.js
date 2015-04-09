@@ -63,7 +63,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         });
 
         typeahead  = new Typeahead(options.selectors.typeahead);
-        typeahead.events.on('cac:typeahead:selected', onTypeaheadSelected);
+        typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
 
         setFromUserPreferences();
         changeMode();
@@ -71,6 +71,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     SidebarExploreControl.prototype = {
         events: events,
+        eventNames: eventNames,
         setAddress: setAddress,
         setDestinationSidebar: setDestinationSidebar
     };

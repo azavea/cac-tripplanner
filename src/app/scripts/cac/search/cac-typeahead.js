@@ -8,7 +8,7 @@
  * All events are fired on the events property of the typeahead instance.
  * e.g:
  * var typeahead = new CAC.Search.Typeahead(...)
- * typeahead.events.on('cac:typeahead:selected', function () {});
+ * typeahead.events.on(typeahead.eventNames.selected, function () {});
  *
  * Events:
  *     - cac:typeahead:selected - Fired when the user selects an element in the list.
@@ -29,6 +29,9 @@ CAC.Search.Typeahead = (function ($) {
 
         this.options = $.extend({}, defaults, options);
         this.events = $({});
+        this.eventNames = {
+            selected: 'cac:typeahead:selected'
+        };
 
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
@@ -54,12 +57,12 @@ CAC.Search.Typeahead = (function ($) {
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'currentlocation') {
-            self.events.trigger('cac:typeahead:selected', [typeaheadKey, suggestion]);
+            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
         } else {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
                     // location will be null if no results found
-                    self.events.trigger('cac:typeahead:selected', [typeaheadKey, location]);
+                    self.events.trigger(self.eventNames.selected, [typeaheadKey, location]);
                 }, function (error) {
                     console.error(error);
                 });

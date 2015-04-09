@@ -17,7 +17,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     Map.prototype.initialize = function () {
 
         sidebarTabControl = new CAC.Control.SidebarTab();
-        sidebarTabControl.events.on('cac:control:sidebartab:shown', $.proxy(onSidebarTabShown, this));
+        window.stc = sidebarTabControl;
+        sidebarTabControl.events.on(sidebarTabControl.eventNames.tabShown,
+                                    $.proxy(onSidebarTabShown, this));
 
         // Map initialization logic and event binding
         mapControl = new MapControl({
@@ -28,16 +30,16 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         sidebarExploreControl = new CAC.Control.SidebarExplore({
             mapControl: mapControl
         });
-        sidebarExploreControl.events.on('cac:control:sidebarexplore:destinationdirections',
+        sidebarExploreControl.events.on(sidebarExploreControl.eventNames.destinationDirections,
                                         $.proxy(getDestinationDirections, this));
 
-        mapControl.events.on('cac:map:control:destinationpopup',
+        mapControl.events.on(mapControl.eventNames.destinationPopupClick,
                              $.proxy(getDestinationDirections, this));
 
-        mapControl.events.on('cac:map:control:originmoved',
+        mapControl.events.on(mapControl.eventNames.originMoved,
                              $.proxy(moveOrigin, this));
 
-        mapControl.events.on('cac:map:control:destinationmoved',
+        mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
 
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({

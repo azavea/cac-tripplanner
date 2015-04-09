@@ -68,6 +68,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
 
     function MapControl(options) {
         this.events = events;
+        this.eventNames = eventNames;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
         map = L.map(this.options.id, { zoomControl: false })
