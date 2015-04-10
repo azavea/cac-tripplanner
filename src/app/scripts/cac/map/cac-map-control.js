@@ -239,6 +239,12 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             cutoffSec: exploreMinutes * 60, // API expects seconds
         };
 
+        // Default precision of 200m; 100m seems good for improving response times on non-transit
+        // http://dev.opentripplanner.org/apidoc/0.12.0/resource_LIsochrone.html
+        if (otpParams.mode === 'WALK' || otpParams.mode === 'BICYCLE') {
+            params.precisionMeters = 100;
+        }
+
         params = $.extend(otpParams, params);
 
         if (coordsOrigin) {
