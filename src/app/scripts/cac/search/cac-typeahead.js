@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function ($, SearchParams) {
+CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
     'use strict';
 
     var defaults = {
@@ -36,12 +36,17 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
 
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
+        this.destinationAdapter = destinationAdapterFactory();
         this.eventsAdapter = null;   // TODO: Add when we have an events search endpoint
 
         this.$element = $(selector).typeahead(this.options, {
             name: 'currentlocation',
             displayKey: 'name',
             source: this.locationAdapter
+        }, {
+            name: 'featured',
+            displayKey: 'name',
+            source: this.destinationAdapter.ttAdapter()
         }, {
             name: 'destinations',
             displayKey: 'text',
@@ -59,6 +64,8 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
 
         if (dataset === 'currentlocation') {
             self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
+        } else if (dataset === 'featured') {
+            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
         } else {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
@@ -70,23 +77,27 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         }
     }
 
-    // Unused, but might add later?
-    /*
     function destinationAdapterFactory() {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
                 url: '/api/destinations/search?text=%QUERY',
-                filter: function (list) {
-                    return list && list.length ? $.map(list, function (item) { return item.fields; }) : [];
+                filter: function (response) {
+                    if (response && response.destinations.length) {
+                        var list = _.map(response.destinations, function (item) {
+                            return Utils.convertDestinationToFeature(item);
+                        });
+                        return list;
+                    } else {
+                        return [];
+                    }
                 }
             }
         });
         adapter.initialize();
         return adapter;
     }
-    */
 
     function locationAdapter(query, callback) {
         if (thisLocation) {
@@ -142,4 +153,4 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         return adapter;
     }
 
-})(jQuery, CAC.Search.SearchParams);
+})(_, jQuery, CAC.Search.SearchParams, CAC.Utils);
