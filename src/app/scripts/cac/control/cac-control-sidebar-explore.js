@@ -8,6 +8,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
     var METERS_PER_MILE = 1609.34;
 
+    // Number of millis to wait on input changes before sending isochrone request
+    var isochroneDebounceMillis = 750;
+
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#exploreBikeTriangle',
@@ -26,7 +29,8 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
             submitExplore: 'section.explore button[type=submit]',
             submitSearch: '.sidebar-search button[type="submit"]',
             typeahead: 'section.explore input.typeahead',
-            wheelchairDiv: '#exploreWheelchair'
+            wheelchairDiv: '#exploreWheelchair',
+            isochroneInput: '.isochrone-input'
         }
     };
     var options = {};
@@ -50,6 +54,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
+        datepicker.on('dp.change', clickedExplore);
 
         $(options.selectors.modeSelector).change($.proxy(changeMode, this));
 
@@ -67,6 +72,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
 
         setFromUserPreferences();
         changeMode();
+
+        // Respond to changes on all isochrone input fields
+        $(options.selectors.isochroneInput).on('input change', clickedExplore);
     }
 
     SidebarExploreControl.prototype = {
@@ -76,17 +84,11 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         setDestinationSidebar: setDestinationSidebar
     };
 
-    return SidebarExploreControl;
-
-    function changeMode() {
-        bikeOptions.changeMode(options.selectors);
-    }
-
     /**
      * Set user preferences before fetching isochrone.
+     * This function has been debounced to cut down on requests.
      */
-    function clickedExplore() {
-
+    var clickedExplore = _.debounce(function() {
         if (addressHasError(exploreLatLng)) {
             return;
         }
@@ -130,6 +132,12 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         UserPreferences.setPreference('mode', mode);
 
         fetchIsochrone(date, exploreMinutes, otpOptions);
+    }, isochroneDebounceMillis);
+
+    return SidebarExploreControl;
+
+    function changeMode() {
+        bikeOptions.changeMode(options.selectors);
     }
 
     /**

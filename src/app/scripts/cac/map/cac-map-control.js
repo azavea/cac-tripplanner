@@ -66,6 +66,16 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
     ].join('');
 
+    // Variables used for limiting to one isochrone request at a time.
+    // Unlike the planTrip request, the isochrone request cannot be handled
+    // solely via debounce, due to differences in the way the isochrone
+    // request flows through the system. There are actions that take place
+    // on this module (drawing the isochrone on the map), and then actions
+    // that take place on the sidebar module (generating the destinations),
+    // so doing the limiting correctly is more of a challenge.
+    var activeIsochroneRequest = null;
+    var pendingIsochroneRequest = null;
+
     function MapControl(options) {
         this.events = events;
         this.eventNames = eventNames;
@@ -207,28 +217,63 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     }
 
     /**
+     * Makes an isochrone request. Only allows one isochrone request at a time.
+     * If another request comes in while one is active, the results of the active
+     * request will be discarded upon completion, and the new query issued.
+     *
+     * @param {Deferred} A jQuery Deferred object used for resolution
+     * @param {Object} Parameters to be sent along with the request
+     */
+    function getIsochrone(deferred, params) {
+        // Check if there's already an active request. If there is one,
+        // then we can't make a query yet -- store it as pending.
+        // If there was already a pending query, immediately resolve it.
+        if (activeIsochroneRequest) {
+            if (pendingIsochroneRequest) {
+                pendingIsochroneRequest.deferred.resolve();
+            }
+            pendingIsochroneRequest = { deferred: deferred, params: params };
+            return;
+        }
+
+        // Set the active isochrone request and make query
+        activeIsochroneRequest = { deferred: deferred, params: params };
+        fetchReachable(params).then(function(data) {
+            activeIsochroneRequest = null;
+            if (pendingIsochroneRequest) {
+                // These results are already out of date. Don't display them, and instead
+                // send off the pending request.
+                deferred.resolve();
+
+                var pending = pendingIsochroneRequest;
+                pendingIsochroneRequest = null;
+                getIsochrone(pending.deferred, pending.params);
+                return;
+            }
+
+            if (!tabControl.isTabShowing('explore')) {
+                // if user has switched away from the explore tab, do not show results
+                deferred.resolve();
+                return;
+            }
+            drawIsochrone(data.isochrone);
+            // also draw 'matched' list of locations
+            drawDestinations(data.matched);
+            deferred.resolve(data.matched);
+        }, function(error) {
+            activeIsochroneRequest = null;
+            pendingIsochroneRequest = null;
+            console.error(error);
+        });
+    }
+
+    /**
      * Get travelshed and destinations within it, then display results on map.
     */
     function fetchIsochrone(coordsOrigin, when, exploreMinutes, otpParams) {
         var deferred = $.Deferred();
         // clear results of last search
         clearDiscoverPlaces();
-
-        var getIsochrone = function(params) {
-            fetchReachable(params).then(function(data) {
-                if (!tabControl.isTabShowing('explore')) {
-                    // if user has switched away from the explore tab, do not show results
-                    deferred.resolve();
-                    return;
-                }
-                drawIsochrone(data.isochrone);
-                // also draw 'matched' list of locations
-                drawDestinations(data.matched);
-                deferred.resolve(data.matched);
-            }, function(error) {
-                console.error(error);
-            });
-        };
 
         var formattedTime = when.format('hh:mma');
         var formattedDate = when.format('YYYY/MM/DD');
@@ -243,16 +288,16 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
 
         if (coordsOrigin) {
             params.fromPlace = coordsOrigin.join(',');
-            getIsochrone(params);
+            getIsochrone(deferred, params);
         } else {
             locateUser().then(function(data) {
                 params.fromPlace = data.join(',');
-                getIsochrone(params);
+                getIsochrone(deferred, params);
             }, function(error) {
                 console.error('Could not geolocate user');
                 console.error(error);
                 // use default location
-                getIsochrone(params);
+                getIsochrone(deferred, params);
             });
         }
 
