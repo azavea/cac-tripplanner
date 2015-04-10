@@ -319,7 +319,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         // Save selections to user preferences
         UserPreferences.setPreference('from', origin);
         UserPreferences.setPreference('fromText', originText);
-        UserPreferences.setPreference('to', Utils.convertDestinationToFeature(destination));
+        UserPreferences.setPreference('to', destination);
         UserPreferences.setPreference('toText', destinationText);
 
         // Get directions

@@ -36,12 +36,17 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
 
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
+        this.destinationAdapter = destinationAdapterFactory();
         this.eventsAdapter = null;   // TODO: Add when we have an events search endpoint
 
         this.$element = $(selector).typeahead(this.options, {
             name: 'currentlocation',
             displayKey: 'name',
             source: this.locationAdapter
+        }, {
+            name: 'featured',
+            displayKey: 'name',
+            source: this.destinationAdapter.ttAdapter()
         }, {
             name: 'destinations',
             displayKey: 'text',
@@ -57,9 +62,7 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
-        if (dataset === 'currentlocation') {
-            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
-        } else {
+        if (dataset === 'destinations') {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
                     // location will be null if no results found
@@ -67,26 +70,30 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
                 }, function (error) {
                     console.error(error);
                 });
+        } else {
+            // current location, or featured locations
+            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
 
-    // Unused, but might add later?
-    /*
     function destinationAdapterFactory() {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
                 url: '/api/destinations/search?text=%QUERY',
-                filter: function (list) {
-                    return list && list.length ? $.map(list, function (item) { return item.fields; }) : [];
+                filter: function (response) {
+                    if (response && response.destinations.length) {
+                        return response.destinations;
+                    } else {
+                        return [];
+                    }
                 }
             }
         });
         adapter.initialize();
         return adapter;
     }
-    */
 
     function locationAdapter(query, callback) {
         if (thisLocation) {

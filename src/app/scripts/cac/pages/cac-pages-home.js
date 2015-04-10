@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, Templates, UserPreferences, Utils) {
+CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -185,7 +185,7 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences, Utils) {
             if (data.destinations && data.destinations.length) {
                 var destination = data.destinations[0];
                 UserPreferences.setPreference('toText', addr);
-                UserPreferences.setPreference('to', Utils.convertDestinationToFeature(destination));
+                UserPreferences.setPreference('to', destination);
                 UserPreferences.setPreference('method', 'directions');
                 window.location = '/map';
             } else {
@@ -213,4 +213,4 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences, Utils) {
         }
     }
 
-})(jQuery, CAC.Home.Templates, CAC.User.Preferences, CAC.Utils);
+})(jQuery, CAC.Home.Templates, CAC.User.Preferences);

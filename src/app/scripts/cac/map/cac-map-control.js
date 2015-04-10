@@ -280,7 +280,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 });
             },
             pointToLayer: function (geojson, latLng) {
-                var popupOptions = { maxWidth: 300 };
+                var popupOptions = { maxWidth: 600 };
                 var popupTemplate = ['<p><b>{{geojson.properties.name}}</b></p>',
                                      '<p>{{geojson.properties.description}}',
                                      '</p><a href="{{geojson.properties.website_url}}" ',
