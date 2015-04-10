@@ -18,8 +18,8 @@ CAC.Search.SearchParams = (function () {
     var searchCategories = ['Address',
                             'Postal',
                             'Coordinate System',
-                            //'Populated Place',
-                            //'POI'
+                            'Populated Place',
+                            'POI'
                             ].join(',');
 
     var module = {

@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
+CAC.Search.Typeahead = (function ($, SearchParams) {
     'use strict';
 
     var defaults = {
@@ -62,11 +62,7 @@ CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
         var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
-        if (dataset === 'currentlocation') {
-            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
-        } else if (dataset === 'featured') {
-            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
-        } else {
+        if (dataset === 'destinations') {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
                     // location will be null if no results found
@@ -74,6 +70,9 @@ CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
                 }, function (error) {
                     console.error(error);
                 });
+        } else {
+            // current location, or featured locations
+            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
 
@@ -85,10 +84,7 @@ CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
                 url: '/api/destinations/search?text=%QUERY',
                 filter: function (response) {
                     if (response && response.destinations.length) {
-                        var list = _.map(response.destinations, function (item) {
-                            return Utils.convertDestinationToFeature(item);
-                        });
-                        return list;
+                        return response.destinations;
                     } else {
                         return [];
                     }
@@ -153,4 +149,4 @@ CAC.Search.Typeahead = (function (_, $, SearchParams, Utils) {
         return adapter;
     }
 
-})(_, jQuery, CAC.Search.SearchParams, CAC.Utils);
+})(jQuery, CAC.Search.SearchParams);
