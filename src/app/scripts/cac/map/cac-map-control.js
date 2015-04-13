@@ -66,13 +66,15 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
     ].join('');
 
-    // Variables used for limiting to one isochrone request at a time.
-    // Unlike the planTrip request, the isochrone request cannot be handled
-    // solely via debounce, due to differences in the way the isochrone
-    // request flows through the system. There are actions that take place
-    // on this module (drawing the isochrone on the map), and then actions
-    // that take place on the sidebar module (generating the destinations),
-    // so doing the limiting correctly is more of a challenge.
+    /**
+     * Variables used for limiting to one isochrone request at a time.
+     * Unlike the planTrip request, the isochrone request cannot be handled
+     * solely via debounce, due to differences in the way the isochrone
+     * request flows through the system. There are actions that take place
+     * on this module (drawing the isochrone on the map), and then actions
+     * that take place on the sidebar module (generating the destinations),
+     * so doing the limiting correctly is more of a challenge.
+     */
     var activeIsochroneRequest = null;
     var pendingIsochroneRequest = null;
 

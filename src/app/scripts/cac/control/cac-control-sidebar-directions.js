@@ -10,7 +10,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
     var METERS_PER_MILE = 1609.34;
 
     // Number of millis to wait on input changes before sending directions request
-    var directionDebounceMillis = 750;
+    var DIRECTION_DEBOUNCE_MILLIS = 750;
 
     var defaults = {
         selectors: {
@@ -229,12 +229,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         });
-    }, directionDebounceMillis);
+    }, DIRECTION_DEBOUNCE_MILLIS);
 
     return SidebarDirectionsControl;
 
     function changeMode() {
         bikeOptions.changeMode(options.selectors);
+        planTrip();
     }
 
     function clearDirections() {

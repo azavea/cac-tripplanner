@@ -9,7 +9,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
     var METERS_PER_MILE = 1609.34;
 
     // Number of millis to wait on input changes before sending isochrone request
-    var isochroneDebounceMillis = 750;
+    var ISOCHRONE_DEBOUNCE_MILLIS = 750;
 
     var defaults = {
         selectors: {
@@ -132,12 +132,13 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         UserPreferences.setPreference('mode', mode);
 
         fetchIsochrone(date, exploreMinutes, otpOptions);
-    }, isochroneDebounceMillis);
+    }, ISOCHRONE_DEBOUNCE_MILLIS);
 
     return SidebarExploreControl;
 
     function changeMode() {
         bikeOptions.changeMode(options.selectors);
+        clickedExplore();
     }
 
     /**
