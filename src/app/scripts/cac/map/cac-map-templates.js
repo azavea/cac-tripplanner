@@ -19,7 +19,7 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
 
     function destinationBlock(destination) {
         var source = [
-            '<a class="block block-destination">',
+            '<a class="block block-destination" id="destination-{{ d.id }}">',
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<h5 class="distance-minutes"></h5>',
