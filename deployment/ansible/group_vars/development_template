@@ -6,6 +6,7 @@ production: false
 # for cac_secrets
 allowed_hosts: ['127.0.0.1', 'localhost']
 internal_ips: ['0.0.0.0', '127.0.0.1']
+postgis_version: [2, 1, 5]
 aws_access_key_id: ''
 aws_secret_access_key: ''
 aws_storage_bucket_name: ''

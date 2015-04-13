@@ -67,6 +67,9 @@ ALLOWED_HOSTS = secrets['allowed_hosts']
 
 INTERNAL_IPS = tuple(secrets['internal_ips'])
 
+# Needed in order to call collectstatic without a DB (during AMI creation)
+POSTGIS_VERSION = tuple(secrets['postgis_version'])
+
 # Application definition
 
 INSTALLED_APPS = (
