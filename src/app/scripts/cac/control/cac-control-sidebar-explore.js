@@ -222,13 +222,13 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
      * Query OTP for travel time to a destination, then put it in the side panel.
      *
      * @param {Object} destination Destination put in the sidebar
-     * @param {Object} $container jQuery-selected HTML snippet in the sidebar for the destination
      */
-    function setDestinationDistance(destination, $container) {
+    function setDestinationDistance(destination) {
 
         // helper to set the text snippet
         function setDestinationMinutesText(distanceMinutes) {
-            $container.find(options.selectors.distanceMinutesText)
+            var $destination = $('#destination-' + destination.id);
+            $destination.find(options.selectors.distanceMinutesText)
                 .text(distanceMinutes + ' minutes away');
         }
 
@@ -279,7 +279,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         var $container = $('<div></div>').addClass('destinations');
         $.each(destinations, function (i, destination) {
             var $destination = $(MapTemplates.destinationBlock(destination));
-
             $destination.click(function () {
                 setDestinationSidebarDetail(destination);
                 mapControl.highlightDestination(destination.id, { panTo: true });
@@ -290,9 +289,12 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
                 mapControl.highlightDestination(null);
             });
             $container.append($destination);
-            setDestinationDistance(destination, $destination);
         });
         $(options.selectors.destinations).html($container);
+        // go find distances once the sidebar templates have been added to DOM
+        $.each(destinations, function(i, destination) {
+            setDestinationDistance(destination);
+        });
         $(options.selectors.sidebarContainer).height(400);
     }
 
