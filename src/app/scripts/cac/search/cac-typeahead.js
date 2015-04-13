@@ -21,7 +21,8 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
 
     var defaults = {
         highlight: true,
-        minLength: 2
+        minLength: 2,
+        autoselect: true
     };
     var defaultTypeaheadKey = 'default';
     var thisLocation = null;
@@ -40,10 +41,6 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         this.eventsAdapter = null;   // TODO: Add when we have an events search endpoint
 
         this.$element = $(selector).typeahead(this.options, {
-            name: 'currentlocation',
-            displayKey: 'name',
-            source: this.locationAdapter
-        }, {
             name: 'featured',
             displayKey: 'name',
             source: this.destinationAdapter.ttAdapter()
@@ -51,6 +48,10 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
             name: 'destinations',
             displayKey: 'text',
             source: this.suggestAdapter.ttAdapter()
+        }, {
+            name: 'currentlocation',
+            displayKey: 'name',
+            source: this.locationAdapter
         });
 
         this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
