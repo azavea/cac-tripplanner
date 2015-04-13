@@ -36,6 +36,7 @@
 
 - name: Write secrets file
   template: src=cac_secrets.j2 dest=/etc/cac_secrets
+  when: develop or production
   notify: Restart cac-tripplanner-app
 
 - name: Configure Gunicorn settings
