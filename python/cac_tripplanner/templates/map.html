@@ -22,7 +22,7 @@
                     </h4>
                 </div>
                 <div class="options search">
-                    <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
+                    <input id="exploreTime" class="isochrone-input" type="number" value="20" min="5" step="5" max="120" />
                     <span class="text">minutes via</span>
                     <select id="exploreModeSelector" class="selectpicker">
                         <option value="TRANSIT,WALK" selected>Transit</option>
@@ -42,7 +42,7 @@
                 <div id="moreExplore" class="more-options">
                     <div id="exploreBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
-                        <select class="form-control selectpicker">
+                        <select class="form-control selectpicker isochrone-input">
                             <option selected value="neutral">Neutral</option>
                             <option value="faster">Faster</option>
                             <option value="flatter">Flatter</option>
@@ -52,13 +52,13 @@
                     <div id="exploreMaxWalk">
                         <h6>Maximum walking distance</h6>
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="0.5">
+                            <input type="text" class="form-control isochrone-input" placeholder="0.5">
                             <span class="input-group-addon">miles</span>
                         </div>
                     </div>
                     <div id="exploreWheelchair" class="input-group">
                         <label class="checkbox-inline">
-                            <input type="checkbox"> <h6>Wheelchair accessible</h6>
+                            <input type="checkbox" class="isochrone-input"> <h6>Wheelchair accessible</h6>
                         </label>
                     </div>
                 </div>
@@ -101,13 +101,17 @@
                 <div id="moreDirections" class="more-options">
                     <div class="btn-group" data-toggle="buttons">
                         <label class="btn btn-primary active">
-                            <input type="radio" name="arriveByDirections" value="departAt" />Depart At</label>
+                            <input type="radio" name="arriveByDirections"
+                                   value="departAt" class="direction-input" />
+                            Depart At</label>
                         <label class="btn btn-primary">
-                            <input type="radio" name="arriveByDirections" value="arriveBy" />Arrive By</label>
+                            <input type="radio" name="arriveByDirections"
+                                   value="arriveBy" class="direction-input" />
+                            Arrive By</label>
                     </div>
                     <div id="directionsBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
-                        <select class="form-control selectpicker">
+                        <select class="form-control selectpicker direction-input">
                             <option selected value="neutral">Neutral</option>
                             <option value="faster">Faster</option>
                             <option value="flatter">Flatter</option>
@@ -117,13 +121,13 @@
                     <div id="directionsMaxWalk">
                         <h6>Maximum walking distance</h6>
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="0.5">
+                            <input type="text" class="form-control direction-input" placeholder="0.5">
                             <span class="input-group-addon">miles</span>
                         </div>
                     </div>
                     <div id="directionsWheelchair" class="input-group">
                         <label class="checkbox-inline">
-                            <input type="checkbox"> <h6>Wheelchair accessible</h6>
+                            <input type="checkbox" class="direction-input"> <h6>Wheelchair accessible</h6>
                         </label>
                     </div>
                 </div>
