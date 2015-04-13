@@ -21,7 +21,8 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
 
     var defaults = {
         highlight: true,
-        minLength: 2
+        minLength: 2,
+        autoselect: true
     };
     var defaultTypeaheadKey = 'default';
     var thisLocation = null;
