@@ -6,6 +6,7 @@ otp_process_mem: 2G
 otp_repo: "https://github.com/OpenTripPlanner/OpenTripPlanner.git"
 otp_version: "otp-0.14.0"
 otp_jarfile: "./target/otp-0.14.0.jar"
+otp_session_timeout_s: 90
 
 s3_otp_data: cleanair-otp-data
 

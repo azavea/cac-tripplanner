@@ -11,4 +11,4 @@ respawn
 setuid {{ app_username }}
 chdir {{ root_app_dir }}
 
-exec gunicorn --config {{ root_conf_dir }}/gunicorn.py cac_tripplanner.wsgi
+exec gunicorn --config {{ root_conf_dir }}/gunicorn.py --timeout {{ otp_session_timeout_s }} cac_tripplanner.wsgi
