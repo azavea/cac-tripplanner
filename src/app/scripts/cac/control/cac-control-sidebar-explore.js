@@ -86,8 +86,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
     };
 
     function movedPoint(position) {
-        console.log('movedPoint');
-
         // show spinner while loading
         $(options.selectors.destinations).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
@@ -109,18 +107,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
             } else {
                 console.error('Failed to reverse geocode position. Received response:');
                 console.error(data);
-                // TODO: show error
-
+                setError('Could not find street address for location.');
                 $(options.selectors.destinations).removeClass('hidden');
                 $(options.selectors.spinner).addClass('hidden');
-                /*
-                $(options.selectors.spinner).addClass('hidden');
-                itineraryListControl.setItinerariesError({
-                    msg: 'Could not find street address for location.'
-                });
-                $(options.selectors.directions).addClass(options.selectors.resultsClass);
-                itineraryListControl.show();
-                */
             }
         });
     }
@@ -198,9 +187,14 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
                 $(options.selectors.spinner).addClass('hidden');
                 $(options.selectors.destinations).removeClass('hidden');
                 if (!destinations) {
-                    return;
+                    setError('No destinations found.');
                 }
                 setDestinationSidebar(destinations);
+            }, function (error) {
+                console.error(error);
+                $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.destinations).removeClass('hidden');
+                setError('Could not find travelshed.');
             }
         );
     }
@@ -341,8 +335,13 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         $(options.selectors.sidebarContainer).height(400);
     }
 
-    function setError(msg) {
+    function setError(message) {
         // TODO: set error message in destinations sidebar error
+        var $container = $('<div></div>').addClass('destinations');
+        var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
+        $container.append($errorTemplate);
+        $(options.selectors.destinations).html($container);
+        $(options.selectors.sidebarContainer).height(200);
     }
 
     function setDestinationSidebarDetail(destination) {

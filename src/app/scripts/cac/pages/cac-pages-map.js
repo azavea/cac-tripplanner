@@ -71,8 +71,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     }
 
     function moveIsochrone(event, position) {
-        console.log('moved!');
-        console.log(position);
         sidebarExploreControl.movedPoint(position);
     }
 
