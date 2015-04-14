@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function ($, SearchParams) {
+CAC.Search.Typeahead = (function (_, $, SearchParams) {
     'use strict';
 
     var defaults = {
@@ -39,7 +39,7 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         this.locationAdapter = locationAdapter;
         this.destinationAdapter = destinationAdapterFactory();
 
-        var createTypeahead = function() {
+        var createTypeahead = _.bind(function() {
             this.$element = $(selector).typeahead(this.options, {
                 name: 'featured',
                 displayKey: 'name',
@@ -55,18 +55,18 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
             });
 
             this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
-        }.bind(this);
+        }, this);
 
         // create typeahead immediately, without current location to boost search results
         createTypeahead();
 
         // try to geolocate user for improved suggestions, then re-create typeahead if successful
-        var setAdapter = function() {
+        var setAdapter = _.bind(function() {
             this.suggestAdapter = suggestAdapterFactory();
             // destroy before re-cretating
             $(selector).typeahead('destroy', 'NoCached');
             createTypeahead();
-        }.bind(this);
+        }, this);
 
         checkLocation(setAdapter);
     }
@@ -181,4 +181,4 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         return adapter;
     }
 
-})(jQuery, CAC.Search.SearchParams);
+})(_, jQuery, CAC.Search.SearchParams);
