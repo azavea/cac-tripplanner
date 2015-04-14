@@ -25,7 +25,8 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         destinationPopupClick: 'cac:map:control:destinationpopup',
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
-        destinationMoved: 'cac:map:control:destinationmoved'
+        destinationMoved: 'cac:map:control:destinationmoved',
+        geocodeMarkerMoved: 'cac:map:control:geocodemoved'
     };
     var basemaps = {};
     var overlays = {};
@@ -413,6 +414,17 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     }
 
     function setGeocodeMarker(latLng) {
+        // helper for when marker dragged to new place
+        function markerDrag(event) {
+            var marker = event.target;
+            var position = marker.getLatLng();
+            var latlng = new L.LatLng(position.lat, position.lng);
+            marker.setLatLng(latlng, {draggable: true});
+            map.panTo(latlng); // allow user to drag marker off map
+
+            events.trigger(eventNames.geocodeMarkerMoved, position);
+        }
+
         if (latLng === null) {
             if (geocodeMarker) {
                 map.removeLayer(geocodeMarker);
@@ -428,8 +440,9 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 prefix: 'fa',
                 markerColor: 'darkred'
             });
-            geocodeMarker = new L.marker(latLng, { icon: icon });
+            geocodeMarker = new L.marker(latLng, { icon: icon, draggable: true });
             geocodeMarker.addTo(map);
+            geocodeMarker.on('dragend', markerDrag);
         }
         map.panTo(latLng);
     }

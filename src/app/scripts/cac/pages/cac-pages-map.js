@@ -42,6 +42,9 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
 
+        mapControl.events.on(mapControl.eventNames.geocodeMarkerMoved,
+                             $.proxy(moveIsochrone, this));
+
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
             tabControl: sidebarTabControl
@@ -65,6 +68,12 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     function moveDestination(event, position) {
         sidebarDirectionsControl.moveOriginDestination('destination', position);
+    }
+
+    function moveIsochrone(event, position) {
+        console.log('moved!');
+        console.log(position);
+        sidebarExploreControl.movedPoint(position);
     }
 
     function onSidebarTabShown(event, tabId) {

@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, Typeahead, UserPreferences) {
+CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, Routing, Typeahead, UserPreferences, Utils) {
 
     'use strict';
 
@@ -80,9 +80,50 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
     SidebarExploreControl.prototype = {
         events: events,
         eventNames: eventNames,
+        movedPoint: movedPoint,
         setAddress: setAddress,
         setDestinationSidebar: setDestinationSidebar
     };
+
+    function movedPoint(position) {
+        console.log('movedPoint');
+
+        // show spinner while loading
+        $(options.selectors.destinations).addClass('hidden');
+        $(options.selectors.spinner).removeClass('hidden');
+
+        // update location
+        exploreLatLng = [position.lat, position.lng];
+
+        Geocoder.reverse(position.lat, position.lng).then(function (data) {
+            if (data && data.address) {
+                var location = Utils.convertReverseGeocodeToFeature(data);
+                /*jshint camelcase: false */
+                var fullAddress = data.address.Match_addr;
+                /*jshint camelcase: true */
+                UserPreferences.setPreference('originText', fullAddress);
+                UserPreferences.setPreference('origin', location);
+                $('div.address > h4').html(MapTemplates.addressText(fullAddress));
+                $(options.selectors.exploreOrigin).typeahead('val', fullAddress);
+                clickedExplore();
+            } else {
+                console.error('Failed to reverse geocode position. Received response:');
+                console.error(data);
+                // TODO: show error
+
+                $(options.selectors.destinations).removeClass('hidden');
+                $(options.selectors.spinner).addClass('hidden');
+                /*
+                $(options.selectors.spinner).addClass('hidden');
+                itineraryListControl.setItinerariesError({
+                    msg: 'Could not find street address for location.'
+                });
+                $(options.selectors.directions).addClass(options.selectors.resultsClass);
+                itineraryListControl.show();
+                */
+            }
+        });
+    }
 
     /**
      * Set user preferences before fetching isochrone.
@@ -300,6 +341,10 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         $(options.selectors.sidebarContainer).height(400);
     }
 
+    function setError(msg) {
+        // TODO: set error message in destinations sidebar error
+    }
+
     function setDestinationSidebarDetail(destination) {
         var $detail = $(MapTemplates.destinationDetail(destination));
         $detail.find('.back').on('click', onDestinationDetailBackClicked);
@@ -361,5 +406,5 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         }
     }
 
-})(jQuery, CAC.Control.BikeOptions, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead,
-   CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeOptions, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Routing.Plans,
+   CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
