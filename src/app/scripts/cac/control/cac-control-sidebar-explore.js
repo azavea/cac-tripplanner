@@ -169,6 +169,8 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, MapTemplates, Routing, T
         if (key === 'search') {
             UserPreferences.setPreference('origin', location);
             setAddress(location);
+
+            clickedExplore();
         } else {
             console.error('Unrecognized typeahead key ' + key + ' in explore tab.');
         }

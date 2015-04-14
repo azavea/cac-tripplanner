@@ -282,6 +282,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             UserPreferences.setPreference(prefKey, location);
             UserPreferences.setPreference(prefKey + 'Text', location.name);
             setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
+
+            planTrip();
         } else {
             console.error('unrecognized key in onTypeaheadSelected: ' + key);
         }
