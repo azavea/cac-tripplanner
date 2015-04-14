@@ -36,6 +36,8 @@ except (IOError, NameError):
         'otp_url': 'http://192.168.8.26:8080/otp/routers/{router}/',
         'allowed_hosts': ['127.0.0.1', 'localhost'],
         'internal_ips': ['0.0.0.0', '127.0.0.1'],
+        'internal_ips': ['0.0.0.0', '127.0.0.1'],
+        'postgis_version': [2, 1, 5],
         'build_dir': '/opt/app/src',
         'production': False,
 
