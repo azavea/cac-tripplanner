@@ -19,7 +19,7 @@
             <span class="text">Where can I go in</span>
             <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
             <span class="text">minutes from</span>
-            <input id="exploreOrigin" class="typeahead" type="text"
+            <input id="exploreOrigin" class="typeahead" type="search"
                 data-typeahead-key="origin" placeholder="City Hall" />
             <span class="text">using</span>
             <select id="exploreMode" class="selectpicker">
@@ -34,10 +34,10 @@
         </form>
         <form id="directions" class="hidden">
             <span class="text">How do I get from</span>
-            <input id="directionsFrom" class="typeahead" type="text"
+            <input id="directionsFrom" class="typeahead" type="search"
                 data-typeahead-key="from" placeholder="Current location" />
             <span class="text">to</span>
-            <input id="directionsTo" class="typeahead" type="text"
+            <input id="directionsTo" class="typeahead" type="search"
                 data-typeahead-key="to" placeholder="City Hall" />
             <span class="text">using</span>
             <select id="directionsMode" class="selectpicker">
