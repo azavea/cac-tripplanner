@@ -197,6 +197,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 'opacity': 0.8
             }
         }).addTo(map);
+        map.fitBounds(isochroneLayer.getBounds());
     }
 
     /**
