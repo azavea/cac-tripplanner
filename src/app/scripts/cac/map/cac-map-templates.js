@@ -4,6 +4,7 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
     var module = {
         addressText: addressText,
         destinationBlock: destinationBlock,
+        destinationError: destinationError,
         destinationDetail: destinationDetail,
         eventPopup: eventPopup
     };
@@ -28,6 +29,18 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({d: destination});
+        return html;
+    }
+
+    function destinationError(error) {
+        var source = [
+            '<a class="block block-destination">',
+                '<div class="modes"></div>',
+                '<h3>{{ error.message }}</h3>',
+            '</a>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({error: error});
         return html;
     }
 
