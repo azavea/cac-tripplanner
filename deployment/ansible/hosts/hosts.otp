@@ -1,0 +1,2 @@
+[production]
+otp ansible_connection=local

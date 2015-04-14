@@ -51,6 +51,7 @@
   django_manage: command=migrate
                  app_path=/opt/app/python/cac_tripplanner
   notify: Restart cac-tripplanner-app
+  when: develop or test
 
 - name: Copy nginx config
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default

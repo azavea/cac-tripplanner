@@ -11,7 +11,7 @@
 - name: Download OTP Data
   local_action: command aws s3 sync s3://cleanair-otp-data/ ../../otp_data/
   sudo: no
-  when: production or test
+  when: test
 
 - name: Copy OTP Data
   copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664

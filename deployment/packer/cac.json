@@ -1,0 +1,94 @@
+{
+  "variables": {
+    "local_project_directory": ".",
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "aws_region": "us-east-1",
+    "ubuntu_ami": "ami-bccaf5d4",
+    "instance_type": "m3.medium",
+    "intermediate_directory": "/home/ubuntu/cac",
+    "destination_directory": "/opt/app",
+    "ansible_staging_directory": "/tmp/packer-provisioner-ansible-local"
+  },
+  "builders": [
+    {
+      "name": "app",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `ubuntu_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "App {{timestamp}}"
+    },
+    {
+      "name": "bastion",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `ubuntu_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "Bastion {{timestamp}}"
+    },
+    {
+      "name": "otp",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `ubuntu_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "ubuntu",
+      "ami_name": "OTP {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 10",
+        "sudo apt-get update",
+        "sudo apt-get -y dist-upgrade",
+        "mkdir -p {{user `ansible_staging_directory`}}",
+        "mkdir -p {{user `intermediate_directory`}}",
+        "sudo apt-get -y install build-essential python-dev python-pip git",
+        "sudo pip install ansible==1.8.4"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `local_project_directory`}}/",
+      "destination": "{{user `intermediate_directory`}}",
+      "only": ["app", "otp"]
+    },
+    {
+      "type": "file",
+      "source": "{{user `local_project_directory`}}/deployment/ansible/roles",
+      "destination": "{{user `ansible_staging_directory`}}"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv {{user `intermediate_directory`}} {{user `destination_directory`}}"
+      ],
+      "only": ["app", "otp"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/app.yml",
+      "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.app",
+      "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "only": ["app"]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/otp.yml",
+      "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.otp",
+      "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "only": ["otp"]
+    }
+  ]
+}
