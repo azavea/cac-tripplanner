@@ -38,23 +38,37 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
         this.destinationAdapter = destinationAdapterFactory();
-        this.eventsAdapter = null;   // TODO: Add when we have an events search endpoint
 
-        this.$element = $(selector).typeahead(this.options, {
-            name: 'featured',
-            displayKey: 'name',
-            source: this.destinationAdapter.ttAdapter()
-        }, {
-            name: 'destinations',
-            displayKey: 'text',
-            source: this.suggestAdapter.ttAdapter()
-        }, {
-            name: 'currentlocation',
-            displayKey: 'name',
-            source: this.locationAdapter
-        });
+        var createTypeahead = function() {
+            this.$element = $(selector).typeahead(this.options, {
+                name: 'featured',
+                displayKey: 'name',
+                source: this.destinationAdapter.ttAdapter()
+            }, {
+                name: 'destinations',
+                displayKey: 'text',
+                source: this.suggestAdapter.ttAdapter()
+            }, {
+                name: 'currentlocation',
+                displayKey: 'name',
+                source: this.locationAdapter
+            });
 
-        this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+            this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+        }.bind(this);
+
+        // create typeahead immediately, without current location to boost search results
+        createTypeahead();
+
+        // try to geolocate user for improved suggestions, then re-create typeahead if successful
+        var setAdapter = function() {
+            this.suggestAdapter = suggestAdapterFactory();
+            // destroy before re-cretating
+            $(selector).typeahead('destroy', 'NoCached');
+            createTypeahead();
+        }.bind(this);
+
+        checkLocation(setAdapter);
     }
 
     return CACTypeahead;
@@ -96,34 +110,38 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
         return adapter;
     }
 
+    function checkLocation(callback) {
+        if ('geolocation' in navigator) {
+            // set a watch on current location the first time it's requested
+            navigator.geolocation.watchPosition(function(position) {
+                var list = [{
+                    name: 'Current Location',
+                    feature: {
+                        geometry: {
+                            x: position.coords.longitude,
+                            y: position.coords.latitude
+                        }
+                    }
+                }];
+                thisLocation = list;
+                callback(thisLocation);
+            }, function (error) {
+                console.error('geolocation', error);
+            }, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 10000
+            });
+        } else {
+            console.error('geolocation not supported');
+        }
+    }
+
     function locationAdapter(query, callback) {
         if (thisLocation) {
             callback(thisLocation);
         } else {
-            if ('geolocation' in navigator) {
-                // set a watch on current location the first time it's requested
-                navigator.geolocation.watchPosition(function(position) {
-                    var list = [{
-                        name: 'Current Location',
-                        feature: {
-                            geometry: {
-                                x: position.coords.longitude,
-                                y: position.coords.latitude
-                            }
-                        }
-                    }];
-                    thisLocation = list;
-                    callback(thisLocation);
-                }, function (error) {
-                    console.error('geolocation', error);
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 10000
-                });
-            } else {
-                console.error('geolocation not supported');
-            }
+            checkLocation(callback);
         }
     }
 
@@ -135,6 +153,19 @@ CAC.Search.Typeahead = (function ($, SearchParams) {
             category: SearchParams.searchCategories,
             f: 'pjson'
         };
+
+        // rank results by distance, if we have user location
+        if (thisLocation) {
+            params.location = [
+                thisLocation[0].feature.geometry.x,
+                thisLocation[0].feature.geometry.y
+            ].join(',');
+            params.distance = 16093; // ~10mi.
+
+            // Due to bug, cannot specify both searchExtent and location
+            // https://geonet.esri.com/thread/132900
+            delete params.searchExtent;
+        }
 
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
