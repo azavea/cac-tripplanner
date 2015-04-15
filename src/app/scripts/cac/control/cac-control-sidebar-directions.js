@@ -200,14 +200,14 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
                 return;
             }
             // Add the itineraries to the map, highlighting the first one
-            var highlight = true;
+            var isFirst = true;
             mapControl.clearItineraries();
             _.forIn(itineraries, function (itinerary) {
-                mapControl.plotItinerary(itinerary);
-                itinerary.highlight(highlight);
-                if (highlight) {
+                mapControl.plotItinerary(itinerary, isFirst);
+                itinerary.highlight(isFirst);
+                if (isFirst) {
                     currentItinerary = itinerary;
-                    highlight = false;
+                    isFirst = false;
                 }
             });
 

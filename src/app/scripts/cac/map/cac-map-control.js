@@ -375,14 +375,17 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     }
 
     /**
-     * Plots an itinerary on a map
+     * Plots an itinerary on a map, optionally zooming to fit.
      *
-     * @param {object} map Leaflet map object
-     * @param {integer} id id of itinerary to highlight
+     * @param {Object} itinerary CAC.Routing.Itinerary object with geojson to draw
+     * @param {Boolean} makeFit If true, zoom to fit itinerary in view
      */
-    function plotItinerary(itinerary) {
+    function plotItinerary(itinerary, makeFit) {
         itineraries[itinerary.id] = itinerary;
-        itinerary.geojson.addTo(map);
+        var layer = itinerary.geojson.addTo(map);
+        if (makeFit) {
+            map.fitBounds(layer.getBounds());
+        }
     }
 
 
