@@ -15,6 +15,19 @@
     right: 0;
     background: $light-gray;
 
+    .leaflet-minimize {
+        background-color: #FFFFFF;
+        color: #707070;
+        cursor: pointer;
+        float: right;
+        border: 2px solid #707070;
+        border-radius: 3px;
+        line-height: 10px;
+        margin-top: -10px;
+        padding-right: 1px;
+        z-index: 99999;
+    }
+
     .leaflet-control-layers {
         margin-right: 30px;
         margin-bottom: 30px;
