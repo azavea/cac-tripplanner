@@ -22,22 +22,33 @@
                     </h4>
                 </div>
                 <div class="options search">
-                    <input id="exploreTime" class="isochrone-input" type="number" value="20" min="5" step="5" max="120" />
+                    <input id="exploreTime" class="isochrone-input input-string-right-margin" type="number" value="20" min="5" step="5" max="120" />
                     <span class="text">minutes via</span>
-                    <select id="exploreModeSelector" class="selectpicker">
-                        <option value="TRANSIT,WALK" selected>Transit</option>
-                        <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
-                        <option value="WALK">Walk Only</option>
-                        <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
-                        <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
-                    </select>
-                    <h6>Departure day and time</h6>
-                    <div class="input-group date" id="datetimeExplore">
-                        <input type="text" class="form-control"
-                            placeholder="Now" />  <span class="input-group-addon">
-                            <span class="glyphicon-calendar glyphicon"></span></span>
+                    <div id="exploreModeSelector" class="btn-toolbar transit-types-container">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
+                                <input type="radio" name="anytime-mode" value="walking" checked="">
+                                <i class="icon-walk"></i>
+                            </label>
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
+                                <input type="radio" name="anytime-mode" value="biking">
+                                <i class="icon-bike"></i>
+                            </label>
+                        </div>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
+                                <input type="checkbox" name="public-transit-mode" value="train">
+                                <i class="icon-train"></i>
+                            </label>
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Bus &amp; Subway">
+                                <input type="checkbox" name="public-transit-mode" value="bus">
+                                <i class="icon-bus"></i>
+                            </label>
+                        </div>
                     </div>
+                    <span class="text">departing</span>
+
+                    <input id="datetimeExplore" class="isochrone-input input-datetimepicker input-string-left-margin" type="text" value="20" min="5" step="5" max="120" placeholder="now" />
                 </div>
                 <div id="moreExplore" class="more-options">
                     <div id="exploreBikeTriangle">
@@ -83,21 +94,42 @@
             </div>
             <div class="sidebar-block sidebar-options">
                 <div class="options search">
-                    <span class="text">via</span>
-                    <select id="directionsModeSelector" class="selectpicker">
-                        <option value="TRANSIT,WALK" selected>Transit</option>
-                        <option value="BICYCLE">Bike</option>
-                        <option value="BICYCLE,TRANSIT">Bike + Transit</option>
-                        <option value="WALK">Walk Only</option>
-                        <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
-                        <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
-                    </select>
-                    <h6>Day and time</h6>
-                    <div class="input-group date" id="datetimeDirections">
-                        <input type="text" class="form-control"
-                            placeholder="Now" />  <span class="input-group-addon">
-                            <span class="glyphicon-calendar glyphicon"></span></span>
+                    <span class="text">traveling via</span>
+                    <div id="directionsModeExplorer" class="btn-toolbar transit-types-container">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
+                                <input type="radio" name="anytime-mode" value="walking" checked="">
+                                <i class="icon-walk"></i>
+                            </label>
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
+                                <input type="radio" name="anytime-mode" value="biking">
+                                <i class="icon-bike"></i>
+                            </label>
+                        </div>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
+                                <input type="checkbox" name="public-transit-mode" value="train">
+                                <i class="icon-train"></i>
+                            </label>
+                            <label class="btn btn-primary btn-transit" title="" data-original-title="Bus &amp; Subway">
+                                <input type="checkbox" name="public-transit-mode" value="bus">
+                                <i class="icon-bus"></i>
+                            </label>
+                        </div>
                     </div>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default dropdown-toggle dropdown-toggle-text" data-toggle="dropdown" aria-expanded="false">
+                        departing <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">departing</a></li>
+                        <li><a href="#">arriving</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                      </ul>
+                    </div>
+                    <input id="datetimeDirections" class="isochrone-input input-datetimepicker" type="text" value="20" min="5" step="5" max="120" placeholder="now" />
                 </div>
                 <div id="moreDirections" class="more-options">
                     <div class="btn-group" data-toggle="buttons">

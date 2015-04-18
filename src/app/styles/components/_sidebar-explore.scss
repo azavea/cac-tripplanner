@@ -27,10 +27,10 @@
             right: 0;
             top: 0;
             padding: 14px 14px;
-            color: #AAA;
+            color: #ccc;
 
             &:hover {
-                color: black;
+                color: #000;
             }
         }
     }
@@ -78,10 +78,9 @@
             }
         }
         .options {
-            height: 124px;
-            background: $light-gray;
-            margin: 0 -14px;
-            padding: 0;
+            height: auto;
+            background: #fff;
+            padding: 14px 0;
 
             .date {
             }
@@ -95,7 +94,7 @@
                 border: none;
                 color: black;
                 padding: 10px 14px;
-                margin: 0 15px 0 12px;
+                margin: 0;
                 height: 44px;
                 vertical-align: top;
 

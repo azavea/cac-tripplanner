@@ -39,6 +39,11 @@
             border: none;
             background: white;
             padding: 5px 6px;
+            color: #ccc;
+
+            &:hover {
+                color: #000;
+            }
         }
     }
     .sidebar-options {
@@ -84,10 +89,9 @@
             }
         }
         .options {
-            height: 124px;
-            background: $light-gray;
-            margin: 0 -14px;
-            padding: 0;
+            height: auto;
+            background: #fff;
+            padding: 14px 0;
 
             .date {
             }
