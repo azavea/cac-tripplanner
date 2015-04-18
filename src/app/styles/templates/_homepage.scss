@@ -1,5 +1,5 @@
 .homepage {
-    .jumbotron {
+    & > .jumbotron {
         margin-bottom: 0;
         position: relative;
         height: 650px;
@@ -35,11 +35,14 @@
                 }
             }
         }
-        .search {
+        & > .search {
             position: absolute;
             width: 100%;
             bottom: 0;
             margin: 0;
+            input:not([type="checkbox"]) {
+                height: auto;
+            }
         }
     }
     .content {
