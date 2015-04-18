@@ -53,7 +53,11 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         bikeOptions = new BikeOptions();
 
         // initiallize date/time picker
-        datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
+        datepicker = $(options.selectors.datepicker).datetimepicker({
+            useCurrent: true,
+            format: 'h:mma on M/D/YY',
+            showTodayButton: true,
+        });
         datepicker.on('dp.change', clickedExplore);
 
         $(options.selectors.modeSelector).change($.proxy(changeMode, this));
