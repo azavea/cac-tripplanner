@@ -6,9 +6,6 @@ input {
     &[type="search"] {
         border: none;
         background: none;
-        -webkit-box-sizing: content-box;
-        -moz-box-sizing: content-box;
-        box-sizing: content-box;
         -webkit-appearance: searchfield;
     }
 

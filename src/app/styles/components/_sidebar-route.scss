@@ -3,6 +3,10 @@
     width: 100%;
     top: 40px;
 
+    .tt-hint {
+        padding: 16px;
+    }
+
     &.show-results {
         .sidebar-clip {
             height: 100%;
@@ -11,6 +15,10 @@
 
     .sidebar-search {
         padding: 0;
+
+        input[type="search"] {
+            width: 100%;
+        }
 
         span.twitter-typeahead {
             width: 100%;
