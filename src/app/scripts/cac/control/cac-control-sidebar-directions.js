@@ -101,7 +101,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             });
 
         setFromUserPreferences();
-        changeMode();
 
         // Respond to changes on all direction input fields
         $(options.selectors.directionInput).on('input change', planTrip);

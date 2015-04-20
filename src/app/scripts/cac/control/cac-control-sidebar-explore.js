@@ -75,7 +75,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
 
         setFromUserPreferences();
-        changeMode();
 
         // Respond to changes on all isochrone input fields
         $(options.selectors.isochroneInput).on('input change', clickedExplore);
@@ -405,7 +404,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         }
 
         if (method === 'explore') {
-            fetchIsochrone(when, exploreTime, otpOptions);
+            clickedExplore();
         }
     }
 
