@@ -27,6 +27,8 @@ Building AMIs
 
 Launching AWS Stacks
 ------------------------
+Note: the file majorkirby.py in deployment/cloudformation is a direct copy of a development version of major kirby. Once major kirby has been released, this file should be removed, and installation should occur via pip.
+
 1. Copy `deployment/default_template.yaml` to `deployment/default.yaml` and edit variables
 2. In the project directory, for a set of `Blue` stacks in the `Production` environment, run: `deployment/cac-stack.py launch-stacks --stack-type prod --stack-color blue --aws-access-key-id YOUR_ACCESS_KEY --aws-secret-access-key YOUR_SECRET_KEY --aws-role-arn YOUR_ASSUMED_ROLE_ARN`
 3. The previous command will do the following:
