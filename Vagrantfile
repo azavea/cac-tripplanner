@@ -158,7 +158,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     otp.vm.synced_folder ".", "/vagrant", disabled: true
 
     # OpenTripPlanner
-    otp.vm.network "forwarded_port", guest: 8080, host: 9090
+    otp.vm.network "forwarded_port", guest: 80, host: 9090
 
     otp.ssh.forward_x11 = true
 

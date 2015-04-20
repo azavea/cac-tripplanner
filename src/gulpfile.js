@@ -39,9 +39,19 @@ var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
 
 // Define the minification order for our js files
 var scriptOrder = [
-    // Needs to come first, since it defines the CAC global
+    // We aren't using an automatic dependency management system,
+    // so this needs to be managed manually. This is very error-prone
+    // and we should consider moving to something more manageable.
     '**/cac.js',
-    '**/search/cac-search-params.js',
+    '**/utils.js',
+    '**/cac/search/cac-search-params.js',
+    '**/cac/map/cac-map-templates.js',
+    '**/cac/user/*.js',
+    '**/cac/search/*.js',
+    '**/cac/routing/*.js',
+    '**/cac/control/*.js',
+    '**/cac/map/*.js',
+    '**/cac/home/*.js',
     '**/*.js'
 ];
 

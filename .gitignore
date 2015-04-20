@@ -46,3 +46,6 @@ nosetests.xml
 
 # Ansible roles
 deployment/ansible/roles/azavea.*
+
+# AWS stack launching parameters
+deployment/default.yaml

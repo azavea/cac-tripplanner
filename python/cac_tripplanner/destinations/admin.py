@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.gis import admin
 
 from .forms import DestinationForm
@@ -18,12 +19,20 @@ class DestinationAdmin(admin.OSMGeoAdmin):
     map_template = 'admin/cac-geocoding-map.html'
 
     # Include geocoder dependencies
-    extra_js = [
-        'https://code.jquery.com/jquery-2.1.3.min.js',
-        '/static/scripts/vendor/lodash.js',
-        '/static/scripts/main/cac/cac.js',
-        '/static/scripts/main/cac/search/cac-geocoder.js'
-    ]
+    jquery = 'https://code.jquery.com/jquery-2.1.3.min.js'
+    if settings.DEBUG:
+        extra_js = [
+            jquery,
+            '/static/scripts/vendor/lodash.js',
+            '/static/scripts/main/cac/cac.js',
+            '/static/scripts/main/cac/search/cac-geocoder.js'
+        ]
+    else:
+        extra_js = [
+            jquery,
+            '/static/scripts/vendor.js',
+            '/static/scripts/main.js'
+        ]
 
     def make_published(self, request, queryset):
         queryset.update(published=True)
