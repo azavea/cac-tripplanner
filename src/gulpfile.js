@@ -31,9 +31,7 @@ var stat = {
     images: staticRoot + '/images'
 };
 
-// The multiple-select module needs special treatment, because its bower.json file is incomplete
-var boostrapSelectRoot = 'bower_components/bootstrap-select/dist/css';
-var multiSelectRoot = 'bower_components/multiple-select';
+var bootstrapSelectRoot = 'bower_components/bootstrap-select/dist/';
 var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
 var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
 
@@ -84,7 +82,7 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [multiSelectRoot + '/jquery.multiple.select.js'])
+    return copyBowerFiles('**/*.js', [])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -97,7 +95,7 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles('**/*.css', [multiSelectRoot + '/multiple-select.css'])
+    return copyBowerFiles('**/*.css', [bootstrapSelectRoot + 'css/bootstrap-select.css'])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -107,13 +105,13 @@ gulp.task('copy:vendor-css', function() {
 });
 
 gulp.task('copy:bootstrap-select-map', function() {
-    return copyBowerFiles('**.*.map', [boostrapSelectRoot + '/bootstrap-select.css.map'])
+    return copyBowerFiles('**.*.map', [bootstrapSelectRoot + 'css/bootstrap-select.css.map'])
         .pipe(concat('bootstrap-select.css.map'))
         .pipe(gulp.dest(stat.styles));
 });
 
 gulp.task('copy:vendor-images', function() {
-    return copyBowerFiles('**/*.png', [multiSelectRoot + '/multiple-select.png'])
+    return copyBowerFiles('**/*.png', [])
         .pipe(gulp.dest(stat.images + '/vendor'));
 });
 
@@ -138,7 +136,7 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [multiSelectRoot + '/jquery.multiple.select.js'])
+    return copyBowerFiles('**/*.js', [])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 

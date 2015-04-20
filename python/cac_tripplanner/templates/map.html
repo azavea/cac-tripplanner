@@ -111,19 +111,10 @@
                         </div>
                     </div>
                     <br>
-                    <div class="btn-group">
-                      <!-- TODO: When a user selects from .dropdown-menu, that
-                           selection should replace the text in .dropdown-toggle.
-                           It should look a lot like a select input field, except
-                           we want to have more control over the styling.   -->
-                      <button type="button" class="btn btn-default dropdown-toggle dropdown-toggle-text" data-toggle="dropdown" aria-expanded="false">
-                        departing <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">departing</a></li>
-                        <li><a href="#">arriving</a></li>
-                      </ul>
-                    </div>
+                    <select id="directionsDepartAt" class="selectpicker" data-width="auto">
+                        <option value="departAt" selected>departing</option>
+                        <option value="arriveBy'">arriving</option>
+                    </select>
                     <input id="datetimeDirections" class="isochrone-input input-datetimepicker" type="text" value="20" min="5" step="5" max="120" placeholder="now" />
                 </div>
                 <div id="moreDirections" class="more-options">

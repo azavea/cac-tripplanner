@@ -12,25 +12,26 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
     // Number of millis to wait on input changes before sending directions request
     var DIRECTION_DEBOUNCE_MILLIS = 750;
 
+    // TODO: ugh.
+    // 'input[name="arriveByDirections"]:checked'
     var defaults = {
         selectors: {
             arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
-            checkboxArriveBy: 'input[name="arriveByDirections"]:checked',
             datepicker: '#datetimeDirections',
+            departAtSelect: '#directionsDepartAt',
             destination: 'section.directions input.destination',
             directions: '.directions',
+            directionInput: '.direction-input',
             errorClass: 'error',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
-            modeSelector: '#directionsModeSelector',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             typeahead: 'section.directions input.typeahead',
-            wheelchairDiv: '#directionsWheelchair',
-            directionInput: '.direction-input'
+            wheelchairDiv: '#directionsWheelchair'
         }
     };
     var options = {};
