@@ -40,11 +40,9 @@ except (IOError, NameError):
         'build_dir': '/opt/app/src',
         'production': False,
 
+        # For storing images on s3, set 'use_s3_storage' to True and specify the bucket name.
+        # AWS access key and secret access keys will be obtained via the IAM role.
         'use_s3_storage': False,
-
-        # Settings only needed if 'use_s3_storage' is set to True
-        'aws_access_key_id': '',
-        'aws_secret_access_key': '',
         'aws_storage_bucket_name': '',
 
         'default_admin_username': 'admin',
@@ -204,10 +202,10 @@ WPADMIN = {
 OTP_URL = secrets['otp_url']
 
 # Settings for S3 storage
+# No need to specify AWS access and secret keys -- they are pulled from
+# the instance metadata by boto.
 if secrets['use_s3_storage']:
     DEFAULT_FILE_STORAGE = 'cac_tripplanner.custom_storages.PublicS3BotoStorage'
-    AWS_ACCESS_KEY_ID = secrets['aws_access_key_id']
-    AWS_SECRET_ACCESS_KEY = secrets['aws_secret_access_key']
     AWS_STORAGE_BUCKET_NAME = secrets['aws_storage_bucket_name']
 
 # Default user
