@@ -33,7 +33,7 @@ except (IOError, NameError):
         # order to view the page on an external machine, this URL must be
         # overridden via the secrets file. This can't be automatically set
         # to the host machine's DNS here, because this code runs in a VM.
-        'otp_url': 'http://192.168.8.26:8080/otp/routers/{router}/',
+        'otp_url': 'http://192.168.8.26/otp/routers/{router}/',
         'allowed_hosts': ['127.0.0.1', 'localhost'],
         'internal_ips': ['0.0.0.0', '127.0.0.1'],
         'postgis_version': [2, 1, 5],

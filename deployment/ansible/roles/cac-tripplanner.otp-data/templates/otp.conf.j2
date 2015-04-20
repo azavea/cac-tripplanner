@@ -9,5 +9,5 @@ setuid {{ otp_user }}
 
 chdir {{ otp_bin_dir }}
 script
-    exec /usr/bin/java -Xmx{{otp_process_mem}} -jar {{ otp_jarfile }} --server --analyst --port {{ otp_web_port }} --basePath {{ otp_data_dir}} --graphs {{ otp_data_dir }} --router default
+    exec /usr/bin/authbind /usr/bin/java -Xmx{{otp_process_mem}} -jar {{ otp_jarfile }} --server --analyst --port 80 --basePath {{ otp_data_dir}} --graphs {{ otp_data_dir }} --router default
 end script
