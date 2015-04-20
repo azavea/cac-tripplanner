@@ -22,14 +22,24 @@
             <input id="exploreOrigin" class="typeahead" type="search"
                 data-typeahead-key="origin" placeholder="City Hall" />
             <span class="text">using</span>
-            <select id="exploreMode" class="selectpicker">
-                <option value="TRANSIT,WALK" selected>Transit</option>
-                <option value="BICYCLE">Bike</option>
-                <option value="BICYCLE,TRANSIT">Bike + Transit</option>
-                <option value="WALK">Walk Only</option>
-                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
-                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
-            </select>
+            <div id="directionsMode" class="btn-toolbar transit-types-container">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
+                        <input class="selectpicker" type="radio" name="anytime-mode" value="walking" checked="">
+                        <i class="md md-directions-walk"></i>
+                    </label>
+                    <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
+                        <input class="selectpicker" type="radio" name="anytime-mode" value="biking">
+                        <i class="md md-directions-bike"></i>
+                    </label>
+                </div>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
+                        <input class="selectpicker" type="checkbox" name="public-transit-mode" value="train">
+                        <i class="md md-directions-transit"></i>
+                    </label>
+                </div>
+            </div>
             <button type="submit">&rarr;</button>
         </form>
         <form id="directions" class="hidden">
@@ -40,14 +50,24 @@
             <input id="directionsTo" class="typeahead" type="search"
                 data-typeahead-key="to" placeholder="City Hall" />
             <span class="text">using</span>
-            <select id="directionsMode" class="selectpicker">
-                <option value="TRANSIT,WALK" selected>Transit</option>
-                <option value="BICYCLE">Bike</option>
-                <option value="BICYCLE,TRANSIT">Bike + Transit</option>
-                <option value="WALK">Walk Only</option>
-                <option value="BUSISH,WALK">Transit (Prefer Bus)</option>
-                <option value="TRAINISH,WALK">Transit (Prefer Trains)</option>
-            </select>
+            <div id="directionsMode" class="btn-toolbar transit-types-container">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
+                        <input class="selectpicker" type="radio" name="anytime-mode" value="walking" checked="">
+                        <i class="md md-directions-walk"></i>
+                    </label>
+                    <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
+                        <input class="selectpicker" type="radio" name="anytime-mode" value="biking">
+                        <i class="md md-directions-bike"></i>
+                    </label>
+                </div>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
+                        <input class="selectpicker" type="checkbox" name="public-transit-mode" value="train">
+                        <i class="md md-directions-transit"></i>
+                    </label>
+                </div>
+            </div>
             <button type="submit">&rarr;</button>
         </form>
     </div>

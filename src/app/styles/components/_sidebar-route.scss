@@ -3,6 +3,10 @@
     width: 100%;
     top: 40px;
 
+    .tt-hint {
+        padding: 16px;
+    }
+
     &.show-results {
         .sidebar-clip {
             height: 100%;
@@ -11,6 +15,10 @@
 
     .sidebar-search {
         padding: 0;
+
+        input[type="search"] {
+            width: 100%;
+        }
 
         span.twitter-typeahead {
             width: 100%;
@@ -31,6 +39,11 @@
             border: none;
             background: white;
             padding: 5px 6px;
+            color: #ccc;
+
+            &:hover {
+                color: #000;
+            }
         }
     }
     .sidebar-options {
@@ -76,10 +89,9 @@
             }
         }
         .options {
-            height: 124px;
-            background: $light-gray;
-            margin: 0 -14px;
-            padding: 0;
+            height: auto;
+            background: #fff;
+            padding: 14px 0;
 
             .date {
             }
