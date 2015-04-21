@@ -22,7 +22,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
             exploreTime: '#exploreTime',
             isochroneInput: '.isochrone-input',
             maxWalkDiv: '#exploreMaxWalk',
-            modeSelector: '#exploreModeSelector',
+            modeSelectors: '#exploreModes input',
             optionsMore: '.sidebar-options .more-options',
             optionsViewMore: '.sidebar-options .view-more',
             sidebarContainer: '.explore .sidebar-clip',
@@ -60,7 +60,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         });
         datepicker.on('dp.change', clickedExplore);
 
-        $(options.selectors.modeSelector).change($.proxy(changeMode, this));
+        $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
 
         $(options.selectors.optionsViewMore).click(showOptions);
 
@@ -127,7 +127,8 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         }
 
         var exploreMinutes = $(options.selectors.exploreTime).val();
-        var mode = $(options.selectors.modeSelector).val();
+        // TODO: read mode
+        //var mode = $(options.selectors.modeSelector).val();
 
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
@@ -279,7 +280,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         }
 
         // distance not cached; go query for it
-        var mode = $(options.selectors.modeSelector).val();
+
+        // TODO: read mode
+        //var mode = $(options.selectors.modeSelector).val();
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
         if (!date) {
@@ -379,7 +382,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
 
         $(options.selectors.exploreOrigin).typeahead('val', originText);
         $(options.selectors.exploreTime).val(exploreTime);
-        $(options.selectors.modeSelector).val(mode);
+
+        // TODO: set mode
+        //$(options.selectors.modeSelector).val(mode);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // use current date/time when loading from preferences

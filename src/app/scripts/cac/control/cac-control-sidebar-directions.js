@@ -28,9 +28,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
-            transitCheckBox: '#directionsModes input[name="public-transit-mode"]',
             typeahead: 'section.directions input.typeahead',
-            walkBikeRadio: '#directionsModes input:radio',
             wheelchairDiv: '#directionsWheelchair'
         }
     };
@@ -139,7 +137,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             date = moment();
         }
 
-        var mode = getMode();
+        var mode = bikeOptions.getMode(options.selectors.modeSelectors);
+        console.log(mode);
 
         var origin = directions.origin;
         var destination = directions.destination;
@@ -221,39 +220,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
     return SidebarDirectionsControl;
 
-    function getMode() {
-        var mode = $(options.selectors.walkBikeRadio + ':checked').val();
-        var transit = $(options.selectors.transitCheckBox).prop('checked');
-        mode += transit ? ',TRANSIT' : '';
-        return mode;
-    }
-
     function changeMode() {
-        var mode = getMode();
-        bikeOptions.changeMode(options.selectors, mode);
+        bikeOptions.changeMode(options.selectors);
         planTrip();
-    }
-
-    function setMode(mode) {
-        var walkBikeVal = $(options.selectors.walkBikeRadio + ':checked').val();
-        var haveTransit = $(options.selectors.transitCheckBox + ':checked').val();
-
-        // toggle transit button selection, if needed
-        // NB: cannot just .click() button here, or wind up in inconsistent state
-        if (mode.indexOf('TRANSIT') > -1 && !haveTransit) {
-            $(options.selectors.transitCheckBox).prop('checked', true);
-            $(options.selectors.transitCheckBox).parents('label').toggleClass('active');
-        } else if (mode.indexOf('TRANSIT') === -1 && haveTransit) {
-            $(options.selectors.transitCheckBox).prop('checked', false);
-            $(options.selectors.transitCheckBox).parents('label').toggleClass('active');
-        }
-
-        // switch walk/bike selection, if needed
-        if (mode.indexOf('BICYCLE') > -1 && walkBikeVal !== 'BICYCLE') {
-            $(options.selectors.walkBikeRadio + '[value=BICYCLE]').click();
-        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal === 'BICYCLE') {
-            $(options.selectors.walkBikeRadio + '[value=WALK]').click();
-        }
     }
 
     function clearDirections() {
@@ -364,7 +333,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
-        setMode(mode);
+        bikeOptions.setMode(options.selectors.modeSelectors, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         $(options.selectors.origin).typeahead('val', originText);
         $(options.selectors.destination).typeahead('val', destinationText);
@@ -432,7 +401,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         $(options.selectors.origin).typeahead('val', fromText);
         $(options.selectors.destination).typeahead('val', toText);
 
-        setMode(mode);
+        bikeOptions.setMode(options.selectors.modeSelectors, mode);
 
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
@@ -447,6 +416,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         initialLoad = false;
         if (from) {
+            //////////////////
+            // TODO: handle 'current location'
+            console.log(from);
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             if (method === 'directions') {
                 planTrip();

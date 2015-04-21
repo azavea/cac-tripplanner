@@ -24,15 +24,25 @@ CAC.Control.BikeOptions = (function ($) {
                 triangleSlopeFactor: 0.17,
                 triangleTimeFactor: 0.17
             }
+        },
+        modes: {
+            // used to suffix to mode inputs selector
+            walkBike: ':radio[name="anytime-mode"]',
+            transit: '[name="public-transit-mode"]'
         }
     };
 
+    var options = {};
+
     function BikeOptionsControl(params) {
-        this.options = $.extend({}, defaults, params);
+        options = $.extend({}, defaults, params);
+        this.options = options;
     }
 
     BikeOptionsControl.prototype = {
-        changeMode: changeMode
+        changeMode: changeMode,
+        getMode: getMode,
+        setMode: setMode
     };
 
     return BikeOptionsControl;
@@ -41,7 +51,8 @@ CAC.Control.BikeOptions = (function ($) {
      * Show/hide sidebar options based on the selected mode.
      * Expects both tabs to have the same selector names for the toggleable divs.
      */
-    function changeMode(selectors, mode) {
+    function changeMode(selectors) {
+        var mode = getMode(selectors.modeSelectors);
         if (mode && mode.indexOf('BICYCLE') > -1) {
             $(selectors.bikeTriangleDiv).removeClass('hidden');
             $(selectors.maxWalkDiv).addClass('hidden');
@@ -50,6 +61,38 @@ CAC.Control.BikeOptions = (function ($) {
             $(selectors.bikeTriangleDiv).addClass('hidden');
             $(selectors.maxWalkDiv).removeClass('hidden');
             $(selectors.wheelchairDiv).removeClass('hidden');
+        }
+    }
+
+    function getMode(modeSelectors) {
+        var mode = $(modeSelectors + options.modes.walkBike + ':checked').val();
+        var transit = $(modeSelectors + options.modes.transit).prop('checked');
+        mode += transit ? ',TRANSIT' : '';
+        return mode;
+    }
+
+    function setMode(modeSelectors, mode) {
+        var radioSelector = modeSelectors + options.modes.walkBike;
+        var transitSelector = modeSelectors + options.modes.transit;
+
+        var walkBikeVal = $(radioSelector + ':checked').val();
+        var haveTransit = $(transitSelector + ':checked').val();
+
+        // toggle transit button selection, if needed
+        // NB: cannot just .click() button here, or wind up in inconsistent state
+        if (mode.indexOf('TRANSIT') > -1 && !haveTransit) {
+            $(transitSelector).prop('checked', true);
+            $(transitSelector).parents('label').toggleClass('active');
+        } else if (mode.indexOf('TRANSIT') === -1 && haveTransit) {
+            $(transitSelector).prop('checked', false);
+            $(transitSelector).parents('label').toggleClass('active');
+        }
+
+        // switch walk/bike selection, if needed
+        if (mode.indexOf('BICYCLE') > -1 && walkBikeVal !== 'BICYCLE') {
+            $(radioSelector + '[value=BICYCLE]').click();
+        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal === 'BICYCLE') {
+            $(radioSelector + '[value=WALK]').click();
         }
     }
 
