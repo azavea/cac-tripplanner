@@ -24,13 +24,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             errorClass: 'error',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
-            modeSelectors: '#directionsModeExplorer input',
+            modeSelectors: '#directionsModes input',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
-            transitCheckBox: '#directionsModeExplorer input[name="public-transit-mode"]',
+            transitCheckBox: '#directionsModes input[name="public-transit-mode"]',
             typeahead: 'section.directions input.typeahead',
-            walkBikeRadio: '#directionsModeExplorer input:radio',
+            walkBikeRadio: '#directionsModes input:radio',
             wheelchairDiv: '#directionsWheelchair'
         }
     };

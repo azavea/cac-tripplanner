@@ -20,6 +20,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
             errorClass: 'error',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
+            isochroneInput: '.isochrone-input',
             maxWalkDiv: '#exploreMaxWalk',
             modeSelector: '#exploreModeSelector',
             optionsMore: '.sidebar-options .more-options',
@@ -29,8 +30,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
             submitExplore: 'section.explore button[type=submit]',
             submitSearch: '.sidebar-search button[type="submit"]',
             typeahead: 'section.explore input.typeahead',
-            wheelchairDiv: '#exploreWheelchair',
-            isochroneInput: '.isochrone-input'
+            wheelchairDiv: '#exploreWheelchair'
         }
     };
     var options = {};
@@ -342,7 +342,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
     }
 
     function setError(message) {
-        // TODO: set error message in destinations sidebar error
         var $container = $('<div></div>').addClass('destinations');
         var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
         $container.append($errorTemplate);
@@ -390,7 +389,8 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         var otpOptions = { mode: mode };
 
         if (mode.indexOf('BICYCLE') > -1) {
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'},
+                     bikeOptions.options.bikeTriangle[bikeTriangle]);
         } else {
             if (maxWalk) {
                 $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
