@@ -395,7 +395,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        console.log(to);
         directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
 
         $(options.selectors.origin).typeahead('val', fromText);

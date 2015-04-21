@@ -128,8 +128,6 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         }
 
         var exploreMinutes = $(options.selectors.exploreTime).val();
-        // TODO: read mode
-        //var mode = $(options.selectors.modeSelector).val();
 
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();

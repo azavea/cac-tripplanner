@@ -10,10 +10,10 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             destinationsContainer: '.destinations',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
-            directionsMode: '#directionsMode',
+            directionsMode: '#directionsMode input',
             directionsTo: '#directionsTo',
             exploreForm: '#explore',
-            exploreMode: '#exploreMode',
+            exploreMode: '#exploreMode input',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             spinner: '.sk-spinner',
@@ -57,7 +57,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     var submitDirections = function(event) {
         event.preventDefault();
         var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
-        console.log('have mode for directions: ' + mode);
         var fromText = $(options.selectors.directionsFrom).val();
         var toText = $(options.selectors.directionsTo).val();
 
@@ -75,14 +74,13 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         UserPreferences.setPreference('fromText', fromText);
         UserPreferences.setPreference('toText', toText);
 
-        //window.location = '/map';
+        window.location = '/map';
     };
 
     var submitExplore = function(event) {
         event.preventDefault();
         var exploreTime = $(options.selectors.exploreTime).val();
         var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
-        console.log('have mode for explore: ' + mode);
         var originText = $(options.selectors.exploreOrigin).val();
 
         if (!originText) {
@@ -95,7 +93,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('originText', originText);
 
-        //window.location = '/map';
+        window.location = '/map';
     };
 
     var loadFromPreferences = function loadFromPreferences() {
