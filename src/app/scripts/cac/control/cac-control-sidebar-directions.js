@@ -2,8 +2,8 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, MapTemplates, Routing,
-                                 Typeahead, UserPreferences, Utils) {
+CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder, MapTemplates,
+                                 Routing, Typeahead, UserPreferences, Utils) {
 
     'use strict';
 
@@ -42,7 +42,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         destination: null
     };
 
-    var bikeOptions = null;
+    var bikeModeOptions = null;
     var mapControl = null;
     var tabControl = null;
     var directionsListControl = null;
@@ -55,7 +55,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
-        bikeOptions = new BikeOptions();
+        bikeModeOptions = new BikeModeOptions();
 
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
@@ -137,7 +137,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             date = moment();
         }
 
-        var mode = bikeOptions.getMode(options.selectors.modeSelectors);
+        var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
         console.log(mode);
 
         var origin = directions.origin;
@@ -158,7 +158,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
             $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     bikeOptions.options.bikeTriangle[bikeTriangle]);
+                     bikeModeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -221,7 +221,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
     return SidebarDirectionsControl;
 
     function changeMode() {
-        bikeOptions.changeMode(options.selectors);
+        bikeModeOptions.changeMode(options.selectors);
         planTrip();
     }
 
@@ -333,7 +333,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
-        bikeOptions.setMode(options.selectors.modeSelectors, mode);
+        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         $(options.selectors.origin).typeahead('val', originText);
         $(options.selectors.destination).typeahead('val', destinationText);
@@ -401,7 +401,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         $(options.selectors.origin).typeahead('val', fromText);
         $(options.selectors.destination).typeahead('val', toText);
 
-        bikeOptions.setMode(options.selectors.modeSelectors, mode);
+        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
 
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
@@ -437,5 +437,5 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         }
     }
 
-})(jQuery, CAC.Control, CAC.Control.BikeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
+})(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

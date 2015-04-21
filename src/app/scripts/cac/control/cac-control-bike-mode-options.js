@@ -1,4 +1,4 @@
-CAC.Control.BikeOptions = (function ($) {
+CAC.Control.BikeModeOptions = (function ($) {
     'use strict';
 
     var defaults = {
@@ -34,18 +34,18 @@ CAC.Control.BikeOptions = (function ($) {
 
     var options = {};
 
-    function BikeOptionsControl(params) {
+    function BikeModeOptionsControl(params) {
         options = $.extend({}, defaults, params);
         this.options = options;
     }
 
-    BikeOptionsControl.prototype = {
+    BikeModeOptionsControl.prototype = {
         changeMode: changeMode,
         getMode: getMode,
         setMode: setMode
     };
 
-    return BikeOptionsControl;
+    return BikeModeOptionsControl;
 
     /**
      * Show/hide sidebar options based on the selected mode.
@@ -64,6 +64,11 @@ CAC.Control.BikeOptions = (function ($) {
         }
     }
 
+    /**
+     * Helper to return the mode string based on the buttons within the given input selector.
+     *
+     * * @param modeSelectors {String} jQuery selector like '#someId input'
+     */
     function getMode(modeSelectors) {
         var mode = $(modeSelectors + options.modes.walkBike + ':checked').val();
         var transit = $(modeSelectors + options.modes.transit).prop('checked');
@@ -71,6 +76,13 @@ CAC.Control.BikeOptions = (function ($) {
         return mode;
     }
 
+    /**
+     * Helper to set the appropriate buttons within the given input selector
+     * so that they match the mode string.
+     *
+     * @param modeSelectors {String} jQuery selector like '#someId input'
+     * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
+     */
     function setMode(modeSelectors, mode) {
         var radioSelector = modeSelectors + options.modes.walkBike;
         var transitSelector = modeSelectors + options.modes.transit;
