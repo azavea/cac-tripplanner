@@ -167,7 +167,7 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
-        clickedExplore();
+        fetchIsochrone(date, exploreMinutes, otpOptions);
     }, ISOCHRONE_DEBOUNCE_MILLIS);
 
     return SidebarExploreControl;
@@ -282,8 +282,7 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         }
 
         // distance not cached; go query for it
-
-        var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
+        var mode = UserPreferences.getPreference('mode');
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
         var date = picker.date();
         if (!date) {
@@ -295,7 +294,8 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeModeOptions.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'},
+                     bikeModeOptions.options.bikeTriangle[bikeTriangle]);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
             if (maxWalk) {

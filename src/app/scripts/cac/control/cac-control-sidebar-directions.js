@@ -115,7 +115,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {
-        if (initialLoad) {
+        if (initialLoad || !tabControl.isTabShowing('directions')) {
             return;
         }
 
@@ -138,8 +138,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
-        console.log(mode);
-
         var origin = directions.origin;
         var destination = directions.destination;
 
@@ -232,6 +230,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         directionsListControl.hide();
         $(options.selectors.directions).removeClass(options.selectors.resultsClass);
     }
+
 
     function onDirectionsBackClicked() {
         directionsListControl.hide();
@@ -415,16 +414,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
 
         initialLoad = false;
-        if (from) {
-            //////////////////
-            // TODO: handle 'current location'
-            console.log(from);
+        if (from && from.feature.geometry) {
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             if (method === 'directions') {
                 planTrip();
             }
         } else if (method === 'directions') {
-            // use current location if no directions origin set
+            // geolocate user, then plan
             mapControl.locateUser().then(function(data) {
                 directions.origin = [data[0], data[1]];
                 setDirectionsError('origin');
@@ -433,6 +429,15 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 console.error('Could not geolocate user');
                 console.error(error);
                 return;
+            });
+        } else {
+            // geolocate user, but do not plan yet (user is on the other tab)
+            mapControl.locateUser().then(function(data) {
+                directions.origin = [data[0], data[1]];
+                setDirectionsError('origin');
+            }, function(error) {
+                console.error('Could not geolocate user');
+                console.error(error);
             });
         }
     }

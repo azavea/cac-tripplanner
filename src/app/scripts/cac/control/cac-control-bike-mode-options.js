@@ -70,9 +70,9 @@ CAC.Control.BikeModeOptions = (function ($) {
      * * @param modeSelectors {String} jQuery selector like '#someId input'
      */
     function getMode(modeSelectors) {
-        var mode = $(modeSelectors + options.modes.walkBike + ':checked').val();
+        var mode = $(modeSelectors + options.modes.walkBike + ':checked').val() || 'WALK';
         var transit = $(modeSelectors + options.modes.transit).prop('checked');
-        mode += transit ? ',TRANSIT' : '';
+        mode = transit ? 'TRANSIT,' + mode : mode;
         return mode;
     }
 
@@ -91,20 +91,29 @@ CAC.Control.BikeModeOptions = (function ($) {
         var haveTransit = $(transitSelector + ':checked').val();
 
         // toggle transit button selection, if needed
-        // NB: cannot just .click() button here, or wind up in inconsistent state
+        // NB: cannot just .click() button here, or wind up in inconsistent state,
+        // particularly on page load.
         if (mode.indexOf('TRANSIT') > -1 && !haveTransit) {
             $(transitSelector).prop('checked', true);
-            $(transitSelector).parents('label').toggleClass('active');
+            $(transitSelector).parents('label').addClass('active');
         } else if (mode.indexOf('TRANSIT') === -1 && haveTransit) {
             $(transitSelector).prop('checked', false);
-            $(transitSelector).parents('label').toggleClass('active');
+            $(transitSelector).parents('label').removeClass('active');
         }
 
         // switch walk/bike selection, if needed
+        var $bikeButton = $(radioSelector + '[value=BICYCLE]');
+        var $walkButton = $(radioSelector + '[value=WALK]');
         if (mode.indexOf('BICYCLE') > -1 && walkBikeVal !== 'BICYCLE') {
-            $(radioSelector + '[value=BICYCLE]').click();
-        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal === 'BICYCLE') {
-            $(radioSelector + '[value=WALK]').click();
+            $bikeButton.prop('checked', true);
+            $bikeButton.parents('label').addClass('active');
+            $walkButton.prop('checked', false);
+            $walkButton.parents('label').removeClass('active');
+        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal !== 'WALK') {
+            $walkButton.prop('checked', true);
+            $walkButton.parents('label').addClass('active');
+            $bikeButton.prop('checked', false);
+            $bikeButton.parents('label').removeClass('active');
         }
     }
 
