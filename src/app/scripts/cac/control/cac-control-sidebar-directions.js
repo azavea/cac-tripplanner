@@ -10,13 +10,10 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
     var METERS_PER_MILE = 1609.34;
 
     // Number of millis to wait on input changes before sending directions request
-    var DIRECTION_DEBOUNCE_MILLIS = 750;
+    var DIRECTION_THROTTLE_MILLIS = 750;
 
-    // TODO: ugh.
-    // 'input[name="arriveByDirections"]:checked'
     var defaults = {
         selectors: {
-            arriveByButton: 'input[name="arriveByDirections"]:eq(1)',
             bikeTriangleDiv: '#directionsBikeTriangle',
             buttonPlanTrip: 'section.directions button[type=submit]',
             datepicker: '#datetimeDirections',
@@ -27,10 +24,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             errorClass: 'error',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
+            modeSelectors: '#directionsModeExplorer input',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
+            transitCheckBox: '#directionsModeExplorer input[name="public-transit-mode"]',
             typeahead: 'section.directions input.typeahead',
+            walkBikeRadio: '#directionsModeExplorer input:radio',
             wheelchairDiv: '#directionsWheelchair'
         }
     };
@@ -51,9 +51,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
     var itineraryListControl = null;
     var typeahead = null;
 
-    // Variables used for limiting to one plan request at a time
-    var activePlanRequest = false;
-    var pendingPlanRequest = false;
+    var initialLoad = true;
 
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -64,7 +62,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         // Plan a trip using information provided
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
 
-        $(options.selectors.modeSelector).change($.proxy(changeMode, this));
+        $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -97,12 +95,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
             directionsListControl.eventNames.directionHovered,
-            function(e, lon, lat){
+            function(e, lon, lat) {
                 mapControl.displayPoint(lon, lat);
             });
 
         setFromUserPreferences();
-        changeMode();
 
         // Respond to changes on all direction input fields
         $(options.selectors.directionInput).on('input change', planTrip);
@@ -117,17 +114,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
     /**
      * Set user preferences before planning trip.
-     * This function has been debounced to cut down on requests.
+     * Throttled to cut down on requests.
      */
-    var planTrip = _.debounce(function() {
-        // If there's already an open plan request, wait until it finishes.
-        // This is automatically handled gracefully via debounce.
-        if (activePlanRequest) {
-            pendingPlanRequest = true;
-            planTrip();
+    var planTrip = _.throttle(function() {
+        if (initialLoad) {
             return;
         }
-        pendingPlanRequest = false;
 
         if (!(directions.origin && directions.destination)) {
             setDirectionsError('origin');
@@ -147,12 +139,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             date = moment();
         }
 
-        var mode = $(options.selectors.modeSelector).val();
+        var mode = getMode();
+
         var origin = directions.origin;
         var destination = directions.destination;
 
         var arriveBy = false; // depart at time by default
-        if ($(options.selectors.checkboxArriveBy).val() === 'arriveBy') {
+        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
             arriveBy = true;
         }
 
@@ -165,7 +158,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeOptions.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'},
+                     bikeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -187,13 +181,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
-        activePlanRequest = true;
         Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
-            activePlanRequest = false;
-            if (pendingPlanRequest) {
-                // These results are already out of date. Don't display them.
-                return;
-            }
 
             $(options.selectors.spinner).addClass('hidden');
             if (!tabControl.isTabShowing('directions')) {
@@ -222,7 +210,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         }, function (error) {
-            activePlanRequest = false;
             $(options.selectors.spinner).addClass('hidden');
             mapControl.setOriginDestinationMarkers(null, null);
             mapControl.clearItineraries();
@@ -230,13 +217,43 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         });
-    }, DIRECTION_DEBOUNCE_MILLIS);
+    }, DIRECTION_THROTTLE_MILLIS);
 
     return SidebarDirectionsControl;
 
+    function getMode() {
+        var mode = $(options.selectors.walkBikeRadio + ':checked').val();
+        var transit = $(options.selectors.transitCheckBox).prop('checked');
+        mode += transit ? ',TRANSIT' : '';
+        return mode;
+    }
+
     function changeMode() {
-        bikeOptions.changeMode(options.selectors);
+        var mode = getMode();
+        bikeOptions.changeMode(options.selectors, mode);
         planTrip();
+    }
+
+    function setMode(mode) {
+        var walkBikeVal = $(options.selectors.walkBikeRadio + ':checked').val();
+        var haveTransit = $(options.selectors.transitCheckBox + ':checked').val();
+
+        // toggle transit button selection, if needed
+        // NB: cannot just .click() button here, or wind up in inconsistent state
+        if (mode.indexOf('TRANSIT') > -1 && !haveTransit) {
+            $(options.selectors.transitCheckBox).prop('checked', true);
+            $(options.selectors.transitCheckBox).parents('label').toggleClass('active');
+        } else if (mode.indexOf('TRANSIT') === -1 && haveTransit) {
+            $(options.selectors.transitCheckBox).prop('checked', false);
+            $(options.selectors.transitCheckBox).parents('label').toggleClass('active');
+        }
+
+        // switch walk/bike selection, if needed
+        if (mode.indexOf('BICYCLE') > -1 && walkBikeVal !== 'BICYCLE') {
+            $(options.selectors.walkBikeRadio + '[value=BICYCLE]').click();
+        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal === 'BICYCLE') {
+            $(options.selectors.walkBikeRadio + '[value=WALK]').click();
+        }
     }
 
     function clearDirections() {
@@ -347,10 +364,10 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
+        setMode(mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         $(options.selectors.origin).typeahead('val', originText);
         $(options.selectors.destination).typeahead('val', destinationText);
-        $(options.selectors.modeSelector).val(mode);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -414,11 +431,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
 
         $(options.selectors.origin).typeahead('val', fromText);
         $(options.selectors.destination).typeahead('val', toText);
-        $(options.selectors.modeSelector).val(mode);
+
+        setMode(mode);
+
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         if (arriveBy) {
-            $(options.selectors.arriveByButton).click();
+            $(options.selectors.departAtSelect).val('arriveBy');
          }
 
         if (method === 'directions') {
@@ -426,6 +445,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeOptions, Geocoder, Ma
             tabControl.setTab('directions');
         }
 
+        initialLoad = false;
         if (from) {
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             if (method === 'directions') {

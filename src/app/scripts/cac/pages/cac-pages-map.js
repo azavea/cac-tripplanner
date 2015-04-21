@@ -56,7 +56,11 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     // featured destination select
     function getDestinationDirections(event, destination) {
         mapControl.clearIsochrone();
-        sidebarDirectionsControl.clearDirections();
+        if (sidebarDirectionsControl) {
+            sidebarDirectionsControl.clearDirections();
+        } else {
+            console.log('No sidebar directions control?!');
+        }
         mapControl.setGeocodeMarker(null);
         sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);

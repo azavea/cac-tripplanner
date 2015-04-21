@@ -75,7 +75,6 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
 
         setFromUserPreferences();
-        changeMode();
 
         // Respond to changes on all isochrone input fields
         $(options.selectors.isochroneInput).on('input change', clickedExplore);
@@ -165,7 +164,7 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
-        fetchIsochrone(date, exploreMinutes, otpOptions);
+        clickedExplore();
     }, ISOCHRONE_DEBOUNCE_MILLIS);
 
     return SidebarExploreControl;
@@ -317,6 +316,9 @@ CAC.Control.SidebarExplore = (function ($, BikeOptions, Geocoder, MapTemplates, 
 
     function setDestinationSidebar(destinations) {
         destinationsCache = destinations;
+        if (!destinations) {
+            return;
+        }
         var $container = $('<div></div>').addClass('destinations');
         $.each(destinations, function (i, destination) {
             var $destination = $(MapTemplates.destinationBlock(destination));

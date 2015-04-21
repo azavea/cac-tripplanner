@@ -41,9 +41,8 @@ CAC.Control.BikeOptions = (function ($) {
      * Show/hide sidebar options based on the selected mode.
      * Expects both tabs to have the same selector names for the toggleable divs.
      */
-    function changeMode(selectors) {
-        var mode = $(selectors.modeSelector).val();
-        if (mode.indexOf('BICYCLE') > -1) {
+    function changeMode(selectors, mode) {
+        if (mode && mode.indexOf('BICYCLE') > -1) {
             $(selectors.bikeTriangleDiv).removeClass('hidden');
             $(selectors.maxWalkDiv).addClass('hidden');
             $(selectors.wheelchairDiv).addClass('hidden');
