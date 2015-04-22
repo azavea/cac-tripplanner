@@ -4,7 +4,7 @@ azavea.opentripplanner,0.3.2
 azavea.nginx,0.2.0
 azavea.nodejs,0.3.0
 azavea.packer,0.1.1
-azavea.pip,0.1.0
+azavea.pip,0.1.1
 azavea.python,0.1.0
 azavea.ruby,0.3.0
 azavea.virtualenv,0.1.0
