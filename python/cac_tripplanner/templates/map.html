@@ -10,8 +10,8 @@
         </div>
         <section class="explore" data-sidebar-tab="true">
             <div class="sidebar-block sidebar-search">
-                <input id="exploreOrigin" class="typeahead" data-typeahead-key="search" type="search"
-                placeholder="Search by location" />
+                <input id="exploreOrigin" class="typeahead" data-typeahead-key="search"
+                    type="search" placeholder="Search by location" />
                 <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
             </div>
             <div class="sidebar-block sidebar-options">
@@ -22,22 +22,29 @@
                     </h4>
                 </div>
                 <div class="options search">
-                    <input id="exploreTime" class="isochrone-input input-string-right-margin" type="number" value="20" min="5" step="5" max="120" />
+                    <input id="exploreTime" class="isochrone-input input-string-right-margin"
+                        type="number" value="20" min="5" step="5" max="120" />
                     <span class="text">minutes via</span>
-                    <div id="exploreModeSelector" class="btn-toolbar transit-types-container">
+                    <div id="exploreModes" class="btn-toolbar transit-types-container">
                         <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
-                                <input class="selectpicker" type="radio" name="anytime-mode" value="walking" checked="">
+                            <label class="btn btn-primary btn-transit active" title=""
+                                data-original-title="Walking">
+                                <input type="radio" name="anytime-mode"
+                                    value="WALK" checked />
                                 <i class="md md-directions-walk"></i>
                             </label>
-                            <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
-                                <input class="selectpicker" type="radio" name="anytime-mode" value="biking">
+                            <label class="btn btn-primary btn-transit" title=""
+                                data-original-title="Biking">
+                                <input type="radio" name="anytime-mode"
+                                    value="BICYCLE" />
                                 <i class="md md-directions-bike"></i>
                             </label>
                         </div>
                         <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
-                                <input class="selectpicker" type="checkbox" name="public-transit-mode" value="train">
+                            <label class="btn btn-primary btn-transit" title=""
+                                data-original-title="Transit">
+                                <input type="checkbox"
+                                    name="public-transit-mode" value="TRANSIT" />
                                 <i class="md md-directions-transit"></i>
                             </label>
                         </div>
@@ -45,7 +52,8 @@
                     <br>
                     <span class="text">departing</span>
 
-                    <input id="datetimeExplore" class="isochrone-input input-datetimepicker input-string-left-margin" type="text" value="20" min="5" step="5" max="120" placeholder="now" />
+                    <input id="datetimeExplore" class="isochrone-input input-datetimepicker"
+                        type="text" placeholder="now" />
                 </div>
                 <div id="moreExplore" class="more-options">
                     <div id="exploreBikeTriangle">
@@ -67,7 +75,8 @@
                     </div>
                     <div id="exploreWheelchair" class="input-group">
                         <label class="checkbox-inline">
-                            <input type="checkbox" class="isochrone-input"> <h6>Wheelchair accessible</h6>
+                            <input type="checkbox"
+                                class="isochrone-input" /> <h6>Wheelchair accessible</h6>
                         </label>
                     </div>
                 </div>
@@ -92,51 +101,38 @@
             <div class="sidebar-block sidebar-options">
                 <div class="options search">
                     <span class="text">traveling via</span>
-                    <div id="directionsModeExplorer" class="btn-toolbar transit-types-container">
+                    <div id="directionsModes" class="btn-toolbar transit-types-container">
                         <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary btn-transit active" title="" data-original-title="Walking">
-                                <input class="selectpicker" type="radio" name="anytime-mode" value="walking" checked="">
+                            <label class="btn btn-primary btn-transit active"
+                                title="" data-original-title="Walking">
+                                <input type="radio" name="anytime-mode" value="WALK" checked />
                                 <i class="md md-directions-walk"></i>
                             </label>
-                            <label class="btn btn-primary btn-transit" title="" data-original-title="Biking">
-                                <input class="selectpicker" type="radio" name="anytime-mode" value="biking">
+                            <label class="btn btn-primary btn-transit" title=""
+                                data-original-title="Biking">
+                                <input type="radio" name="anytime-mode" value="BICYCLE" />
                                 <i class="md md-directions-bike"></i>
                             </label>
                         </div>
                         <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary btn-transit" title="" data-original-title="Regional Rail">
-                                <input class="selectpicker" type="checkbox" name="public-transit-mode" value="train">
+                            <label class="btn btn-primary btn-transit" title=""
+                                data-original-title="Transit">
+                                <input type="checkbox"
+                                    name="public-transit-mode" value="TRANSIT" />
                                 <i class="md md-directions-transit"></i>
                             </label>
                         </div>
                     </div>
                     <br>
-                    <div class="btn-group">
-                      <!-- TODO: When a user selects from .dropdown-menu, that
-                           selection should replace the text in .dropdown-toggle.
-                           It should look a lot like a select input field, except
-                           we want to have more control over the styling.   -->
-                      <button type="button" class="btn btn-default dropdown-toggle dropdown-toggle-text" data-toggle="dropdown" aria-expanded="false">
-                        departing <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">departing</a></li>
-                        <li><a href="#">arriving</a></li>
-                      </ul>
-                    </div>
-                    <input id="datetimeDirections" class="isochrone-input input-datetimepicker" type="text" value="20" min="5" step="5" max="120" placeholder="now" />
+                    <select id="directionsDepartAt" class="selectpicker direction-input"
+                        data-width="auto">
+                        <option value="departAt" selected>departing</option>
+                        <option value="arriveBy">arriving</option>
+                    </select>
+                    <input id="datetimeDirections" class="direction-input input-datetimepicker"
+                        type="text" placeholder="now" />
                 </div>
                 <div id="moreDirections" class="more-options">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary active">
-                            <input type="radio" name="arriveByDirections"
-                                   value="departAt" class="direction-input" />
-                            Depart At</label>
-                        <label class="btn btn-primary">
-                            <input type="radio" name="arriveByDirections"
-                                   value="arriveBy" class="direction-input" />
-                            Arrive By</label>
-                    </div>
                     <div id="directionsBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control selectpicker direction-input">
@@ -150,13 +146,14 @@
                         <h6>Maximum walking distance</h6>
                         <div class="input-group">
                             <input type="number" class="form-control direction-input"
-                                placeholder="0.5" value="" min="0.1" step="0.1" >
+                                placeholder="0.5" value="" min="0.1" step="0.1" />
                             <span class="input-group-addon">miles</span>
                         </div>
                     </div>
                     <div id="directionsWheelchair" class="input-group">
                         <label class="checkbox-inline">
-                            <input type="checkbox" class="direction-input"> <h6>Wheelchair accessible</h6>
+                            <input type="checkbox"
+                                class="direction-input" /> <h6>Wheelchair accessible</h6>
                         </label>
                     </div>
                 </div>

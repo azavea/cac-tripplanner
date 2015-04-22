@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, Templates, UserPreferences) {
+CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -10,10 +10,10 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
             destinationsContainer: '.destinations',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
-            directionsMode: '#directionsMode',
+            directionsMode: '#directionsMode input',
             directionsTo: '#directionsTo',
             exploreForm: '#explore',
-            exploreMode: '#exploreMode',
+            exploreMode: '#exploreMode input',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             spinner: '.sk-spinner',
@@ -26,9 +26,11 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     };
     var destinationSearchUrl = '/api/destinations/search';
     var options = {};
+    var bikeModeOptions = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
+        bikeModeOptions = new BikeModeOptions();
     }
 
     Home.prototype.initialize = function () {
@@ -54,7 +56,7 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
 
     var submitDirections = function(event) {
         event.preventDefault();
-        var mode = $(options.selectors.directionsMode).val();
+        var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
         var fromText = $(options.selectors.directionsFrom).val();
         var toText = $(options.selectors.directionsTo).val();
 
@@ -78,7 +80,7 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
     var submitExplore = function(event) {
         event.preventDefault();
         var exploreTime = $(options.selectors.exploreTime).val();
-        var mode = $(options.selectors.exploreMode).val();
+        var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
         var originText = $(options.selectors.exploreOrigin).val();
 
         if (!originText) {
@@ -111,14 +113,14 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
 
         $(options.selectors.exploreOrigin).typeahead('val', originText);
         $(options.selectors.exploreTime).val(exploreTime);
-        $(options.selectors.exploreMode).val(mode);
+        bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
         var fromText = UserPreferences.getPreference('fromText');
         var toText = UserPreferences.getPreference('toText');
         $(options.selectors.directionsFrom).typeahead('val', fromText);
         $(options.selectors.directionsTo).typeahead('val', toText);
-        $(options.selectors.directionsMode).val(mode);
+        bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
 
     return Home;
@@ -213,4 +215,4 @@ CAC.Pages.Home = (function ($, Templates, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.Home.Templates, CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeModeOptions, CAC.Home.Templates, CAC.User.Preferences);
