@@ -410,7 +410,7 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         }
 
         if (method === 'explore') {
-            clickedExplore();
+            fetchIsochrone(when, exploreTime, otpOptions);
         }
     }
 
