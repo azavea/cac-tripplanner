@@ -1,8 +1,9 @@
-CAC.Map.Templates = (function (Handlebars, Utils) {
+CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     'use strict';
 
     var module = {
         addressText: addressText,
+        bikeSharePopup: bikeSharePopup,
         destinationBlock: destinationBlock,
         destinationError: destinationError,
         destinationDetail: destinationDetail,
@@ -15,6 +16,43 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
         var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
         var template = Handlebars.compile(source);
         var html = template({address: address});
+        return html;
+    }
+
+    // Helper to convert bike share API hours to a more readable format
+    function reformatBikeShareHours(timeString) {
+        var time = moment(timeString, 'HH:mm:ss');
+        if (!time.isValid()) {
+            // parsing failed; stick with the string the API gave us
+            console.warn('Could not parse time string ' + timeString);
+            return timeString;
+        }
+        return time.format('hh:mm A');
+    }
+
+    function bikeSharePopup(share) {
+        share.properties.openTime = reformatBikeShareHours(share.properties.openTime);
+        share.properties.closeTime = reformatBikeShareHours(share.properties.closeTime);
+        if (share.properties.isEventBased) {
+            share.properties.eventStart = reformatBikeShareHours(share.properties.eventStart);
+            share.properties.eventEnd = reformatBikeShareHours(share.properties.eventEnd);
+        }
+        share.properties.indegoLogo = Utils.getImageUrl('indego_logo.png');
+        var source = [
+            '<div class="bikeshare"><h4>{{share.name}}</h4>',
+            '<p><strong>{{share.addressStreet}}</strong></p>',
+            '<p>Status: {{share.kioskPublicStatus}}</p>',
+            '<p>Hours: {{share.openTime}} to {{share.closeTime}}</p>',
+            '{{#if share.isEventBased}}<p>Event hours: {{share.eventStart}} to {{share.eventEnd}}</p>{{/if}}',
+            '<p>{{share.bikesAvailable}} / {{share.totalDocks}} bikes available</p>',
+            '<p>{{share.docksAvailable}} / {{share.totalDocks}} docks available</p>',
+            '{{#if share.trikesAvailable}}<p>{{share.trikesAvailable}} trikes available</p>{{/if}}',
+            '<a href="http://www.rideindego.com/" target="_blank">',
+            '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a>',
+            '</div>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({share: share.properties});
         return html;
     }
 
@@ -77,4 +115,4 @@ CAC.Map.Templates = (function (Handlebars, Utils) {
         return html;
     }
 
-})(Handlebars, CAC.Utils);
+})(Handlebars, moment, CAC.Utils);

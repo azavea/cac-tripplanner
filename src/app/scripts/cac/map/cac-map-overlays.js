@@ -3,6 +3,7 @@ CAC.Map.OverlaysControl = (function ($, L) {
 
     var defaults = {};
 
+    var bikeShareFeatureGroup = null;
     var eventsFeatureGroup = null;
 
     function OverlaysControl(options) {
@@ -18,7 +19,18 @@ CAC.Map.OverlaysControl = (function ($, L) {
     // TODO: Implement - This may not be the best way to architect these depending on how these
     //                      layers are added
     function bikeShareOverlay() {
-        return L.featureGroup([]);
+        bikeShareFeatureGroup = L.featureGroup([]);
+        $.ajax({
+            contentType: 'application/json',
+            url: 'http://api.phila.gov/bike-share-stations/v1',
+            success: function (data) {
+                data = JSON.parse(data);
+                $.each(data.features, function (i, share) {
+                    bikeShareFeatureGroup.addLayer(getBikeShareMarker(share));
+                });
+            }
+        });
+        return bikeShareFeatureGroup;
     }
 
     // TODO: Implement
@@ -37,6 +49,18 @@ CAC.Map.OverlaysControl = (function ($, L) {
             }
         });
         return eventsFeatureGroup;
+    }
+
+    function getBikeShareMarker(share) {
+        var latLng = L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
+        var icon = L.AwesomeMarkers.icon({
+            icon: 'directions-bike',
+            markerColor: 'green',
+            prefix: 'md'
+        });
+        var marker = new L.marker(latLng, { icon: icon });
+        marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share), {});
+        return marker;
     }
 
     function getFeedEventMarker(event) {
