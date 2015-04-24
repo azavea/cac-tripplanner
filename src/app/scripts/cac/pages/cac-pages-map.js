@@ -2,7 +2,10 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     'use strict';
 
     var defaults = {
-        map: {}
+        map: {},
+        selectors: {
+            leafletPopups: 'a.leaflet-popup-close-button'
+        }
     };
 
     var mapControl = null;
@@ -75,6 +78,10 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     }
 
     function onSidebarTabShown(event, tabId) {
+        // close any open map popups on tab switch
+        _.each($(this.options.selectors.leafletPopups), function(closeBtn) {
+            closeBtn.click();
+        });
         if (tabId === 'directions') {
             mapControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
