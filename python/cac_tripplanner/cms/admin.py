@@ -14,6 +14,13 @@ class ArticleAdmin(admin.ModelAdmin):
     ordering = ('created', )
     prepopulated_fields = {'slug': ('title', )}
 
+    # Only allow About and FAQ pages to be edited, not added or deleted
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
