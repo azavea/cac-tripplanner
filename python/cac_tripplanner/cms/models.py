@@ -65,11 +65,8 @@ class AboutFaq(models.Model):
 
     @property
     def published(self):
-        """Helper property to easily determine if a page is published"""
-        if self.publish_date:
-            return (self.publish_date < now())
-        else:
-            return False
+        """About and FAQ pages are always published"""
+        return True
 
     def __unicode__(self):
         return self.title
