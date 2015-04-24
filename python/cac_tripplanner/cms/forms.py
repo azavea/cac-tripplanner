@@ -1,7 +1,14 @@
 from django.forms import ModelForm
 
-from .models import Article
+from .models import AboutFaq, Article
 from cac_tripplanner.image_utils import validate_image
+
+
+class AboutFaqForm(ModelForm):
+    """About and FAQ pages"""
+    class Meta:
+        model = AboutFaq
+        exclude = []
 
 
 class ArticleForm(ModelForm):

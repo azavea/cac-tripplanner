@@ -1,7 +1,18 @@
 from django.contrib import admin
 
-from .forms import ArticleForm
-from .models import Article
+from .forms import AboutFaqForm, ArticleForm
+from .models import AboutFaq, Article
+
+
+@admin.register(AboutFaq)
+class ArticleAdmin(admin.ModelAdmin):
+    form = AboutFaqForm
+
+    list_display = ('title', 'author', 'published', 'created', 'modified')
+    readonly_fields = ('created', 'modified')
+    date_hierarchy = ('created')
+    ordering = ('created', )
+    prepopulated_fields = {'slug': ('title', )}
 
 
 @admin.register(Article)

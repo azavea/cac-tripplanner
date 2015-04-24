@@ -18,6 +18,11 @@ urlpatterns = patterns(
     url(r'^map/', 'destinations.views.map', name='map'),
     url(r'^directions/', 'destinations.views.directions', name='directions'),
 
+    # About and FAQ
+    url(r'^info/(?P<slug>[\w-]+)/$',
+        'cms.views.about_faq',
+        name='about-faq'),
+
     # Community Profiles
     url(r'^community-profile/(?P<slug>[\w-]+)/$',
         'cms.views.community_profile_detail',
