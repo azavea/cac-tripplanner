@@ -5,7 +5,7 @@ from .models import AboutFaq, Article
 
 
 @admin.register(AboutFaq)
-class ArticleAdmin(admin.ModelAdmin):
+class AboutFaq(admin.ModelAdmin):
     form = AboutFaqForm
 
     list_display = ('title', 'author', 'published', 'created', 'modified')
@@ -20,6 +20,13 @@ class ArticleAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    # make slug field read-only (cannot add to readonly_fields, because it is pre-populated)
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            self.prepopulated_fields = {}
+            return self.readonly_fields + ('slug',)
+        return self.readonly_fields
 
 
 @admin.register(Article)
