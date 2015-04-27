@@ -22,7 +22,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             directions: '.directions',
             directionInput: '.direction-input',
             errorClass: 'error',
-            itineraryById: '.block-itinerary[data-itinerary="',
+            itineraryBlock: '.block-itinerary',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelectors: '#directionsModes input',
@@ -261,15 +261,17 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
     }
 
+    function findItineraryBlock(id) {
+        return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
+    }
+
     /**
      * Handles hover events to highlight a given itinerary
      */
     function onItineraryHover(event, itinerary) {
         if (itinerary) {
-            $(options.selectors.itineraryById + currentItinerary.id + '"]')
-                .css('background-color', 'white');
-            $(options.selectors.itineraryById + itinerary.id + '"]')
-                .css('background-color', 'lightgray');
+            findItineraryBlock(currentItinerary.id).css('background-color', 'white');
+            findItineraryBlock(itinerary.id).css('background-color', 'lightgray');
             currentItinerary.highlight(false);
             itinerary.highlight(true);
             currentItinerary = itinerary;
