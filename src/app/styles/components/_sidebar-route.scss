@@ -1,7 +1,76 @@
+.trip-numbers {
+    margin-bottom: 6px;
+    float: right;
+    line-height: 1.2;
+}
+.trip-duration {
+    font-size: 18px;
+    font-weight: bold;
+}
+.trip-distance {
+    font-size: 12px;
+    color: #337AB7;
+}
+
+.trip-details {
+    overflow: auto;
+}
+
+.direction-section {
+    font-size: 16px;
+}
+
+.direction-arrive {
+    border-top: 2px solid #bbb;
+    font-size: 16px;
+    padding: 15px 0 20px;
+}
+
+.direction-text {
+    padding-right: 8px;
+}
+
+.direction-icon {
+    @extend .direction-text;
+    vertical-align: top;
+}
+
+.directions-header-divider {
+    opacity: .5;
+}
+
+.trip-details .short-description {
+    font-size: 16px;
+}
+
+.directions-header {
+    background-color: #333;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 10px;
+    font-size: 18px;
+    color: #fff;
+    a {
+        color: #fff;
+        &:hover {
+            color: #aaa;
+        }
+    }
+}
+
+.block-step.direction-item {
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+    color: #999;
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
 .directions {
     position: absolute;
     width: 100%;
-    top: 40px;
+    top: 50px;
 
     .tt-hint {
         padding: 16px;
@@ -152,49 +221,49 @@
         }
     }
     .sidebar-details {
-        overflow-y: auto;
         padding: 0 15px;
         position: relative;
-        width: 100%;
-        max-height: 250px;
+
         height: 100%;
 
         .itineraries {
             overflow-y: auto;
             height: 100%;
             left: 15px;
-            padding-right: 15px;
             right: 0px;
             top: 0;
             bottom: 0;
         }
         .directions-list {
-            overflow-y: auto;
             height: 100%;
             left: 15px;
-            padding-right: 15px;
             right: 0px;
             top: 0;
             bottom: 0;
         }
         .block-itinerary {
             height: auto;
-            margin-bottom: 10px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top-style: solid;
-
+            padding-top: 20px;
+            padding-bottom: 20px;
+            cursor: pointer;
+            border-bottom: #bbb solid 1px;
+            &:last-of-type {
+                border-bottom: 0;
+            }
             &:first-of-type {
                 margin-top: 15px;
-                border-top-style: none;
             }
         }
         .block-leg {
             height: auto;
             margin-bottom: 10px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top-style: solid;
+            margin-top: 15px;
+            padding-top: 15px;
+            width: 100%;
+            border-top: 1px solid #bbb;
+            &:first-child {
+                border-top: 0;
+            }
         }
 
         .sk-spinner {

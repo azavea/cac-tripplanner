@@ -1,9 +1,12 @@
 .sidebar {
     z-index: 5;
     position: absolute;
-    width: 380px;
-    top: 75px;
-    left: 35px;
+    width: 400px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: #eee;
+    overflow-x: hidden;
 
     .tt-hint {
         color: #999;
@@ -11,17 +14,20 @@
     .sidebar-tabs {
         .btn {
             border-radius: 0;
-            padding: 8px 14px 12px;
+            padding: 16px 14px;
             color: #AAA;
-            background: #F1F1F2;
-            box-shadow: 0 0 8px rgba(0,0,0,0.25);
+            background-color: transparent;
+            border: 0;
+            box-shadow: none;
+            outline: none;
 
             &:hover {
-                background: white;
+                color: #333;
             }
+
             &.active {
-                color: #27A9E1;
-                background: white;
+                color: #337AB7;
+                font-weight: bold;
             }
         }
     }
@@ -30,8 +36,9 @@
         margin-bottom: 10px;
         padding: 10px 14px;
         position: relative;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        border-top: 5px solid #eee;
         &:last-of-type {
             margin: 0;
         }
@@ -74,6 +81,6 @@
 }
 
 .input-datetimepicker {
-    width: 220px !important;
+    width: 200px !important;
     margin: 0 !important;
 }
