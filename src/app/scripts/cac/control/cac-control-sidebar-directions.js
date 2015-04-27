@@ -330,6 +330,14 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var destinationText = destination.address;
         directions.destination = [toCoords[1], toCoords[0]];
 
+        // Save destination coordinates in expected format (to match typeahead results)
+        destination.feature = {
+            geometry: {
+                x: toCoords[0],
+                y: toCoords[1]
+            }
+        };
+
         // set in UI
         var mode = UserPreferences.getPreference('mode');
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
@@ -395,7 +403,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+        if (to && to.feature && to.feature.geometry) {
+            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+        } else {
+            console.error('destination not found!');
+        }
 
         $(options.selectors.origin).typeahead('val', fromText);
         $(options.selectors.destination).typeahead('val', toText);
