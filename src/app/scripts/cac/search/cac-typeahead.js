@@ -154,6 +154,9 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
             f: 'pjson'
         };
 
+        // TODO: re-enable result distance ranking when bug fixed to work with searchExtent
+        // https://geonet.esri.com/thread/132900
+        /*
         // rank results by distance, if we have user location
         if (thisLocation) {
             params.location = [
@@ -161,11 +164,8 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
                 thisLocation[0].feature.geometry.y
             ].join(',');
             params.distance = 16093; // ~10mi.
-
-            // Due to bug, cannot specify both searchExtent and location
-            // https://geonet.esri.com/thread/132900
-            delete params.searchExtent;
         }
+        */
 
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
