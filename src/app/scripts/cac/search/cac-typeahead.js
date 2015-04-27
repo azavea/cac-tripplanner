@@ -164,7 +164,7 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
 
             // Due to bug, cannot specify both searchExtent and location
             // https://geonet.esri.com/thread/132900
-            delete params.searchExtent;
+            // delete params.searchExtent;
         }
 
         var adapter = new Bloodhound({
