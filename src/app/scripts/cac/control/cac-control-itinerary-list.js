@@ -21,7 +21,8 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
 
     var events = $({});
     var eventNames = {
-        itineraryClicked: 'cac:control:itinerarylist:itineraryclicked'
+        itineraryClicked: 'cac:control:itinerarylist:itineraryclicked',
+        itineraryHover: 'cac:control:itinerarylist:itineraryhover'
     };
 
     var $container = null;
@@ -38,6 +39,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
         eventNames: eventNames,
         setItineraries: setItineraries,
         setItinerariesError: setItinerariesError,
+        showItineraries: showItineraries,
         show: show,
         hide: hide,
         toggle: toggle
@@ -56,6 +58,8 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
         $container.html(html);
         $('a.itinerary').on('click', onItineraryClicked);
         $('.block-itinerary').on('click', onItineraryClicked);
+        $('a.itinerary').hover(onItineraryHover);
+        $('.block-itinerary').hover(onItineraryHover);
     }
 
     // Template for itinerary summaries
@@ -106,8 +110,28 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
         events.trigger(eventNames.itineraryClicked, itinerary);
     }
 
+    /**
+     * Handle hover event on itinerary list item
+     */
+    function onItineraryHover() {
+        var itineraryId = this.getAttribute('data-itinerary');
+        var itinerary = getItineraryById(itineraryId);
+        events.trigger(eventNames.itineraryHover, itinerary);
+    }
+
     function show() {
         $container.removeClass('hidden');
+    }
+
+    /**
+     * Show/hide all itineraries
+     *
+     * @param {Boolean} show If false, will make all itineraries transparent (hide them)
+     */
+    function showItineraries(show) {
+        for (var i in itineraries) {
+            itineraries[i].show(show);
+        }
     }
 
     function hide() {

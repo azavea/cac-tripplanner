@@ -22,6 +22,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             directions: '.directions',
             directionInput: '.direction-input',
             errorClass: 'error',
+            itineraryById: '.block-itinerary[data-itinerary="',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
             modeSelectors: '#directionsModes input',
@@ -86,6 +87,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         });
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryClicked,
                                        onItineraryClicked);
+        itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
+                                       onItineraryHover);
 
         typeahead = new Typeahead(options.selectors.typeahead);
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
@@ -233,16 +236,21 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
 
     function onDirectionsBackClicked() {
+        // show the other itineraries again
+        itineraryListControl.showItineraries(true);
+        currentItinerary.highlight(true);
         directionsListControl.hide();
         itineraryListControl.show();
     }
 
     /**
-     * Handles click events to highlight a given itinerary
+     * Handles click events to select a given itinerary
      */
     function onItineraryClicked(event, itinerary) {
         if (itinerary) {
-            currentItinerary.highlight(false);
+            // hide all other itineraries
+            itineraryListControl.showItineraries(false);
+            itinerary.show(true);
             itinerary.highlight(true);
             currentItinerary = itinerary;
 
@@ -250,6 +258,21 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
             itineraryListControl.hide();
             directionsListControl.show();
+        }
+    }
+
+    /**
+     * Handles hover events to highlight a given itinerary
+     */
+    function onItineraryHover(event, itinerary) {
+        if (itinerary) {
+            $(options.selectors.itineraryById + currentItinerary.id + '"]')
+                .css('background-color', 'white');
+            $(options.selectors.itineraryById + itinerary.id + '"]')
+                .css('background-color', 'lightgray');
+            currentItinerary.highlight(false);
+            itinerary.highlight(true);
+            currentItinerary = itinerary;
         }
     }
 

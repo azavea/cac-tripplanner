@@ -23,11 +23,15 @@ CAC.Routing.Itinerary = (function ($, L, _) {
 
         this.geojson = L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
-        this.geojson.setStyle(getStyle());
+        this.geojson.setStyle(getStyle(true, false));
     }
 
     Itinerary.prototype.highlight = function (isHighlighted) {
-        this.geojson.setStyle(getStyle(isHighlighted));
+        this.geojson.setStyle(getStyle(true, isHighlighted));
+    };
+
+    Itinerary.prototype.show = function (isShown) {
+        this.geojson.setStyle(getStyle(isShown, false));
     };
 
     /**
@@ -129,14 +133,17 @@ CAC.Routing.Itinerary = (function ($, L, _) {
     /**
      * Helper function to construct style object for an itinerary
      *
-     * @param {integer} ID that determines if this itinerary should be
-     * highlighted on the map
-     *
-     * @return {object} Leaflet style object to apply to geojson
+     * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
+     * @param {Boolean} highlighted Should this itinerary be highlighted on the map
+     * @return {Object} Leaflet style object to apply to geojson
      */
-    function getStyle(highlighted) {
+    function getStyle(shown, highlighted) {
+        if (!shown) {
+            return {opacity: 0};
+        }
         var defaultStyle = {color: 'Black',
-                            dashArray: null};
+                            dashArray: null,
+                            opacity: 0.7};
         if (highlighted) {
             defaultStyle.dashArray = null;
         } else {
