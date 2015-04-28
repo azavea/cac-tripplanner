@@ -146,7 +146,7 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     }
 
     function suggestAdapterFactory() {
-        var url = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
+        var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
 
         var params = {
             searchExtent: SearchParams.searchBounds,

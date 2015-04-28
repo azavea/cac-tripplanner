@@ -22,7 +22,7 @@ CAC.Map.OverlaysControl = (function ($, L) {
         bikeShareFeatureGroup = L.featureGroup([]);
         $.ajax({
             contentType: 'application/json',
-            url: 'http://api.phila.gov/bike-share-stations/v1',
+            url: 'https://api.phila.gov/bike-share-stations/v1',
             success: function (data) {
                 data = JSON.parse(data);
                 $.each(data.features, function (i, share) {

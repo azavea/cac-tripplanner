@@ -1,8 +1,8 @@
 CAC.Search.Geocoder = (function ($, SearchParams) {
     'use strict';
 
-    var url = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find';
-    var reverseUrl = 'http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
+    var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find';
+    var reverseUrl = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
 
     var defaults = {
         bbox: SearchParams.searchBounds,

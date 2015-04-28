@@ -116,6 +116,12 @@ class AppServerStack(StackNode):
                         'notifications'),
             source='GlobalNotificationsARN')
 
+        self.param_ssl_certificate_arn = self.add_parameter(Parameter(
+            'SSLCertificateARN', Type='String',
+            Description='Physical resource ID on an AWS::IAM::ServerCertificate '
+                        'for the application server load balancer'),
+            source='SSLCertificateARN')
+
         self.param_public_subnets = self.add_parameter(Parameter(
             'PublicSubnets', Type='CommaDelimitedList',
             Description='A list of public subnets'),
@@ -263,6 +269,12 @@ class AppServerStack(StackNode):
                     LoadBalancerPort='80',
                     InstancePort='80',
                     Protocol='HTTP'
+                ),
+                elb.Listener(
+                    LoadBalancerPort='443',
+                    InstancePort='80',
+                    Protocol='HTTPS',
+                    SSLCertificateId=Ref(self.param_ssl_certificate_arn)
                 )
             ],
             HealthCheck=elb.HealthCheck(
@@ -394,6 +406,7 @@ BASE_INPUTS = {
     'KeyName': ['global:AppServerKeyName', 'global:KeyName'],
     'StackColor': ['global:StackColor'],
     'GlobalNotificationsARN': ['global:GlobalNotificationsARN'],
+    'SSLCertificateARN': ['global:SSLCertificateARN'],
     'AppServerPublicSubnets': ['global:AppServerPublicSubnets',
                                'VPC:DefaultAppServerPublicSubnets'],
     'AppServerPrivateSubnets': ['global:AppServerPrivateSubnets',
