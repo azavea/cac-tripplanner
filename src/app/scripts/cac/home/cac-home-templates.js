@@ -21,7 +21,7 @@ CAC.Home.Templates = (function (Handlebars) {
             '<h3 class="destination-name">{{this.name}}</h3>',
             '<h5 class="destination-address">{{this.address}}</h5>',
             '<h5 class="destination-address-2">{{this.city}}, {{this.state}} {{this.zip}}</h5>',
-            '<img src="{{#if this.wide_image}}{{ this.wide_image }}{{^}}http://placehold.it/300x150{{/if}}"',
+            '<img src="{{#if this.wide_image}}{{ this.wide_image }}{{^}}https://placehold.it/300x150{{/if}}"',
             ' width="400" height="200"/>',
             '</a>',
             '</div>',

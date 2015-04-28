@@ -47,7 +47,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<p>{{share.bikesAvailable}} / {{share.totalDocks}} bikes available</p>',
             '<p>{{share.docksAvailable}} / {{share.totalDocks}} docks available</p>',
             '{{#if share.trikesAvailable}}<p>{{share.trikesAvailable}} trikes available</p>{{/if}}',
-            '<a href="http://www.rideindego.com/" target="_blank">',
+            '<a href="https://www.rideindego.com/" target="_blank">',
             '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a>',
             '</div>'
         ].join('');
@@ -62,7 +62,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<h5 class="distance-minutes"></h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}http://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
+                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
             '</a>'
         ].join('');
         var template = Handlebars.compile(source);
@@ -87,7 +87,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<div class="block-detail">',
                 '<h3>{{ d.name }}</h3>',
                 '<h5 class="distance-minutes">{{#if d.durationMinutes}}{{ d.durationMinutes }} minutes away{{/if}}</h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}http://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
+                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
                 '{{{ d.description }}}',    // the parent element of whatever is put here is a <p> tag
                 '<div class="row">',
                     // .back and .getdirections are used to select these elements for the click event
