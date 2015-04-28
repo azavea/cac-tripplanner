@@ -1,4 +1,4 @@
-CAC.Routing.Itinerary = (function ($, L, _) {
+CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         this.durationMinutes = getDurationMinutes(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.legs = otpItinerary.legs;
+        this.legs = getLegs(otpItinerary.legs);
         this.from = _.first(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
 
@@ -52,6 +52,9 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         bufferRatio = bufferRatio || 0;
         return bounds.pad(bufferRatio);
     };
+
+    // cache of geocoded OSM nodes (node name mapped to reverse geocode name)
+    var nodeCache = {};
 
     return Itinerary;
 
@@ -131,6 +134,51 @@ CAC.Routing.Itinerary = (function ($, L, _) {
     }
 
     /**
+     * Helper to reverse geocode OSM node labels. Caches results.
+     *
+     * @param {Object} place `from` or `to` object from an OTP itinerary leg
+     * @returns {Object} Promise that resolves to reverse geocode result for the location
+     */
+    function getOsmNodeName(place) {
+        var dfd = $.Deferred();
+
+        if (_.has(nodeCache, place.name)) {
+            dfd.resolve(nodeCache[place.name]);
+            return dfd.promise();
+        }
+
+        // not cached; go reverse geocode it
+        Geocoder.reverse(place.lat, place.lon).then(function(result) {
+            nodeCache[place.name] = result.address.Address;
+            dfd.resolve(result.address.Address);
+        });
+
+        return dfd.promise();
+    }
+
+    /**
+     * Check leg from/to place name; if it's an OSM node label, reverse geocode it and update label
+     *
+     * @params {Array} legs Itinerary legs returned by OTP
+     * @returns {Array} Itinerary legs, with prettified place labels
+     */
+    function getLegs(legs) {
+        return _.map(legs, function(leg) {
+            if (leg.from.name.indexOf('osm:node') > -1) {
+                getOsmNodeName(leg.from).then(function(name) {
+                    leg.from.name = name;
+                });
+            }
+            if (leg.to.name.indexOf('osm:node') > -1) {
+                getOsmNodeName(leg.to).then(function(name) {
+                    leg.to.name = name;
+                });
+            }
+            return leg;
+        });
+    }
+
+    /**
      * Helper function to construct style object for an itinerary
      *
      * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
@@ -152,4 +200,4 @@ CAC.Routing.Itinerary = (function ($, L, _) {
         return defaultStyle;
     }
 
-})(jQuery, L, _);
+})(jQuery, L, _, CAC.Search.Geocoder);
