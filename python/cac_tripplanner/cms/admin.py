@@ -1,7 +1,32 @@
 from django.contrib import admin
 
-from .forms import ArticleForm
-from .models import Article
+from .forms import AboutFaqForm, ArticleForm
+from .models import AboutFaq, Article
+
+
+@admin.register(AboutFaq)
+class AboutFaq(admin.ModelAdmin):
+    form = AboutFaqForm
+
+    list_display = ('title', 'author', 'published', 'created', 'modified')
+    readonly_fields = ('created', 'modified')
+    date_hierarchy = ('created')
+    ordering = ('created', )
+    prepopulated_fields = {'slug': ('title', )}
+
+    # Only allow About and FAQ pages to be edited, not added or deleted
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # make slug field read-only (cannot add to readonly_fields, because it is pre-populated)
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            self.prepopulated_fields = {}
+            return self.readonly_fields + ('slug',)
+        return self.readonly_fields
 
 
 @admin.register(Article)

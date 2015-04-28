@@ -11,6 +11,13 @@ def generate_filename(instance, filename):
     """Helper for generating image filenames"""
     return generate_image_filename('cms', instance, filename)
 
+
+class AboutFaqManager(models.Manager):
+
+    def published(self):
+        return self.get_queryset().filter(publish_date__lt=now())
+
+
 class ArticleManager(models.Manager):
 
     def published(self):
@@ -41,6 +48,28 @@ class TipsAndTricksManager(ArticleManager):
 
     def get_queryset(self):
         return super(TipsAndTricksManager, self).get_queryset().filter(content_type='tips')
+
+
+class AboutFaq(models.Model):
+    """User-editable About and FAQ pages"""
+    title = models.CharField(max_length=80)
+    slug = models.SlugField()
+    author = models.ForeignKey(User)
+    content = RichTextField(null=True, blank=True)
+    publish_date = models.DateTimeField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    # Managers
+    objects = AboutFaqManager()
+
+    @property
+    def published(self):
+        """About and FAQ pages are always published"""
+        return True
+
+    def __unicode__(self):
+        return self.title
 
 
 class Article(models.Model):

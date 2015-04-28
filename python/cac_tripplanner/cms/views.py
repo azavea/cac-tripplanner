@@ -3,7 +3,7 @@ from random import shuffle
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
-from .models import Article
+from .models import AboutFaq, Article
 from destinations.models import Destination
 
 
@@ -26,6 +26,12 @@ def home(request):
                                   tips_and_tricks=tips_and_tricks,
                                   destinations=destinations[:4]))
     return render_to_response('home.html', context_instance=context)
+
+
+def about_faq(request, slug):
+    page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
+    context = RequestContext(request, {'page': page})
+    return render_to_response('about-faq.html', context_instance=context)
 
 
 def community_profile_detail(request, slug):

@@ -13,7 +13,6 @@ ADMIN_USER = {
 }
 
 def add_admin_user(apps, schema_editor):
-    #Destination = apps.get_model('destinations', 'Destination')
     admin_user = User.objects.filter(username=ADMIN_USER['username'])
     if len(admin_user) == 0:
         default_admin = User(**ADMIN_USER)
