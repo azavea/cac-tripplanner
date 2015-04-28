@@ -16,6 +16,7 @@
 # TODO: peg this to a version, rather than a commit, when released
 - name: Install majorkirby
   pip: name="git://github.com/azavea/majorkirby@8b64417e371f6cb7f3ef883d3dd9d3669e8aa5db#egg=majorkirby"
+  when: develop
 
 - name: Touch log file if it does not exist
   command: touch {{ app_log }}
