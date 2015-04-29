@@ -10,8 +10,25 @@ body {
 * {
     font-family: $primary-font;
 }
+*:focus, *:hover, *:active {
+    outline: none;
+}
 
 
+h1 {
+    font-family: $secondary-font;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 3.6rem;
+
+    > small > a {
+        font-size: 18px;
+        margin-left: 10px;
+        font-weight: 700;
+        font-style: italic;
+        text-transform: none;
+    }
+}
 h2 {
     color: #A7A9AB;
     margin-bottom: 20px;
@@ -25,17 +42,35 @@ h2 {
         font-style: italic;
     }
 }
-
 h3 {
-    color: #A7A9AB;
-    margin-bottom: 20px;
-    font-weight: 300;
-    font-size: 2.4rem;
+    color: $gpg-red;
+    font-family: $secondary-font;
+    font-weight: 700;
+    font-size: 2.0rem;
+    text-transform: uppercase;
 
     > small > a {
-        font-size: 18px;
+        font-size: 1.6rem;
         margin-left: 10px;
         font-weight: 700;
         font-style: italic;
+        text-transform: none;
+    }
+}
+h4 {
+    color: #414042;
+    font-size: 2.1rem;
+    font-weight: 700;
+}
+
+p {
+    font-size: 1.8rem;
+    line-height: 2.1;
+    margin-bottom: 15px;
+
+    &.lead {
+        font-weight: 700;
+        font-size: 2.4rem;
+        margin-bottom: 25px;
     }
 }

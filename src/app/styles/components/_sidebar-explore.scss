@@ -1,23 +1,24 @@
 .explore {
     position: absolute;
     width: 100%;
-    top: 50px;
+    top: 78px;
+    bottom: 0;
 
     &.show-results {
         .sidebar-clip {
-            height: 100%;
+            //height: 100%;
         }
     }
     .sidebar-search {
-        height: 50px;
+        height: 55px;
         padding: 0;
 
         span.twitter-typeahead {
             width: 100%;
-            height: 50px;
+            height: 55px;
         }
         input[type="search"] {
-            padding: 12px 45px 12px 12px;
+            padding: 16px 45px 15px 16px;
             width: 100%;
         }
         button {
@@ -26,7 +27,7 @@
             position: absolute;
             right: 0;
             top: 0;
-            padding: 14px 14px;
+            padding: 18px;
             color: #ccc;
 
             &:hover {
@@ -37,6 +38,7 @@
     .sidebar-options {
         height: auto;
         padding: 10px 14px 0;
+        background: white;
 
         .address {
             display: none;
@@ -79,23 +81,25 @@
         }
         .options {
             height: auto;
-            background: #fff;
-            padding: 14px 0;
+            background: $gpg-red;
+            padding: 14px 14px;
+            margin: -10px -14px 0;
 
             .date {
             }
 
             span.text {
-                color: #999;
-                padding: 11px 0;
+                color: white;
+                padding: 11px 8px;
+                font-size: 16px;
             }
             input:not([type="checkbox"]) {
-                background: darken($light-gray, 5%);
+                background: white;
                 border: none;
                 color: black;
                 padding: 10px 14px;
                 margin: 0;
-                height: 44px;
+                height: 38px;
                 vertical-align: top;
 
                 &::-webkit-input-placeholder {
@@ -114,6 +118,7 @@
 
                 &[type="number"] {
                     width: 70px;
+                    vertical-align: middle;
                 }
             }
             .ms-parent {
@@ -137,6 +142,10 @@
                 max-height: 500px;
                 padding: 10px 0;
                 overflow: visible;
+            }
+
+            input[type="checkbox"] {
+                margin-top: 10px;
             }
         }
     }

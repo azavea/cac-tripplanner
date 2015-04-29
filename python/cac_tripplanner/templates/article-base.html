@@ -1,27 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
-{% include "header-mixin.html" %}
-<section class="jumbotron">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-        <h3 class="text-center">{% block title %}Open Transit Block{% endblock %}</h3>
-        <h1 class="text-center">{{ article.title }}</h1>
+<div class="article">
+    {% include "header-mixin.html" %}
+    <section class="jumbotron small" style="background-image: url('/media/{{ article.wide_image }}');"></section>
+    <section class="content">
+      <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 content-main">
+                <h3>{% block title %}Open Transit Block{% endblock %}</h3>
+                <h1>{{ article.title }}</h1>
+    
+                <div class="pull-quote">
+                  {{ article.teaser|safe }}
+                </div>
+                {{ article.content|safe }}
+            </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-<section class="content">
-  <div class="row">
-    <div class="col-sm-4 col-sm-offset-2 pull-quote">
-      {{ article.teaser|safe }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 content-main">
-      {{ article.content|safe }}
-    </div>
-  </div>
-</section>
-{% include "footer-mixin.html" %}
+    </section>
+    {% include "footer-mixin.html" %}
+</div>
 {% endblock %}

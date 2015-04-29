@@ -3,19 +3,24 @@
  * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#look-and-feel
  */
 .twitter-typeahead {
+    
 
     .tt-dropdown-menu {
-        background-color: #999;
-        border: 1px solid black;
-        color: white;
+        background-color: white;
+        border: 1px solid #ccc;
+        color: black;
+        min-width: 100%;
+        text-align: left;
+        margin-top: 5px;
 
         .tt-cursor {
-            background-color: #666;
+            background-color: #F1F2F2;
         }
-
         p {
-            padding: 2px 5px;
             font-size: 1.4rem;
+            line-height: 1.3;
+            margin: 0;
+            padding: 10px 15px;
         }
     }
 }

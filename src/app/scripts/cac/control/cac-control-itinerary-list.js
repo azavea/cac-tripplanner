@@ -75,13 +75,12 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
                 '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
                 '</div>' +
                 '<div class="trip-details">' +
-                '<table><tr><td class="direction-icon">' +
                 '{{#each this.modes}}' +
+                '<div class="direction-icon">' +
                 ' {{modeIcon this}}' +
+                '</div>' +
                 '{{/each}}' +
-                '</td><td>' +
                 '<span class="short-description"> via {{this.via}}</span>' +
-                '</td></tr></table>' +
                 '<a class="itinerary" data-itinerary="{{this.id}}">View Directions</a>' +
                 '</div>' +
                 '</div>' +

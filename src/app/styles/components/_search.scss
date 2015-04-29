@@ -1,25 +1,31 @@
 .search {
-    background: rgba(0,0,0,0.6);
+    background: $gpg-red;
     margin: 0;
-    height: 100px;
-    padding: 20px 0;
+    height: 70px;
+    padding: 0;
 
     span.text {
         color: white;
         display: inline-block;
-        padding: 17px 0;
+        padding: 22px 0;
+        font-size: 18px;
+        vertical-align: middle;
     }
     span.twitter-typeahead {
-        vertical-align: top;
+        vertical-align: middle;
+        margin: 0 15px;
+    }
+    input[type="number"] {
+        margin: 0 15px;
     }
     input:not([type="checkbox"]) {
-        background: #444;
+        background: white;
         border: none;
-        color: white;
+        color: black;
         padding: 17px 14px;
-        margin: 0 15px;
         height: 60px;
         border-radius: 9px;
+        vertical-align: middle;
 
         &::-webkit-input-placeholder {
             color: white;
@@ -39,6 +45,28 @@
             width: 260px;
         }
     }
+    .transit-types-container {
+        display: inline-block;
+        margin: 0 0 0 15px;
+        height: 70px;
+        padding: 7px 0;
+        vertical-align: middle;    
+    
+        .btn-transit {
+            font-size: 21px;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 99px;
+            box-shadow: none;
+
+            &.active {
+                background: white;
+                color: $gpg-red;
+            }
+        }
+    }
     button[type="submit"] {
         border: none;
         background: none;
@@ -46,7 +74,9 @@
         font-size: 4.2rem;
         font-weight: 300;
         display: inline-block;
-        padding: 0 16px 10px;
-        vertical-align: top;
+        padding: 10px 16px;
+        vertical-align: middle;
+        height: 70px;
+        line-height: 16px;
     }
 }

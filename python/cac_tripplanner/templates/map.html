@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-{% include "header-mixin.html" %}
 <section class="app">
     <div id="map"></div>
     <aside class="sidebar">
+        <div class="small-header">
+            {% include "header-mixin.html" %}
+        </div>
         <div class="sidebar-tabs">
             <button class="btn active" data-tab="explore">Discover Places</button>
             <button class="btn" data-tab="directions">Get Directions</button>
@@ -49,13 +51,12 @@
                             </label>
                         </div>
                     </div>
-                    <br>
-                    <span class="text input-string-right-margin">departing</span>
-
-                    <input id="datetimeExplore" class="isochrone-input input-datetimepicker"
-                        type="text" placeholder="now" />
                 </div>
                 <div id="moreExplore" class="more-options">
+                    <h6>Departing</h6>
+                    <input id="datetimeExplore" class="isochrone-input input-datetimepicker form-control"
+                        type="text" placeholder="now" />
+
                     <div id="exploreBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control selectpicker isochrone-input">
@@ -100,7 +101,6 @@
             </div>
             <div class="sidebar-block sidebar-options">
                 <div class="options search">
-                    <span class="text">traveling via</span>
                     <div id="directionsModes" class="btn-toolbar transit-types-container">
                         <div class="btn-group" data-toggle="buttons">
                             <label class="btn btn-primary btn-transit active"
@@ -123,16 +123,15 @@
                             </label>
                         </div>
                     </div>
-                    <br>
-                    <select id="directionsDepartAt" class="selectpicker direction-input"
-                        data-width="auto">
-                        <option value="departAt" selected>departing</option>
-                        <option value="arriveBy">arriving</option>
-                    </select>
-                    <input id="datetimeDirections" class="direction-input input-datetimepicker input-string-left-margin"
-                        type="text" placeholder="now" />
                 </div>
                 <div id="moreDirections" class="more-options">
+                    <select id="directionsDepartAt" class="selectpicker direction-input form-control"
+                        data-width="auto">
+                        <option value="departAt" selected>Departing at</option>
+                        <option value="arriveBy">Arriving by</option>
+                    </select>
+                    <input id="datetimeDirections" class="direction-input input-datetimepicker form-control"
+                        type="text" placeholder="now" />
                     <div id="directionsBikeTriangle">
                         <h6>What kind of ride do you want?</h6>
                         <select class="form-control selectpicker direction-input">

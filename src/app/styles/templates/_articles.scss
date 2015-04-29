@@ -1,0 +1,18 @@
+.article {
+    .content-main {
+        padding: 60px 0;
+    }
+    .pull-quote {
+        background: $gpg-purple;
+        padding: 20px;
+        color: white;
+        font-family: $secondary-font;
+        font-style: italic;
+        font-size: 2.1rem;
+        float: right;
+        max-width: 40%;
+        margin-left: 25px;
+
+        p { margin: 0; }
+    }
+}

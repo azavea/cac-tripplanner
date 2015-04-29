@@ -1,16 +1,12 @@
 .homepage {
     & > .jumbotron {
-        margin-bottom: 0;
-        position: relative;
-        height: 650px;
-        background: url('../images/homepage_hero@2x.jpg');
-        background-size: cover;
+        background-image: url('../images/homepage_hero@2x.jpg');
 
         h1 {
             line-height: 1.3;
             font-size: 4rem;
             font-weight: 700;
-            margin: 140px 0 50px;
+            margin: 140px 0 80px;
             color: white;
             text-shadow: 0 2px 12px rgba(0,0,0,0.45);
         }
@@ -28,9 +24,11 @@
                 font-size: 16px;
                 padding: 16px 22px;
                 color: white;
+                border-radius: 99px;
 
                 &.active {
-                    background: #41C0CB;
+                    color: $gpg-red;
+                    background: white;
                     box-shadow: 0 2px 12px rgba(0,0,0,0.65);
                 }
             }
@@ -40,6 +38,7 @@
             width: 100%;
             bottom: 0;
             margin: 0;
+
             input:not([type="checkbox"]) {
                 height: auto;
             }
@@ -49,7 +48,8 @@
         padding: 80px 0;
 
         &.content-gray {
-            background: $light-gray;
+            background: #A4C7E2 url('../images/background_pattern.png');
+            background-size: cover;
         }
     }
 }

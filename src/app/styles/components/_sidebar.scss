@@ -12,14 +12,20 @@
         color: #999;
     }
     .sidebar-tabs {
+        position: absolute;
+        top: 0;
+        right: 10px;
+
         .btn {
             border-radius: 0;
-            padding: 16px 14px;
             color: #AAA;
             background-color: transparent;
             border: 0;
             box-shadow: none;
             outline: none;
+            padding: 24px 14px;
+            margin: 0;
+            font-weight: 700;
 
             &:hover {
                 color: #333;
@@ -27,36 +33,37 @@
 
             &.active {
                 color: #337AB7;
-                font-weight: bold;
+                background: #f1f2f2;
             }
         }
     }
     .sidebar-block {
         background: white;
         margin-bottom: 10px;
+        margin-top: 5px;
         padding: 10px 14px;
         position: relative;
         margin-left: 10px !important;
         margin-right: 10px !important;
-        border-top: 5px solid #eee;
-        &:last-of-type {
-            margin: 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+
+    .transit-types-container {
+        display: inline-block;
+        margin-left: 0;
+        height: 45px;
+        vertical-align: middle;
+        padding-top: 5px;
+
+        .btn-transit {
+            font-size: 16px;
+            line-height: 15px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding: 9px 9px;
+            height: 36px;
         }
     }
-}
-
-.transit-types-container {
-    display: inline-block;
-    margin-left: 0;
-    height: 45px;
-    vertical-align: middle;
-    padding-top: 7px;
-}
-
-.btn-transit {
-    font-size: 12px;
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 .sidebar-options {
@@ -81,6 +88,5 @@
 }
 
 .input-datetimepicker {
-    width: 200px !important;
-    margin: 0 !important;
+    width: 100%;
 }

@@ -70,7 +70,8 @@
 .directions {
     position: absolute;
     width: 100%;
-    top: 50px;
+    top: 78px;
+    bottom: 0;
 
     .tt-hint {
         padding: 16px;
@@ -78,12 +79,18 @@
 
     &.show-results {
         .sidebar-clip {
-            height: 100%;
+            //height: 100%;
         }
     }
 
+    .input-datetimepicker {
+        width: auto;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
     .sidebar-search {
-        padding: 0;
+        padding: 0 50px 0 0;
 
         input[type="search"] {
             width: 100%;
@@ -104,20 +111,22 @@
             margin-top: -20px;
             height: 40px;
             width: 40px;
-            right: 15px;
+            right: 5px;
             border: none;
-            background: white;
-            padding: 5px 6px;
+            background: transparent;
+            padding: 5px 6px 4px;
             color: #ccc;
+            border-radius: 99px;
 
             &:hover {
-                color: #000;
+                color: #333;
+                background: $light-gray;
             }
         }
     }
     .sidebar-options {
         height: auto;
-        padding: 0 14px;
+        padding-bottom: 0;
 
         .address {
             height: 60px;
@@ -159,14 +168,15 @@
         }
         .options {
             height: auto;
-            background: #fff;
-            padding: 14px 0;
+            background: $gpg-red;
+            padding: 10px;
+            margin: -10px -14px 0;
 
             .date {
             }
 
             span.text {
-                color: #999;
+                color: white;
                 padding: 11px 0;
             }
             input:not([type="checkbox"]) {
@@ -218,22 +228,16 @@
                 padding: 10px 0;
                 overflow: visible;
             }
+            input[type="checkbox"] {
+                margin-top: 10px;
+            }
         }
     }
     .sidebar-details {
         padding: 0 15px;
         position: relative;
-
         height: 100%;
 
-        .itineraries {
-            overflow-y: auto;
-            height: 100%;
-            left: 15px;
-            right: 0px;
-            top: 0;
-            bottom: 0;
-        }
         .directions-list {
             height: 100%;
             left: 15px;
@@ -243,15 +247,12 @@
         }
         .block-itinerary {
             height: auto;
-            padding-top: 20px;
-            padding-bottom: 20px;
+            margin: 0 -15px;
+            padding: 20px;
             cursor: pointer;
             border-bottom: #bbb solid 1px;
             &:last-of-type {
                 border-bottom: 0;
-            }
-            &:first-of-type {
-                margin-top: 15px;
             }
         }
         .block-leg {
