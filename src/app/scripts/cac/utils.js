@@ -146,7 +146,12 @@ CAC.Utils = (function (_) {
             // ignore empty string if search is empty
             .map(function(item) {
                 if (item) {
-                    return item.split('=');
+                    var itm = item.split('=');
+                    if (itm.length > 1) {
+                        // decode parameters before passing them on to OTP
+                        itm[1] = decodeURIComponent(itm[1]);
+                    }
+                    return itm;
                 }
                 return undefined;
             })
