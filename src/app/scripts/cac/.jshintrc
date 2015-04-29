@@ -21,6 +21,7 @@
   "validthis": true,
   "globals": {
     "CAC": true,
+    "FB": true,
     "Handlebars": true,
     "Bloodhound": true,
     "moment": true,
