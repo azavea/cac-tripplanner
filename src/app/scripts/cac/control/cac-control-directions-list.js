@@ -130,8 +130,6 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
             legs: itinerary.legs
         };
 
-        console.log(templateData);
-
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
             '<div class="block block-step directions-header">',
@@ -160,8 +158,10 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                         '</div>',
                         '<div class="trip-details">',
                             '<div class="direction-section"><table><tr><td class="direction-icon">',
-                            '{{modeIcon this.mode}}</td><td class="direction-text">',
-                            '{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} {{this.headsign}}{{/if}} ',
+                            '{{modeIcon this.mode}}</td><td class="direction-text direction-item"',
+                            ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
+                            '{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} ',
+                                '{{this.headsign}}{{/if}} ',
                             'to {{this.to.name}}</td></tr></table></div>',
                             '<div class="block direction-item"',
                             ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
