@@ -35,6 +35,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
         $.ajax(url, {
             data: params,
             dataType: 'json',
+            cache: true,
             success: function (data) {
                 if (data && data.locations && data.locations.length &&
                     data.locations[0].feature.attributes.StAddr.length) {
@@ -57,6 +58,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
                                 $.ajax(url, {
                                     data: params,
                                     dataType: 'json',
+                                    cache: true,
                                     success: function (data) {
                                         if (data && data.locations && data.locations.length &&
                                             data.locations[0].feature.attributes.StAddr.length) {
@@ -105,7 +107,8 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
             location: [lng, lat].join(','),
             distance: 900,  // radius, in meters, to search within; defaults to 100m
             returnIntersection: true,
-            f: 'pjson'
+            f: 'pjson',
+            cache: true
         };
 
         $.ajax(reverseUrl, {

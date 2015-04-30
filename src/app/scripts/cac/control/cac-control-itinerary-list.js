@@ -71,7 +71,7 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
         var source = '{{#each itineraries}}' +
                 '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
                     '<div class="trip-numbers">' +
-                        '<div class="trip-duration"> {{this.durationMinutes}} min</div>' +
+                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
                         '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
                     '</div>' +
                     '<div class="trip-details">' +
