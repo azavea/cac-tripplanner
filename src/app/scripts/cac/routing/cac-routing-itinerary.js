@@ -1,4 +1,4 @@
-CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
+CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
     'use strict';
 
     /**
@@ -112,13 +112,19 @@ CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
      *
      * @param {object} otpItinerary OTP itinerary or leg
      *
-     * @return {string} duration of itinerary/leg, formatted with unit (minutes, hours, etc.)
+     * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
     function getFormattedDuration(otpItineraryLeg) {
-        var mins = parseInt(otpItineraryLeg.duration / 60.0);
-        console.log(mins);
-        var str = mins.toString() + ' min';
-        console.log(str);
+        // x hrs, y min, z s (will trim empty units from left)
+        var fmt = 'h [hrs], m [min], ss [s]';
+        var str = moment.duration(otpItineraryLeg.duration, 'seconds').format(fmt);
+        // trim empty seconds from right of string
+        var emptySecIdx = str.indexOf(', 00 s');
+        if (emptySecIdx > 0) {
+            str = str.substring(0, emptySecIdx);
+        }
+        // fix hour singular
+        str = str.replace('1 hrs,', '1 hr,');
         return str;
     }
 
@@ -205,4 +211,4 @@ CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
         return defaultStyle;
     }
 
-})(jQuery, L, _, CAC.Search.Geocoder);
+})(jQuery, L, _, moment, CAC.Search.Geocoder);
