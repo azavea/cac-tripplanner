@@ -5,10 +5,13 @@ $screen-md			 : "(min-width: 992px) and (max-width: 1199px)";
 $screen-lg			 : "(min-width: 1200px)";
 
 // Fonts
-$primary-font 	     : 'Open Sans', 'Helvetica Neue', sans-serif;
+$primary-font 	     : 'Cabin', 'Helvetica Neue', sans-serif;
+$secondary-font 	 : 'Arvo', 'Helvetica Neue', sans-serif;
 
 // Colors
 $light-gray          : #F1F2F2;
+$gpg-red             : #D02D2D;
+$gpg-purple          : #5B3479;
 
 // Transition
 $transition          : all 0.5s;

@@ -62,7 +62,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<div class="modes"></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<h5 class="distance-minutes"></h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
+                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" />',
             '</a>'
         ].join('');
         var template = Handlebars.compile(source);
@@ -85,14 +85,16 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function destinationDetail(destination) {
         var source = [
             '<div class="block-detail">',
+                '<div class="trip-numbers">{{#if d.durationMinutes}}<div class="trip-duration"> {{ d.durationMinutes }} min</div>{{/if}}<div class="trip-distance">{{ d.distanceMiles }}</div></div>',
                 '<h3>{{ d.name }}</h3>',
-                '<h5 class="distance-minutes">{{#if d.durationMinutes}}{{ d.durationMinutes }} minutes away{{/if}}</h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" width="300px" height="150px" />',
-                '{{{ d.description }}}',    // the parent element of whatever is put here is a <p> tag
-                '<div class="row">',
-                    // .back and .getdirections are used to select these elements for the click event
-                    '<a class="back col-xs-6">Back</a>',
-                    '<a class="getdirections col-xs-6">Get Directions</a>',
+                '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" />',
+                '<div class="explore-block">{{{ d.description }}}</div>',    // the parent element of whatever is put here is a <p> tag
+                '<div class="explore-block">',
+                    '<div class="row">',
+                        // .back and .getdirections are used to select these elements for the click event
+                        '<div class="col-xs-6"><a class="back btn btn-primary btn-block">Back</a></div>',
+                        '<div class="col-xs-6"><a class="getdirections btn btn-primary btn-block">Get Directions</a></div>',
+                    '</div>',
                 '</div>',
             '</div>'
         ].join('');
@@ -108,7 +110,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<h4><img src="{{ event.uwishunuLogo }}" width="30px" height="30px" /> {{ event.title }}</h4>',
             '<p>{{{ event.description }}}</p>',
             '<a href="{{ event.link }}" target="_blank">More Info</a>',
-            '<small class="pull-right">Events by <a href="http://www.uwishunu.com">Uwishunu</a>'
+            '<small class="pull-right">Events by <a href="https://www.uwishunu.com">Uwishunu</a>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({event: event});

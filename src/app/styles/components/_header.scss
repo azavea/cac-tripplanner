@@ -1,9 +1,9 @@
 header {
     height: 50px;
     padding: 22px 25px;
-    position: relative;
     z-index: 99;
-    position: fixed;
+    position: absolute;
+    width: 100%;
 
     a {
         font-weight: 700;
@@ -15,5 +15,22 @@ header {
             text-decoration: none;
             color: white;
         }
+    }
+
+    .small-header & {
+        img { height: 40px; }
+    }
+}
+
+.app .small-header {
+    border-bottom: 1px solid #ccc;
+    height: 70px;
+    background: white;
+
+    header {
+        background: none;
+        width: auto;
+        padding: 15px;
+        height: 70px;
     }
 }

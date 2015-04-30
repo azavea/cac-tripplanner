@@ -1,15 +1,14 @@
 footer {
-    background: #CCC;
+    background: $gpg-red;
     padding: 30px 0;
     
-    h4 {
-        margin-bottom: 5px;
-        font-size: 1.8rem;
-        color: #666;
+    img {
+        margin-bottom: 10px;
     }
     p {
         font-size: 1.2rem;
-        color: #666;
+        line-height: 1.4;
+        color: white;
         width: 50%;
         margin: 0 auto;
     }
@@ -17,7 +16,7 @@ footer {
         a {
             font-size: 1.2rem;
             font-weight: 700;
-            color: black;
+            color: white;
         }
     }
 }

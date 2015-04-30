@@ -1,7 +1,77 @@
+.trip-numbers {
+    margin-bottom: 6px;
+    float: right;
+    line-height: 1.2;
+}
+.trip-duration {
+    font-size: 18px;
+    font-weight: bold;
+}
+.trip-distance {
+    font-size: 12px;
+    color: #337AB7;
+}
+
+.trip-details {
+    overflow: auto;
+}
+
+.direction-section {
+    font-size: 16px;
+}
+
+.direction-arrive {
+    border-top: 2px solid #bbb;
+    font-size: 16px;
+    padding: 15px 0 20px;
+}
+
+.direction-text {
+    padding-right: 8px;
+}
+
+.direction-icon {
+    @extend .direction-text;
+    vertical-align: top;
+}
+
+.directions-header-divider {
+    opacity: .5;
+}
+
+.trip-details .short-description {
+    font-size: 16px;
+}
+
+.directions-header {
+    background-color: #333;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 10px;
+    font-size: 18px;
+    color: #fff;
+    a {
+        color: #fff;
+        &:hover {
+            color: #aaa;
+        }
+    }
+}
+
+.block-step.direction-item {
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+    color: #999;
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
 .directions {
     position: absolute;
     width: 100%;
-    top: 40px;
+    top: 78px;
+    bottom: 0;
 
     .tt-hint {
         padding: 16px;
@@ -9,12 +79,18 @@
 
     &.show-results {
         .sidebar-clip {
-            height: 100%;
+            //height: 100%;
         }
     }
 
+    .input-datetimepicker {
+        width: auto;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
     .sidebar-search {
-        padding: 0;
+        padding: 0 50px 0 0;
 
         input[type="search"] {
             width: 100%;
@@ -35,20 +111,22 @@
             margin-top: -20px;
             height: 40px;
             width: 40px;
-            right: 15px;
+            right: 5px;
             border: none;
-            background: white;
-            padding: 5px 6px;
+            background: transparent;
+            padding: 5px 6px 4px;
             color: #ccc;
+            border-radius: 99px;
 
             &:hover {
-                color: #000;
+                color: #333;
+                background: $light-gray;
             }
         }
     }
     .sidebar-options {
         height: auto;
-        padding: 0 14px;
+        padding-bottom: 0;
 
         .address {
             height: 60px;
@@ -90,14 +168,15 @@
         }
         .options {
             height: auto;
-            background: #fff;
-            padding: 14px 0;
+            background: $gpg-red;
+            padding: 10px;
+            margin: -10px -14px 0;
 
             .date {
             }
 
             span.text {
-                color: #999;
+                color: white;
                 padding: 11px 0;
             }
             input:not([type="checkbox"]) {
@@ -149,52 +228,43 @@
                 padding: 10px 0;
                 overflow: visible;
             }
+            input[type="checkbox"] {
+                margin-top: 10px;
+            }
         }
     }
     .sidebar-details {
-        overflow-y: auto;
         padding: 0 15px;
         position: relative;
-        width: 100%;
-        max-height: 250px;
         height: 100%;
 
-        .itineraries {
-            overflow-y: auto;
-            height: 100%;
-            left: 15px;
-            padding-right: 15px;
-            right: 0px;
-            top: 0;
-            bottom: 0;
-        }
         .directions-list {
-            overflow-y: auto;
             height: 100%;
             left: 15px;
-            padding-right: 15px;
             right: 0px;
             top: 0;
             bottom: 0;
         }
         .block-itinerary {
             height: auto;
-            margin-bottom: 10px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top-style: solid;
-
-            &:first-of-type {
-                margin-top: 15px;
-                border-top-style: none;
+            margin: 0 -15px;
+            padding: 20px;
+            cursor: pointer;
+            border-bottom: #bbb solid 1px;
+            &:last-of-type {
+                border-bottom: 0;
             }
         }
         .block-leg {
             height: auto;
             margin-bottom: 10px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top-style: solid;
+            margin-top: 15px;
+            padding-top: 15px;
+            width: 100%;
+            border-top: 1px solid #bbb;
+            &:first-child {
+                border-top: 0;
+            }
         }
 
         .sk-spinner {

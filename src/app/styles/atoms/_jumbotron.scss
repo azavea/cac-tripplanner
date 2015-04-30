@@ -1,0 +1,12 @@
+.jumbotron {
+    margin-bottom: 0;
+    position: relative;
+    height: 650px;
+    background-size: cover;
+
+    &.small {
+        height: 400px;
+        background-image: url('../images/homepage_hero@2x.jpg');
+        background-size: cover;
+    }
+}

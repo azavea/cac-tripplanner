@@ -70,13 +70,19 @@ CAC.Control.ItineraryList = (function ($, Handlebars, Utils) {
 
         var source = '{{#each itineraries}}' +
                 '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
-                '{{#each this.modes}}' +
-                ' {{modeIcon this}}' +
-                '{{/each}}' +
-                '<span class="short-description"> via <b>{{this.via}}</b></span>' +
-                '<span class="trip-duration"> {{this.durationMinutes}} minutes,</span>'  +
-                '<span class="trip-distance"> {{this.distanceMiles}} mi.</span>' +
-                '<p><a class="itinerary" data-itinerary="{{this.id}}">View Directions</a></p>' +
+                    '<div class="trip-numbers">' +
+                        '<div class="trip-duration"> {{this.durationMinutes}} min</div>' +
+                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
+                    '</div>' +
+                    '<div class="trip-details">' +
+                        '{{#each this.modes}}' +
+                            '<div class="direction-icon">' +
+                                ' {{modeIcon this}}' +
+                            '</div>' +
+                        '{{/each}}' +
+                        '<span class="short-description"> via {{this.via}}</span>' +
+                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
+                    '</div>' +
                 '</div>' +
                 '{{/each}}';
         var template = Handlebars.compile(source);

@@ -11,7 +11,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0;
+    left: 400px;
     right: 0;
     background: $light-gray;
 
@@ -30,8 +30,8 @@
             top: 0;
         }
     }
+}
 
-    .leaflet-popup-content .bikeshare {
-        line-height: 10%;
-    }
+.leaflet-popup-content .bikeshare {
+    line-height: 10%;
 }
