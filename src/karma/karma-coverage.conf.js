@@ -18,6 +18,7 @@ module.exports = function(config) {
       '/srv/cac/scripts/vendor/jquery.js',
       // load moment before other vendor scripts; is requirement for bootstrap datetime picker
       '/srv/cac/scripts/vendor/moment.js',
+      '/srv/cac/scripts/vendor/moment-duration-format.js',
       '/srv/cac/scripts/vendor/leaflet.js',
       '/srv/cac/scripts/vendor/leaflet.awesome-markers.js',
       '/srv/cac/scripts/vendor/Polyline.encoded.js',
