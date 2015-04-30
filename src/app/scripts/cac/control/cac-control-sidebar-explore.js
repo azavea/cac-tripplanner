@@ -274,8 +274,8 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         }
 
         // first check if we have distance cached
-        if (destination.durationMinutes) {
-            setDestinationMinutesText(destination.durationMinutes);
+        if (destination.formattedDuration) {
+            setDestinationMinutesText(destination.formattedDuration);
             return;
         }
 
@@ -309,8 +309,8 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         Routing.planTrip(exploreLatLng, dest, date, otpOptions)
             .then(function (itineraries) {
             if (itineraries.length) {
-                var distance = itineraries[0].durationMinutes;
-                destination.durationMinutes = distance;
+                var distance = itineraries[0].formattedDuration;
+                destination.formattedDuration = distance;
                 setDestinationMinutesText(distance);
             }
         });

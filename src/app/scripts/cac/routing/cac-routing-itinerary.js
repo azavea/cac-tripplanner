@@ -14,7 +14,7 @@ CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
         this.via = getVia(otpItinerary);
         this.modes = getModes(otpItinerary);
         this.distanceMiles = getDistanceMiles(otpItinerary);
-        this.durationMinutes = getDurationMinutes(otpItinerary);
+        this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.legs = getLegs(otpItinerary.legs);
@@ -108,14 +108,18 @@ CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get label/via summary for an itinerary or leg
      *
-     * @param {object} otpItinerary OTP itinerary
+     * @param {object} otpItinerary OTP itinerary or leg
      *
-     * @return {integer} duration of itinerary in minutes
+     * @return {string} duration of itinerary/leg, formatted with unit (minutes, hours, etc.)
      */
-    function getDurationMinutes(otpItinerary) {
-        return parseInt(otpItinerary.duration / 60.0);
+    function getFormattedDuration(otpItineraryLeg) {
+        var mins = parseInt(otpItineraryLeg.duration / 60.0);
+        console.log(mins);
+        var str = mins.toString() + ' min';
+        console.log(str);
+        return str;
     }
 
     /**
@@ -174,6 +178,7 @@ CAC.Routing.Itinerary = (function ($, L, _, Geocoder) {
                     leg.to.name = name;
                 });
             }
+            leg.formattedDuration = getFormattedDuration(leg);
             return leg;
         });
     }

@@ -117,38 +117,52 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         });
 
         var templateData = {
+            showBackButton: options.showBackButton,
+            showShareButton: options.showShareButton,
             start: {
                 text:  UserPreferences.getPreference('fromText'),
-                time: new Date(itinerary.startTime).toLocaleTimeString()
+                time: itinerary.startTime
             },
             end: {
                 text:  UserPreferences.getPreference('toText'),
-                time: new Date(itinerary.endTime).toLocaleTimeString()
+                time: itinerary.endTime
             },
             legs: itinerary.legs
         };
+
+        console.log(templateData);
 
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
             '<div class="block block-step directions-header">',
                 'Directions',
-                '<div class="pull-right"><a class="back pull-right">' + (options.showBackButton ? '<i class="md md-close"></i>' : '&nbsp;') + '</a></div>',
-                '<div class="pull-right"><a class="share">' + (options.showShareButton ? '<i class="md md-share"></i>' : '&nbsp;') + '</a> <span class="directions-header-divider">|</span> </div>',
+                '{{#if data.showBackButton}}<div class="pull-right"><a class="back pull-right">',
+                 '<i class="md md-close"></i></a></div>{{/if}}',
+                '<div class="pull-right">{{#if data.showShareButton}}<a class="share">',
+                 '<i class="md md-share"></i></a>{{/if}} ',
+                 '<span class="directions-header-divider">|</span> </div>',
+            '</div>',
+            '<div class="block block-step direction-depart">',
+                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
+                    '<td>Depart from <strong>{{data.start.text}} at {{datetime data.start.time}}</td>',
+                '</tr></table></strong>',
             '</div>',
             '<div class="block-legs">',
                 '{{#each data.legs}}',
                     '<div class="block block-leg">',
                         '<div class="trip-numbers">',
                             '<div class="trip-duration">',
-                                // TODO: Replace with time in minutes
-                                '{{inMiles this.distance}} min',
+                                '{{this.formattedDuration}}',
                             '</div>',
                             '<div class="trip-distance">',
                                 '{{inMiles this.distance}} mi',
                             '</div>',
                         '</div>',
                         '<div class="trip-details">',
-                            '<div class="direction-section"><table><tr><td class="direction-icon">{{modeIcon this.mode}}</td><td class="direction-text">{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} {{this.headsign}}{{/if}} to {{this.to.name}}</td></tr></table></div>',
+                            '<div class="direction-section"><table><tr><td class="direction-icon">',
+                            '{{modeIcon this.mode}}</td><td class="direction-text">',
+                            '{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} {{this.headsign}}{{/if}} ',
+                            'to {{this.to.name}}</td></tr></table></div>',
                             '<div class="block direction-item"',
                             ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
                                 '{{#each steps}}',
@@ -167,7 +181,9 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 '{{/each}}',
             '</div>',
             '<div class="block block-step direction-arrive">',
-                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td><td>Arrive at <strong>{{data.end.text}} at {{data.end.time}}</td></tr></table></strong>',
+                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
+                    '<td>Arrive at <strong>{{data.end.text}} at {{datetime data.end.time}}</td>',
+                '</tr></table></strong>',
             '</div>',
         ].join('');
         var template = Handlebars.compile(source);

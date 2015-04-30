@@ -85,15 +85,20 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function destinationDetail(destination) {
         var source = [
             '<div class="block-detail">',
-                '<div class="trip-numbers">{{#if d.durationMinutes}}<div class="trip-duration"> {{ d.durationMinutes }} min</div>{{/if}}<div class="trip-distance">{{ d.distanceMiles }}</div></div>',
+                '<div class="trip-numbers">{{#if d.formattedDuration}}<div class="trip-duration"> ',
+                '{{ d.formattedDuration }}</div>{{/if}}<div class="trip-distance">',
+                '{{ d.distanceMiles }}</div></div>',
                 '<h3>{{ d.name }}</h3>',
-                '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" />',
-                '<div class="explore-block">{{{ d.description }}}</div>',    // the parent element of whatever is put here is a <p> tag
+                '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}',
+                    '{{^}}https://placehold.it/300x150{{/if}}" />',
+                    // the parent element of whatever is put here is a <p> tag
+                '<div class="explore-block">{{{ d.description }}}</div>',
                 '<div class="explore-block">',
                     '<div class="row">',
                         // .back and .getdirections are used to select these elements for the click event
                         '<div class="col-xs-6"><a class="back btn btn-primary btn-block">Back</a></div>',
-                        '<div class="col-xs-6"><a class="getdirections btn btn-primary btn-block">Get Directions</a></div>',
+                        '<div class="col-xs-6"><a class="getdirections btn btn-primary btn-block">',
+                            'Get Directions</a></div>',
                     '</div>',
                 '</div>',
             '</div>'
