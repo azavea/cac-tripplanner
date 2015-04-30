@@ -377,10 +377,10 @@ class AppServerStack(StackNode):
                             Ref(self.param_stacktype),
                             self.STACK_NAME_PREFIX,
                             Ref(self.param_public_hosted_zone_name)]),
-            TTL=600,
-            Type='CNAME',
-            HostedZoneName=Ref(self.param_public_hosted_zone_name),
-            ResourceRecords=[GetAtt(app_server_load_balancer, 'DNSName')]
+            Type='A',
+            AliasTarget=route53.AliasTarget(GetAtt(app_server_load_balancer, 'CanonicalHostedZoneNameID'),
+                                            GetAtt(app_server_load_balancer, 'DNSName')),
+            HostedZoneName=Ref(self.param_public_hosted_zone_name)
         ))
 
         self.add_output([
