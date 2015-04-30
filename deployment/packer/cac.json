@@ -43,7 +43,6 @@
       "inline": [
         "sleep 10",
         "sudo apt-get update",
-        "sudo apt-get -y dist-upgrade",
         "mkdir -p {{user `ansible_staging_directory`}}",
         "mkdir -p {{user `intermediate_directory`}}",
         "sudo apt-get -y install build-essential python-dev python-pip git",
