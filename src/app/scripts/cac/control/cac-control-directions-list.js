@@ -231,6 +231,13 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     }
 
     function shareOnFacebook(event) {
+        var caption = 'Trip Plan on GoPhillyGo';
+
+        // TODO: get a screenshot of the map page to post?
+        var pictureUrl = [options.useHost,
+                          '/static/images/logo_color.svg'
+                         ].join('');
+
         if (typeof FB !== 'undefined') {
             // prompt user to log in, if they aren't already
             FB.getLoginStatus(function(response) {
@@ -239,15 +246,10 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 }
             });
 
-            // TODO: get a screenshot of the map page to post?
-            var pictureUrl = [options.useHost,
-                              '/static/images/logo_color.svg'
-                             ].join('');
-
             FB.ui({
                 method: 'feed',
                 link: event.data.url,
-                caption: 'Trip Plan on GoPhillyGo',
+                caption: caption,
                 picture: pictureUrl,
             }, function(response){
                 if (!response || _.has(response, 'error_code')) {
@@ -259,13 +261,23 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
             console.warn('FB unavailable. Is script loaded?');
             // TODO: redirect to URL if API unavailable
 
-            /*
-            https://www.facebook.com/dialog/feed?
-              app_id=145634995501895
-              &display=popup&caption=An%20example%20caption
-              &link=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2F
-              &redirect_uri=https://developers.facebook.com/tools/explorer
-            */
+            var feedUrl = 'https://www.facebook.com/dialog/feed?';
+
+            /* jshint camelcase:false */
+            var params = {
+                app_id: '1594368497497826',
+                display: 'popup',
+                caption: caption,
+                picture: pictureUrl,
+                link: event.data.url,
+                redirect_uri: options.useHost + '/map'
+            };
+            /* jshint camelcase:true */
+
+            var url = feedUrl + $.param(params);
+            window.open(url, '_blank');
+            event.returnValue = false;
+            event.preventDefault();
         }
 
         event.returnValue = false;
