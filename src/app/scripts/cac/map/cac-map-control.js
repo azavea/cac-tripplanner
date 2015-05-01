@@ -101,6 +101,26 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             events.trigger(eventNames.destinationPopupClick,
                            destinationMarkers[event.currentTarget.id].destination);
         });
+
+        // add minimize button to layer control
+        var leafletMinimizer = '.leaflet-minimize';
+        var leafletLayerList = '.leaflet-control-layers-list';
+        var $layerContainer = $('.leaflet-control-layers');
+
+        $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
+        $(leafletMinimizer).click(function() {
+            if ($(leafletMinimizer).hasClass('minimized')) {
+                // show again
+                $(leafletLayerList).show();
+                $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
+                $(leafletMinimizer).removeClass('minimized');
+            } else {
+                // minimize it
+                $(leafletMinimizer).html('<i class="fa fa-plus"></i>');
+                $(leafletMinimizer).addClass('minimized');
+                $(leafletLayerList).hide();
+            }
+        });
     }
 
     MapControl.prototype.clearIsochrone = clearIsochrone;
