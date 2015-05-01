@@ -214,8 +214,15 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         isochroneLayer = L.geoJson(isochrone, {
             clickable: false,
             style: {
-                'color': 'red',
-                'opacity': 0.8
+                clickable: false,
+                color: '#5c2482',
+                fillColor: '#5c2482',
+                lineCap: 'round',
+                lineJoin: 'round',
+                opacity: 0.4,
+                fillOpacity: 0.3,
+                stroke: true,
+                weight: 2
             }
         }).addTo(map);
         map.fitBounds(isochroneLayer.getBounds());

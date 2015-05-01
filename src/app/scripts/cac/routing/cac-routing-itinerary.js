@@ -200,13 +200,17 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
         if (!shown) {
             return {opacity: 0};
         }
-        var defaultStyle = {color: 'Black',
+        var defaultStyle = {clickable: false,
+                            color: '#d02d2d',
                             dashArray: null,
-                            opacity: 0.7};
+                            lineCap: 'round',
+                            lineJoin: 'round',
+                            opacity: 0.75};
         if (highlighted) {
             defaultStyle.dashArray = null;
         } else {
-            defaultStyle.dashArray = [5, 15];
+            defaultStyle.color = '#2c7fb8';
+            defaultStyle.dashArray = [5, 8];
         }
         return defaultStyle;
     }
