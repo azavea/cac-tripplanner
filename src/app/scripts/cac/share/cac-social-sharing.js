@@ -18,15 +18,21 @@ CAC.Share.Social = (function ($, Settings) {
     Social.prototype = {
         shareOnFacebook: shareOnFacebook,
         shareOnGooglePlus: shareOnGooglePlus,
-        shareOnTwitter: shareOnTwitter
+        shareOnTwitter: shareOnTwitter,
+        shortenLink: shortenLink
     };
 
     return Social;
 
+    /**
+     * Open popup for user to post directions link to their timeline.
+     *
+     * @param {object} event Triggering click event; expected to have data.url set to link to share
+    */
     function shareOnFacebook(event) {
         var caption = 'Trip Plan on GoPhillyGo';
 
-        // TODO: get a screenshot of the map page to post?
+        // TODO: get a screenshot of the map page to post? Shouldn't be using logo.
         var pictureUrl = [options.useHost,
                           '/static/images/logo_color.svg'
                          ].join('');
@@ -72,11 +78,13 @@ CAC.Share.Social = (function ($, Settings) {
             event.returnValue = false;
             event.preventDefault();
         }
-
-        event.returnValue = false;
-        event.preventDefault();
     }
 
+    /**
+     * Open popup for user to post directions link to Google+.
+     *
+     * @param {object} event Triggering click event; expected to have data.url set to link to share
+    */
     function shareOnGooglePlus(event) {
         // TODO: make interactive post instead?
         // https://developers.google.com/+/web/share/interactive
@@ -84,35 +92,32 @@ CAC.Share.Social = (function ($, Settings) {
         // use the share endpoint directly
         // https://developers.google.com/+/web/share/#sharelink-endpoint
         var shareUrl = 'https://plus.google.com/share';
+        var windowOpts = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600';
+
         var params = {
             url: event.data.url
         };
         var url = shareUrl + '?' + $.param(params);
-        var windowOptions = 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600';
-        window.open(url, '', windowOptions);
+        window.open(url, '', windowOpts);
         event.returnValue = false;
         event.preventDefault();
     }
 
+    /**
+     * Open popup for user to tweet directions link.
+     *
+     * @param {object} event Triggering click event; expected to have data.url set to link to share
+    */
     function shareOnTwitter(event) {
         var intentUrl = 'https://twitter.com/intent/tweet';
-        // TODO: get tweet wording
+        // TODO: change tweet wording?
         var tweet = 'Check out my trip on GoPhillyGo!';
         // @go_philly_go twitter account is "related" to tweet (might suggest to follow)
         var related ='go_philly_go:GoPhillyGo on Twitter';
         // TODO: use via?
 
-        var tweetParams = {
-            url: event.data.url,
-            text: tweet,
-            related: related
-        };
-
-        var url = intentUrl + '?' + $.param(tweetParams);
-
         // open in a popup like standard Twitter button; see 'Limited Dependencies' section here:
         // https://dev.twitter.com/web/intents
-
         var winWidth = screen.width;
         var winHeight = screen.height;
         var width = 550;
@@ -130,9 +135,46 @@ CAC.Share.Social = (function ($, Settings) {
                              ',top=' + top
                             ].join('');
 
-        window.open(url, 'intent', windowOptions);
-        event.returnValue = false;
-        event.preventDefault();
+        var tweetParams = {
+                url: event.data.url,
+                text: tweet,
+                related: related
+            };
+            var url = intentUrl + '?' + $.param(tweetParams);
+            window.open(url, 'intent', windowOptions);
+            event.returnValue = false;
+            event.preventDefault();
+    }
+
+    /**
+     * Pass URL through link shortener.
+     *
+     * @param {string} url Link to shorten; must be from this domain
+     * @returns {Object} Promsie resolving to shortened URL (or unshortened URL on failure)
+     */
+    function shortenLink(url) {
+        var dfd = $.Deferred();
+        var shortenerUrl = '/link/shorten/';
+        $.ajax({
+            url: shortenerUrl,
+            data: JSON.stringify({destination: url}),
+            contentType: 'application/json',
+            dataType: 'json',
+            type: 'POST'
+        }).done(function(data) {
+            if (data && data.shortenedUrl) {
+                dfd.resolve(data.shortenedUrl);
+            } else {
+                console.error('Unexpected response shortening URL ' + url);
+                console.error(data);
+                dfd.resolve(url);
+            }
+        }).fail(function(error) {
+            console.error('Failed to shorten URL ' + url);
+            console.error(error);
+            dfd.resolve(url);
+        });
+        return dfd.promise();
     }
 
 })(jQuery, CAC.Settings);

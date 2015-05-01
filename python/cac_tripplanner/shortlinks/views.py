@@ -45,6 +45,6 @@ class ShortenedLinkCreateView(View):
             short_path = reverse('dereference-shortened',
                                  kwargs={'key': shortened.key})
             short_url = request.build_absolute_uri(short_path)
-            return HttpResponse(json.dumps({'shortened_url': short_url}), status=201)
+            return HttpResponse(json.dumps({'shortenedUrl': short_url}), status=201)
         else:
             return HttpResponse(json.dumps(link_form.errors), status=400)

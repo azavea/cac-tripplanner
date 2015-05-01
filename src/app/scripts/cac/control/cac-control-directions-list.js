@@ -107,16 +107,18 @@ CAC.Control.DirectionsList = (function ($, Handlebars, Social, UserPreferences, 
                             ].join('');
         directionsUrl = encodeURI(directionsUrl);
 
-        // click handlers for social sharing
-        $(options.selectors.twitterShareButton).on('click',
-                                                   {url: directionsUrl},
-                                                   socialSharing.shareOnTwitter);
-        $(options.selectors.facebookShareButton).on('click',
-                                                    {url: directionsUrl},
-                                                    socialSharing.shareOnFacebook);
-        $(options.selectors.googlePlusShareButton).on('click',
-                                                      {url: directionsUrl},
-                                                      socialSharing.shareOnGooglePlus);
+        socialSharing.shortenLink(directionsUrl).then(function(shortened) {
+            // set up click handlers for social sharing with shortened link
+            $(options.selectors.twitterShareButton).on('click',
+                                                       {url: shortened},
+                                                       socialSharing.shareOnTwitter);
+            $(options.selectors.facebookShareButton).on('click',
+                                                        {url: shortened},
+                                                        socialSharing.shareOnFacebook);
+            $(options.selectors.googlePlusShareButton).on('click',
+                                                          {url: shortened},
+                                                          socialSharing.shareOnGooglePlus);
+        });
     }
 
     function getTemplate(itinerary) {
