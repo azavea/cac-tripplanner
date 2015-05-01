@@ -15,8 +15,7 @@
     <!-- TODO: reword? -->
     <meta property="og:description"
         content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
-    <!-- TODO: update app ID once we have real app -->
-    <meta property="fb:app_id" content="1594368497497826" />
+    <meta property="fb:app_id" content="{{ fb_app_id }}" />
     <meta property="og:type" content="article" />
     <meta property="og:locale" content="en_US" />
     <meta property="article:author" content="Clean Air Council" />
@@ -52,13 +51,12 @@
 
     <!-- facebook loads async; might not be there during module init! -->
     <!-- loading debug version here -->
-    <!-- TODO: update app ID once we have real app -->
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
       js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk/debug.js#xfbml=1&version=v2.3&appId=1594368497497826";
+      js.src = "//connect.facebook.net/en_US/sdk/debug.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
 
@@ -100,13 +98,12 @@
 
     <!-- facebook loads async; might not be there during module init! -->
     <!-- loading minified version here -->
-    <!-- TODO: update app ID once we have real app -->
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
       js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3&appId=1594368497497826";
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
 

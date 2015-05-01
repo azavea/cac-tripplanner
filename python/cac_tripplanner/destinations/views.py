@@ -12,20 +12,20 @@ from django.views.generic import View
 
 import requests
 
-from cac_tripplanner.settings import OTP_URL
+from cac_tripplanner.settings import FB_APP_ID, OTP_URL
 from .models import Destination, FeedEvent
 
 
 def base_otp_view(request, page):
     """
-    Base view that sets the OTP routing_url variable
+    Base view that sets the OTP routing_url variable and Facebook app ID
 
     :param request: Request object
     :param page: String representation of the HTML template
     :returns: A rendered response
     """
     routing_url = OTP_URL.format(router='default') + 'plan'
-    context = RequestContext(request, dict(routing_url=routing_url))
+    context = RequestContext(request, dict(fb_app_id=FB_APP_ID, routing_url=routing_url))
     return render_to_response(page, context_instance=context)
 
 

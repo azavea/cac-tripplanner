@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
+CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Settings, Utils) {
 
     'use strict';
 
@@ -265,7 +265,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
 
             /* jshint camelcase:false */
             var params = {
-                app_id: '1594368497497826',
+                app_id: Settings.fbAppId,
                 display: 'popup',
                 caption: caption,
                 picture: pictureUrl,
@@ -400,4 +400,4 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         return turnTextString;
     }
 
-})(jQuery, Handlebars, CAC.User.Preferences, CAC.Utils);
+})(jQuery, Handlebars, CAC.User.Preferences, CAC.Settings, CAC.Utils);
