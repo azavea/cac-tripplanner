@@ -136,7 +136,7 @@ class ShortenedLinkRedirectTestCase(TestCase):
         data = json.loads(self.client.post('/link/shorten/',
                                            data=json.dumps({'destination': self.path}),
                                            content_type='application/json').content)
-        short_path = urlparse.urlparse(data['shortened_url']).path
+        short_path = urlparse.urlparse(data['shortenedUrl']).path
         # Navigate to the short link
         response = self.client.get(short_path)
         # Make sure it's found
