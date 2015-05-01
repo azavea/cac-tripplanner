@@ -19,6 +19,7 @@ module.exports = function(config) {
       '/srv/cac/scripts/vendor/*.js',
       '/srv/cac/scripts/main/cac/cac.js',
       '/srv/cac/scripts/main/cac/search/cac-search-params.js',
+      '/srv/cac/scripts/main/cac/share/cac-social-sharing.js',
       '/srv/cac/scripts/main/**/*.js',
       'test/spec/*.js',
       'test/spec/**/*.js'
