@@ -45,6 +45,9 @@ except (IOError, NameError):
         'use_s3_storage': False,
         'aws_storage_bucket_name': '',
 
+        # Facebook app ID
+        'fb_app_id': '',
+
         'default_admin_username': 'admin',
         'default_admin_password': 'admin',
         'default_admin_email': 'systems+cac@azavea.com'
@@ -197,6 +200,9 @@ WPADMIN = {
         }
     }
 }
+
+# FACEBOOK CONFIGURATION
+FB_APP_ID = secrets['fb_app_id']
 
 # OTP CONFIGURATION
 OTP_URL = secrets['otp_url']

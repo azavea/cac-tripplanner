@@ -14,6 +14,7 @@ db_host: '192.168.8.25'
 db_name: 'cac_tripplanner'
 db_password: 'cac_tripplanner'
 db_username: 'cac_tripplanner'
+fb_app_id: ''
 otp_host: 'http://192.168.8.26'
 django_secret_key: '%&_DEVELOPMENT_SECRET_KEY_#42*pk!3y6lvk&1psyk=e=pr'
 use_s3_storage: false

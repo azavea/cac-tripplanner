@@ -8,6 +8,7 @@ CAC = (function () {
         Pages: {},
         Routing: {},
         Search: {},
+        Share: {},
         Settings: {},
         User: {},
         Utils: {}

@@ -188,6 +188,7 @@
 $(document).ready(function () {
     // Settings pulled in from server-side
     CAC.Settings.routingUrl = '{{ routing_url }}';
+    CAC.Settings.fbAppId = '{{ fb_app_id }}';
 
     var map = new CAC.Pages.Map();
     map.initialize();

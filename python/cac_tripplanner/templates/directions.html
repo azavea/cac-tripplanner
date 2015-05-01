@@ -11,6 +11,7 @@
 <script type="text/javascript">
 $(document).ready(function () {
     CAC.Settings.routingUrl = '{{ routing_url }}';
+    CAC.Settings.fbAppId = '{{ fb_app_id }}';
 
     var directions = new CAC.Pages.Directions();
     directions.initialize();

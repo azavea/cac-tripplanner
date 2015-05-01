@@ -44,6 +44,7 @@ var scriptOrder = [
     '**/utils.js',
     '**/cac/search/cac-search-params.js',
     '**/cac/map/cac-map-templates.js',
+    '**/cac/share/*.js',
     '**/cac/user/*.js',
     '**/cac/search/*.js',
     '**/cac/routing/*.js',

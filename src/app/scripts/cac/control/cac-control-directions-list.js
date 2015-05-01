@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
+CAC.Control.DirectionsList = (function ($, Handlebars, Social, UserPreferences, Utils) {
 
     'use strict';
 
@@ -14,31 +14,36 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         showBackButton: false,
         // Should the share button be shown in the control
         showShareButton: false,
-        // NB: if these selectors are overridden on list creation, these default values are ignored
         selectors: {
             container: '.directions-list',
             backButton: 'a.back',
-            shareButton: 'a.share',
-            directionItem: '.direction-item'
-        }
+            directionItem: '.direction-item',
+            facebookShareButton: '#fbShareBtn',
+            twitterShareButton: '#twShareBtn',
+            googlePlusShareButton: '#gpShareBtn'
+        },
+        useHost: window.location.protocol + '//' + window.location.host
     };
     var options = {};
 
     var events = $({});
     var eventNames = {
         backButtonClicked: 'cac:control:directionslist:backbutton',
-        shareButtonClicked: 'cac:control:directionslist:sharebutton',
         listItemClicked: 'cac:control:directionslist:listitem',
         directionHovered: 'cac:control:directionslist:directionhover'
     };
 
     var $container = null;
     var itinerary = {};
+    var socialSharing = null;
 
     function DirectionsListControl(params) {
-        options = $.extend({}, defaults, params);
+        // recursively extend objects, so those not overridden will still exist
+        options = $.extend(true, {}, defaults, params);
 
         $container = $(options.selectors.container);
+
+        socialSharing = new Social();
 
         registerListItemHelpers();
     }
@@ -73,17 +78,6 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 events.trigger(eventNames.backButtonClicked);
             });
         }
-        if (options.showShareButton) {
-            $html.find(options.selectors.shareButton).on('click', function () {
-                events.trigger(eventNames.shareButtonClicked);
-
-                // Note: this code is only here temporarily to demonstrate the directions page
-                var paramString = decodeURIComponent($.param(newItinerary.requestParameters));
-                var index = newItinerary.id;
-                var directionsUrl = '/directions/?' + paramString + '&itineraryIndex=' + index;
-                window.open(directionsUrl, '_blank');
-            });
-        }
 
         // Wire up hover events on step-by-step directions
         $html.find(options.selectors.directionItem)
@@ -101,6 +95,28 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
             });
 
         $container.empty().append($html);
+
+        // get URL for sharing
+        var paramString = decodeURIComponent($.param(itinerary.requestParameters));
+        var index = itinerary.id;
+        var directionsUrl = [options.useHost,
+                             '/directions/?',
+                             paramString,
+                             '&itineraryIndex=',
+                             index
+                            ].join('');
+        directionsUrl = encodeURI(directionsUrl);
+
+        // click handlers for social sharing
+        $(options.selectors.twitterShareButton).on('click',
+                                                   {url: directionsUrl},
+                                                   socialSharing.shareOnTwitter);
+        $(options.selectors.facebookShareButton).on('click',
+                                                    {url: directionsUrl},
+                                                    socialSharing.shareOnFacebook);
+        $(options.selectors.googlePlusShareButton).on('click',
+                                                      {url: directionsUrl},
+                                                      socialSharing.shareOnGooglePlus);
     }
 
     function getTemplate(itinerary) {
@@ -136,9 +152,22 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
                 'Directions',
                 '{{#if data.showBackButton}}<div class="pull-right"><a class="back pull-right">',
                  '<i class="md md-close"></i></a></div>{{/if}}',
-                '<div class="pull-right">{{#if data.showShareButton}}<a class="share">',
-                 '<i class="md md-share"></i></a>{{/if}} ',
-                 '<span class="directions-header-divider">|</span> </div>',
+                '<div class="pull-right dropdown">{{#if data.showShareButton}}',
+                    '<a class="share dropdown-toggle" data-toggle="dropdown">',
+                    '<i class="md md-share"></i></a>',
+                    '<ul class="dropdown-menu">',
+                        '<li><a id="twShareBtn" title="Twitter" data-toggle="tooltip"',
+                            'data-target="#" <i class="fa fa-2x fa-twitter-square"></i>',
+                        '</a></li>',
+                        '<li><a id="fbShareBtn" title="Facebook" data-toggle="tooltip" ',
+                            'data-target="#" <i class="fa fa-2x fa-facebook-official"></i>',
+                        '</a></li>',
+                        '<li><a id="gpShareBtn" title="Google+" data-toggle="tooltip" ',
+                            'data-target="#" <i class="fa fa-2x fa-google-plus"></i>',
+                        '</a></li>',
+                    '</ul>{{/if}} ',
+                    '<span class="directions-header-divider">|</span> ',
+                '</div>',
             '</div>',
             '<div class="block block-step direction-depart">',
                 '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
@@ -210,7 +239,8 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
     function registerListItemHelpers() {
         // Only register these once, when the control loads
         Handlebars.registerHelper('directionIcon', function(direction) {
-            return new Handlebars.SafeString('<span class="glyphicon '+ getTurnIconName(direction) + '"></span>');
+            return new Handlebars.SafeString('<span class="glyphicon '+
+                                             getTurnIconName(direction) + '"></span>');
         });
         Handlebars.registerHelper('directionText', function () {
             var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
@@ -265,4 +295,4 @@ CAC.Control.DirectionsList = (function ($, Handlebars, UserPreferences, Utils) {
         return turnTextString;
     }
 
-})(jQuery, Handlebars, CAC.User.Preferences, CAC.Utils);
+})(jQuery, Handlebars, CAC.Share.Social, CAC.User.Preferences, CAC.Utils);

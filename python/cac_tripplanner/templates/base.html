@@ -7,6 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
     <title>{% block title %}Open Transit Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
 
+    {% block extrametatags %}
+    <meta property="og:title" content="Trip Planner" />
+    <meta property="og:size_name" content="Go Philly Go" />
+    <meta property="og:url"
+    content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
+    <!-- TODO: reword? -->
+    <meta property="og:description"
+        content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
+    <meta property="fb:app_id" content="{{ fb_app_id }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="article:author" content="Clean Air Council" />
+    <meta property="article:publisher" content="CAC Trip Planner" />
+    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}//static/images/logo_color.svg" />
+    {% endblock %}
+
     {% block cssimports %}
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -31,8 +47,18 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 
-
     {% if debug %}
+
+    <!-- facebook loads async; might not be there during module init! -->
+    <!-- loading debug version here -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk/debug.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
 
     <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
     <script src="{% static 'scripts/vendor/jquery.storageapi.js' %}"></script>
@@ -52,6 +78,7 @@
     <script src="{% static 'scripts/main/cac/search/cac-search-params.js' %}"></script>
     <script src="{% static 'scripts/main/cac/search/cac-geocoder.js' %}"></script>
     <script src="{% static 'scripts/main/cac/search/cac-typeahead.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/share/cac-social-sharing.js' %}"></script>
     <script src="{% static 'scripts/main/cac/routing/cac-routing-itinerary.js' %}"></script>
     <script src="{% static 'scripts/main/cac/routing/cac-routing-plans.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-control.js' %}"></script>
@@ -69,6 +96,17 @@
     <script src="{% static 'scripts/main/cac/pages/cac-pages-directions.js' %}"></script>
 
     {% else %}
+
+    <!-- facebook loads async; might not be there during module init! -->
+    <!-- loading minified version here -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
 
     <script src="{% static 'scripts/vendor.js' %}"></script>
     <script src="{% static 'scripts/main.js' %}"></script>
