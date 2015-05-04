@@ -58,6 +58,8 @@
 }
 
 .directions-print {
+    position: static !important;
+    width: auto !important;
     .block-leg {
         height: auto;
         margin-bottom: 10px;
