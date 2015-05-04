@@ -18,6 +18,7 @@ CAC.Control.DirectionsList = (function ($, Handlebars, Social, UserPreferences, 
             container: '.directions-list',
             backButton: 'a.back',
             directionItem: '.direction-item',
+            emailShareButton: '#emailShareBtn',
             facebookShareButton: '#fbShareBtn',
             twitterShareButton: '#twShareBtn',
             googlePlusShareButton: '#gpShareBtn'
@@ -118,6 +119,9 @@ CAC.Control.DirectionsList = (function ($, Handlebars, Social, UserPreferences, 
             $(options.selectors.googlePlusShareButton).on('click',
                                                           {url: shortened},
                                                           socialSharing.shareOnGooglePlus);
+            $(options.selectors.emailShareButton).on('click',
+                                                     {url: shortened},
+                                                     socialSharing.shareViaEmail);
         });
     }
 
@@ -166,6 +170,9 @@ CAC.Control.DirectionsList = (function ($, Handlebars, Social, UserPreferences, 
                         '</a></li>',
                         '<li><a id="gpShareBtn" title="Google+" data-toggle="tooltip" ',
                             'data-target="#" <i class="fa fa-2x fa-google-plus"></i>',
+                        '</a></li>',
+                        '<li><a id="emailShareBtn" title="E-Mail" data-toggle="tooltip" ',
+                            'data-target="#" <i class="fa fa-2x fa-envelope"></i>',
                         '</a></li>',
                     '</ul>{{/if}} ',
                     '<span class="directions-header-divider">|</span> ',

@@ -19,6 +19,7 @@ CAC.Share.Social = (function ($, Settings) {
         shareOnFacebook: shareOnFacebook,
         shareOnGooglePlus: shareOnGooglePlus,
         shareOnTwitter: shareOnTwitter,
+        shareViaEmail: shareViaEmail,
         shortenLink: shortenLink
     };
 
@@ -144,6 +145,20 @@ CAC.Share.Social = (function ($, Settings) {
             window.open(url, 'intent', windowOptions);
             event.returnValue = false;
             event.preventDefault();
+    }
+
+    /**
+     * Open email client with message pre-populated with directions link.
+     *
+     * @param {object} event Triggering click event; expected to have data.url set to link to share
+     */
+    function shareViaEmail(event) {
+        var mailToLink = ['mailto:?subject=My Trip on GoPhillyGo',
+                          '&body=Check out my trip on GoPhillyGo: ',
+                          event.data.url
+                         ].join('');
+        mailToLink = encodeURI(mailToLink);
+        window.location.href = mailToLink;
     }
 
     /**
