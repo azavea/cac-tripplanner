@@ -1,9 +1,14 @@
+import json
 from random import shuffle
 
+from django.forms.models import model_to_dict
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.views.generic import View
 
 from .models import AboutFaq, Article
+from cac_tripplanner.settings import MEDIA_URL
 from destinations.models import Destination
 
 
@@ -56,3 +61,19 @@ def tips_and_tricks_detail(request, slug):
     context = RequestContext(request, {'article': tips_and_tricks})
     return render_to_response('tips-and-tricks-detail.html',
                               context_instance=context)
+
+class AllArticles(View):
+    """ API endpoint for the Articles model """
+
+    def get(self, request, *args, **kwargs):
+        """ GET title, slug, and images for the 20 most recent articles that are published"""
+        results = Article.objects.published().values('title',
+                                             'slug',
+                                             'wide_image',
+                                             'narrow_image').order_by('publish_date')[:20]
+
+        for obj in results:
+            obj['wide_image'] = MEDIA_URL + obj['wide_image']
+            obj['narrow_image'] = MEDIA_URL + obj['narrow_image']
+
+        return HttpResponse(json.dumps(list(results)), 'application/json')
