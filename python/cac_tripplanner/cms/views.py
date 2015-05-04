@@ -1,10 +1,15 @@
+import json
 from random import shuffle
 
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.views.generic import View
 
 from .models import AboutFaq, Article
 from destinations.models import Destination
+from cac_tripplanner.settings import HOMEPAGE_RESULTS_LIMIT
 
 
 def home(request):
@@ -56,3 +61,26 @@ def tips_and_tricks_detail(request, slug):
     context = RequestContext(request, {'article': tips_and_tricks})
     return render_to_response('tips-and-tricks-detail.html',
                               context_instance=context)
+
+class AllArticles(View):
+    """ API endpoint for the Articles model """
+
+    def get(self, request, *args, **kwargs):
+        """ GET title, URL, and images for the 20 most recent articles that are published"""
+        results = Article.objects.published().order_by('-publish_date')[:HOMEPAGE_RESULTS_LIMIT]
+
+        # resolve full URLs to articles and their images
+        response = []
+        for obj in results:
+            article = {}
+            article['wide_image'] = obj.wide_image.url
+            article['narrow_image'] = obj.narrow_image.url
+            article['title'] = obj.title
+            if obj.content_type == 'prof':
+                relative_url = reverse(community_profile_detail, args=[obj.slug])
+            else:
+                relative_url = reverse(tips_and_tricks_detail, args=[obj.slug])
+            article['url'] = request.build_absolute_uri(relative_url)
+            response.append(article)
+
+        return HttpResponse(json.dumps(response), 'application/json')

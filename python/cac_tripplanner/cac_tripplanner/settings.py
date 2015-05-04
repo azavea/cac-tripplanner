@@ -232,3 +232,7 @@ MAX_IMAGE_SIZE_MB = 1
 DEFAULT_MEDIA_PATH = 'default_media'
 # src directory for default media images
 DEFAULT_MEDIA_SRC_PATH = os.path.join(BASE_DIR, DEFAULT_MEDIA_PATH)
+
+# limit the number of featured destinations/articles returned by "view all" to this amount
+# TODO: paginate instead?
+HOMEPAGE_RESULTS_LIMIT = 20

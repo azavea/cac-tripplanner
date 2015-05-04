@@ -3,6 +3,7 @@ from django.contrib.gis import admin
 
 from django.contrib.staticfiles import views as staticviews
 
+from cms.views import AllArticles
 from destinations.views import FindReachableDestinations, SearchDestinations, FeedEvents
 import settings
 
@@ -22,6 +23,9 @@ urlpatterns = patterns(
     url(r'^info/(?P<slug>[\w-]+)/$',
         'cms.views.about_faq',
         name='about-faq'),
+
+    # All Published Articles
+    url(r'^api/articles$', AllArticles.as_view(), name='api_articles'),
 
     # Community Profiles
     url(r'^community-profile/(?P<slug>[\w-]+)/$',
