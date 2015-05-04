@@ -123,7 +123,7 @@
                         <h3 class="destination-name">{{ destinations.2.name }}</h3>
                         <h5 class="destination-address">{{ destinations.2.address }}</h5>
                         <h5 class="destination-address-2">{{ destinations.2.city }}, {{ destinations.2.state }} {{ destinations.2.zip }}</h5>
-                        {% if destinations.2.image %}
+                        {% if destinations.2.wide_image %}
                         <img src="{{ destinations.2.wide_image.url }}" width="400" height="200"/>
                         {% else %}
                         <img src="https://placehold.it/400x400.jpg" />
@@ -133,7 +133,7 @@
                         <h3 class="destination-name">{{ destinations.3.name }}</h3>
                         <h5 class="destination-address">{{ destinations.3.address }}</h5>
                         <h5 class="destination-address-2">{{ destinations.3.city }}, {{ destinations.3.state }} {{ destinations.3.zip }}</h5>
-                        {% if destinations.3.image %}
+                        {% if destinations.3.wide_image %}
                         <img src="{{ destinations.3.wide_image.url }}" width="400" height="200"/>
                         {% else %}
                         <img src="https://placehold.it/400x400.jpg" />
@@ -150,12 +150,19 @@
                     <h3>GoPhillyGo Spotlight <small><a href="#">View all &raquo;</a></small></h3>
                     <div class="row">
                       {% if community_profile %}
+                      <script>
+                        console.log('{{ community_profile.wide_image }}');
+                      </script>
                         <div class="col-sm-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
                                 <h3 class="destination-name">{{ community_profile.title }}</h3>
                                 <h5>Community Profile</h5>
+                                {% if community_profile.narrow_image %}
+                                <img src="{{ community_profile.narrow_image }}" width="400" height="600"/>
+                                {% else %}
                                 <img src="https://placehold.it/400x600.jpg" />
+                                {% endif %}
                             </a>
                         </div>
                         {% endif %}
@@ -165,7 +172,11 @@
                              href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
                                 <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
                                 <h5>Tips & Tricks</h5>
+                                {% if tips_and_tricks.wide_image %}
+                                <img src="{{ tips_and_tricks.narrow_image }}" width="400" height="600"/>
+                                {% else %}
                                 <img src="https://placehold.it/400x600.jpg" />
+                                {% endif %}
                             </a>
                         </div>
                         {% endif %}

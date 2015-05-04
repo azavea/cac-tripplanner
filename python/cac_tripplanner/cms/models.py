@@ -4,6 +4,7 @@ from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
 
+from cac_tripplanner.settings import MEDIA_URL
 from cac_tripplanner.image_utils import generate_image_filename
 
 
@@ -24,12 +25,21 @@ class ArticleManager(models.Manager):
         return self.get_queryset().filter(publish_date__lt=now())
 
     def random(self):
-        """Returns a randomized title and slug field if one is available
+        """Returns a randomized title, slug field, and images, if an article is available
 
         Note: This does not return a queryset so cannot be chained,
         if additional filtering is required, use a different method
         """
-        randomized = self.published().values('title', 'slug').order_by('?')[:1]
+        randomized = self.published().values('title',
+                                             'slug',
+                                             'wide_image',
+                                             'narrow_image').order_by('?')[:1]
+
+        # URL value strings are missing media prefix; add it back
+        for rand in randomized:
+            rand['wide_image'] = MEDIA_URL + rand['wide_image']
+            rand['narrow_image'] = MEDIA_URL + rand['narrow_image']
+
         if randomized:
             return randomized[0]
         else:
