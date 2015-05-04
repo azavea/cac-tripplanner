@@ -51,3 +51,22 @@
         line-height: 20%;
     }
 }
+
+.print > header {
+    position: static;
+    height: auto;
+}
+
+.directions-print {
+    .block-leg {
+        height: auto;
+        margin-bottom: 10px;
+        margin-top: 15px;
+        padding-top: 15px;
+        width: 100%;
+        border-top: 1px solid #bbb;
+        &:first-child {
+            border-top: 0;
+        }
+    }
+}
