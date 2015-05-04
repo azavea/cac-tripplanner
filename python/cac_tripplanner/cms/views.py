@@ -9,6 +9,7 @@ from django.views.generic import View
 
 from .models import AboutFaq, Article
 from destinations.models import Destination
+from cac_tripplanner.settings import HOMEPAGE_RESULTS_LIMIT
 
 
 def home(request):
@@ -66,7 +67,7 @@ class AllArticles(View):
 
     def get(self, request, *args, **kwargs):
         """ GET title, URL, and images for the 20 most recent articles that are published"""
-        results = Article.objects.published().order_by('-publish_date')[:20]
+        results = Article.objects.published().order_by('-publish_date')[:HOMEPAGE_RESULTS_LIMIT]
 
         # resolve full URLs to articles and their images
         response = []

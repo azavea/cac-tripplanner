@@ -12,7 +12,7 @@ from django.views.generic import View
 
 import requests
 
-from cac_tripplanner.settings import FB_APP_ID, OTP_URL
+from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, OTP_URL
 from .models import Destination, FeedEvent
 
 
@@ -206,7 +206,7 @@ class FeedEvents(View):
         utc = timezone('UTC')
         epoch = utc.localize(datetime(1970, 1, 1))
 
-        results = FeedEvent.objects.published().order_by('end_date')[:20]
+        results = FeedEvent.objects.published().order_by('end_date')[:HOMEPAGE_RESULTS_LIMIT]
         response = [model_to_dict(x) for x in results]
         for obj in response:
             pnt = obj['point']
