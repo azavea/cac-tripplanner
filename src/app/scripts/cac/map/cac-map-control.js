@@ -362,8 +362,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 });
             },
             pointToLayer: function (geojson, latLng) {
-                var popupOptions = { maxWidth: 600 };
-                var popupTemplate = ['<p><b>{{geojson.properties.name}}</b></p>',
+                var popupTemplate = ['<h4>{{geojson.properties.name}}</h4>',
                                      '<p>{{geojson.properties.description}}',
                                      '</p><a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
@@ -374,7 +373,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
                 var marker = new L.marker(latLng, {icon: destinationIcon})
-                        .bindPopup(popupContent, popupOptions);
+                        .bindPopup(popupContent);
                 destinationMarkers[markerId] = {
                     marker: marker,
                     destination: destinations[geojson.properties.id]
