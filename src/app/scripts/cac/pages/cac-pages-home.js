@@ -3,11 +3,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
 
     var defaults = {
         selectors: {
+            articlesContainer: '.articles',
+            articlesSpinner: '#articlesSpinner',
             destinationAddress: '.destination-address',
             destinationAddressLineTwo: '.destination-address-2',
             destinationName: '.destination-name',
             destinationBlock: '.block-destination',
             destinationsContainer: '.destinations',
+            destinationsSpinner: '#destinationsSpinner',
             directionsForm: '#directions',
             directionsFrom: '#directionsFrom',
             directionsMode: '#directionsMode input',
@@ -16,14 +19,15 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             exploreMode: '#exploreMode input',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
-            spinner: '.sk-spinner',
             toggleButton: '.toggle-search button',
             toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
             typeahead: 'input.typeahead',
-            viewAll: '#viewAll'
+            viewAllArticles: '#viewAllArticles',
+            viewAllDestinations: '#viewAllDestinations'
         }
     };
+    var articleUrl = '/api/articles';
     var destinationSearchUrl = '/api/destinations/search';
     var options = {};
     var bikeModeOptions = null;
@@ -48,7 +52,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
-        $(options.selectors.viewAll).click($.proxy(clickedViewAll, this));
+        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
+        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
         $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
@@ -125,12 +130,41 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
 
     return Home;
 
-    function clickedViewAll(event) {
+    function clickedViewAllArticles(event) {
+        event.preventDefault();
+
+        // hide existing articles and show loading spinner
+        $(options.selectors.articlesContainer).addClass('hidden');
+        $(options.selectors.articlesSpinner).removeClass('hidden');
+
+        $.ajax({
+            type: 'GET',
+            cache: true,
+            url: articleUrl,
+            contentType: 'application/json'
+        }).then(function(data) {
+            if (data && data.length) {
+                var html = Templates.articles(data);
+                $(options.selectors.articlesContainer).html(html);
+
+                // hide 'view all' button and spinner, and show features again
+                $(options.selectors.viewAllArticles).addClass('hidden');
+                $(options.selectors.articlesSpinner).addClass('hidden');
+                $(options.selectors.articlesContainer).removeClass('hidden');
+            } else {
+                console.error('Could not load all articles');
+                $(options.selectors.articlesSpinner).addClass('hidden');
+                $(options.selectors.articlesContainer).removeClass('hidden');
+            }
+        });
+    }
+
+    function clickedViewAllDestinations(event) {
         event.preventDefault();
 
         // hide existing destinations list and show loading spinner
         $(options.selectors.destinationsContainer).addClass('hidden');
-        $(options.selectors.spinner).removeClass('hidden');
+        $(options.selectors.destinationsSpinner).removeClass('hidden');
 
         var origin = UserPreferences.getPreference('origin');
         var payload = {
@@ -153,12 +187,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
                 $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
 
                 // hide 'view all' button and spinner, and show features again
-                $(options.selectors.viewAll).addClass('hidden');
-                $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.viewAllDestinations).addClass('hidden');
+                $(options.selectors.destinationsSpinner).addClass('hidden');
                 $(options.selectors.destinationsContainer).removeClass('hidden');
             } else {
                 console.error('Could not load all destinations');
-                $(options.selectors.spinner).addClass('hidden');
+                $(options.selectors.destinationsSpinner).addClass('hidden');
                 $(options.selectors.destinationsContainer).removeClass('hidden');
             }
         });

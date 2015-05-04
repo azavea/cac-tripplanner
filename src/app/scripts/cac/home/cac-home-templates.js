@@ -2,6 +2,7 @@ CAC.Home.Templates = (function (Handlebars) {
     'use strict';
 
     var module = {
+        articles: articles,
         destinations: destinations
     };
 
@@ -29,6 +30,28 @@ CAC.Home.Templates = (function (Handlebars) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({destinations: useDestinations});
+        return html;
+    }
+
+    /**
+     * Take list of articles and return templated HTML snippet for sidebar.
+     *
+     * @param articles {Array} Collection of JSON destinations from /api/artic
+     * @return html {String} Snippets for boxes to display on home page for each destination
+     */
+    function articles(useArticles) {
+        var source = [
+            '{{#each articles}}',
+            '<div class="col-sm-6">',
+            '<a class="block block-spotlight" href="{{this.url}}">',
+            '<h3 class="destination-name">{{this.title}}</h3>',
+            '<h5>Community Profile</h5>',
+            '{{#if this.narrow_image}}<img src="{{this.narrow_image}}" width="400" height="600"/>',
+            '{{else}}<img src="https://placehold.it/400x600.jpg" />',
+            '{{/if}}</a></div>{{/each}}'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({articles: useArticles});
         return html;
     }
 

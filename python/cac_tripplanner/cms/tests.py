@@ -58,7 +58,9 @@ class ArticleTests(TestCase):
 
         random_community_profile = Article.profiles.random()
         test_dictionary = {'title': self.published_comm.title,
-                           'slug': self.published_comm.slug}
+                           'slug': self.published_comm.slug,
+                           'narrow_image': '/media/',
+                           'wide_image': '/media/'}
         self.assertDictEqual(random_community_profile, test_dictionary)
 
     def test_tips_and_tricks_manager(self):
@@ -72,7 +74,9 @@ class ArticleTests(TestCase):
 
         random_tips = Article.tips.random()
         test_dictionary = {'title': self.published_tips.title,
-                           'slug': self.published_tips.slug}
+                           'slug': self.published_tips.slug,
+                           'narrow_image': '/media/',
+                           'wide_image': '/media/'}
         self.assertDictEqual(random_tips, test_dictionary)
 
     def test_article_manager(self):

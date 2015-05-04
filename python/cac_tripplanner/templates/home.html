@@ -86,9 +86,9 @@
     <section class="content content-gray">
         <div class="container">
             <h1>Featured Locations <small>
-                <a id="viewAll" href="#">View all &raquo;</a>
+                <a id="viewAllDestinations" href="#">View all &raquo;</a>
             </small></h1>
-            <div class="sk-spinner sk-spinner-three-bounce hidden">
+            <div id="#destinationsSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
                 <div class="sk-bounce1"></div>
                 <div class="sk-bounce2"></div>
                 <div class="sk-bounce3"></div>
@@ -147,12 +147,16 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-8">
-                    <h3>GoPhillyGo Spotlight <small><a href="#">View all &raquo;</a></small></h3>
-                    <div class="row">
+                    <h3>GoPhillyGo Spotlight <small>
+                        <a id="viewAllArticles" href="#">View all &raquo;</a>
+                    </small></h3>
+                    <div id="articlesSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
+                        <div class="sk-bounce1"></div>
+                        <div class="sk-bounce2"></div>
+                        <div class="sk-bounce3"></div>
+                    </div>
+                    <div class="row articles">
                       {% if community_profile %}
-                      <script>
-                        console.log('{{ community_profile.wide_image }}');
-                      </script>
                         <div class="col-sm-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">

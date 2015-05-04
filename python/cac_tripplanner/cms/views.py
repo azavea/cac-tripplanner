@@ -1,14 +1,13 @@
 import json
 from random import shuffle
 
-from django.forms.models import model_to_dict
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.generic import View
 
 from .models import AboutFaq, Article
-from cac_tripplanner.settings import MEDIA_URL
 from destinations.models import Destination
 
 
@@ -66,14 +65,21 @@ class AllArticles(View):
     """ API endpoint for the Articles model """
 
     def get(self, request, *args, **kwargs):
-        """ GET title, slug, and images for the 20 most recent articles that are published"""
-        results = Article.objects.published().values('title',
-                                             'slug',
-                                             'wide_image',
-                                             'narrow_image').order_by('publish_date')[:20]
+        """ GET title, URL, and images for the 20 most recent articles that are published"""
+        results = Article.objects.published().order_by('-publish_date')[:20]
 
+        # resolve full URLs to articles and their images
+        response = []
         for obj in results:
-            obj['wide_image'] = MEDIA_URL + obj['wide_image']
-            obj['narrow_image'] = MEDIA_URL + obj['narrow_image']
+            article = {}
+            article['wide_image'] = obj.wide_image.url
+            article['narrow_image'] = obj.narrow_image.url
+            article['title'] = obj.title
+            if obj.content_type == 'prof':
+                relative_url = reverse(community_profile_detail, args=[obj.slug])
+            else:
+                relative_url = reverse(tips_and_tricks_detail, args=[obj.slug])
+            article['url'] = request.build_absolute_uri(relative_url)
+            response.append(article)
 
-        return HttpResponse(json.dumps(list(results)), 'application/json')
+        return HttpResponse(json.dumps(response), 'application/json')
