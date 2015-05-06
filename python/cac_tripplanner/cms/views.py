@@ -21,15 +21,14 @@ def home(request):
     tips_and_tricks = Article.tips.random()
 
     # get a few randomized destinations
-    # TODO: Investigate performance, as this creates a list of every destination
-    #       before shuffling and slicing
-    destinations = list(Destination.objects.published())
-    shuffle(destinations)
+    destination_ids = list(Destination.objects.published().values_list('id', flat=True))
+    shuffle(destination_ids)
+    destinations = Destination.objects.filter(id__in=destination_ids[:4])
 
     context = RequestContext(request,
                              dict(community_profile=community_profile,
                                   tips_and_tricks=tips_and_tricks,
-                                  destinations=destinations[:4]))
+                                  destinations=destinations))
     return render_to_response('home.html', context_instance=context)
 
 
