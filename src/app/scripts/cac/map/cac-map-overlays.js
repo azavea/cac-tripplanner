@@ -11,13 +11,11 @@ CAC.Map.OverlaysControl = (function ($, L) {
     }
 
     OverlaysControl.prototype.bikeShareOverlay = bikeShareOverlay;
-    OverlaysControl.prototype.bikeParkingOverlay = bikeParkingOverlay;
+    OverlaysControl.prototype.bikeRoutesOverlay = bikeRoutesOverlay;
     OverlaysControl.prototype.nearbyEventsOverlay = nearbyEventsOverlay;
 
     return OverlaysControl;
 
-    // TODO: Implement - This may not be the best way to architect these depending on how these
-    //                      layers are added
     function bikeShareOverlay() {
         bikeShareFeatureGroup = L.featureGroup([]);
         $.ajax({
@@ -33,9 +31,14 @@ CAC.Map.OverlaysControl = (function ($, L) {
         return bikeShareFeatureGroup;
     }
 
-    // TODO: Implement
-    function bikeParkingOverlay() {
-        return L.featureGroup([]);
+    function bikeRoutesOverlay() {
+        // https://cac-tripplanner.cartodb.com/viz/501dbdc8-f4ea-11e4-8c9e-0e018d66dc29/public_map
+        var url = 'https://cartocdn-ashbu.global.ssl.fastly.net/cac-tripplanner/api/v1/map/1d73301b7a6ba30ee80e8be7093ae9b2:1431024779440.44/{z}/{x}/{y}.png';
+        var attribution = ['Bike routes data:',
+                           '<a href="http://www.dvrpc.org/mapping/data.htm">DVRPC</a>,',
+                           '<a href="https://www.opendataphilly.org/dataset/bike-network">City of Philadelphia</a>'
+                           ].join(' ');
+        return L.tileLayer(url, {attribution: attribution});
     }
 
     function nearbyEventsOverlay() {
