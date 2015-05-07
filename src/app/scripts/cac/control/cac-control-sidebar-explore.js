@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplates, Routing,
+CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemplates, Routing,
                               Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -46,6 +46,7 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
     var mapControl = null;
     var typeahead = null;
     var exploreLatLng = null;
+    var selectedDestination = null;
     var destinationsCache = [];
 
     function SidebarExploreControl(params) {
@@ -208,7 +209,7 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
         if (key === 'search') {
             UserPreferences.setPreference('origin', location);
             setAddress(location);
-
+            selectedDestination = null;
             clickedExplore();
         } else {
             console.error('Unrecognized typeahead key ' + key + ' in explore tab.');
@@ -341,6 +342,12 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
             setDestinationDistance(destination);
         });
         $(options.selectors.sidebarContainer).height(400);
+
+        // show destination details, if origin is a destination
+        if (selectedDestination) {
+            setDestinationSidebarDetail(selectedDestination);
+            selectedDestination = null;
+        }
     }
 
     function setError(message) {
@@ -411,8 +418,14 @@ CAC.Control.SidebarExplore = (function ($, BikeModeOptions, Geocoder, MapTemplat
 
         if (method === 'explore') {
             fetchIsochrone(when, exploreTime, otpOptions);
+            // show destination details, if origin set by clicking destination on homepage
+            if (_.has(exploreOrigin, 'id')) {
+                selectedDestination = exploreOrigin;
+            } else {
+                selectedDestination = null;
+            }
         }
     }
 
-})(jQuery, CAC.Control.BikeModeOptions, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Routing.Plans,
-   CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, CAC.Control.BikeModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
+    CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

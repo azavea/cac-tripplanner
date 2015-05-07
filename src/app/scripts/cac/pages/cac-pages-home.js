@@ -199,12 +199,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     }
 
     /**
-     * When user clicks a destination, look it up, then redirect to show directions to it on map.
+     * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
      */
     function clickedDestination(event) {
         event.preventDefault();
         var block = $(event.target).closest(options.selectors.destinationBlock);
         var destName = block.children(options.selectors.destinationName).text();
+        var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
+        var exploreTime = $(options.selectors.exploreTime).val();
         var addr = [destName + ',',
                     block.children(options.selectors.destinationAddress).text(),
                     block.children(options.selectors.destinationAddressLineTwo).text()
@@ -220,9 +222,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
                 var destination = data.destinations[0];
-                UserPreferences.setPreference('toText', addr);
-                UserPreferences.setPreference('to', destination);
-                UserPreferences.setPreference('method', 'directions');
+                UserPreferences.setPreference('originText', addr);
+                // show isochrone around destination
+                UserPreferences.setPreference('origin', destination);
+                UserPreferences.setPreference('method', 'explore');
+                UserPreferences.setPreference('exploreTime', exploreTime);
+                UserPreferences.setPreference('mode', mode);
                 window.location = '/map';
             } else {
                 console.error('Could not find destination ' + destName);
