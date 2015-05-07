@@ -160,6 +160,10 @@
 
         .destinations {
             height: 100%;
+
+            .alert-container {
+                padding-top: 5px;
+            }
         }
         .block-destination {
             height: 160px;

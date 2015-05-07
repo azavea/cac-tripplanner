@@ -34,11 +34,12 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             type: type
         };
         var source = [
+            '<div class="alert-container">',
             '<div class="alert alert-{{info.type}} alert-dismissible" role="alert">',
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
             '<span aria-hidden="true">&times;</span></button>',
             '{{info.message}}',
-            '</div>'
+            '</div></div>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({info: info});
