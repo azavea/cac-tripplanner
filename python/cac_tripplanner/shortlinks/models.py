@@ -3,7 +3,7 @@ from django.db import models
 
 class ShortenedLink(models.Model):
     """Represents a shortened URL used to share routes"""
-    key = models.CharField(max_length=24, db_index=True)  # base-64-encoded UUID
+    key = models.CharField(max_length=22, db_index=True)  # base-58-encoded UUID
     destination = models.CharField(max_length=512)
     create_date = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(default=True)
