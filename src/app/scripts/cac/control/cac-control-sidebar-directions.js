@@ -2,7 +2,7 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder, MapTemplates,
+CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder,
                                  Routing, Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -479,5 +479,5 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
     }
 
-})(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
+})(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
