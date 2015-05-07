@@ -52,20 +52,8 @@ CAC.Control.ItineraryList = (function (_, $, Handlebars, Utils) {
      * @param {[object]} itinerary An open trip planner itinerary object, as returned from the plan endpoint
      */
     function setItineraries(newItineraries) {
-        // Add unique itineraries.
-        // Due to issue: https://github.com/opentripplanner/OpenTripPlanner/issues/1894
-        // itineraries with transit + (bike/walk) can return 3 identical itineraries if only
-        // bike/walk used, and not transit.
-        itineraries = [];
-        if (newItineraries.length > 0) {
-            // _.findWhere returns null if list is empty, so prime list with first itinerary
-            itineraries.push(newItineraries[0]);
-        }
-        _.each(newItineraries, function(itinerary) {
-            if (_.findWhere(itineraries, itinerary) === null) {
-                itineraries.push(itinerary);
-            }
-        });
+        itineraries = newItineraries;
+
 
         // Show the directions div and populate with itineraries
         var html = getTemplate(itineraries);
