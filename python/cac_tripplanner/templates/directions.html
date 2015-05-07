@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-{% include "header-mixin.html" %}
-<section class="directions">
-  <div class="directions-list">
-  </div>
-</section>
+<div class="print container">
+  {% include "header-mixin.html" %}
+  <section class="directions directions-print">
+    <div class="directions-list">
+    </div>
+  </section>
+</div>
 {% endblock %}
 
 {%block jspage %}
