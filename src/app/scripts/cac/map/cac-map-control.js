@@ -156,7 +156,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
 
     function initializeOverlays() {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
-        overlays['Bike Parking'] = overlaysControl.bikeParkingOverlay();
+        overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay();
         overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
         overlays['Nearby Events'].addTo(map);
     }
