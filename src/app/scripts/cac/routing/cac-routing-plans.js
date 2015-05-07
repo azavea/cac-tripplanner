@@ -28,7 +28,25 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
             data: urlParams
         }).then(function(data) {
             if (data.plan) {
-                var itineraries = _(data.plan.itineraries).map(function(itinerary, i) {
+                // Ensure unique itineraries.
+                // Due to issue: https://github.com/opentripplanner/OpenTripPlanner/issues/1894
+                // itineraries with transit + (bike/walk) can return 3 identical itineraries if only
+                // bike/walk used, and not transit.
+                // TODO: remove this workaround once OTP issue resolved.
+                var lastItinerary = null;
+                var planItineraries = _.reject(data.plan.itineraries, function(itinerary) {
+                    var thisItinerary = JSON.stringify(itinerary);
+                    if (lastItinerary === thisItinerary) {
+                        // found a duplicate itinerary; reject it
+                        lastItinerary = thisItinerary;
+                        return true;
+                    }
+                    lastItinerary = thisItinerary;
+                    return false;
+                });
+
+                // return the Itinerary objects for the unique collection
+                var itineraries = _(planItineraries).map(function(itinerary, i) {
                     return new Itinerary(itinerary, i, data.requestParameters);
                 }).value();
                 deferred.resolve(itineraries);
