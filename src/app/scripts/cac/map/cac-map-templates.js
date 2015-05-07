@@ -2,6 +2,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     'use strict';
 
     var module = {
+        alert: alert,
         addressText: addressText,
         bikeSharePopup: bikeSharePopup,
         destinationBlock: destinationBlock,
@@ -16,6 +17,31 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
         var template = Handlebars.compile(source);
         var html = template({address: address});
+        return html;
+    }
+
+    /**
+     * Build an HTML snippet for a Bootstrap alert, with close button
+     * http://getbootstrap.com/components/#alerts
+     *
+     * @param {string} message Message to display; can contain HTML tags
+     * @param {string} type Alert type (success, warning, info, or danger)
+     * @returns {String} Compiled Handlebars template for the Bootstrap alert
+     */
+    function alert(message, type) {
+        var info = {
+            message: message,
+            type: type
+        };
+        var source = [
+            '<div class="alert alert-{{info.type}} alert-dismissible" role="alert">',
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span></button>',
+            '{{info.message}}',
+            '</div>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({info: info});
         return html;
     }
 
