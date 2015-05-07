@@ -23,7 +23,7 @@ class LinkShortenerTestCase(TestCase):
 
     def test_generate_key(self):
         shortener = LinkShortener()
-        self.assertEqual(len(shortener.generate_key(self.long_link)), 24)
+        self.assertEqual(len(shortener.generate_key(self.long_link)), 22)
 
 
 class ShortenedLinkModelsTestCase(TestCase):
@@ -100,14 +100,14 @@ class ShortenedLinkViewsTestCase(TestCase):
         response = self.client.post('/link/shorten/')
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.post('/link/abcdefghijklmnopqrstuvwx')
+        response = self.client.post('/link/abcdefghijklmnopqrstuv')
         self.assertEqual(response.status_code, 405)
-        response = self.client.get('/link/abcdefghijklmnopqrstuvwx')
+        response = self.client.get('/link/abcdefghijklmnopqrstuv')
         self.assertEqual(response.status_code, 404)
         # This will throw an error if it fails; this is to make sure that the
         # URL resolution is fully working since the redirect method will return a
         # 404 if it is given a bad key.
-        reverse('dereference-shortened', kwargs={'key': u'CMBOzqQbSPq25N-9BTD_4w=='})
+        reverse('dereference-shortened', kwargs={'key': u'CMBOzqQbSPq25N29BTD54w'})
 
 
 class ShortenedLinkCreateTestCase(TestCase):
