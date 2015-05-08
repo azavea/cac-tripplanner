@@ -10,8 +10,11 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         destinationDetail: destinationDetail,
         eventPopup: eventPopup,
         itinerary: itinerary,
-        registerListItemHelpers: registerListItemHelpers
+        itineraryList: itineraryList
     };
+
+    // Only register these once, when the module loads
+    registerListItemHelpers();
 
     return module;
 
@@ -151,19 +154,31 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         return html;
     }
 
+    // Template for itinerary summaries
+    function itineraryList(itineraries) {
+        var source = '{{#each itineraries}}' +
+                '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
+                    '<div class="trip-numbers">' +
+                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
+                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
+                    '</div>' +
+                    '<div class="trip-details">' +
+                        '{{#each this.modes}}' +
+                            '<div class="direction-icon">' +
+                                ' {{modeIcon this}}' +
+                            '</div>' +
+                        '{{/each}}' +
+                        '<span class="short-description"> via {{this.via}}</span>' +
+                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
+                    '</div>' +
+                '</div>' +
+                '{{/each}}';
+        var template = Handlebars.compile(source);
+        var html = template({itineraries: itineraries});
+        return html;
+    }
+
     function itinerary(templateData) {
-        Handlebars.registerHelper('modeIcon', function(modeString) {
-            return new Handlebars.SafeString(Utils.modeStringHelper(modeString));
-        });
-
-        Handlebars.registerHelper('datetime', function(dateTime) {
-            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
-        });
-
-        Handlebars.registerHelper('inMiles', function(meters) {
-            return new Handlebars.SafeString(Math.round(((meters / 1000) * 0.621371) * 100) / 100);
-        });
-
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
             '<div class="block block-step directions-header">',
@@ -242,7 +257,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     function registerListItemHelpers() {
-        // Only register these once, when the control loads
         Handlebars.registerHelper('directionIcon', function(direction) {
             return new Handlebars.SafeString('<span class="glyphicon '+
                                              getTurnIconName(direction) + '"></span>');
@@ -251,9 +265,21 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
             return new Handlebars.SafeString('<span>' + text + '</span>');
         });
+
+        Handlebars.registerHelper('modeIcon', function(modeString) {
+            return new Handlebars.SafeString(Utils.modeStringHelper(modeString));
+        });
+
+        Handlebars.registerHelper('datetime', function(dateTime) {
+            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
+        });
+
+        Handlebars.registerHelper('inMiles', function(meters) {
+            return new Handlebars.SafeString(Math.round(((meters / 1000) * 0.621371) * 100) / 100);
+        });
     }
 
-        function getTurnIconName(turnType) {
+    function getTurnIconName(turnType) {
         switch (turnType) {
             case 'DEPART':
             case 'CONTINUE':
