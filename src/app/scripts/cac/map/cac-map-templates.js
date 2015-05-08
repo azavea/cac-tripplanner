@@ -4,6 +4,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     var module = {
         alert: alert,
         addressText: addressText,
+        bicycleWarningAlert: bicycleWarningAlert,
         bikeSharePopup: bikeSharePopup,
         destinationBlock: destinationBlock,
         destinationError: destinationError,
@@ -29,7 +30,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
      * Build an HTML snippet for a Bootstrap alert, with close button
      * http://getbootstrap.com/components/#alerts
      *
-     * @param {string} message Message to display; can contain HTML tags
+     * @param {string} message Message to display
      * @param {string} type Alert type (success, warning, info, or danger)
      * @returns {String} Compiled Handlebars template for the Bootstrap alert
      */
@@ -48,6 +49,45 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({info: info});
+        return html;
+    }
+
+    /**
+     * Build an HTML snippet for an alert with links to transit agencies' bicycle policies
+     *
+     * @param {array} agencies List of agency names to link to (agencyName from OTP leg)
+     * @returns {String} Compiled Handlebars template for the Bootstrap alert
+     */
+    function bicycleWarningAlert(agencies) {
+        var policyLinks = {
+            'SEPTA': 'http://www.septa.org/policy/bike.html',
+            'NJ TRANSIT BUS': 'http://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=BikeProgramTo',
+            'NJ TRANSIT RAIL': 'http://www.njtransit.com/rg/rg_servlet.srv?hdnPageAction=BikeProgramTo',
+            'Port Authority Transit Corporation': 'http://www.ridepatco.org/travel/bicycles.html',
+            'DART First State': 'http://www.dartfirststate.com/information/programs/bike/index.shtml'
+        };
+
+        var msg = 'Check agency bike policy before riding: ';
+        _.each(agencies, function(agency) {
+                msg += ['<a class="alert-link" target="_blank" href="',
+                        policyLinks[agency],
+                        '">',
+                        agency,
+                        '</a>, '].join('');
+        });
+        msg = msg.substring(0, msg.length - 2); // trim off trailing comma
+
+        // message is not templated, so we can embed links
+        var source = [
+            '<div class="alert-container">',
+            '<div class="alert alert-{{type}} alert-dismissible" role="alert">',
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span></button>',
+            msg,
+            '</div></div>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({type: 'warning'});
         return html;
     }
 
