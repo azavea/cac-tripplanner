@@ -38,15 +38,15 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var tabControl = null;
 
     var destinationIcon = L.AwesomeMarkers.icon({
-        icon: 'plane',
-        prefix: 'fa',
-        markerColor: 'blue'
+        icon: 'beenhere',
+        prefix: 'md',
+        markerColor: 'green'
     });
     var highlightIcon = L.AwesomeMarkers.icon({
-        icon: 'plane',
-        prefix: 'fa',
+        icon: 'beenhere',
+        prefix: 'md',
         iconColor: 'black',
-        markerColor: 'lightblue'
+        markerColor: 'lightgreen'
     });
 
     var esriSatelliteAttribution = [
@@ -525,7 +525,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             var originIcon = L.AwesomeMarkers.icon({
                 icon: 'home',
                 prefix: 'fa',
-                markerColor: 'green'
+                markerColor: 'purple'
             });
 
             var destIcon = L.AwesomeMarkers.icon({

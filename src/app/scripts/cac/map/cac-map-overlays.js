@@ -58,7 +58,7 @@ CAC.Map.OverlaysControl = (function ($, L) {
         var latLng = L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
         var icon = L.AwesomeMarkers.icon({
             icon: 'directions-bike',
-            markerColor: 'green',
+            markerColor: 'blue',
             prefix: 'md'
         });
         var marker = new L.marker(latLng, { icon: icon });
@@ -70,7 +70,7 @@ CAC.Map.OverlaysControl = (function ($, L) {
         var latLng = L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
         var icon = L.AwesomeMarkers.icon({
             icon: 'calendar',
-            markerColor: 'gray',
+            markerColor: 'orange',
             prefix: 'fa'
         });
         var marker = new L.marker(latLng, { icon: icon });
