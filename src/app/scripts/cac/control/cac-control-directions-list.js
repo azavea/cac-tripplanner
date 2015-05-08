@@ -41,12 +41,8 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
     function DirectionsListControl(params) {
         // recursively extend objects, so those not overridden will still exist
         options = $.extend(true, {}, defaults, params);
-
         $container = $(options.selectors.container);
-
         socialSharing = new Social();
-
-        MapTemplates.registerListItemHelpers();
     }
 
     DirectionsListControl.prototype = {
