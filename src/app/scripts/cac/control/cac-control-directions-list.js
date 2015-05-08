@@ -91,7 +91,15 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
                 e.stopPropagation();
             });
 
-        $container.empty().append($html);
+        $container.empty();
+
+        // Show alert with link to transit agency bicycle policy for bike+transit itineraries
+        if (_.contains(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
+            var $alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
+            $container.append($alert);
+        }
+
+        $container.append($html);
 
         // get URL for sharing
         var paramString = decodeURIComponent($.param(itinerary.requestParameters));
