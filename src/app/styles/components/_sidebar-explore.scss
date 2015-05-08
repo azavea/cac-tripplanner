@@ -164,6 +164,10 @@
             .alert-container {
                 padding-top: 5px;
             }
+
+            .alert-container:empty {
+                padding-top: 0px;
+            }
         }
         .block-destination {
             height: 160px;
