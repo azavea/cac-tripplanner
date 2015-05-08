@@ -152,7 +152,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
                 $(options.selectors.articlesSpinner).addClass('hidden');
                 $(options.selectors.articlesContainer).removeClass('hidden');
             } else {
-                console.error('Could not load all articles');
                 $(options.selectors.articlesSpinner).addClass('hidden');
                 $(options.selectors.articlesContainer).removeClass('hidden');
             }
@@ -191,7 +190,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
                 $(options.selectors.destinationsSpinner).addClass('hidden');
                 $(options.selectors.destinationsContainer).removeClass('hidden');
             } else {
-                console.error('Could not load all destinations');
                 $(options.selectors.destinationsSpinner).addClass('hidden');
                 $(options.selectors.destinationsContainer).removeClass('hidden');
             }

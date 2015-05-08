@@ -2,7 +2,7 @@
  *  View control for the itinerary list
  *
  */
-CAC.Control.ItineraryList = (function (_, $, Handlebars, Utils) {
+CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
 
     'use strict';
 
@@ -56,7 +56,7 @@ CAC.Control.ItineraryList = (function (_, $, Handlebars, Utils) {
 
 
         // Show the directions div and populate with itineraries
-        var html = getTemplate(itineraries);
+        var html = MapTemplates.itineraryList(itineraries);
         $container.html(html);
         $('a.itinerary').on('click', onItineraryClicked);
         $('.block-itinerary').on('click', onItineraryClicked);
@@ -64,45 +64,13 @@ CAC.Control.ItineraryList = (function (_, $, Handlebars, Utils) {
         $('.block-itinerary').hover(onItineraryHover);
     }
 
-    // Template for itinerary summaries
-    function getTemplate(itineraries) {
-        Handlebars.registerHelper('modeIcon', function(modeString) {
-            return new Handlebars.SafeString(Utils.modeStringHelper(modeString));
-        });
-
-        var source = '{{#each itineraries}}' +
-                '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
-                    '<div class="trip-numbers">' +
-                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
-                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
-                    '</div>' +
-                    '<div class="trip-details">' +
-                        '{{#each this.modes}}' +
-                            '<div class="direction-icon">' +
-                                ' {{modeIcon this}}' +
-                            '</div>' +
-                        '{{/each}}' +
-                        '<span class="short-description"> via {{this.via}}</span>' +
-                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
-                    '</div>' +
-                '</div>' +
-                '{{/each}}';
-        var template = Handlebars.compile(source);
-        var html = template({itineraries: itineraries});
-        return html;
-    }
-
     /**
      * Use in case OTP planner returns an error
      * @param {Object} Error object returned from OTP
      */
     function setItinerariesError(error) {
-        var source = '<div class="block block-itinerary">' +
-                '<span class="short-description"><b>{{error.msg}}</b></span>' +
-                '</div>';
-        var template = Handlebars.compile(source);
-        var html = template({error: error});
-        $container.html(html);
+        var $alert = MapTemplates.alert('Could not plan trip: ' + error.msg, 'danger');
+        $container.html($alert);
     }
 
     function getItineraryById(id) {
@@ -153,4 +121,4 @@ CAC.Control.ItineraryList = (function (_, $, Handlebars, Utils) {
             hide();
         }
     }
-})(_, jQuery, Handlebars, CAC.Utils);
+})(_, jQuery, CAC.Map.Templates);
