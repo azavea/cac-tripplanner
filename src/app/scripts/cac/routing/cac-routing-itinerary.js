@@ -11,15 +11,16 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
     function Itinerary(otpItinerary, index, requestParameters) {
         this.id = index.toString();
         this.requestParameters = requestParameters;
-        this.via = getVia(otpItinerary);
-        this.modes = getModes(otpItinerary);
-        this.distanceMiles = getDistanceMiles(otpItinerary);
+        this.via = getVia(otpItinerary.legs);
+        this.modes = getModes(otpItinerary.legs);
+        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.legs = getLegs(otpItinerary.legs);
         this.from = _.first(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
+        this.agencies = getTransitAgencies(otpItinerary.legs);
 
         this.geojson = L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
@@ -59,49 +60,47 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
     return Itinerary;
 
     /**
+     * Find transit agency names for this itinerary.
+     *
+     * @param {array} legs Legs property of OTP itinerary
+     * @return {array} List of unique agency names traversed in this itinerary
+     */
+    function getTransitAgencies(legs) {
+        return _.chain(legs).pluck('agencyName').uniq().without(undefined).value();
+    }
+
+    /**
      * Helper function to get label/via summary for an itinerary.
      * Chooses the streetname with the longest distance for an
      * itinerary.
      *
-     * @param {object} otpItinerary OTP itinerary
-     *
+     * @param {array} legs Legs property of OTP itinerary
      * @return {string} string to use for labeling an itinerary
      */
-    function getVia(otpItinerary) {
-        var steps = _(otpItinerary.legs).map(function(leg) {
-            return leg.steps;
-        }).flatten();
-
-        return steps.max(function(step) {
+    function getVia(legs) {
+        return _.chain(legs).pluck('steps').flatten().max(function(step) {
             return step.distance;
-        }).streetName;
+        }).value().streetName;
     }
 
     /**
      * Helper function to get label/via summary for an itinerary
      *
-     * @param {object} otpItinerary OTP itinerary
-     *
+     * @param {array} legs Legs property of OTP itinerary
      * @return {array} array of strings representing modes for itinerary
      */
-    function getModes(otpItinerary) {
-        var modes = _(otpItinerary.legs).map(function(leg) {
-            return leg.mode;
-        });
-        return modes.uniq().value();
+    function getModes(legs) {
+        return _.chain(legs).pluck('mode').uniq().value();
     }
 
     /**
      * Helper function to get label/via summary for an itinerary
      *
-     * @param {object} otpItinerary OTP itinerary
-     *
+     * @param {array} legs Legs property of OTP itinerary
      * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
      */
-    function getDistanceMiles(otpItinerary) {
-        var distanceMeters = _(otpItinerary.legs).map(function(leg) {
-            return leg.distance;
-        }).reduce(function(sum, n){
+    function getDistanceMiles(legs) {
+        var distanceMeters = _.chain(legs).pluck('distance').reduce(function(sum, n) {
             return sum + n;
         });
         return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
@@ -110,8 +109,7 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
     /**
      * Helper function to get label/via summary for an itinerary or leg
      *
-     * @param {object} otpItinerary OTP itinerary or leg
-     *
+     * @param {object} otpItinerary OTP itinerary or leg (both have duration property)
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
     function getFormattedDuration(otpItineraryLeg) {
@@ -131,12 +129,11 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
     /**
      * Helper function to get label/via summary for an itinerary
      *
-     * @param {object} itineraryLegs set of legs for an itinerary
-     *
+     * @param {array} legs set of legs for an OTP itinerary
      * @return {array} array of geojson features
      */
-    function getFeatures(itineraryLegs) {
-        return _.map(itineraryLegs, function(leg) {
+    function getFeatures(legs) {
+        return _.map(legs, function(leg) {
             var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
             linestringGeoJson.properties = leg;
             return linestringGeoJson;
