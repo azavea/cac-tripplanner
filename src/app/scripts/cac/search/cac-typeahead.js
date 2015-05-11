@@ -21,23 +21,34 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
 
     var defaults = {
         highlight: true,
-        minLength: 2,
+        minLength: 0, // set minLength to 0 so can check for empty input
         autoselect: true
     };
     var defaultTypeaheadKey = 'default';
     var thisLocation = null;
+    var triggerClear = null;
 
     function CACTypeahead(selector, options) {
 
         this.options = $.extend({}, defaults, options);
         this.events = $({});
         this.eventNames = {
+            cleared: 'cac:typeahead:cleared',
             selected: 'cac:typeahead:selected'
         };
 
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
         this.destinationAdapter = destinationAdapterFactory();
+
+        // Bind function to module context so event may be triggered on input clear.
+        // Note outstanding feature request for typeahead event to listen to for cleared input:
+        // https://github.com/twitter/typeahead.js/issues/607
+        var self = this;
+        triggerClear = _.bind(function () {
+            self.events.trigger(self.eventNames.cleared);
+        }, self);
+
 
         var createTypeahead = _.bind(function() {
             this.$element = $(selector).typeahead(this.options, {
@@ -138,6 +149,10 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     }
 
     function locationAdapter(query, callback) {
+        // trigger 'cleared' event if typeahead input field is empty
+        if (query === '') {
+            triggerClear();
+        }
         if (thisLocation) {
             callback(thisLocation);
         } else {
