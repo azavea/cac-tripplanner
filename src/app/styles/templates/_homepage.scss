@@ -51,6 +51,17 @@
         input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
         input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
         input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
+
+         &::-webkit-input-placeholder {
+            color: gray;
+            opacity: 0.75;
+            font-style: italic;
+        }
+        &:-moz-placeholder,
+        &::-moz-placeholder
+        &:-ms-input-placeholder {
+            color: gray;
+        }
     }
     .content {
         padding: 80px 0;

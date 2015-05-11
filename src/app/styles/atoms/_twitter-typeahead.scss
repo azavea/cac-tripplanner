@@ -3,6 +3,16 @@
  * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#look-and-feel
  */
 .twitter-typeahead {
+    &::-webkit-input-placeholder {
+        color: gray;
+        opacity: 0.75;
+        font-style: italic;
+    }
+    &:-moz-placeholder,
+    &::-moz-placeholder
+    &:-ms-input-placeholder {
+        color: gray;
+    }
     input:focus::-webkit-input-placeholder { color:transparent; }
     input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
     input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
@@ -11,7 +21,6 @@
     .tt-dropdown-menu {
         background-color: white;
         border: 1px solid #ccc;
-        color: black;
         min-width: 100%;
         text-align: left;
         margin-top: 5px;
@@ -26,4 +35,8 @@
             padding: 10px 15px;
         }
     }
+}
+
+.tt-hint {
+    color: #999;
 }
