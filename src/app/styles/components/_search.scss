@@ -52,6 +52,9 @@
         &[type="text"]:not(.form-control) {
             width: 260px;
         }
+        &.error {
+            border: solid 1px blue;
+        }
     }
     .transit-types-container {
         display: inline-block;
