@@ -26,29 +26,20 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     };
     var defaultTypeaheadKey = 'default';
     var thisLocation = null;
-    var triggerClear = null;
+    var events = $({});
+    var eventNames = {
+        cleared: 'cac:typeahead:cleared',
+        selected: 'cac:typeahead:selected'
+    };
 
     function CACTypeahead(selector, options) {
-
         this.options = $.extend({}, defaults, options);
-        this.events = $({});
-        this.eventNames = {
-            cleared: 'cac:typeahead:cleared',
-            selected: 'cac:typeahead:selected'
-        };
-
         this.suggestAdapter = suggestAdapterFactory();
         this.locationAdapter = locationAdapter;
         this.destinationAdapter = destinationAdapterFactory();
 
-        // Bind function to module context so event may be triggered on input clear.
-        // Note outstanding feature request for typeahead event to listen to for cleared input:
-        // https://github.com/twitter/typeahead.js/issues/607
-        var self = this;
-        triggerClear = _.bind(function () {
-            self.events.trigger(self.eventNames.cleared);
-        }, self);
-
+        this.events = events;
+        this.eventNames = eventNames;
 
         var createTypeahead = _.bind(function() {
             this.$element = $(selector).typeahead(this.options, {
@@ -85,20 +76,19 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     return CACTypeahead;
 
     function onTypeaheadSelected(event, suggestion, dataset) {
-        var self = this;
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
 
         if (dataset === 'destinations') {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
                     // location will be null if no results found
-                    self.events.trigger(self.eventNames.selected, [typeaheadKey, location]);
+                    events.trigger(eventNames.selected, [typeaheadKey, location]);
                 }, function (error) {
                     console.error(error);
                 });
         } else {
             // current location, or featured locations
-            self.events.trigger(self.eventNames.selected, [typeaheadKey, suggestion]);
+            events.trigger(eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
 
@@ -149,9 +139,14 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     }
 
     function locationAdapter(query, callback) {
-        // trigger 'cleared' event if typeahead input field is empty
+        // Trigger 'cleared' event if typeahead input field is empty.
+        // Note outstanding feature request for typeahead event to listen to for cleared input:
+        // https://github.com/twitter/typeahead.js/issues/607
         if (query === '') {
-            triggerClear();
+            // find key (do not have triggering event to inspect here)
+            var $element = $(this.$el[0].parentElement.parentElement).children('input').first();
+            var typeaheadKey = $element.data('typeahead-key') || defaultTypeaheadKey;
+            events.trigger(eventNames.cleared, [typeaheadKey]);
         }
         if (thisLocation) {
             callback(thisLocation);

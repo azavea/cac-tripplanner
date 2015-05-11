@@ -92,6 +92,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
         typeahead = new Typeahead(options.selectors.typeahead);
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
+        typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
@@ -278,8 +279,17 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
     }
 
+    function onTypeaheadCleared(event, key) {
+        // delete directions object/label values
+        if (key === 'origin' || key === 'destination') {
+            var prefKey = key === 'origin' ? 'from' : 'to';
+            UserPreferences.setPreference(prefKey, undefined);
+            UserPreferences.setPreference(prefKey + 'Text', undefined);
+            clearDirections();
+        }
+    }
+
     function onTypeaheadSelected(event, key, location) {
-        // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'origin' || key === 'destination') {
             var prefKey = key === 'origin' ? 'from' : 'to';
 
@@ -295,8 +305,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
 
             planTrip();
-        } else {
-            console.error('unrecognized key in onTypeaheadSelected: ' + key);
         }
     }
 
@@ -428,15 +436,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        if (to && to.feature && to.feature.geometry) {
-            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-        } else {
-            console.error('destination not found!');
-        }
-
-        $(options.selectors.origin).typeahead('val', fromText);
-        $(options.selectors.destination).typeahead('val', toText);
-
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
 
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
@@ -445,19 +444,29 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $(options.selectors.departAtSelect).val('arriveBy');
          }
 
+        if (to && to.feature && to.feature.geometry) {
+            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
+            $(options.selectors.destination).typeahead('val', toText);
+        }
+
+        if (from && from.feature && from.feature.geometry) {
+            $(options.selectors.origin).typeahead('val', fromText);
+        }
+
         if (method === 'directions') {
             // switch tabs
             tabControl.setTab('directions');
         }
 
         initialLoad = false;
-        if (from && from.feature.geometry) {
+        if (from && from.feature.geometry && to && to.feature.geometry) {
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             if (method === 'directions') {
                 planTrip();
             }
-        } else if (method === 'directions') {
+        } else if (method === 'directions' && to && to.feature.geometry) {
             // geolocate user, then plan
+            $(options.selectors.origin).typeahead('val', 'Current Location');
             mapControl.locateUser().then(function(data) {
                 directions.origin = [data[0], data[1]];
                 setDirectionsError('origin');
@@ -467,7 +476,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 console.error(error);
                 return;
             });
-        } else {
+        } else if (to && to.feature.geometry) {
             // geolocate user, but do not plan yet (user is on the other tab)
             mapControl.locateUser().then(function(data) {
                 directions.origin = [data[0], data[1]];
@@ -476,6 +485,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 console.error('Could not geolocate user');
                 console.error(error);
             });
+        } else {
+            // have neither origin nor destination
+            directions.origin = null;
+            directions.destination = null;
+            mapControl.setOriginDestinationMarkers(null, null);
+            mapControl.clearItineraries();
         }
     }
 
