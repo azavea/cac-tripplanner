@@ -28,14 +28,14 @@
         vertical-align: middle;
 
         &::-webkit-input-placeholder {
-            color: white;
+            color: gray;
             opacity: 0.75;
             font-style: italic;
         }
         &:-moz-placeholder,
         &::-moz-placeholder
         &:-ms-input-placeholder {
-            color: white;
+            color: gray;
         }
 
         &[type="number"] {
@@ -50,8 +50,7 @@
         margin: 0 0 0 15px;
         height: 70px;
         padding: 7px 0;
-        vertical-align: middle;    
-    
+        vertical-align: middle;
         .btn-transit {
             font-size: 21px;
             background: transparent;
