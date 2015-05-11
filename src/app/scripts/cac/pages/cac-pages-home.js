@@ -15,6 +15,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             directionsFrom: '#directionsFrom',
             directionsMode: '#directionsMode input',
             directionsTo: '#directionsTo',
+            errorClass: 'error',
             exploreForm: '#explore',
             exploreMode: '#exploreMode input',
             exploreOrigin: '#exploreOrigin',
@@ -47,6 +48,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         this.typeahead = new CAC.Search.Typeahead(options.selectors.typeahead);
         this.typeahead.events.on(this.typeahead.eventNames.selected,
                                  $.proxy(onTypeaheadSelected, this));
+        this.typeahead.events.on(this.typeahead.eventNames.cleared,
+                                 $.proxy(onTypeaheadCleared, this));
 
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);
@@ -65,21 +68,25 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         var fromText = $(options.selectors.directionsFrom).val();
         var toText = $(options.selectors.directionsTo).val();
 
-        // unset stored origin/destination and use defaults, if not entered
+        // unset stored origin/destination and show error, if not entered
         if (!fromText) {
             UserPreferences.setPreference('from', undefined);
+            $(options.selectors.directionsFrom).addClass(options.selectors.errorClass);
         }
 
         if (!toText) {
             UserPreferences.setPreference('to', undefined);
+            $(options.selectors.directionsTo).addClass(options.selectors.errorClass);
         }
+        // TODO: set error
 
-        UserPreferences.setPreference('method', 'directions');
-        UserPreferences.setPreference('mode', mode);
-        UserPreferences.setPreference('fromText', fromText);
-        UserPreferences.setPreference('toText', toText);
-
-        window.location = '/map';
+        if (fromText && toText) {
+            UserPreferences.setPreference('method', 'directions');
+            UserPreferences.setPreference('mode', mode);
+            UserPreferences.setPreference('fromText', fromText);
+            UserPreferences.setPreference('toText', toText);
+            window.location = '/map';
+        }
     };
 
     var submitExplore = function(event) {
@@ -89,8 +96,10 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         var originText = $(options.selectors.exploreOrigin).val();
 
         if (!originText) {
-            // unset stored origin and use default, if none entered
+            // unset stored origin and show error, if none entered
             UserPreferences.setPreference('origin', undefined);
+            $(options.selectors.exploreOrigin).addClass(options.selectors.errorClass);
+            return;
         }
 
         UserPreferences.setPreference('method', 'explore');
@@ -233,9 +242,28 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         });
     }
 
+    function onTypeaheadCleared(event, key) {
+        UserPreferences.setPreference(key, undefined);
+    }
+
     function onTypeaheadSelected(event, key, location) {
         event.preventDefault();  // do not submit form
         UserPreferences.setPreference(key, location);
+        var $input;
+        if (key === 'origin') {
+            $input = $(options.selectors.exploreOrigin);
+        } else if (key === 'from') {
+            $input = $(options.selectors.directionsFrom);
+        } else if (key === 'to') {
+            $input = $(options.selectors.directionsTo);
+        } else {
+            return;
+        }
+        if (location) {
+            $input.removeClass(options.selectors.errorClass);
+        } else {
+            $input.addClass(options.selectors.errorClass);
+        }
     }
 
     function setTab(tab) {
