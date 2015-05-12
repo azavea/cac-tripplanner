@@ -285,15 +285,15 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     function onTypeaheadCleared(event, key) {
         // delete directions object/label values
         if (key === 'origin' || key === 'destination') {
+            clearItineraries();
+            directions[key] = null;
             var prefKey = key === 'origin' ? 'from' : 'to';
             UserPreferences.setPreference(prefKey, undefined);
             UserPreferences.setPreference(prefKey + 'Text', undefined);
-            clearItineraries();
         }
     }
 
     function onTypeaheadSelected(event, key, location) {
-        console.log('selected ' + key);
         if (key === 'origin' || key === 'destination') {
             var prefKey = key === 'origin' ? 'from' : 'to';
 
@@ -478,13 +478,15 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             mapControl.locateUser().then(function(data) {
                 directions.origin = [data[0], data[1]];
                 setDirectionsError('origin');
+                UserPreferences.setPreference('from', undefined);
+                UserPreferences.setPreference('fromText', 'Current Location');
                 if (method === 'directions') {
                     planTrip(); // only plan now if user is currently on this tab
                 }
             }, function() {
                 // could not geolocate user
-                UserPreferences.setPreference('origin', undefined);
-                UserPreferences.setPreference('originText', undefined);
+                UserPreferences.setPreference('from', undefined);
+                UserPreferences.setPreference('fromText', undefined);
                 $(options.selectors.origin).typeahead('val', '');
                 setDirections('origin', null);
                 return;
