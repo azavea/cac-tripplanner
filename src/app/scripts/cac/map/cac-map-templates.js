@@ -184,10 +184,13 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         event.uwishunuLogo = Utils.getImageUrl('uwishunu_logo.png');
         var source = [
             '',
-            '<h4><img src="{{ event.uwishunuLogo }}" width="30px" height="30px" /> {{ event.title }}</h4>',
-            '<p>{{{ event.description }}}</p>',
-            '<a href="{{ event.link }}" target="_blank">More Info</a>',
-            '<small class="pull-right">Events by <a href="https://www.uwishunu.com">Uwishunu</a>'
+            '<div class="popup-header">',
+                '<img class="popup-logo" src="{{ event.uwishunuLogo }}" width="30px" height="30px" />',
+                '<h4 class="popup-title">{{ event.title }}</h4>',
+            '</div>',
+            '<p class="popup-text">{{{ event.description }}}</p>',
+            '<small>Events by <a href="https://www.uwishunu.com">Uwishunu</a>',
+            '<a href="{{ event.link }}" target="_blank" class="pull-right">More Info</a>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({event: event});

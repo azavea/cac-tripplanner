@@ -52,6 +52,16 @@
     }
 }
 
+.popup-title {
+    overflow: auto;
+    overflow-y: hidden;
+}
+
+.popup-logo {
+    float: left;
+    margin-right: 1.8rem;
+}
+
 .print > header {
     position: static;
     height: auto;
