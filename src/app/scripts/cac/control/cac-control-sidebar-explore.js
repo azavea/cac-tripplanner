@@ -19,7 +19,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             destinations: '.destinations',
             distanceMinutesText: '.distance-minutes',
             errorClass: 'error',
-            exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             isochroneInput: '.isochrone-input',
             maxWalkDiv: '#exploreMaxWalk',
@@ -73,8 +72,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             $('.explore').addClass('show-results');
         });
 
-        typeahead  = new Typeahead(options.selectors.typeahead);
+        typeahead = new Typeahead(options.selectors.typeahead);
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
+        typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
 
         setFromUserPreferences();
 
@@ -204,15 +204,23 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         );
     }
 
+    function onTypeaheadCleared(event, key) {
+        // delete origin object/label values
+        if (key === 'search') {
+            UserPreferences.setPreference('origin', undefined);
+            UserPreferences.setPreference('originText', undefined);
+            exploreLatLng = null;
+            selectedDestination = null;
+            mapControl.clearDiscoverPlaces();
+        }
+    }
+
     function onTypeaheadSelected(event, key, location) {
-        // TODO: Deleting text from input elements does not delete directions object values
         if (key === 'search') {
             UserPreferences.setPreference('origin', location);
             setAddress(location);
             selectedDestination = null;
             clickedExplore();
-        } else {
-            console.error('Unrecognized typeahead key ' + key + ' in explore tab.');
         }
     }
 
@@ -377,16 +385,18 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         var mode = UserPreferences.getPreference('mode');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         var exploreOrigin = UserPreferences.getPreference('origin');
-        exploreLatLng = [exploreOrigin.feature.geometry.y,
-                                    exploreOrigin.feature.geometry.x];
-        var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
 
-        setAddress(exploreOrigin);
+        if (exploreOrigin) {
+            exploreLatLng = [exploreOrigin.feature.geometry.y,
+                             exploreOrigin.feature.geometry.x];
+            var originText = UserPreferences.getPreference('originText');
+            $(options.selectors.exploreOrigin).typeahead('val', originText);
+            setAddress(exploreOrigin);
+        }
 
-        $(options.selectors.exploreOrigin).typeahead('val', originText);
         $(options.selectors.exploreTime).val(exploreTime);
 
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
@@ -416,7 +426,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        if (method === 'explore') {
+        if (method === 'explore' && exploreLatLng) {
             fetchIsochrone(when, exploreTime, otpOptions);
             // show destination details, if origin set by clicking destination on homepage
             if (_.has(exploreOrigin, 'id')) {

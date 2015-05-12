@@ -14,6 +14,26 @@
     span.twitter-typeahead {
         vertical-align: middle;
         margin: 0 15px;
+
+        &::-webkit-input-placeholder {
+            color: gray;
+            opacity: 0.75;
+            font-style: italic;
+        }
+        &:-moz-placeholder,
+        &::-moz-placeholder
+        &:-ms-input-placeholder {
+            color: gray;
+        }
+
+        focus::-webkit-input-placeholder { color:transparent; }
+        focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
+        focus::-moz-placeholder { color:transparent; } /* FF 19+ */
+        focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
+
+        .tt-hint {
+            color: #999;
+        }
     }
     input[type="number"] {
         margin: 0 15px;
@@ -21,22 +41,10 @@
     input:not([type="checkbox"]) {
         background: white;
         border: none;
-        color: black;
         padding: 17px 14px;
         height: 60px;
         border-radius: 9px;
         vertical-align: middle;
-
-        &::-webkit-input-placeholder {
-            color: white;
-            opacity: 0.75;
-            font-style: italic;
-        }
-        &:-moz-placeholder,
-        &::-moz-placeholder
-        &:-ms-input-placeholder {
-            color: white;
-        }
 
         &[type="number"] {
             width: 70px;
@@ -44,14 +52,16 @@
         &[type="text"]:not(.form-control) {
             width: 260px;
         }
+        &.error {
+            border: solid 1px blue;
+        }
     }
     .transit-types-container {
         display: inline-block;
         margin: 0 0 0 15px;
         height: 70px;
         padding: 7px 0;
-        vertical-align: middle;    
-    
+        vertical-align: middle;
         .btn-transit {
             font-size: 21px;
             background: transparent;
