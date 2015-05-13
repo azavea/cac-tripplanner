@@ -16,8 +16,14 @@
         });
 
         it('Should fetch a default setting', function(done) {
+            var val = UserPreferences.getPreference('method');
+            expect(val).toEqual('explore');
+            done();
+        });
+
+        it('Should have no location default setting', function(done) {
             var val = UserPreferences.getPreference('fromText');
-            expect(val).toEqual('Current Location');
+            expect(val).toBeUndefined();
             done();
         });
     });

@@ -212,7 +212,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             itineraryListControl.show();
         }, function (error) {
             $(options.selectors.spinner).addClass('hidden');
-            mapControl.setOriginDestinationMarkers(null, null);
             mapControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
@@ -229,6 +228,10 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
     function clearDirections() {
         mapControl.setOriginDestinationMarkers(null, null);
+        clearItineraries();
+    }
+
+    function clearItineraries() {
         mapControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
@@ -282,10 +285,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     function onTypeaheadCleared(event, key) {
         // delete directions object/label values
         if (key === 'origin' || key === 'destination') {
+            clearItineraries();
+            directions[key] = null;
             var prefKey = key === 'origin' ? 'from' : 'to';
             UserPreferences.setPreference(prefKey, undefined);
             UserPreferences.setPreference(prefKey + 'Text', undefined);
-            clearDirections();
         }
     }
 
@@ -339,8 +343,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 setDirections(key, [position.lat, position.lng]);
                 planTrip();
             } else {
-                console.error('Failed to reverse geocode position. Received response:');
-                console.error(data);
+                // unset location and show error
+                UserPreferences.setPreference(prefKey, undefined);
+                UserPreferences.setPreference(prefKey + 'Text', undefined);
+                $(options.selectors[key]).typeahead('val', '');
+                setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
                 itineraryListControl.setItinerariesError({
                     msg: 'Could not find street address for location.'
@@ -390,6 +397,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     }
 
     function setDirections(key, value) {
+        clearItineraries();
         if (key === 'origin' || key === 'destination') {
             directions[key] = value;
             setDirectionsError(key);
@@ -459,38 +467,37 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
 
         initialLoad = false;
-        if (from && from.feature.geometry && to && to.feature.geometry) {
+        if (from && to) {
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             if (method === 'directions') {
                 planTrip();
             }
-        } else if (method === 'directions' && to && to.feature.geometry) {
+        } else if (to) {
             // geolocate user, then plan
             $(options.selectors.origin).typeahead('val', 'Current Location');
             mapControl.locateUser().then(function(data) {
                 directions.origin = [data[0], data[1]];
                 setDirectionsError('origin');
-                planTrip();
-            }, function(error) {
-                console.error('Could not geolocate user');
-                console.error(error);
+                UserPreferences.setPreference('from', undefined);
+                UserPreferences.setPreference('fromText', 'Current Location');
+                if (method === 'directions') {
+                    planTrip(); // only plan now if user is currently on this tab
+                }
+            }, function() {
+                // could not geolocate user
+                UserPreferences.setPreference('from', undefined);
+                UserPreferences.setPreference('fromText', undefined);
+                $(options.selectors.origin).typeahead('val', '');
+                setDirections('origin', null);
                 return;
-            });
-        } else if (to && to.feature.geometry) {
-            // geolocate user, but do not plan yet (user is on the other tab)
-            mapControl.locateUser().then(function(data) {
-                directions.origin = [data[0], data[1]];
-                setDirectionsError('origin');
-            }, function(error) {
-                console.error('Could not geolocate user');
-                console.error(error);
             });
         } else {
             // have neither origin nor destination
             directions.origin = null;
             directions.destination = null;
-            mapControl.setOriginDestinationMarkers(null, null);
-            mapControl.clearItineraries();
+            $(options.selectors.origin).typeahead('val', '');
+            $(options.selectors.destination).typeahead('val', '');
+            clearDirections();
         }
     }
 

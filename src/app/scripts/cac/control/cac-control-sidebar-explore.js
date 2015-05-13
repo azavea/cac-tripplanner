@@ -107,11 +107,10 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
                 UserPreferences.setPreference('originText', fullAddress);
                 UserPreferences.setPreference('origin', location);
                 $('div.address > h4').html(MapTemplates.addressText(fullAddress));
-                $(options.selectors.exploreOrigin).typeahead('val', fullAddress);
+                $(options.selectors.typeahead).typeahead('val', fullAddress);
                 clickedExplore();
             } else {
-                console.error('Failed to reverse geocode position. Received response:');
-                console.error(data);
+                addressHasError(null);
                 setError('Could not find street address for location.');
                 $(options.selectors.destinations).removeClass('hidden');
                 $(options.selectors.spinner).addClass('hidden');
@@ -162,7 +161,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('originText', $(options.selectors.exploreOrigin).val());
+        UserPreferences.setPreference('originText', $(options.selectors.typeahead).val());
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
@@ -231,7 +230,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
      * @returns {Boolean} true if location is falsy
      */
     function addressHasError(location) {
-        var $input = $(options.selectors.exploreOrigin);
+        var $input = $(options.selectors.typeahead);
 
         if (location) {
             $input.removeClass(options.selectors.errorClass);
@@ -239,7 +238,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         } else {
             exploreLatLng = null;
             UserPreferences.setPreference('origin', undefined);
+            UserPreferences.setPreference('originText', undefined);
             $input.addClass(options.selectors.errorClass);
+            mapControl.clearDiscoverPlaces();
             return true;
         }
     }
@@ -385,6 +386,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         var mode = UserPreferences.getPreference('mode');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         var exploreOrigin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
@@ -392,9 +394,11 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         if (exploreOrigin) {
             exploreLatLng = [exploreOrigin.feature.geometry.y,
                              exploreOrigin.feature.geometry.x];
-            var originText = UserPreferences.getPreference('originText');
-            $(options.selectors.exploreOrigin).typeahead('val', originText);
+            $(options.selectors.typeahead).typeahead('val', originText);
             setAddress(exploreOrigin);
+        } else {
+            $(options.selectors.typeahead).typeahead('val', 'Current Location');
+            exploreLatLng = null;
         }
 
         $(options.selectors.exploreTime).val(exploreTime);
@@ -434,6 +438,28 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             } else {
                 selectedDestination = null;
             }
+        } else if (!exploreLatLng) {
+            // use current location
+            selectedDestination = null;
+            mapControl.locateUser().then(function(data) {
+                exploreLatLng = [data[0], data[1]];
+                UserPreferences.setPreference('origin', undefined);
+                UserPreferences.setPreference('originText', 'Current Location');
+                // show draggable marker on current location
+                var latLng = L.latLng(data[0], data[1]);
+                mapControl.setGeocodeMarker(latLng);
+                // only get isochrone now if user is currently on this tab
+                if (method === 'explore') {
+                    fetchIsochrone(when, exploreTime, otpOptions);
+                }
+            }, function() {
+                // could not geolocate user
+                UserPreferences.setPreference('origin', undefined);
+                UserPreferences.setPreference('originText', undefined);
+                $(options.selectors.typeahead).typeahead('val', '');
+                mapControl.clearDiscoverPlaces();
+                return;
+            });
         }
     }
 
