@@ -9,6 +9,11 @@ header {
         font-weight: 700;
         text-transform: uppercase;
         color: white;
+        display: block;
+        background: white;
+        float: left;
+        padding: 20px;
+        border-radius: 999px;
         
         &:hover {
             opacity: 0.75;
@@ -36,5 +41,11 @@ header {
         width: auto;
         padding: 15px;
         height: 70px;
+
+        a {
+            padding: 0;
+            border-radius: 0;
+            float: none;
+        }
     }
 }

@@ -1,6 +1,12 @@
 .article {
     .content-main {
         padding: 60px 0;
+
+        p {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
     }
     .pull-quote {
         background: $gpg-purple;
@@ -15,4 +21,8 @@
 
         p { margin: 0; }
     }
+}
+
+.articles {
+    margin-bottom: 20px;
 }
