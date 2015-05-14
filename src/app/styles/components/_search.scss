@@ -54,7 +54,7 @@
         }
         &.error {
             background: rgb(253, 239, 239) !important;
-            color: red;
+            color: #D02D2D;
         }
     }
     .transit-types-container {
@@ -63,6 +63,7 @@
         height: 70px;
         padding: 7px 0;
         vertical-align: middle;
+
         .btn-transit {
             font-size: 21px;
             background: transparent;
@@ -72,9 +73,13 @@
             border-radius: 99px;
             box-shadow: none;
 
+            .md { opacity: 0.5; }
+
             &.active {
                 background: white;
                 color: $gpg-red;
+
+                .md { opacity: 1; }
             }
         }
     }
