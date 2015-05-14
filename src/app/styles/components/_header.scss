@@ -26,6 +26,10 @@ header {
     border-bottom: 1px solid #ccc;
     height: 70px;
     background: white;
+    position: fixed;
+    z-index: 99;
+    left: 0;
+    width: 400px;
 
     header {
         background: none;
