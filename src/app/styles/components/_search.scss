@@ -53,7 +53,8 @@
             width: 260px;
         }
         &.error {
-            border: solid 1px blue;
+            background: rgb(253, 239, 239) !important;
+            color: red;
         }
     }
     .transit-types-container {
