@@ -28,13 +28,11 @@ header {
 }
 
 .app .small-header {
-    border-bottom: 1px solid #ccc;
     height: 70px;
-    background: white;
     position: fixed;
-    z-index: 99;
+    z-index: 100;
     left: 0;
-    width: 400px;
+    width: 72px;
 
     header {
         background: none;

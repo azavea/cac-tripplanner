@@ -16,22 +16,28 @@
     background: $light-gray;
 
     .leaflet-minimize {
-        background-color: #FFFFFF;
         color: #707070;
         cursor: pointer;
-        float: right;
-        border: 2px solid #707070;
+        position: absolute;
         border-radius: 3px;
         line-height: 10px;
-        margin-right: -15px;
-        margin-top: -12px;
-        padding: 2px;
+        padding: 15px;
+        top: 0;
         z-index: 99999;
+        right: 0;
+
+        &.minimized {
+            font-size: 18px;
+            height: 42px;
+            line-height: 16px;
+            background: white;
+        }
     }
 
     .leaflet-control-layers {
         margin-right: 30px;
         margin-bottom: 30px;
+        position: relative;
         padding: 15px 20px;
         border-radius: 0;
         box-shadow: 0 0 12px rgba(0,0,0,0.35);

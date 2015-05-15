@@ -14,6 +14,10 @@
 
 .trip-details {
     overflow: auto;
+
+    .itinerary {
+        display: block;
+    }
 }
 
 .direction-section {
@@ -39,6 +43,7 @@
 .direction-icon {
     @extend .direction-text;
     vertical-align: top;
+    float: left;
 }
 
 .directions-header-divider {
@@ -105,11 +110,12 @@
 
         input[type="search"] {
             width: 100%;
+            padding: 15px;
         }
 
         span.twitter-typeahead {
             width: 100%;
-            padding: 15px;
+            padding: 0;
             border-bottom: 1px solid #DDD;
 
             &:last-of-type {
