@@ -12,8 +12,8 @@ class DestinationForm(ModelForm):
 
     def clean_image(self):
         """Custom validator for image field"""
-        return validate_image(self.cleaned_data.get('image', False), 1)
+        return validate_image(self.cleaned_data.get('image', False), 400, 400)
 
     def clean_wide_image(self):
         """Custom validator for wide_image field"""
-        return validate_image(self.cleaned_data.get('wide_image', False), 2)
+        return validate_image(self.cleaned_data.get('wide_image', False), 400, 200)
