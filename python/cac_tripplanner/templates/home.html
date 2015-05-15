@@ -163,7 +163,7 @@
                                 <h3 class="destination-name">{{ community_profile.title }}</h3>
                                 <h5>Community Profile</h5>
                                 {% if community_profile.narrow_image %}
-                                <img src="{{ community_profile.narrow_image }}" width="400" height="600"/>
+                                <img src="{{ community_profile.narrow_image.url }}" width="400" height="600"/>
                                 {% else %}
                                 <img src="https://placehold.it/400x600.jpg" />
                                 {% endif %}
@@ -177,7 +177,7 @@
                                 <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
                                 <h5>Tips & Tricks</h5>
                                 {% if tips_and_tricks.wide_image %}
-                                <img src="{{ tips_and_tricks.narrow_image }}" width="400" height="600"/>
+                                <img src="{{ tips_and_tricks.narrow_image.url }}" width="400" height="600"/>
                                 {% else %}
                                 <img src="https://placehold.it/400x600.jpg" />
                                 {% endif %}

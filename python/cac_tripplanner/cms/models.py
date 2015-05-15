@@ -30,15 +30,9 @@ class ArticleManager(models.Manager):
         Note: This does not return a queryset so cannot be chained,
         if additional filtering is required, use a different method
         """
-        randomized = self.published().values('title',
-                                             'slug',
-                                             'wide_image',
-                                             'narrow_image').order_by('?')[:1]
-
-        # URL value strings are missing media prefix; add it back
-        for rand in randomized:
-            rand['wide_image'] = MEDIA_URL + rand['wide_image']
-            rand['narrow_image'] = MEDIA_URL + rand['narrow_image']
+        # Need to use the full object, because there is a magic transformation of the URL
+        # at some point which is needed for assembling the s3 url.
+        randomized = self.published().order_by('?')[:1]
 
         if randomized:
             return randomized[0]
