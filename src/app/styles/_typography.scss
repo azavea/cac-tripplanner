@@ -27,6 +27,11 @@ h1 {
         font-weight: 700;
         font-style: italic;
         text-transform: none;
+
+        @media screen and #{$screen-xs} {
+            display: block;
+            margin: 0;
+        }
     }
 }
 h2 {
@@ -40,6 +45,11 @@ h2 {
         margin-left: 10px;
         font-weight: 700;
         font-style: italic;
+            
+        @media screen and #{$screen-xs} {
+            display: block;
+            margin: 0;
+        }
     }
 }
 h3 {
@@ -55,6 +65,11 @@ h3 {
         font-weight: 700;
         font-style: italic;
         text-transform: none;
+
+        @media screen and #{$screen-xs} {
+            display: block;
+            margin: 0;
+        }
     }
 }
 h4 {

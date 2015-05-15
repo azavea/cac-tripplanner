@@ -8,13 +8,23 @@
     background: #eee;
     overflow-x: hidden;
 
+    @media screen and #{$screen-xs} {
+        width: 100%;
+    }
+
     .tt-hint {
         color: #999;
     }
     .sidebar-tabs {
-        position: absolute;
+        position: fixed;
         top: 0;
-        right: 10px;
+        left: 0;
+        width: 400px;
+        z-index: 99;
+        height: 70px;
+        text-align: right;
+        background: white;
+        border-bottom: 1px solid #ccc;
 
         .btn {
             border-radius: 0;
