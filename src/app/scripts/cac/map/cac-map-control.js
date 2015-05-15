@@ -116,7 +116,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 $(leafletMinimizer).removeClass('minimized');
             } else {
                 // minimize it
-                $(leafletMinimizer).html('<i class="fa fa-plus"></i>');
+                $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
                 $(leafletMinimizer).addClass('minimized');
                 $(leafletLayerList).hide();
             }
