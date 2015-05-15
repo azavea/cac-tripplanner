@@ -25,20 +25,10 @@ class ArticleManager(models.Manager):
         return self.get_queryset().filter(publish_date__lt=now())
 
     def random(self):
-        """Returns a randomized title, slug field, and images, if an article is available
-
-        Note: This does not return a queryset so cannot be chained,
-        if additional filtering is required, use a different method
-        """
-        randomized = self.published().values('title',
-                                             'slug',
-                                             'wide_image',
-                                             'narrow_image').order_by('?')[:1]
-
-        # URL value strings are missing media prefix; add it back
-        for rand in randomized:
-            rand['wide_image'] = MEDIA_URL + rand['wide_image']
-            rand['narrow_image'] = MEDIA_URL + rand['narrow_image']
+        """Returns a randomized article"""
+        # Need to use the full object, because there is a magic transformation of the URL
+        # at some point which is needed for assembling the s3 url.
+        randomized = self.published().order_by('?')[:1]
 
         if randomized:
             return randomized[0]
@@ -103,7 +93,7 @@ class Article(models.Model):
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The wide image. Will be displayed at 1280x400.')
+                                   help_text='The wide image. Will be displayed at 1440x400.')
     narrow_image = models.ImageField(upload_to=generate_filename, null=True,
                                      help_text='The narrow image. Will be displayed at 400x600.')
 
