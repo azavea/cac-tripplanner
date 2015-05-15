@@ -54,17 +54,9 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, ',
         'AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
     ].join('');
-    var stamenTonerAttribution = [
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
-        'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, ',
-        'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
-    ].join('');
-    var stamenAttribution = [
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
-        'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
+    var cartodbAttribution = [
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ',
+        '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
     ].join('');
 
     /**
@@ -139,19 +131,24 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     return MapControl;
 
     function initializeBasemaps() {
-        basemaps.Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
-            attribution: stamenAttribution
+        var retina = '';
+        if (window.devicePixelRatio > 1) {
+            retina = '@2x';
+        }
+
+        basemaps.Light = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}' + retina + '.png', {
+            attribution: cartodbAttribution
+        });
+
+        basemaps.Dark = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}' + retina + '.png', {
+            attribution: cartodbAttribution
         });
 
         basemaps.Satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: esriSatelliteAttribution
         });
 
-        basemaps.Streets = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
-            attribution: stamenTonerAttribution
-        });
-
-        basemaps.Terrain.addTo(map);
+        basemaps.Light.addTo(map);
     }
 
     function initializeOverlays() {
