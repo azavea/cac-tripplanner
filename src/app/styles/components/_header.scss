@@ -12,13 +12,19 @@ header {
         display: block;
         background: white;
         float: left;
-        padding: 20px;
+        padding: 20px 17px 20px 23px;
         border-radius: 999px;
         
         &:hover {
             opacity: 0.75;
             text-decoration: none;
             color: white;
+        }
+
+        @media screen and #{$screen-xs} {
+            width: 60px;
+            padding: 11px 9px 10px 11px;
+            height: 60px;
         }
     }
 
@@ -44,6 +50,7 @@ header {
             padding: 0;
             border-radius: 0;
             float: none;
+            background: none;
         }
     }
 }

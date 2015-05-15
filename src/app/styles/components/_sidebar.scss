@@ -8,6 +8,10 @@
     background: #eee;
     overflow-x: hidden;
 
+    @media screen and #{$screen-xs} {
+        width: 100%;
+    }
+
     .tt-hint {
         color: #999;
     }

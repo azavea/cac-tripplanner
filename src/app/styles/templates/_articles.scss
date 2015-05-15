@@ -19,10 +19,20 @@
         max-width: 40%;
         margin-left: 25px;
 
+        @media screen and #{$screen-xs} {
+            float: none;
+            margin: 10px 0;
+            max-width: 100%;
+        }
+
         p { margin: 0; }
     }
 }
-
+.content {
+    @media screen and #{$screen-xs} {
+        padding: 15px;
+    }
+}
 .articles {
     margin-bottom: 20px;
 }

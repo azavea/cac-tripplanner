@@ -2,6 +2,10 @@
     & > .jumbotron {
         background-image: url('../images/homepage_hero@2x.jpg');
 
+        @media screen and #{$screen-xs} {
+            height: auto;
+        }
+
         h1 {
             line-height: 1.3;
             font-size: 4rem;
@@ -9,6 +13,11 @@
             margin: 120px 0 60px;
             color: white;
             text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+
+            @media screen and #{$screen-xs} {
+                margin: 90px 0 25px;
+                font-size: 32px;
+            }
         }
         h3 {
             font-family: 'Cabin';
@@ -81,6 +90,10 @@
         &.content-gray {
             background: #d6effb;
             background-size: cover;
+
+            @media screen and #{$screen-xs} {
+                padding: 50px 0;
+            }
         }
     }
 }

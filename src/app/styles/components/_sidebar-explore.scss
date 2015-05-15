@@ -93,6 +93,10 @@
                 color: white;
                 padding: 11px 8px;
                 font-size: 16px;
+
+                @media screen and #{$screen-xs} {
+                    font-size: 14px;
+                }
             }
             input:not([type="checkbox"]) {
                 background: white;
@@ -120,6 +124,11 @@
                 &[type="number"] {
                     width: 70px;
                     vertical-align: middle;
+
+                    @media screen and #{$screen-xs} {
+                        width: 50px;
+                        padding-right: 0;
+                    }
                 }
             }
             .ms-parent {

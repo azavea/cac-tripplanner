@@ -7,8 +7,16 @@
         height: 360px;
         cursor: pointer;
 
+        @media screen and #{$screen-xs} {
+            margin-bottom: 15px;
+        }
+
         &.block-half {
             height: 172px;
+
+            @media screen and #{$screen-xs} {
+                margin-bottom: 15px;
+            }
 
             &:first-of-type {
                 margin-bottom: 15px;
