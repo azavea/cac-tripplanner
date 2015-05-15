@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.utils.timezone import now
@@ -11,8 +12,15 @@ from cms.models import Article
 class ArticleTests(TestCase):
     def setUp(self):
         user = User.objects.create_user(username='test-user')
+        test_image = File(open('default_media/square/BartramsGarden.jpg'))
 
-        common_args = dict(teaser='None', content='None', author=user)
+        common_args = dict(
+            teaser='None',
+            content='None',
+            author=user,
+            narrow_image=test_image,
+            wide_image=test_image
+        )
 
         publish_date = now() - timedelta(hours=1)
 
@@ -56,12 +64,9 @@ class ArticleTests(TestCase):
         published_community_profiles_count = Article.profiles.published().count()
         self.assertEqual(published_community_profiles_count, 1)
 
-        random_community_profile = Article.profiles.random()
-        test_dictionary = {'title': self.published_comm.title,
-                           'slug': self.published_comm.slug,
-                           'narrow_image': '/media/',
-                           'wide_image': '/media/'}
-        self.assertDictEqual(random_community_profile, test_dictionary)
+        random = Article.profiles.random()
+        published = Article.profiles.published()[0]
+        self.assertEqual(random, published)
 
     def test_tips_and_tricks_manager(self):
         """Test that community profile manager works"""
@@ -72,12 +77,9 @@ class ArticleTests(TestCase):
         published_tips_count = Article.tips.published().count()
         self.assertEqual(published_tips_count, 1)
 
-        random_tips = Article.tips.random()
-        test_dictionary = {'title': self.published_tips.title,
-                           'slug': self.published_tips.slug,
-                           'narrow_image': '/media/',
-                           'wide_image': '/media/'}
-        self.assertDictEqual(random_tips, test_dictionary)
+        random = Article.tips.random()
+        published = Article.tips.published()[0]
+        self.assertEqual(random, published)
 
     def test_article_manager(self):
         """Test that community profile manager works"""
