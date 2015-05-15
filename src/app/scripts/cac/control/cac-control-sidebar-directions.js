@@ -12,6 +12,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     // Number of millis to wait on input changes before sending directions request
     var DIRECTION_THROTTLE_MILLIS = 750;
 
+    // default maxWalk when biking (in miles)
+    var MAXWALK_BIKE = 300;
+
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#directionsBikeTriangle',
@@ -162,6 +165,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $.extend(otpOptions, {optimize: 'TRIANGLE'},
                      bikeModeOptions.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+
+            // allow longer bike riding when using public transit
+            $.extend(otpOptions, { maxWalkDistance: MAXWALK_BIKE * METERS_PER_MILE });
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
             if (maxWalk) {
