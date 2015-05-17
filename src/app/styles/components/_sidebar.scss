@@ -10,6 +10,8 @@
 
     @media screen and #{$screen-xs} {
         width: 100%;
+        position: relative;
+        height: 100%;
     }
 
     .tt-hint {
@@ -25,6 +27,10 @@
         text-align: right;
         background: white;
         border-bottom: 1px solid #ccc;
+
+        @media screen and #{$screen-xs} {
+            width: 100%:
+        }
 
         .btn {
             border-radius: 0;

@@ -33,7 +33,8 @@
 .direction-depart {
     border-bottom: 2px solid #bbb;
     font-size: 16px;
-    padding: 15px 0 20px;
+    margin: 0 -15px;
+    padding: 15px;
 }
 
 .direction-text {
@@ -48,6 +49,12 @@
 
 .directions-header-divider {
     opacity: .5;
+    padding: 0 8px;
+}
+
+.back {
+    font-size: 2.1rem;
+    line-height: 1.2;
 }
 
 .trip-details .short-description {
@@ -59,7 +66,7 @@
     background-color: #333;
     margin-left: -15px;
     margin-right: -15px;
-    padding: 10px;
+    padding: 15px;
     font-size: 18px;
     color: #fff;
     a {
@@ -77,6 +84,7 @@
 .block-step.direction-item {
     border-bottom: 1px solid #eee;
     padding: 8px 0;
+    padding-left: 24px;
     color: #999;
     &:last-child {
         border-bottom: 0;
@@ -103,6 +111,11 @@
         width: auto;
         display: inline-block;
         vertical-align: middle;
+
+        @media screen and #{$screen-xs} {
+            max-width: 150px;
+            margin-left: 5px;
+        }
     }
 
     .sidebar-search {
@@ -280,13 +293,16 @@
                 border-bottom: 0;
             }
         }
+        .block-legs {
+            margin: 0 -15px;
+        }
         .block-leg {
             height: auto;
-            margin-bottom: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
+            margin: 0;
+            padding: 15px;
             width: 100%;
             border-top: 1px solid #bbb;
+
             &:first-child {
                 border-top: 0;
             }

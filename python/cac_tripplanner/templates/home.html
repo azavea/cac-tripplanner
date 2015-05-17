@@ -95,7 +95,7 @@
                 <div class="sk-bounce3"></div>
             </div>
             <div class="row destinations">
-                <div class="col-lg-4">
+                <div class="col-md-4">
                     <a class="block block-destination" href="#">
                         <h3 class="destination-name">{{ destinations.0.name }}</h3>
                         <h5 class="destination-address">{{ destinations.0.address }}</h5>
@@ -107,7 +107,7 @@
                         {% endif %}
                     </a>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-md-4">
                     <a class="block block-destination" href="#">
                         <h3 class="destination-name">{{ destinations.1.name }}</h3>
                         <h5 class="destination-address">{{ destinations.1.address }}</h5>
@@ -119,7 +119,7 @@
                         {% endif %}
                     </a>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-md-4">
                     <a class="block block-destination block-half" href="#">
                         <h3 class="destination-name">{{ destinations.2.name }}</h3>
                         <h5 class="destination-address">{{ destinations.2.address }}</h5>
@@ -147,7 +147,7 @@
     <section class="content">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-md-8">
                     <h3>GoPhillyGo Spotlight <lgall>
                         <a id="viewAllArticles" href="#">View all &raquo;</a>
                     </lgall></h3>
@@ -158,7 +158,7 @@
                     </div>
                     <div class="row articles">
                       {% if community_profile %}
-                        <div class="col-lg-6">
+                        <div class="col-md-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
                                 <h3 class="destination-name">{{ community_profile.title }}</h3>
@@ -172,7 +172,7 @@
                         </div>
                         {% endif %}
                         {% if tips_and_tricks %}
-                        <div class="col-lg-6">
+                        <div class="col-md-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
                                 <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
@@ -187,7 +187,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-lg-4 hidden-xs hidden-lg">
+                <div class="col-md-4 hidden-xs hidden-sm">
                     <h3>Stay Connected</h3>
                     <a class="twitter-timeline" href="https://twitter.com/go_philly_go"
                         data-widget-id="591426048786587650">Tweets by @go_philly_go</a>
