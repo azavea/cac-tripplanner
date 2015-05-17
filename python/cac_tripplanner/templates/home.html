@@ -7,16 +7,16 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2">
                     <h1 class="text-center">GoPhillyGo is a new online mapping tool for the Greater Philadelphia area.</h1>
-                    <h3 class="text-center hidden-xs">There are 2 easy ways to use the map:</h3>
-                    <div class="text-center toggle-search hidden-xs">
+                    <h3 class="text-center hidden-xs hidden-sm">There are 2 easy ways to use the map:</h3>
+                    <div class="text-center toggle-search hidden-xs hidden-sm">
                         <button class="btn btn-lg active" id="toggle-explore">Explore nearby locations</button>
-                        <lgall>or</lgall>
+                        <small>or</small>
                         <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="search text-center hidden-xs hidden-lg">
+        <div class="search text-center hidden-xs hidden-sm">
             <form id="explore">
                 <span class="text">Where can I go in</span>
                 <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
@@ -86,16 +86,16 @@
     </section>
     <section class="content content-gray">
         <div class="container">
-            <h1>Featured Locations <lgall>
+            <h1>Featured Locations <small>
                 <a id="viewAllDestinations" href="#">View all &raquo;</a>
-            </lgall></h1>
+            </small></h1>
             <div id="#destinationsSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
                 <div class="sk-bounce1"></div>
                 <div class="sk-bounce2"></div>
                 <div class="sk-bounce3"></div>
             </div>
             <div class="row destinations">
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <a class="block block-destination" href="#">
                         <h3 class="destination-name">{{ destinations.0.name }}</h3>
                         <h5 class="destination-address">{{ destinations.0.address }}</h5>
@@ -107,7 +107,7 @@
                         {% endif %}
                     </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <a class="block block-destination" href="#">
                         <h3 class="destination-name">{{ destinations.1.name }}</h3>
                         <h5 class="destination-address">{{ destinations.1.address }}</h5>
@@ -119,7 +119,7 @@
                         {% endif %}
                     </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <a class="block block-destination block-half" href="#">
                         <h3 class="destination-name">{{ destinations.2.name }}</h3>
                         <h5 class="destination-address">{{ destinations.2.address }}</h5>
@@ -148,9 +148,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
-                    <h3>GoPhillyGo Spotlight <lgall>
+                    <h3>GoPhillyGo Spotlight <small>
                         <a id="viewAllArticles" href="#">View all &raquo;</a>
-                    </lgall></h3>
+                    </small></h3>
                     <div id="articlesSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
                         <div class="sk-bounce1"></div>
                         <div class="sk-bounce2"></div>
@@ -158,7 +158,7 @@
                     </div>
                     <div class="row articles">
                       {% if community_profile %}
-                        <div class="col-md-6">
+                        <div class="col-sm-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
                                 <h3 class="destination-name">{{ community_profile.title }}</h3>
@@ -172,7 +172,7 @@
                         </div>
                         {% endif %}
                         {% if tips_and_tricks %}
-                        <div class="col-md-6">
+                        <div class="col-sm-6">
                           <a class="block block-spotlight"
                              href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
                                 <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>

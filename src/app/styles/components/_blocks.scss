@@ -7,6 +7,23 @@
         height: 360px;
         cursor: pointer;
 
+        .homepage &:after{
+            opacity: 0.15;
+            content: '';
+            position: absolute;
+            background: black;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            transition: 0.5s all;
+        }
+
+        .homepage &:hover:after {
+            opacity: 0.05;
+        }
+
         @media screen and #{$screen-xs} {
             margin-bottom: 15px;
         }
@@ -22,10 +39,14 @@
                 margin-bottom: 15px;
             }
 
-            h3 { font-size: 2.1rem; bottom: 65px; }
-            h5 { font-size: 1.4rem; bottom: 45px; }
+            h3 { font-size: 2.1rem; bottom: 63px; 
+                @media screen and #{$screen-xs} {
+                    font-size: 1.8rem;
+                }
+            }
+            h5 { font-size: 1.4rem; bottom: 43px; }
             h5.destination-address-2 {
-                bottom: 25px;
+                bottom: 23px;
             }
         }
 
@@ -33,7 +54,7 @@
             bottom: 70px;
             font-size: 24px;
             font-weight: 700;
-            line-height: 1.3;
+            line-height: 1.2;
             text-shadow: 0 0 8px rgba(0,0,0,0.35);
         }
         h5 {
@@ -94,7 +115,7 @@
     }
     h3, h5 {
         color: white;
-        z-index: 2;
+        z-index: 3;
         left: 30px;
         right: 30px;
     }

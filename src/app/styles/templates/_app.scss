@@ -38,9 +38,9 @@
         }
     }
 
-    .leaflet-container a.leaflet-popup-close-button {
-        top: 5px;
-        right: 5px;
+    .leaflet-popup-close-button {
+        top: 5px !important;
+        right: 5px !important;
     }
 
     .leaflet-control-layers {

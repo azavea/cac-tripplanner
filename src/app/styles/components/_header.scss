@@ -14,6 +14,7 @@ header {
         float: left;
         padding: 20px 17px 20px 23px;
         border-radius: 999px;
+        transition: 0.5s all;
         
         &:hover {
             opacity: 0.75;

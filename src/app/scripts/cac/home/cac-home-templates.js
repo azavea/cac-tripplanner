@@ -17,7 +17,7 @@ CAC.Home.Templates = (function (Handlebars) {
     function destinations(useDestinations) {
         var source = [
             '{{#each destinations}}',
-            '<div class="col-sm-4">',
+            '<div class="col-sm-6 col-md-4">',
             '<a class="block block-destination block-half" href="#">',
             '<h3 class="destination-name">{{this.name}}</h3>',
             '<h5 class="destination-address">{{this.address}}</h5>',
