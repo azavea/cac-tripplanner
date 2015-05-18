@@ -45,8 +45,9 @@
                 border-radius: 99px;
                 outline: none;
                 opacity: 0.5;
+                transition: 0.5s all;
 
-                &.active {
+                &.active, &:hover {
                     color: $gpg-red;
                     background: white;
                     box-shadow: 0 2px 12px rgba(0,0,0,0.65);

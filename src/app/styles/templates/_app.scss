@@ -38,6 +38,11 @@
         }
     }
 
+    .leaflet-popup-close-button {
+        top: 5px !important;
+        right: 5px !important;
+    }
+
     .leaflet-control-layers {
         margin-right: 30px;
         margin-bottom: 30px;
@@ -56,6 +61,9 @@
     }
 }
 
+.leaflet-popup-content-wrapper {
+    border-radius: 0;
+}
 .leaflet-popup-content .bikeshare {
     p {
         line-height: 20%;
