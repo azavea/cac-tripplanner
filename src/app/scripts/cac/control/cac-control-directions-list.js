@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences) {
+CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferences) {
 
     'use strict';
 
@@ -18,6 +18,7 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
             container: '.directions-list',
             backButton: 'a.back',
             directionItem: '.direction-item',
+            directLinkButton: '#directLinkBtn',
             emailShareButton: '#emailShareBtn',
             facebookShareButton: '#fbShareBtn',
             twitterShareButton: '#twShareBtn',
@@ -126,6 +127,9 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
             $(options.selectors.emailShareButton).on('click',
                                                      {url: shortened},
                                                      socialSharing.shareViaEmail);
+            $(options.selectors.directLinkButton).on('click',
+                                                     {url: shortened},
+                                                     socialSharing.shareDirectLink);
         });
     }
 
@@ -163,4 +167,4 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences);
+})(_, jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences);

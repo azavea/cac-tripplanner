@@ -6,7 +6,11 @@ CAC.Share.Social = (function ($, Settings) {
     'use strict';
 
     var defaults = {
-        useHost: window.location.protocol + '//' + window.location.host
+        useHost: window.location.protocol + '//' + window.location.host,
+        selectors: {
+            modal: '#linkModal',
+            modalLink: '#modalDirectionsLink'
+        }
     };
     var options = {};
 
@@ -16,6 +20,7 @@ CAC.Share.Social = (function ($, Settings) {
     }
 
     Social.prototype = {
+        shareDirectLink: shareDirectLink,
         shareOnFacebook: shareOnFacebook,
         shareOnGooglePlus: shareOnGooglePlus,
         shareOnTwitter: shareOnTwitter,
@@ -76,8 +81,6 @@ CAC.Share.Social = (function ($, Settings) {
 
             var url = feedUrl + $.param(params);
             window.open(url, '_blank');
-            event.returnValue = false;
-            event.preventDefault();
         }
     }
 
@@ -100,8 +103,6 @@ CAC.Share.Social = (function ($, Settings) {
         };
         var url = shareUrl + '?' + $.param(params);
         window.open(url, '', windowOpts);
-        event.returnValue = false;
-        event.preventDefault();
     }
 
     /**
@@ -159,6 +160,17 @@ CAC.Share.Social = (function ($, Settings) {
                          ].join('');
         mailToLink = encodeURI(mailToLink);
         window.location.href = mailToLink;
+    }
+
+     /**
+     * Open modal to display directions link.
+     *
+     * @param {object} event Triggering click event; expected to have data.url set to link to share
+     */
+    function shareDirectLink(event) {
+        $(options.selectors.modalLink).text(event.data.url);
+        $(options.selectors.modalLink).attr('href', event.data.url);
+        $(options.selectors.modal).modal();
     }
 
     /**
