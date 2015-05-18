@@ -6,7 +6,11 @@ CAC.Share.Social = (function ($, Settings) {
     'use strict';
 
     var defaults = {
-        useHost: window.location.protocol + '//' + window.location.host
+        useHost: window.location.protocol + '//' + window.location.host,
+        selectors: {
+            modal: '#linkModal',
+            modalLink: '#modalDirectionsLink'
+        }
     };
     var options = {};
 
@@ -159,12 +163,14 @@ CAC.Share.Social = (function ($, Settings) {
     }
 
      /**
-     * Open modal with directions link.
+     * Open modal to display directions link.
      *
      * @param {object} event Triggering click event; expected to have data.url set to link to share
      */
     function shareDirectLink(event) {
-        window.open(event.data.url, '_blank');
+        $(options.selectors.modalLink).text(event.data.url);
+        $(options.selectors.modalLink).attr('href', event.data.url);
+        $(options.selectors.modal).modal();
     }
 
     /**
