@@ -2,7 +2,6 @@
 app_username: "vagrant"
 
 # open trip planner vars
-otp_process_mem: 2G
 otp_repo: "https://github.com/OpenTripPlanner/OpenTripPlanner.git"
 otp_version: "otp-0.15.0"
 otp_jarfile: "./target/otp-0.15.0.jar"
