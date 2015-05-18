@@ -30,7 +30,6 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
 
     function ItineraryListControl(params) {
         options = $.extend({}, defaults, params);
-
         $container = $(options.selectors.container);
     }
 
@@ -58,9 +57,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Show the directions div and populate with itineraries
         var html = MapTemplates.itineraryList(itineraries);
         $container.html(html);
-        $('a.itinerary').on('click', onItineraryClicked);
         $('.block-itinerary').on('click', onItineraryClicked);
-        $('a.itinerary').hover(onItineraryHover);
         $('.block-itinerary').hover(onItineraryHover);
     }
 

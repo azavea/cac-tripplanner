@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences) {
+CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferences) {
 
     'use strict';
 
@@ -167,4 +167,4 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
         }
     }
 
-})(jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences);
+})(_, jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences);
