@@ -18,6 +18,7 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
             container: '.directions-list',
             backButton: 'a.back',
             directionItem: '.direction-item',
+            directLinkButton: '#directLinkBtn',
             emailShareButton: '#emailShareBtn',
             facebookShareButton: '#fbShareBtn',
             twitterShareButton: '#twShareBtn',
@@ -126,6 +127,9 @@ CAC.Control.DirectionsList = (function ($, MapTemplates, Social, UserPreferences
             $(options.selectors.emailShareButton).on('click',
                                                      {url: shortened},
                                                      socialSharing.shareViaEmail);
+            $(options.selectors.directLinkButton).on('click',
+                                                     {url: shortened},
+                                                     socialSharing.shareDirectLink);
         });
     }
 
