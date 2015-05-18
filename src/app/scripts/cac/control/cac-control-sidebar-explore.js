@@ -161,7 +161,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('originText', $(options.selectors.typeahead).val());
         UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
@@ -217,6 +216,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function onTypeaheadSelected(event, key, location) {
         if (key === 'search') {
             UserPreferences.setPreference('origin', location);
+            UserPreferences.setPreference('originText', location.name);
             setAddress(location);
             selectedDestination = null;
             clickedExplore();
@@ -398,6 +398,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             setAddress(exploreOrigin);
         } else {
             $(options.selectors.typeahead).typeahead('val', 'Current Location');
+            UserPreferences.setPreference('originText', 'Current Location');
             exploreLatLng = null;
         }
 
@@ -443,7 +444,12 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             selectedDestination = null;
             mapControl.locateUser().then(function(data) {
                 exploreLatLng = [data[0], data[1]];
-                UserPreferences.setPreference('origin', undefined);
+                var originFeature = {
+                    feature: {
+                        geometry: {x: data[1], y: data[0]}
+                    }
+                };
+                UserPreferences.setPreference('origin', originFeature);
                 UserPreferences.setPreference('originText', 'Current Location');
                 // show draggable marker on current location
                 var latLng = L.latLng(data[0], data[1]);
