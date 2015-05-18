@@ -434,7 +434,8 @@ class OtpServerStack(AppServerStack):
     """
     HEALTH_ENDPOINT = 'HTTP:80/otp/'
     STACK_NAME_PREFIX = 'Otp'
-    INPUTS = dict(BASE_INPUTS, **{'AppServerAMI': ['global:OtpServerAMI']})
+    INPUTS = dict(BASE_INPUTS, **{'AppServerAMI': ['global:OtpServerAMI'],
+                                  'AppServerInstanceType': ['global:OtpInstanceType']})
 
 
 class WebServerStack(AppServerStack):
