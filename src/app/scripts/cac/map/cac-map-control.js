@@ -76,7 +76,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         this.eventNames = eventNames;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
-        map = L.map(this.options.id, { zoomControl: false })
+        map = new L.map(this.options.id, { zoomControl: false })
             .setView(this.options.center, this.options.zoom);
 
         // put zoom control on top right
@@ -149,11 +149,17 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         });
 
         basemaps.Light.addTo(map);
+
+        // In case the base layer changes after the bike routes overlay has been added,
+        // make sure the bike routes overlay shows on top of the new base layer.
+        map.on('baselayerchange', function() {
+            overlays['Bike Routes'].bringToFront();
+        });
     }
 
     function initializeOverlays() {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
-        overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay();
+        overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
         overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
         overlays['Nearby Events'].addTo(map);
     }

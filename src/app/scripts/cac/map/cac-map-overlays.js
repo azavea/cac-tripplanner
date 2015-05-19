@@ -1,4 +1,4 @@
-CAC.Map.OverlaysControl = (function ($, L) {
+CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     'use strict';
 
     var defaults = {};
@@ -31,14 +31,25 @@ CAC.Map.OverlaysControl = (function ($, L) {
         return bikeShareFeatureGroup;
     }
 
-    function bikeRoutesOverlay() {
-        // https://cac-tripplanner.cartodb.com/viz/501dbdc8-f4ea-11e4-8c9e-0e018d66dc29/public_map
-        var url = 'https://cartocdn-ashbu.global.ssl.fastly.net/cac-tripplanner/api/v1/map/1d73301b7a6ba30ee80e8be7093ae9b2:1431024779440.44/{z}/{x}/{y}.png';
-        var attribution = ['Bike routes data:',
-                           '<a href="http://www.dvrpc.org/mapping/data.htm">DVRPC</a>,',
-                           '<a href="https://www.opendataphilly.org/dataset/bike-network">City of Philadelphia</a>'
-                           ].join(' ');
-        return L.tileLayer(url, {attribution: attribution});
+    function bikeRoutesOverlay(map) {
+        var layerGroup = L.featureGroup([]);
+        var url = 'https://cac-tripplanner.cartodb.com/api/v2/viz/501dbdc8-f4ea-11e4-8c9e-0e018d66dc29/viz.json';
+        // TODO: fix attribution
+        // cartodb.js does not allow for changing the layer attribution, and has lso somehow
+        // broken the setAttribute method on the layer object.
+        //var attribution = ['Bike routes data:',
+        //                   '<a href="http://www.dvrpc.org/mapping/data.htm">DVRPC</a>,',
+        //                   '<a href="https://www.opendataphilly.org/dataset/bike-network">City of Philadelphia</a>'
+        //                   ].join(' ');
+        cartodb.createLayer(map, url).on('done', function(layer) {
+            layerGroup.addLayer(layer);
+            // Wait until layer has loaded to bring it to front.  Otherwise, it loads behind
+            // the base layer.
+            layer.on('load', function() {
+                layer.bringToFront();
+            });
+        });
+        return layerGroup;
     }
 
     function nearbyEventsOverlay() {
@@ -78,4 +89,4 @@ CAC.Map.OverlaysControl = (function ($, L) {
         return marker;
     }
 
-})(jQuery, L);
+})(jQuery, cartodb, L);
