@@ -51,6 +51,16 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
             });
 
             this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+
+            // Trigger cleared event when user clears the input via keyboard or clicking the x
+            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
+            this.$element.on('keyup search', function() {
+                var $element = $(this);
+               if (!$element.val()) {
+                   $element.typeahead('close');
+                   events.trigger(eventNames.cleared, [typeaheadKey]);
+               }
+            });
         }, this);
 
         createTypeahead();
