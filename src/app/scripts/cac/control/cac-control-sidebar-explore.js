@@ -202,7 +202,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         );
     }
 
-    function onTypeaheadCleared(event, key) {
+    function onTypeaheadCleared() {
         UserPreferences.setPreference('origin', undefined);
         UserPreferences.setPreference('originText', undefined);
         exploreLatLng = null;
