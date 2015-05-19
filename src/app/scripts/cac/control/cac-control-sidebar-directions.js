@@ -349,14 +349,16 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 var fullAddress = data.address.Match_addr;
                 /*jshint camelcase: true */
                 UserPreferences.setPreference(prefKey + 'Text', fullAddress);
-                $(options.selectors[key]).typeahead('val', fullAddress);
+                // The change event is triggered after setting the typeahead value
+                // in order to run the navigation icon hide/show logic
+                $(options.selectors[key]).typeahead('val', fullAddress).change();
                 setDirections(key, [position.lat, position.lng]);
                 planTrip();
             } else {
                 // unset location and show error
                 UserPreferences.setPreference(prefKey, undefined);
                 UserPreferences.setPreference(prefKey + 'Text', undefined);
-                $(options.selectors[key]).typeahead('val', '');
+                $(options.selectors[key]).typeahead('val', '').change();
                 setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
                 itineraryListControl.setItinerariesError({
@@ -392,8 +394,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var mode = UserPreferences.getPreference('mode');
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        $(options.selectors.origin).typeahead('val', originText);
-        $(options.selectors.destination).typeahead('val', destinationText);
+        $(options.selectors.origin).typeahead('val', originText).change();
+        $(options.selectors.destination).typeahead('val', destinationText).change();
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -464,12 +466,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
         if (to && to.feature && to.feature.geometry) {
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-            $(options.selectors.destination).typeahead('val', toText);
+            $(options.selectors.destination).typeahead('val', toText).change();
         }
 
         if (from && from.feature && from.feature.geometry) {
             directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-            $(options.selectors.origin).typeahead('val', fromText);
+            $(options.selectors.origin).typeahead('val', fromText).change();
         }
 
         if (method === 'directions') {

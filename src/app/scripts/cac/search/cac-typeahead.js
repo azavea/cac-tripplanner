@@ -77,7 +77,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
             // Trigger cleared event when user clears the input via keyboard or clicking the x
             var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
             var events = this.events;
-            this.$element.on('keyup search', function() {
+            this.$element.on('keyup search change', function() {
                 var $element = $(this);
                 if ($element.val()) {
                     $locator.hide();

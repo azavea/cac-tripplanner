@@ -107,7 +107,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
                 UserPreferences.setPreference('originText', fullAddress);
                 UserPreferences.setPreference('origin', location);
                 $('div.address > h4').html(MapTemplates.addressText(fullAddress));
-                $(options.selectors.typeahead).typeahead('val', fullAddress);
+                $(options.selectors.typeahead).typeahead('val', fullAddress).change();
                 clickedExplore();
             } else {
                 addressHasError(null);
@@ -389,7 +389,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         if (exploreOrigin) {
             exploreLatLng = [exploreOrigin.feature.geometry.y,
                              exploreOrigin.feature.geometry.x];
-            $(options.selectors.typeahead).typeahead('val', originText);
+            $(options.selectors.typeahead).typeahead('val', originText).change();
             setAddress(exploreOrigin);
         } else {
             exploreLatLng = null;

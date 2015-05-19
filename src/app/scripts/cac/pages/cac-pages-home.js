@@ -125,15 +125,15 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
 
-        $(options.selectors.exploreOrigin).typeahead('val', originText);
+        $(options.selectors.exploreOrigin).typeahead('val', originText).change();
         $(options.selectors.exploreTime).val(exploreTime);
         bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
         var fromText = UserPreferences.getPreference('fromText');
         var toText = UserPreferences.getPreference('toText');
-        $(options.selectors.directionsFrom).typeahead('val', fromText);
-        $(options.selectors.directionsTo).typeahead('val', toText);
+        $(options.selectors.directionsFrom).typeahead('val', fromText).change();
+        $(options.selectors.directionsTo).typeahead('val', toText).change();
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
 
