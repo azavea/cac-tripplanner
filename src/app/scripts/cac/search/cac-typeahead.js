@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
+CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     'use strict';
 
     var defaults = {
@@ -50,6 +50,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
                 source: this.suggestAdapter.ttAdapter()
             });
 
+            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
+            var events = this.events;
+
             $element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
 
             // Add locator button and wire it up
@@ -61,12 +64,13 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
                             if (data && data.address) {
+                                var location = Utils.convertReverseGeocodeToFeature(data);
                                 /*jshint camelcase: false */
                                 var fullAddress = data.address.Match_addr;
                                 /*jshint camelcase: true */
 
-                                // TODO: wire this up
-                                console.log(fullAddress);
+                                $element.typeahead('val', fullAddress).change();
+                                events.trigger(eventNames.selected, [typeaheadKey, location]);
                             }
                         });
 
@@ -75,8 +79,6 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
             }
 
             // Trigger cleared event when user clears the input via keyboard or clicking the x
-            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
-            var events = this.events;
             $element.on('keyup search change', function() {
                 if ($element.val()) {
                     $locator.hide();
@@ -156,4 +158,4 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
         return adapter;
     }
 
-})(_, jQuery, CAC.Search.Geocoder, CAC.Search.SearchParams);
+})(_, jQuery, CAC.Search.Geocoder, CAC.Search.SearchParams, CAC.Utils);

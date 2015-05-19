@@ -171,8 +171,6 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      * @return {object} (promise) which should resolve to the current coordinates of a user
      */
     function locateUser() {
-        console.log('in locateUser');
-
         var deferred = $.Deferred();
         var options = {
             enableHighAccuracy: true,
