@@ -21,9 +21,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             toggleButton: '.toggle-search button',
-            toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
-            typeahead: 'input.typeahead',
+            toggleExploreButton: '#toggle-explore',
+            typeaheadExplore: '#exploreOrigin',
+            typeaheadFrom: '#directionsFrom',
+            typeaheadTo: '#directionsTo',
             viewAllArticles: '#viewAllArticles',
             viewAllDestinations: '#viewAllDestinations'
         }
@@ -45,11 +47,13 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             setTab(id);
         });
 
-        this.typeahead = new CAC.Search.Typeahead(options.selectors.typeahead);
-        this.typeahead.events.on(this.typeahead.eventNames.selected,
-                                 $.proxy(onTypeaheadSelected, this));
-        this.typeahead.events.on(this.typeahead.eventNames.cleared,
-                                 $.proxy(onTypeaheadCleared, this));
+        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
+            var typeaheadName = 'typeahead' + id;
+            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
+            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
+            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
+            this[typeaheadName] = typeahead;
+        }, this));
 
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);
@@ -125,15 +129,15 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
 
-        $(options.selectors.exploreOrigin).typeahead('val', originText);
+        $(options.selectors.exploreOrigin).typeahead('val', originText).change();
         $(options.selectors.exploreTime).val(exploreTime);
         bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
         var fromText = UserPreferences.getPreference('fromText');
         var toText = UserPreferences.getPreference('toText');
-        $(options.selectors.directionsFrom).typeahead('val', fromText);
-        $(options.selectors.directionsTo).typeahead('val', toText);
+        $(options.selectors.directionsFrom).typeahead('val', fromText).change();
+        $(options.selectors.directionsTo).typeahead('val', toText).change();
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
 

@@ -57,7 +57,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         datepicker = $(options.selectors.datepicker).datetimepicker({
             useCurrent: true,
             format: 'h:mma on M/D/YY',
-            showTodayButton: true,
+            showTodayButton: true
         });
         datepicker.on('dp.change', clickedExplore);
 
@@ -107,7 +107,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
                 UserPreferences.setPreference('originText', fullAddress);
                 UserPreferences.setPreference('origin', location);
                 $('div.address > h4').html(MapTemplates.addressText(fullAddress));
-                $(options.selectors.typeahead).typeahead('val', fullAddress);
+                $(options.selectors.typeahead).typeahead('val', fullAddress).change();
                 clickedExplore();
             } else {
                 addressHasError(null);
@@ -202,25 +202,20 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         );
     }
 
-    function onTypeaheadCleared(event, key) {
-        // delete origin object/label values
-        if (key === 'search') {
-            UserPreferences.setPreference('origin', undefined);
-            UserPreferences.setPreference('originText', undefined);
-            exploreLatLng = null;
-            selectedDestination = null;
-            mapControl.clearDiscoverPlaces();
-        }
+    function onTypeaheadCleared() {
+        UserPreferences.setPreference('origin', undefined);
+        UserPreferences.setPreference('originText', undefined);
+        exploreLatLng = null;
+        selectedDestination = null;
+        mapControl.clearDiscoverPlaces();
     }
 
     function onTypeaheadSelected(event, key, location) {
-        if (key === 'search') {
-            UserPreferences.setPreference('origin', location);
-            UserPreferences.setPreference('originText', location.name);
-            setAddress(location);
-            selectedDestination = null;
-            clickedExplore();
-        }
+        UserPreferences.setPreference('origin', location);
+        UserPreferences.setPreference('originText', location.name);
+        setAddress(location);
+        selectedDestination = null;
+        clickedExplore();
     }
 
     /**
@@ -394,11 +389,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         if (exploreOrigin) {
             exploreLatLng = [exploreOrigin.feature.geometry.y,
                              exploreOrigin.feature.geometry.x];
-            $(options.selectors.typeahead).typeahead('val', originText);
+            $(options.selectors.typeahead).typeahead('val', originText).change();
             setAddress(exploreOrigin);
         } else {
-            $(options.selectors.typeahead).typeahead('val', 'Current Location');
-            UserPreferences.setPreference('originText', 'Current Location');
             exploreLatLng = null;
         }
 
@@ -439,33 +432,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             } else {
                 selectedDestination = null;
             }
-        } else if (!exploreLatLng) {
-            // use current location
-            selectedDestination = null;
-            mapControl.locateUser().then(function(data) {
-                exploreLatLng = [data[0], data[1]];
-                var originFeature = {
-                    feature: {
-                        geometry: {x: data[1], y: data[0]}
-                    }
-                };
-                UserPreferences.setPreference('origin', originFeature);
-                UserPreferences.setPreference('originText', 'Current Location');
-                // show draggable marker on current location
-                var latLng = L.latLng(data[0], data[1]);
-                mapControl.setGeocodeMarker(latLng);
-                // only get isochrone now if user is currently on this tab
-                if (method === 'explore') {
-                    fetchIsochrone(when, exploreTime, otpOptions);
-                }
-            }, function() {
-                // could not geolocate user
-                UserPreferences.setPreference('origin', undefined);
-                UserPreferences.setPreference('originText', undefined);
-                $(options.selectors.typeahead).typeahead('val', '');
-                mapControl.clearDiscoverPlaces();
-                return;
-            });
         }
     }
 

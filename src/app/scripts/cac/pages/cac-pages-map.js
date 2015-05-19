@@ -28,7 +28,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         mapControl = new MapControl({
             tabControl: sidebarTabControl
         });
-        mapControl.locateUser();
 
         sidebarExploreControl = new CAC.Control.SidebarExplore({
             mapControl: mapControl

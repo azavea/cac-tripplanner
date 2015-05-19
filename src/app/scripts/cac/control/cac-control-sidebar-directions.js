@@ -32,8 +32,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
-            typeahead: 'section.directions input.typeahead',
-            wheelchairDiv: '#directionsWheelchair'
+            wheelchairDiv: '#directionsWheelchair',
+
+            // Use separate typeahead selectors for dest/origin so we they aren't
+            // treated as a single entity (e.g. so clearing doesn't clear both).
+            typeaheadDest: 'section.directions input.typeahead.destination',
+            typeaheadOrigin: 'section.directions input.typeahead.origin'
         }
     };
     var options = {};
@@ -51,7 +55,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     var tabControl = null;
     var directionsListControl = null;
     var itineraryListControl = null;
-    var typeahead = null;
+    var typeaheadDest = null;
+    var typeaheadOrigin = null;
 
     var initialLoad = true;
 
@@ -93,9 +98,13 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
 
-        typeahead = new Typeahead(options.selectors.typeahead);
-        typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
-        typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
+        typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
+        typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
+        typeaheadDest.events.on(typeaheadDest.eventNames.cleared, onTypeaheadCleared);
+
+        typeaheadOrigin = new Typeahead(options.selectors.typeaheadOrigin);
+        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.selected, onTypeaheadSelected);
+        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.cleared, onTypeaheadCleared);
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
@@ -289,33 +298,28 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     }
 
     function onTypeaheadCleared(event, key) {
-        // delete directions object/label values
-        if (key === 'origin' || key === 'destination') {
-            clearItineraries();
-            directions[key] = null;
-            var prefKey = key === 'origin' ? 'from' : 'to';
-            UserPreferences.setPreference(prefKey, undefined);
-            UserPreferences.setPreference(prefKey + 'Text', undefined);
-        }
+        clearItineraries();
+        directions[key] = null;
+        var prefKey = key === 'origin' ? 'from' : 'to';
+        UserPreferences.setPreference(prefKey, undefined);
+        UserPreferences.setPreference(prefKey + 'Text', undefined);
     }
 
     function onTypeaheadSelected(event, key, location) {
-        if (key === 'origin' || key === 'destination') {
-            var prefKey = key === 'origin' ? 'from' : 'to';
+        var prefKey = key === 'origin' ? 'from' : 'to';
 
-            if (!location) {
-                UserPreferences.setPreference(prefKey, undefined);
-                setDirections(key, null);
-                return;
-            }
-
-            // save text for address to preferences
-            UserPreferences.setPreference(prefKey, location);
-            UserPreferences.setPreference(prefKey + 'Text', location.name);
-            setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
-
-            planTrip();
+        if (!location) {
+            UserPreferences.setPreference(prefKey, undefined);
+            setDirections(key, null);
+            return;
         }
+
+        // save text for address to preferences
+        UserPreferences.setPreference(prefKey, location);
+        UserPreferences.setPreference(prefKey + 'Text', location.name);
+        setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
+
+        planTrip();
     }
 
     /**
@@ -345,14 +349,16 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 var fullAddress = data.address.Match_addr;
                 /*jshint camelcase: true */
                 UserPreferences.setPreference(prefKey + 'Text', fullAddress);
-                $(options.selectors[key]).typeahead('val', fullAddress);
+                // The change event is triggered after setting the typeahead value
+                // in order to run the navigation icon hide/show logic
+                $(options.selectors[key]).typeahead('val', fullAddress).change();
                 setDirections(key, [position.lat, position.lng]);
                 planTrip();
             } else {
                 // unset location and show error
                 UserPreferences.setPreference(prefKey, undefined);
                 UserPreferences.setPreference(prefKey + 'Text', undefined);
-                $(options.selectors[key]).typeahead('val', '');
+                $(options.selectors[key]).typeahead('val', '').change();
                 setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
                 itineraryListControl.setItinerariesError({
@@ -388,8 +394,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var mode = UserPreferences.getPreference('mode');
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        $(options.selectors.origin).typeahead('val', originText);
-        $(options.selectors.destination).typeahead('val', destinationText);
+        $(options.selectors.origin).typeahead('val', originText).change();
+        $(options.selectors.destination).typeahead('val', destinationText).change();
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -460,51 +466,26 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
         if (to && to.feature && to.feature.geometry) {
             directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-            $(options.selectors.destination).typeahead('val', toText);
+            $(options.selectors.destination).typeahead('val', toText).change();
         }
 
         if (from && from.feature && from.feature.geometry) {
-            $(options.selectors.origin).typeahead('val', fromText);
+            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
+            $(options.selectors.origin).typeahead('val', fromText).change();
         }
 
         if (method === 'directions') {
             // switch tabs
             tabControl.setTab('directions');
+
+            if (from && to) {
+                planTrip();
+            } else {
+                clearDirections();
+            }
         }
 
         initialLoad = false;
-        if (from && to) {
-            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-            if (method === 'directions') {
-                planTrip();
-            }
-        } else if (to) {
-            // geolocate user, then plan
-            $(options.selectors.origin).typeahead('val', 'Current Location');
-            mapControl.locateUser().then(function(data) {
-                directions.origin = [data[0], data[1]];
-                setDirectionsError('origin');
-                UserPreferences.setPreference('from', undefined);
-                UserPreferences.setPreference('fromText', 'Current Location');
-                if (method === 'directions') {
-                    planTrip(); // only plan now if user is currently on this tab
-                }
-            }, function() {
-                // could not geolocate user
-                UserPreferences.setPreference('from', undefined);
-                UserPreferences.setPreference('fromText', undefined);
-                $(options.selectors.origin).typeahead('val', '');
-                setDirections('origin', null);
-                return;
-            });
-        } else {
-            // have neither origin nor destination
-            directions.origin = null;
-            directions.destination = null;
-            $(options.selectors.origin).typeahead('val', '');
-            $(options.selectors.destination).typeahead('val', '');
-            clearDirections();
-        }
     }
 
 })(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,

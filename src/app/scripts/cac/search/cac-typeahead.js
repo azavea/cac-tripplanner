@@ -16,17 +16,15 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function (_, $, SearchParams) {
+CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     'use strict';
 
     var defaults = {
         highlight: true,
-        minLength: 0, // set minLength to 0 so can check for empty input
+        minLength: 1, // empty input is checked differently, 0 minLength no longer needed
         autoselect: true
     };
     var defaultTypeaheadKey = 'default';
-    var thisLocation = null;
-    var events = $({});
     var eventNames = {
         cleared: 'cac:typeahead:cleared',
         selected: 'cac:typeahead:selected'
@@ -35,14 +33,14 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
     function CACTypeahead(selector, options) {
         this.options = $.extend({}, defaults, options);
         this.suggestAdapter = suggestAdapterFactory();
-        this.locationAdapter = locationAdapter;
         this.destinationAdapter = destinationAdapterFactory();
 
-        this.events = events;
+        // Define event objects within the constructor so events aren't shared among all typeaheads
+        this.events = $({});
         this.eventNames = eventNames;
 
         var createTypeahead = _.bind(function() {
-            this.$element = $(selector).typeahead(this.options, {
+            var $element = $(selector).typeahead(this.options, {
                 name: 'featured',
                 displayKey: 'name',
                 source: this.destinationAdapter.ttAdapter()
@@ -50,33 +48,56 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
                 name: 'destinations',
                 displayKey: 'text',
                 source: this.suggestAdapter.ttAdapter()
-            }, {
-                name: 'currentlocation',
-                displayKey: 'name',
-                source: this.locationAdapter
             });
 
-            this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
+            var events = this.events;
+
+            $element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+
+            // Add locator button and wire it up
+            var locatorTemplate = '<span class="glyphicon glyphicon-globe locate-icon"/>';
+            var $locator = $(locatorTemplate).insertBefore($element);
+            if ('geolocation' in navigator) {
+                $element.parent().on('click', '.locate-icon', function() {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        var coords = pos.coords;
+                        Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
+                            if (data && data.address) {
+                                var location = Utils.convertReverseGeocodeToFeature(data);
+                                /*jshint camelcase: false */
+                                var fullAddress = data.address.Match_addr;
+                                /*jshint camelcase: true */
+
+                                $element.typeahead('val', fullAddress).change();
+                                events.trigger(eventNames.selected, [typeaheadKey, location]);
+                            }
+                        });
+
+                    });
+                });
+            }
+
+            // Trigger cleared event when user clears the input via keyboard or clicking the x
+            $element.on('keyup search change', function() {
+                if ($element.val()) {
+                    $locator.hide();
+                } else {
+                    $element.typeahead('close');
+                    events.trigger(eventNames.cleared, [typeaheadKey]);
+                    $locator.show();
+                }
+            });
         }, this);
 
-        // create typeahead immediately, without current location to boost search results
         createTypeahead();
-
-        // try to geolocate user for improved suggestions, then re-create typeahead if successful
-        var setAdapter = _.bind(function() {
-            this.suggestAdapter = suggestAdapterFactory();
-            // destroy before re-cretating
-            $(selector).typeahead('destroy', 'NoCached');
-            createTypeahead();
-        }, this);
-
-        checkLocation(setAdapter);
     }
 
     return CACTypeahead;
 
     function onTypeaheadSelected(event, suggestion, dataset) {
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
+        var events = this.events;
 
         if (dataset === 'destinations') {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
@@ -87,7 +108,7 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
                     console.error(error);
                 });
         } else {
-            // current location, or featured locations
+            // featured locations
             events.trigger(eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
@@ -111,50 +132,6 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
         return adapter;
     }
 
-    function checkLocation(callback) {
-        if ('geolocation' in navigator) {
-            // set a watch on current location the first time it's requested
-            navigator.geolocation.watchPosition(function(position) {
-                var list = [{
-                    name: 'Current Location',
-                    feature: {
-                        geometry: {
-                            x: position.coords.longitude,
-                            y: position.coords.latitude
-                        }
-                    }
-                }];
-                thisLocation = list;
-                callback(thisLocation);
-            }, function (error) {
-                console.error('geolocation', error);
-            }, {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 10000
-            });
-        } else {
-            console.error('geolocation not supported');
-        }
-    }
-
-    function locationAdapter(query, callback) {
-        // Trigger 'cleared' event if typeahead input field is empty.
-        // Note outstanding feature request for typeahead event to listen to for cleared input:
-        // https://github.com/twitter/typeahead.js/issues/607
-        if (query === '') {
-            // find key (do not have triggering event to inspect here)
-            var $element = $(this.$el[0].parentElement.parentElement).children('input').first();
-            var typeaheadKey = $element.data('typeahead-key') || defaultTypeaheadKey;
-            events.trigger(eventNames.cleared, [typeaheadKey]);
-        }
-        if (thisLocation) {
-            callback(thisLocation);
-        } else {
-            checkLocation(callback);
-        }
-    }
-
     function suggestAdapterFactory() {
         var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
 
@@ -164,26 +141,16 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
             f: 'pjson'
         };
 
-        // TODO: re-enable result distance ranking when bug fixed to work with searchExtent
-        // https://geonet.esri.com/thread/132900
-        /*
-        // rank results by distance, if we have user location
-        if (thisLocation) {
-            params.location = [
-                thisLocation[0].feature.geometry.x,
-                thisLocation[0].feature.geometry.y
-            ].join(',');
-            params.distance = 16093; // ~10mi.
-        }
-        */
-
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
                 url: url + '?text=%QUERY&' + $.param(params),
                 filter: function (list) {
-                    return list.suggestions;
+                    // Must only use objects with isCollection set to false. Collections
+                    // do not behave well with the follow-up geocode.
+                    // See: https://github.com/azavea/cac-tripplanner/issues/307
+                    return _.filter(list.suggestions, { isCollection: false });
                 }
             }
         });
@@ -191,4 +158,4 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
         return adapter;
     }
 
-})(_, jQuery, CAC.Search.SearchParams);
+})(_, jQuery, CAC.Search.Geocoder, CAC.Search.SearchParams, CAC.Utils);

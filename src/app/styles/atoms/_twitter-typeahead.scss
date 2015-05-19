@@ -40,3 +40,11 @@
 .tt-hint {
     color: #999;
 }
+
+.locate-icon {
+    position: absolute;
+    right: 34px;
+    top: 20px;
+    cursor: pointer;
+    z-index: 999;
+}
