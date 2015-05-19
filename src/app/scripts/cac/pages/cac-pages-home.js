@@ -48,9 +48,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         });
 
         $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
-            var typeahead = new CAC.Search.Typeahead(options.selectors['typeahead' + id]);
+            var typeaheadName = 'typeahead' + id;
+            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
             typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
             typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
+            this[typeaheadName] = typeahead;
         }, this));
 
         // save form data and redirect to map when 'go' button clicked
