@@ -16,7 +16,7 @@
  *                                    String typeaheadKey
  *                                    Object location
  */
-CAC.Search.Typeahead = (function (_, $, SearchParams) {
+CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
     'use strict';
 
     var defaults = {
@@ -61,6 +61,29 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
                    events.trigger(eventNames.cleared, [typeaheadKey]);
                }
             });
+
+            // Add locator button and wire it up
+            if ('geolocation' in navigator) {
+                var $locator = $('<span class="glyphicon glyphicon-globe locate-icon"></span>');
+                $locator.insertBefore(this.$element);
+                this.$element.parent().on('click', '.locate-icon', function() {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        console.log('pos: ', pos);
+                        var coords = pos.coords;
+                        Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
+                            if (data && data.address) {
+                                /*jshint camelcase: false */
+                                var fullAddress = data.address.Match_addr;
+                                /*jshint camelcase: true */
+
+                                // TODO: wire this up
+                                console.log(fullAddress);
+                            }
+                        });
+
+                    });
+                });
+            }
         }, this);
 
         createTypeahead();
@@ -127,4 +150,4 @@ CAC.Search.Typeahead = (function (_, $, SearchParams) {
         return adapter;
     }
 
-})(_, jQuery, CAC.Search.SearchParams);
+})(_, jQuery, CAC.Search.Geocoder, CAC.Search.SearchParams);
