@@ -26,7 +26,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             typeaheadExplore: '#exploreOrigin',
             typeaheadFrom: '#directionsFrom',
             typeaheadTo: '#directionsTo',
-            typeaheadExplore: '#exploreOrigin',
             viewAllArticles: '#viewAllArticles',
             viewAllDestinations: '#viewAllDestinations'
         }
