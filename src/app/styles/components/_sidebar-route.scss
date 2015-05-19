@@ -50,6 +50,10 @@
 .directions-header-divider {
     opacity: .5;
     padding: 0 8px;
+
+    .print & {
+        display: none;
+    }
 }
 
 .directions-header .back {
