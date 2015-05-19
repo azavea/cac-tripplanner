@@ -144,7 +144,10 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
             remote: {
                 url: url + '?text=%QUERY&' + $.param(params),
                 filter: function (list) {
-                    return list.suggestions;
+                    // Must only use objects with isCollection set to false. Collections
+                    // do not behave well with the follow-up geocode.
+                    // See: https://github.com/azavea/cac-tripplanner/issues/307
+                    return _.filter(list.suggestions, { isCollection: false });
                 }
             }
         });
