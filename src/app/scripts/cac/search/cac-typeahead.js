@@ -40,7 +40,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
         this.eventNames = eventNames;
 
         var createTypeahead = _.bind(function() {
-            this.$element = $(selector).typeahead(this.options, {
+            var $element = $(selector).typeahead(this.options, {
                 name: 'featured',
                 displayKey: 'name',
                 source: this.destinationAdapter.ttAdapter()
@@ -50,13 +50,13 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
                 source: this.suggestAdapter.ttAdapter()
             });
 
-            this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
+            $element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
 
             // Add locator button and wire it up
             var locatorTemplate = '<span class="glyphicon glyphicon-globe locate-icon"/>';
-            var $locator = $(locatorTemplate).insertBefore(this.$element);
+            var $locator = $(locatorTemplate).insertBefore($element);
             if ('geolocation' in navigator) {
-                this.$element.parent().on('click', '.locate-icon', function() {
+                $element.parent().on('click', '.locate-icon', function() {
                     navigator.geolocation.getCurrentPosition(function(pos) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
@@ -77,8 +77,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
             // Trigger cleared event when user clears the input via keyboard or clicking the x
             var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
             var events = this.events;
-            this.$element.on('keyup search change', function() {
-                var $element = $(this);
+            $element.on('keyup search change', function() {
                 if ($element.val()) {
                     $locator.hide();
                 } else {
