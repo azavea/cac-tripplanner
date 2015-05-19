@@ -6,13 +6,42 @@ CAC.User.Preferences = (function($) {
     var namespaceStorage = $.initNamespaceStorage(namespace);
     var storage = namespaceStorage.localStorage;
 
+    // store to use for default location
+    var cityHall = {
+        name: 'Philadelphia City Hall',
+        extent: {
+            xmax: -75.158978,
+            xmin: -75.168978,
+            ymax: 39.958449,
+            ymin: 39.948449
+        },
+        feature: {
+            attributes: {
+                City: 'Philadelphia',
+                Postal: '',
+                Region: 'Pennsylvania',
+                StAddr: '1450 John F Kennedy Blvd'
+            },
+            geometry: {
+                x: -75.16397666699964,
+                y: 39.95344911900048
+            }
+        }
+    };
+
     var defaults = {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
         exploreTime: 20,
+        from: cityHall,
+        fromText: 'City Hall, Philadelphia, Pennsylvania, USA',
         maxWalk: undefined, // no max
         method: 'explore',
         mode: 'TRANSIT,WALK',
+        origin: cityHall,
+        originText: 'City Hall, Philadelphia, Pennsylvania, USA',
+        to: cityHall,
+        toText: 'City Hall, Philadelphia, Pennsylvania, USA',
         wheelchair: false
     };
 
