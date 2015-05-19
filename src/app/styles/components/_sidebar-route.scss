@@ -50,9 +50,13 @@
 .directions-header-divider {
     opacity: .5;
     padding: 0 8px;
+
+    .print & {
+        display: none;
+    }
 }
 
-.back {
+.directions-header .back {
     font-size: 2.1rem;
     line-height: 1.2;
 }

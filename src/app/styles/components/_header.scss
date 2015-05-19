@@ -5,6 +5,7 @@ header {
     position: absolute;
     width: 100%;
 
+
     a {
         font-weight: 700;
         text-transform: uppercase;
@@ -20,6 +21,12 @@ header {
             opacity: 0.75;
             text-decoration: none;
             color: white;
+        }
+
+        .print & {
+            margin: 0 auto;
+            float: none;
+            width: 142px;
         }
 
         @media screen and #{$screen-xs} {
