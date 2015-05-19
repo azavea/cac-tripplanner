@@ -57,7 +57,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         datepicker = $(options.selectors.datepicker).datetimepicker({
             useCurrent: true,
             format: 'h:mma on M/D/YY',
-            showTodayButton: true,
+            showTodayButton: true
         });
         datepicker.on('dp.change', clickedExplore);
 
@@ -203,24 +203,19 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     }
 
     function onTypeaheadCleared(event, key) {
-        // delete origin object/label values
-        if (key === 'search') {
-            UserPreferences.setPreference('origin', undefined);
-            UserPreferences.setPreference('originText', undefined);
-            exploreLatLng = null;
-            selectedDestination = null;
-            mapControl.clearDiscoverPlaces();
-        }
+        UserPreferences.setPreference('origin', undefined);
+        UserPreferences.setPreference('originText', undefined);
+        exploreLatLng = null;
+        selectedDestination = null;
+        mapControl.clearDiscoverPlaces();
     }
 
     function onTypeaheadSelected(event, key, location) {
-        if (key === 'search') {
-            UserPreferences.setPreference('origin', location);
-            UserPreferences.setPreference('originText', location.name);
-            setAddress(location);
-            selectedDestination = null;
-            clickedExplore();
-        }
+        UserPreferences.setPreference('origin', location);
+        UserPreferences.setPreference('originText', location.name);
+        setAddress(location);
+        selectedDestination = null;
+        clickedExplore();
     }
 
     /**

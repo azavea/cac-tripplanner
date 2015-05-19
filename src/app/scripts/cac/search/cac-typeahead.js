@@ -21,11 +21,10 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
 
     var defaults = {
         highlight: true,
-        minLength: 0, // set minLength to 0 so can check for empty input
+        minLength: 1, // empty input is checked differently, 0 minLength no longer needed
         autoselect: true
     };
     var defaultTypeaheadKey = 'default';
-    var events = $({});
     var eventNames = {
         cleared: 'cac:typeahead:cleared',
         selected: 'cac:typeahead:selected'
@@ -36,7 +35,8 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
         this.suggestAdapter = suggestAdapterFactory();
         this.destinationAdapter = destinationAdapterFactory();
 
-        this.events = events;
+        // Define event objects within the constructor so events aren't shared among all typeaheads
+        this.events = $({});
         this.eventNames = eventNames;
 
         var createTypeahead = _.bind(function() {
@@ -76,6 +76,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
 
             // Trigger cleared event when user clears the input via keyboard or clicking the x
             var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
+            var events = this.events;
             this.$element.on('keyup search', function() {
                 var $element = $(this);
                 if ($element.val()) {
@@ -95,6 +96,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
 
     function onTypeaheadSelected(event, suggestion, dataset) {
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
+        var events = this.events;
 
         if (dataset === 'destinations') {
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
