@@ -21,9 +21,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
             toggleButton: '.toggle-search button',
-            toggleExploreButton: '#toggle-explore',
             toggleDirectionsButton: '#toggle-directions',
-            typeahead: 'input.typeahead',
+            toggleExploreButton: '#toggle-explore',
+            typeaheadExplore: '#exploreOrigin',
+            typeaheadFrom: '#directionsFrom',
+            typeaheadTo: '#directionsTo',
+            typeaheadExplore: '#exploreOrigin',
             viewAllArticles: '#viewAllArticles',
             viewAllDestinations: '#viewAllDestinations'
         }
@@ -45,11 +48,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             setTab(id);
         });
 
-        this.typeahead = new CAC.Search.Typeahead(options.selectors.typeahead);
-        this.typeahead.events.on(this.typeahead.eventNames.selected,
-                                 $.proxy(onTypeaheadSelected, this));
-        this.typeahead.events.on(this.typeahead.eventNames.cleared,
-                                 $.proxy(onTypeaheadCleared, this));
+        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
+            var typeahead = new CAC.Search.Typeahead(options.selectors['typeahead' + id]);
+            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
+            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
+        }, this));
 
         // save form data and redirect to map when 'go' button clicked
         $(options.selectors.exploreForm).submit(submitExplore);
