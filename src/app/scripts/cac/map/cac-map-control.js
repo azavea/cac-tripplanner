@@ -171,6 +171,8 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      * @return {object} (promise) which should resolve to the current coordinates of a user
      */
     function locateUser() {
+        console.log('in locateUser');
+
         var deferred = $.Deferred();
         var options = {
             enableHighAccuracy: true,
@@ -309,7 +311,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         var params = {
             time: formattedTime,
             date: formattedDate,
-            cutoffSec: exploreMinutes * 60, // API expects seconds
+            cutoffSec: exploreMinutes * 60 // API expects seconds
         };
 
         // Default precision of 200m; 100m seems good for improving response times on non-transit
@@ -323,16 +325,6 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         if (coordsOrigin) {
             params.fromPlace = coordsOrigin.join(',');
             getIsochrone(deferred, params);
-        } else {
-            locateUser().then(function(data) {
-                params.fromPlace = data.join(',');
-                getIsochrone(deferred, params);
-            }, function(error) {
-                console.error('Could not geolocate user');
-                console.error(error);
-                // use default location
-                getIsochrone(deferred, params);
-            });
         }
 
         return deferred.promise();

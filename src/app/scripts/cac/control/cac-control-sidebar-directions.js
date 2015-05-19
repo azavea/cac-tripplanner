@@ -464,47 +464,22 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         }
 
         if (from && from.feature && from.feature.geometry) {
+            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
             $(options.selectors.origin).typeahead('val', fromText);
         }
 
         if (method === 'directions') {
             // switch tabs
             tabControl.setTab('directions');
+
+            if (from && to) {
+                planTrip();
+            } else {
+                clearDirections();
+            }
         }
 
         initialLoad = false;
-        if (from && to) {
-            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-            if (method === 'directions') {
-                planTrip();
-            }
-        } else if (to) {
-            // geolocate user, then plan
-            $(options.selectors.origin).typeahead('val', 'Current Location');
-            mapControl.locateUser().then(function(data) {
-                directions.origin = [data[0], data[1]];
-                setDirectionsError('origin');
-                UserPreferences.setPreference('from', undefined);
-                UserPreferences.setPreference('fromText', 'Current Location');
-                if (method === 'directions') {
-                    planTrip(); // only plan now if user is currently on this tab
-                }
-            }, function() {
-                // could not geolocate user
-                UserPreferences.setPreference('from', undefined);
-                UserPreferences.setPreference('fromText', undefined);
-                $(options.selectors.origin).typeahead('val', '');
-                setDirections('origin', null);
-                return;
-            });
-        } else {
-            // have neither origin nor destination
-            directions.origin = null;
-            directions.destination = null;
-            $(options.selectors.origin).typeahead('val', '');
-            $(options.selectors.destination).typeahead('val', '');
-            clearDirections();
-        }
     }
 
 })(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,

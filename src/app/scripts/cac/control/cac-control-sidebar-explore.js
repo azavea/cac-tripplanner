@@ -397,8 +397,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             $(options.selectors.typeahead).typeahead('val', originText);
             setAddress(exploreOrigin);
         } else {
-            $(options.selectors.typeahead).typeahead('val', 'Current Location');
-            UserPreferences.setPreference('originText', 'Current Location');
             exploreLatLng = null;
         }
 
@@ -439,33 +437,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             } else {
                 selectedDestination = null;
             }
-        } else if (!exploreLatLng) {
-            // use current location
-            selectedDestination = null;
-            mapControl.locateUser().then(function(data) {
-                exploreLatLng = [data[0], data[1]];
-                var originFeature = {
-                    feature: {
-                        geometry: {x: data[1], y: data[0]}
-                    }
-                };
-                UserPreferences.setPreference('origin', originFeature);
-                UserPreferences.setPreference('originText', 'Current Location');
-                // show draggable marker on current location
-                var latLng = L.latLng(data[0], data[1]);
-                mapControl.setGeocodeMarker(latLng);
-                // only get isochrone now if user is currently on this tab
-                if (method === 'explore') {
-                    fetchIsochrone(when, exploreTime, otpOptions);
-                }
-            }, function() {
-                // could not geolocate user
-                UserPreferences.setPreference('origin', undefined);
-                UserPreferences.setPreference('originText', undefined);
-                $(options.selectors.typeahead).typeahead('val', '');
-                mapControl.clearDiscoverPlaces();
-                return;
-            });
         }
     }
 
