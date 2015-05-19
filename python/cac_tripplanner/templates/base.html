@@ -49,6 +49,7 @@
 
     {% if debug %}
 
+    {% if fb_app_id %}
     <!-- facebook loads async; might not be there during module init! -->
     <!-- loading debug version here -->
     <div id="fb-root"></div>
@@ -59,6 +60,7 @@
       js.src = "//connect.facebook.net/en_US/sdk/debug.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
+    {% endif %}
 
     <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
     <script src="{% static 'scripts/vendor/jquery.storageapi.js' %}"></script>
@@ -97,6 +99,7 @@
 
     {% else %}
 
+    {% if fb_app_id %}
     <!-- facebook loads async; might not be there during module init! -->
     <!-- loading minified version here -->
     <div id="fb-root"></div>
@@ -107,6 +110,7 @@
       js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3&appId={{ fb_app_id }}";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
+    {% endif %}
 
     <script src="{% static 'scripts/vendor.js' %}"></script>
     <script src="{% static 'scripts/main.js' %}"></script>
