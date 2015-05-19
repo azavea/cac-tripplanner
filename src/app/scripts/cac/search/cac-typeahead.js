@@ -52,23 +52,12 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
 
             this.$element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
 
-            // Trigger cleared event when user clears the input via keyboard or clicking the x
-            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
-            this.$element.on('keyup search', function() {
-                var $element = $(this);
-               if (!$element.val()) {
-                   $element.typeahead('close');
-                   events.trigger(eventNames.cleared, [typeaheadKey]);
-               }
-            });
-
             // Add locator button and wire it up
+            var locatorTemplate = '<span class="glyphicon glyphicon-globe locate-icon"/>';
+            var $locator = $(locatorTemplate).insertBefore(this.$element);
             if ('geolocation' in navigator) {
-                var $locator = $('<span class="glyphicon glyphicon-globe locate-icon"></span>');
-                $locator.insertBefore(this.$element);
                 this.$element.parent().on('click', '.locate-icon', function() {
                     navigator.geolocation.getCurrentPosition(function(pos) {
-                        console.log('pos: ', pos);
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
                             if (data && data.address) {
@@ -84,6 +73,19 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams) {
                     });
                 });
             }
+
+            // Trigger cleared event when user clears the input via keyboard or clicking the x
+            var typeaheadKey = $(selector).data('typeahead-key') || defaultTypeaheadKey;
+            this.$element.on('keyup search', function() {
+                var $element = $(this);
+                if ($element.val()) {
+                    $locator.hide();
+                } else {
+                    $element.typeahead('close');
+                    events.trigger(eventNames.cleared, [typeaheadKey]);
+                    $locator.show();
+                }
+            });
         }, this);
 
         createTypeahead();
