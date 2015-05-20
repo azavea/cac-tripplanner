@@ -34,6 +34,7 @@ var stat = {
 var bootstrapSelectRoot = 'bower_components/bootstrap-select/dist/';
 var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
 var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
+var cartoDbRoot = 'bower_components/cartodb.js/src/';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -83,7 +84,7 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [])
+    return copyBowerFiles('**/*.js', [cartoDbRoot + '**/cartodb.js'])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -137,7 +138,7 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [])
+    return copyBowerFiles('**/*.js', [cartoDbRoot + '**/cartodb.js'])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 

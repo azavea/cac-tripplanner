@@ -28,6 +28,7 @@
     "$": true,
     "_": true,
     "cartodb": true,
+    "L": true,
     "turf": true
   }
 }

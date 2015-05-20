@@ -1,4 +1,4 @@
-CAC.Map.OverlaysControl = (function ($, cartodb) {
+CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     'use strict';
 
     var defaults = {};
@@ -67,7 +67,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb) {
 
     function getBikeShareMarker(share) {
         var latLng = cartodb.L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
-        var icon = cartodb.L.AwesomeMarkers.icon({
+        var icon = L.AwesomeMarkers.icon({
             icon: 'directions-bike',
             markerColor: 'blue',
             prefix: 'md'
@@ -79,7 +79,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb) {
 
     function getFeedEventMarker(event) {
         var latLng = cartodb.L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
-        var icon = cartodb.L.AwesomeMarkers.icon({
+        var icon = L.AwesomeMarkers.icon({
             icon: 'calendar',
             markerColor: 'orange',
             prefix: 'fa'
@@ -89,4 +89,4 @@ CAC.Map.OverlaysControl = (function ($, cartodb) {
         return marker;
     }
 
-})(jQuery, cartodb);
+})(jQuery, cartodb, L);

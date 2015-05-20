@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     'use strict';
 
     var defaults = {
@@ -37,12 +37,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
     var isochroneLayer = null;
     var tabControl = null;
 
-    var destinationIcon = cartodb.L.AwesomeMarkers.icon({
+    var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
         markerColor: 'green'
     });
-    var highlightIcon = cartodb.L.AwesomeMarkers.icon({
+    var highlightIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
         iconColor: 'black',
@@ -457,7 +457,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
         if (geocodeMarker) {
             geocodeMarker.setLatLng(latLng);
         } else {
-            var icon = cartodb.L.AwesomeMarkers.icon({
+            var icon = L.AwesomeMarkers.icon({
                 icon: 'dot-circle-o',
                 prefix: 'fa',
                 markerColor: 'darkred'
@@ -514,13 +514,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
             originMarker.setLatLng(origin);
             destinationMarker.setLatLng(destination);
         } else {
-            var originIcon = cartodb.L.AwesomeMarkers.icon({
+            var originIcon = L.AwesomeMarkers.icon({
                 icon: 'home',
                 prefix: 'fa',
                 markerColor: 'purple'
             });
 
-            var destIcon = cartodb.L.AwesomeMarkers.icon({
+            var destIcon = L.AwesomeMarkers.icon({
                 icon: 'flag-o',
                 prefix: 'fa',
                 markerColor: 'red'
@@ -584,4 +584,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, _);
+})(jQuery, Handlebars, cartodb, L, _);
