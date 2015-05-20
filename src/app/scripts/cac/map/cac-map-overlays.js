@@ -1,4 +1,4 @@
-CAC.Map.OverlaysControl = (function ($, cartodb, L) {
+CAC.Map.OverlaysControl = (function ($, cartodb) {
     'use strict';
 
     var defaults = {};
@@ -17,7 +17,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     return OverlaysControl;
 
     function bikeShareOverlay() {
-        bikeShareFeatureGroup = L.featureGroup([]);
+        bikeShareFeatureGroup = cartodb.L.featureGroup([]);
         $.ajax({
             contentType: 'application/json',
             url: 'https://api.phila.gov/bike-share-stations/v1',
@@ -32,7 +32,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     }
 
     function bikeRoutesOverlay(map) {
-        var layerGroup = L.featureGroup([]);
+        var layerGroup = cartodb.L.featureGroup([]);
         var url = 'https://cac-tripplanner.cartodb.com/api/v2/viz/501dbdc8-f4ea-11e4-8c9e-0e018d66dc29/viz.json';
         // TODO: fix attribution
         // cartodb.js does not allow for changing the layer attribution, and has lso somehow
@@ -53,7 +53,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     }
 
     function nearbyEventsOverlay() {
-        eventsFeatureGroup = L.featureGroup([]);
+        eventsFeatureGroup = cartodb.L.featureGroup([]);
         $.ajax({
             url: '/api/feedevents',
             success: function (data) {
@@ -66,27 +66,27 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L) {
     }
 
     function getBikeShareMarker(share) {
-        var latLng = L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
-        var icon = L.AwesomeMarkers.icon({
+        var latLng = cartodb.L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
+        var icon = cartodb.L.AwesomeMarkers.icon({
             icon: 'directions-bike',
             markerColor: 'blue',
             prefix: 'md'
         });
-        var marker = new L.marker(latLng, { icon: icon });
+        var marker = new cartodb.L.marker(latLng, { icon: icon });
         marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share), {});
         return marker;
     }
 
     function getFeedEventMarker(event) {
-        var latLng = L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
-        var icon = L.AwesomeMarkers.icon({
+        var latLng = cartodb.L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
+        var icon = cartodb.L.AwesomeMarkers.icon({
             icon: 'calendar',
             markerColor: 'orange',
             prefix: 'fa'
         });
-        var marker = new L.marker(latLng, { icon: icon });
+        var marker = new cartodb.L.marker(latLng, { icon: icon });
         marker.bindPopup(CAC.Map.Templates.eventPopup(event), {});
         return marker;
     }
 
-})(jQuery, cartodb, L);
+})(jQuery, cartodb);

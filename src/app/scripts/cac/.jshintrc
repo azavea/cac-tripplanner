@@ -27,7 +27,6 @@
     "moment": true,
     "$": true,
     "_": true,
-    "L": true,
     "cartodb": true,
     "turf": true
   }
