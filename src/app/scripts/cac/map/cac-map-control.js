@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, L, _) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, _) {
     'use strict';
 
     var defaults = {
@@ -37,12 +37,12 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
     var isochroneLayer = null;
     var tabControl = null;
 
-    var destinationIcon = L.AwesomeMarkers.icon({
+    var destinationIcon = cartodb.L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
         markerColor: 'green'
     });
-    var highlightIcon = L.AwesomeMarkers.icon({
+    var highlightIcon = cartodb.L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
         iconColor: 'black',
@@ -76,11 +76,11 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         this.eventNames = eventNames;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
-        map = L.map(this.options.id, { zoomControl: false })
+        map = new cartodb.L.map(this.options.id, { zoomControl: false })
             .setView(this.options.center, this.options.zoom);
 
         // put zoom control on top right
-        new L.Control.Zoom({ position: 'topright' }).addTo(map);
+        new cartodb.L.Control.Zoom({ position: 'topright' }).addTo(map);
 
         tabControl = options.tabControl;
 
@@ -136,30 +136,36 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             retina = '@2x';
         }
 
-        basemaps.Light = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}' + retina + '.png', {
+        basemaps.Light = cartodb.L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}' + retina + '.png', {
             attribution: cartodbAttribution
         });
 
-        basemaps.Dark = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}' + retina + '.png', {
+        basemaps.Dark = cartodb.L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}' + retina + '.png', {
             attribution: cartodbAttribution
         });
 
-        basemaps.Satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        basemaps.Satellite = cartodb.L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: esriSatelliteAttribution
         });
 
         basemaps.Light.addTo(map);
+
+        // In case the base layer changes after the bike routes overlay has been added,
+        // make sure the bike routes overlay shows on top of the new base layer.
+        map.on('baselayerchange', function() {
+            overlays['Bike Routes'].bringToFront();
+        });
     }
 
     function initializeOverlays() {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
-        overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay();
+        overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
         overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
         overlays['Nearby Events'].addTo(map);
     }
 
     function initializeLayerControl() {
-        L.control.layers(basemaps, overlays, {
+        cartodb.L.control.layers(basemaps, overlays, {
             position: 'bottomright',
             collapsed: false
         }).addTo(map);
@@ -182,7 +188,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             if (userMarker) {
                 userMarker.setLatLng(latlng);
             } else {
-                userMarker = new L.CircleMarker(latlng)
+                userMarker = new cartodb.L.CircleMarker(latlng)
                   .on('click', function() {
                       // TODO: not implemented
                       events.trigger(eventNames.currentLocationClick, latlng);
@@ -208,7 +214,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      * Add isochrone outline to map
      */
     function drawIsochrone(isochrone) {
-        isochroneLayer = L.geoJson(isochrone, {
+        isochroneLayer = cartodb.L.geoJson(isochrone, {
             clickable: false,
             style: {
                 clickable: false,
@@ -342,7 +348,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             return point;
         });
         destinationMarkers = {};
-        destinationsLayer = L.geoJson(locationGeoJSON, {
+        destinationsLayer = cartodb.L.geoJson(locationGeoJSON, {
             onEachFeature: function(feature, layer) {
                 layer.on('click', function(){
                     // TODO: this triggers on marker click, not popup
@@ -359,7 +365,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
-                var marker = new L.marker(latLng, {icon: destinationIcon})
+                var marker = new cartodb.L.marker(latLng, {icon: destinationIcon})
                         .bindPopup(popupContent);
                 destinationMarkers[markerId] = {
                     marker: marker,
@@ -434,7 +440,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         function markerDrag(event) {
             var marker = event.target;
             var position = marker.getLatLng();
-            var latlng = new L.LatLng(position.lat, position.lng);
+            var latlng = new cartodb.L.LatLng(position.lat, position.lng);
             marker.setLatLng(latlng, {draggable: true});
             map.panTo(latlng); // allow user to drag marker off map
 
@@ -451,12 +457,12 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         if (geocodeMarker) {
             geocodeMarker.setLatLng(latLng);
         } else {
-            var icon = L.AwesomeMarkers.icon({
+            var icon = cartodb.L.AwesomeMarkers.icon({
                 icon: 'dot-circle-o',
                 prefix: 'fa',
                 markerColor: 'darkred'
             });
-            geocodeMarker = new L.marker(latLng, { icon: icon, draggable: true });
+            geocodeMarker = new cartodb.L.marker(latLng, { icon: icon, draggable: true });
             geocodeMarker.addTo(map);
             geocodeMarker.on('dragend', markerDrag);
         }
@@ -476,7 +482,7 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         function markerDrag(event) {
             var marker = event.target;
             var position = marker.getLatLng();
-            var latlng = new L.LatLng(position.lat, position.lng);
+            var latlng = new cartodb.L.LatLng(position.lat, position.lng);
             marker.setLatLng(latlng, {draggable: true});
             map.panTo(latlng); // allow user to drag marker off map
 
@@ -501,30 +507,30 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
             return;
         }
 
-        var origin = L.latLng(originCoords[0], originCoords[1]);
-        var destination = L.latLng(destinationCoords[0], destinationCoords[1]);
+        var origin = cartodb.L.latLng(originCoords[0], originCoords[1]);
+        var destination = cartodb.L.latLng(destinationCoords[0], destinationCoords[1]);
 
         if (originMarker && destinationMarker) {
             originMarker.setLatLng(origin);
             destinationMarker.setLatLng(destination);
         } else {
-            var originIcon = L.AwesomeMarkers.icon({
+            var originIcon = cartodb.L.AwesomeMarkers.icon({
                 icon: 'home',
                 prefix: 'fa',
                 markerColor: 'purple'
             });
 
-            var destIcon = L.AwesomeMarkers.icon({
+            var destIcon = cartodb.L.AwesomeMarkers.icon({
                 icon: 'flag-o',
                 prefix: 'fa',
                 markerColor: 'red'
             });
 
             var originOptions = {icon: originIcon, draggable: true, title: 'origin' };
-            originMarker = new L.marker(origin, originOptions).bindPopup('<p>Origin</p>');
+            originMarker = new cartodb.L.marker(origin, originOptions).bindPopup('<p>Origin</p>');
 
             var destOptions = {icon: destIcon, draggable: true, title: 'destination' };
-            destinationMarker = new L.marker(destination, destOptions)
+            destinationMarker = new cartodb.L.marker(destination, destOptions)
                                             .bindPopup('<p>Destination</p>');
 
             originMarker.addTo(map);
@@ -569,8 +575,8 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
      */
     function displayPoint(lon, lat) {
         if (lon && lat) {
-            var latlng = new L.LatLng(lat, lon);
-            lastDisplayPointMarker = new L.CircleMarker(latlng);
+            var latlng = new cartodb.L.LatLng(lat, lon);
+            lastDisplayPointMarker = new cartodb.L.CircleMarker(latlng);
             lastDisplayPointMarker.addTo(map);
         } else if (lastDisplayPointMarker) {
             map.removeLayer(lastDisplayPointMarker);
@@ -578,4 +584,4 @@ CAC.Map.Control = (function ($, Handlebars, L, _) {
         }
     }
 
-})(jQuery, Handlebars, L, _);
+})(jQuery, Handlebars, cartodb, _);
