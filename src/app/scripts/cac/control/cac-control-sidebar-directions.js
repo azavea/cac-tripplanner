@@ -327,7 +327,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
      * @param {Object} position Has coordinates for new spot as 'lat' and 'lng' properties
      */
     function moveOriginDestination(key, position) {
-        if (key !== 'origin' || key !== 'destination') {
+        if (key !== 'origin' && key !== 'destination') {
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
@@ -374,15 +374,15 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
 
         // Set destination
-        var toCoords = destination.point.coordinates;
+        var destinationCoords = destination.point.coordinates;
         var destinationText = destination.address;
-        directions.destination = [toCoords[1], toCoords[0]];
+        directions.destination = [destinationCoords[1], destinationCoords[0]];
 
         // Save destination coordinates in expected format (to match typeahead results)
         destination.feature = {
             geometry: {
-                x: toCoords[0],
-                y: toCoords[1]
+                x: destinationCoords[0],
+                y: destinationCoords[1]
             }
         };
 
@@ -395,8 +395,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
-        UserPreferences.setPreference('to', destination);
-        UserPreferences.setPreference('toText', destinationText);
+        UserPreferences.setPreference('destination', destination);
+        UserPreferences.setPreference('destinationText', destinationText);
 
         // Get directions
         planTrip();
@@ -437,8 +437,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         var origin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
-        var to = UserPreferences.getPreference('to');
-        var toText = UserPreferences.getPreference('toText');
+        var destination = UserPreferences.getPreference('destination');
+        var destinationText = UserPreferences.getPreference('destinationText');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
 
@@ -458,9 +458,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $(options.selectors.departAtSelect).val('arriveBy');
          }
 
-        if (to && to.feature && to.feature.geometry) {
-            directions.destination = [to.feature.geometry.y, to.feature.geometry.x];
-            $(options.selectors.destination).typeahead('val', toText).change();
+        if (destination && destination.feature && destination.feature.geometry) {
+            directions.destination = [
+                destination.feature.geometry.y,
+                destination.feature.geometry.x
+            ];
+            $(options.selectors.destination).typeahead('val', destinationText).change();
         }
 
         if (origin && origin.feature && origin.feature.geometry) {
@@ -472,7 +475,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             // switch tabs
             tabControl.setTab('directions');
 
-            if (origin && to) {
+            if (origin && destination) {
                 planTrip();
             } else {
                 clearDirections();
