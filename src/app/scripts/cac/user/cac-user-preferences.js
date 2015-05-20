@@ -8,7 +8,7 @@ CAC.User.Preferences = (function($) {
 
     // store to use for default location
     var cityHall = {
-        name: 'Philadelphia City Hall',
+        name: 'City Hall, Philadelphia, Pennsylvania, USA',
         extent: {
             xmax: -75.158978,
             xmin: -75.168978,
@@ -33,21 +33,18 @@ CAC.User.Preferences = (function($) {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
         exploreTime: 20,
-        from: cityHall,
-        fromText: 'City Hall, Philadelphia, Pennsylvania, USA',
         maxWalk: undefined, // no max
         method: 'explore',
         mode: 'TRANSIT,WALK',
         origin: cityHall,
-        originText: 'City Hall, Philadelphia, Pennsylvania, USA',
-        to: cityHall,
-        toText: 'City Hall, Philadelphia, Pennsylvania, USA',
+        originText: cityHall.name,
+        to: undefined,
+        toText: '',
         wheelchair: false
     };
 
     var module = {
         getPreference: getPreference,
-        havePreferences: havePreferences,
         setPreference: setPreference
     };
     return module;
@@ -67,15 +64,6 @@ CAC.User.Preferences = (function($) {
             setPreference(preference, val);
         }
         return val;
-    }
-
-    /**
-     * Check if there are any settings on the browser.
-     *
-     * @return {Boolean} true if CAC settings found
-    */
-    function havePreferences() {
-        return !!(storage.get('method'));
     }
 
     /**

@@ -87,7 +87,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         eventNames: eventNames,
         movedPoint: movedPoint,
         setAddress: setAddress,
-        setDestinationSidebar: setDestinationSidebar
+        setDestinationSidebar: setDestinationSidebar,
+        setFromUserPreferences: setFromUserPreferences
     };
 
     function movedPoint(position) {

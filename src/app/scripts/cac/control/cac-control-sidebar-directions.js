@@ -123,7 +123,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         clearDirections: clearDirections,
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
-        setDirections: setDirections
+        setDirections: setDirections,
+        setFromUserPreferences: setFromUserPreferences
     };
 
     /**
@@ -300,23 +301,20 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     function onTypeaheadCleared(event, key) {
         clearItineraries();
         directions[key] = null;
-        var prefKey = key === 'origin' ? 'from' : 'to';
-        UserPreferences.setPreference(prefKey, undefined);
-        UserPreferences.setPreference(prefKey + 'Text', undefined);
+        UserPreferences.setPreference(key, undefined);
+        UserPreferences.setPreference(key + 'Text', undefined);
     }
 
     function onTypeaheadSelected(event, key, location) {
-        var prefKey = key === 'origin' ? 'from' : 'to';
-
         if (!location) {
-            UserPreferences.setPreference(prefKey, undefined);
+            UserPreferences.setPreference(key, undefined);
             setDirections(key, null);
             return;
         }
 
         // save text for address to preferences
-        UserPreferences.setPreference(prefKey, location);
-        UserPreferences.setPreference(prefKey + 'Text', location.name);
+        UserPreferences.setPreference(key, location);
+        UserPreferences.setPreference(key + 'Text', location.name);
         setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
 
         planTrip();
@@ -329,9 +327,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
      * @param {Object} position Has coordinates for new spot as 'lat' and 'lng' properties
      */
     function moveOriginDestination(key, position) {
-        if (key === 'origin' || key === 'destination') {
-            var prefKey = key === 'origin' ? 'from' : 'to';
-        } else {
+        if (key !== 'origin' || key !== 'destination') {
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
@@ -344,11 +340,11 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
                 var location = Utils.convertReverseGeocodeToFeature(data);
-                UserPreferences.setPreference(prefKey, location);
+                UserPreferences.setPreference(key, location);
                 /*jshint camelcase: false */
                 var fullAddress = data.address.Match_addr;
                 /*jshint camelcase: true */
-                UserPreferences.setPreference(prefKey + 'Text', fullAddress);
+                UserPreferences.setPreference(key + 'Text', fullAddress);
                 // The change event is triggered after setting the typeahead value
                 // in order to run the navigation icon hide/show logic
                 $(options.selectors[key]).typeahead('val', fullAddress).change();
@@ -356,8 +352,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 planTrip();
             } else {
                 // unset location and show error
-                UserPreferences.setPreference(prefKey, undefined);
-                UserPreferences.setPreference(prefKey + 'Text', undefined);
+                UserPreferences.setPreference(key, undefined);
+                UserPreferences.setPreference(key + 'Text', undefined);
                 $(options.selectors[key]).typeahead('val', '').change();
                 setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
@@ -399,8 +395,6 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
-        UserPreferences.setPreference('from', origin);
-        UserPreferences.setPreference('fromText', originText);
         UserPreferences.setPreference('to', destination);
         UserPreferences.setPreference('toText', destinationText);
 
@@ -441,9 +435,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        var from = UserPreferences.getPreference('from');
+        var origin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
         var to = UserPreferences.getPreference('to');
-        var fromText = UserPreferences.getPreference('fromText');
         var toText = UserPreferences.getPreference('toText');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
@@ -469,16 +463,16 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             $(options.selectors.destination).typeahead('val', toText).change();
         }
 
-        if (from && from.feature && from.feature.geometry) {
-            directions.origin = [from.feature.geometry.y, from.feature.geometry.x];
-            $(options.selectors.origin).typeahead('val', fromText).change();
+        if (origin && origin.feature && origin.feature.geometry) {
+            directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
+            $(options.selectors.origin).typeahead('val', originText).change();
         }
 
-        if (method === 'directions') {
+        if (initialLoad && method === 'directions') {
             // switch tabs
             tabControl.setTab('directions');
 
-            if (from && to) {
+            if (origin && to) {
                 planTrip();
             } else {
                 clearDirections();

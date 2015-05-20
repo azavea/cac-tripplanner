@@ -69,12 +69,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     var submitDirections = function(event) {
         event.preventDefault();
         var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
-        var fromText = $(options.selectors.directionsFrom).val();
+        var originText = $(options.selectors.directionsFrom).val();
         var toText = $(options.selectors.directionsTo).val();
 
         // unset stored origin/destination and show error, if not entered
-        if (!fromText) {
-            UserPreferences.setPreference('from', undefined);
+        if (!originText) {
+            UserPreferences.setPreference('origin', undefined);
             $(options.selectors.directionsFrom).addClass(options.selectors.errorClass);
         }
 
@@ -84,10 +84,10 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }
         // TODO: set error
 
-        if (fromText && toText) {
+        if (originText && toText) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
-            UserPreferences.setPreference('fromText', fromText);
+            UserPreferences.setPreference('originText', originText);
             UserPreferences.setPreference('toText', toText);
             window.location = '/map';
         }
@@ -115,12 +115,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     };
 
     var loadFromPreferences = function loadFromPreferences() {
-
-        // only load preferences if they are set
-        if (!UserPreferences.havePreferences()) {
-            return;
-        }
-
         var method = UserPreferences.getPreference('method');
         var mode = UserPreferences.getPreference('mode');
         setTab(method);
@@ -134,9 +128,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
-        var fromText = UserPreferences.getPreference('fromText');
         var toText = UserPreferences.getPreference('toText');
-        $(options.selectors.directionsFrom).typeahead('val', fromText).change();
+        $(options.selectors.directionsFrom).typeahead('val', originText).change();
         $(options.selectors.directionsTo).typeahead('val', toText).change();
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
@@ -247,27 +240,32 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     }
 
     function onTypeaheadCleared(event, key) {
-        UserPreferences.setPreference(key, undefined);
+        onTypeaheadSelected(event, key, undefined);
     }
 
     function onTypeaheadSelected(event, key, location) {
         event.preventDefault();  // do not submit form
-        UserPreferences.setPreference(key, location);
+
         var $input;
-        if (key === 'origin') {
-            $input = $(options.selectors.exploreOrigin);
-        } else if (key === 'from') {
-            $input = $(options.selectors.directionsFrom);
+        var $other;
+
+        // Make sure to keep the directionsFrom origin in sync with the explore origin
+        if (key === 'origin' || key === 'from') {
+            $input = $(options.selectors[key === 'from' ? 'directionsFrom' : 'exploreOrigin']);
+            $other = $(options.selectors[key === 'from' ? 'exploreOrigin' : 'directionsFrom']);
+
+            var text = $input.typeahead('val');
+            if (text !== $other.typeahead('val')) {
+                $other.typeahead('val', text).change();
+            }
         } else if (key === 'to') {
             $input = $(options.selectors.directionsTo);
         } else {
             return;
         }
-        if (location) {
-            $input.removeClass(options.selectors.errorClass);
-        } else {
-            $input.addClass(options.selectors.errorClass);
-        }
+
+        UserPreferences.setPreference(key, location);
+        UserPreferences.setPreference(key + 'Text', $input.typeahead('val'));
     }
 
     function setTab(tab) {
