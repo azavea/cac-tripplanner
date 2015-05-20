@@ -59,7 +59,10 @@ CAC.User.Preferences = (function($) {
         var val = storage.get(preference);
         if (val) {
             val = JSON.parse(val);
-        } else {
+        }
+
+        // If a typeahead is cleared, we want to grab the default
+        if (!val || val === '') {
             val = defaults[preference];
             setPreference(preference, val);
         }
