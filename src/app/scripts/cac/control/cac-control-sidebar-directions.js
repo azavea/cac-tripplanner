@@ -132,7 +132,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {
-        if (initialLoad || !tabControl.isTabShowing('directions')) {
+        if (!tabControl.isTabShowing('directions')) {
             return;
         }
 

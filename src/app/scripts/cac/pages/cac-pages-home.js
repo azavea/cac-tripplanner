@@ -226,9 +226,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
                 var destination = data.destinations[0];
-                UserPreferences.setPreference('originText', addr);
-                // show isochrone around destination
-                UserPreferences.setPreference('origin', destination);
+                UserPreferences.setPreference('toText', addr);
+                UserPreferences.setPreference('to', destination);
                 UserPreferences.setPreference('method', 'explore');
                 UserPreferences.setPreference('exploreTime', exploreTime);
                 UserPreferences.setPreference('mode', mode);

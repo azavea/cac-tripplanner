@@ -348,7 +348,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         });
         $(options.selectors.sidebarContainer).height(400);
 
-        // show destination details, if origin is a destination
+        // show destination details if destination is selected
         if (selectedDestination) {
             setDestinationSidebarDetail(selectedDestination);
             selectedDestination = null;
@@ -381,6 +381,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         var method = UserPreferences.getPreference('method');
         var mode = UserPreferences.getPreference('mode');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+        var destination = UserPreferences.getPreference('to');
         var exploreOrigin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
@@ -427,9 +428,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         if (method === 'explore' && exploreLatLng) {
             fetchIsochrone(when, exploreTime, otpOptions);
-            // show destination details, if origin set by clicking destination on homepage
-            if (_.has(exploreOrigin, 'id')) {
-                selectedDestination = exploreOrigin;
+            // show destination details if destination selected on homepage
+            if (_.has(destination, 'id')) {
+                selectedDestination = destination;
             } else {
                 selectedDestination = null;
             }
