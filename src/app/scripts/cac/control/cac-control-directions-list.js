@@ -60,7 +60,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
     /**
      * Set the directions list from an OTP itinerary object
      *
-     * Pulls the start/end text from UserPreference originText and toText keys,
+     * Pulls the start/end text from UserPreference originText and destinationText keys,
      * ensure that these are set
      *
      * @param {[object]} itinerary An instance of Itinerary in cac-routing-itinerary
@@ -142,7 +142,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
                 time: itinerary.startTime
             },
             end: {
-                text:  UserPreferences.getPreference('toText'),
+                text:  UserPreferences.getPreference('destinationText'),
                 time: itinerary.endTime
             },
             legs: itinerary.legs

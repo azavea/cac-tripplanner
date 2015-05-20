@@ -70,7 +70,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         event.preventDefault();
         var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
         var originText = $(options.selectors.directionsFrom).val();
-        var toText = $(options.selectors.directionsTo).val();
+        var destinationText = $(options.selectors.directionsTo).val();
 
         // unset stored origin/destination and show error, if not entered
         if (!originText) {
@@ -78,17 +78,17 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             $(options.selectors.directionsFrom).addClass(options.selectors.errorClass);
         }
 
-        if (!toText) {
-            UserPreferences.setPreference('to', undefined);
+        if (!destinationText) {
+            UserPreferences.setPreference('destination', undefined);
             $(options.selectors.directionsTo).addClass(options.selectors.errorClass);
         }
         // TODO: set error
 
-        if (originText && toText) {
+        if (originText && destinationText) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
             UserPreferences.setPreference('originText', originText);
-            UserPreferences.setPreference('toText', toText);
+            UserPreferences.setPreference('destinationText', destinationText);
             window.location = '/map';
         }
     };
@@ -128,9 +128,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
-        var toText = UserPreferences.getPreference('toText');
+        var destinationText = UserPreferences.getPreference('destinationText');
         $(options.selectors.directionsFrom).typeahead('val', originText).change();
-        $(options.selectors.directionsTo).typeahead('val', toText).change();
+        $(options.selectors.directionsTo).typeahead('val', destinationText).change();
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
 
@@ -226,8 +226,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
                 var destination = data.destinations[0];
-                UserPreferences.setPreference('toText', addr);
-                UserPreferences.setPreference('to', destination);
+                UserPreferences.setPreference('destinationText', addr);
+                UserPreferences.setPreference('destination', destination);
                 UserPreferences.setPreference('method', 'explore');
                 UserPreferences.setPreference('exploreTime', exploreTime);
                 UserPreferences.setPreference('mode', mode);
@@ -247,9 +247,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
 
         var $input;
         var $other;
+        var prefKey;
 
         // Make sure to keep the directionsFrom origin in sync with the explore origin
         if (key === 'origin' || key === 'from') {
+            prefKey = 'origin';
             $input = $(options.selectors[key === 'from' ? 'directionsFrom' : 'exploreOrigin']);
             $other = $(options.selectors[key === 'from' ? 'exploreOrigin' : 'directionsFrom']);
 
@@ -258,13 +260,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
                 $other.typeahead('val', text).change();
             }
         } else if (key === 'to') {
+            prefKey = 'destination';
             $input = $(options.selectors.directionsTo);
         } else {
             return;
         }
 
-        UserPreferences.setPreference(key, location);
-        UserPreferences.setPreference(key + 'Text', $input.typeahead('val'));
+        UserPreferences.setPreference(prefKey, location);
+        UserPreferences.setPreference(prefKey + 'Text', $input.typeahead('val'));
     }
 
     function setTab(tab) {

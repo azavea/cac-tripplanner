@@ -38,8 +38,8 @@ CAC.User.Preferences = (function($) {
         mode: 'TRANSIT,WALK',
         origin: cityHall,
         originText: cityHall.name,
-        to: undefined,
-        toText: '',
+        destination: undefined,
+        destinationText: '',
         wheelchair: false
     };
 
