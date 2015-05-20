@@ -81,11 +81,17 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         _.each($(this.options.selectors.leafletPopups), function(closeBtn) {
             closeBtn.click();
         });
+
+        // Load user preferences on tab switch in order to easily keep the pages in sync
         if (tabId === 'directions') {
             mapControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
+            if (sidebarDirectionsControl) {
+                sidebarDirectionsControl.setFromUserPreferences();
+            }
         } else {
             sidebarDirectionsControl.clearDirections();
+            sidebarExploreControl.setFromUserPreferences();
         }
     }
 

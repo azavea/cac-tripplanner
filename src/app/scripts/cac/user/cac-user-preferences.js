@@ -6,6 +6,29 @@ CAC.User.Preferences = (function($) {
     var namespaceStorage = $.initNamespaceStorage(namespace);
     var storage = namespaceStorage.localStorage;
 
+    // store to use for default location
+    var cityHall = {
+        name: 'City Hall, Philadelphia, Pennsylvania, USA',
+        extent: {
+            xmax: -75.158978,
+            xmin: -75.168978,
+            ymax: 39.958449,
+            ymin: 39.948449
+        },
+        feature: {
+            attributes: {
+                City: 'Philadelphia',
+                Postal: '',
+                Region: 'Pennsylvania',
+                StAddr: '1450 John F Kennedy Blvd'
+            },
+            geometry: {
+                x: -75.16397666699964,
+                y: 39.95344911900048
+            }
+        }
+    };
+
     var defaults = {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
@@ -13,12 +36,15 @@ CAC.User.Preferences = (function($) {
         maxWalk: undefined, // no max
         method: 'explore',
         mode: 'TRANSIT,WALK',
+        origin: cityHall,
+        originText: cityHall.name,
+        to: undefined,
+        toText: '',
         wheelchair: false
     };
 
     var module = {
         getPreference: getPreference,
-        havePreferences: havePreferences,
         setPreference: setPreference
     };
     return module;
@@ -33,20 +59,14 @@ CAC.User.Preferences = (function($) {
         var val = storage.get(preference);
         if (val) {
             val = JSON.parse(val);
-        } else {
+        }
+
+        // If a typeahead is cleared, we want to grab the default
+        if (!val || val === '') {
             val = defaults[preference];
             setPreference(preference, val);
         }
         return val;
-    }
-
-    /**
-     * Check if there are any settings on the browser.
-     *
-     * @return {Boolean} true if CAC settings found
-    */
-    function havePreferences() {
-        return !!(storage.get('method'));
     }
 
     /**
