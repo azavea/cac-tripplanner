@@ -84,7 +84,7 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [cartoDbRoot + '**/cartodb.js'])
+    return copyBowerFiles('**/*.js', [])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -138,7 +138,7 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles('**/*.js', [cartoDbRoot + '**/cartodb.js'])
+    return copyBowerFiles('**/*.js', [])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -180,7 +180,16 @@ gulp.task('test:copy-jquery', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:copy-jquery'],
+// Since cartodb.js is loaded from a CDN, we need to pull it in manually here.
+gulp.task('test:copy-cartodb', function() {
+    return copyBowerFiles('cartodb.js', [cartoDbRoot + '**/cartodb.js'])
+        .pipe(gulp.dest(stat.scripts));
+});
+
+gulp.task('test:production', ['minify:scripts',
+                              'minify:vendor-scripts',
+                              'test:copy-jquery',
+                              'test:copy-cartodb'],
     function(done) {
         setTimeout(function() {
             karma.start({
@@ -190,7 +199,7 @@ gulp.task('test:production', ['minify:scripts', 'minify:vendor-scripts', 'test:c
     }
 );
 
-gulp.task('test:coverage', ['copy:vendor-scripts', 'copy:scripts'],
+gulp.task('test:coverage', ['copy:vendor-scripts', 'copy:scripts', 'test:copy-cartodb'],
     function(done) {
         setTimeout(function() {
             karma.start({
@@ -226,6 +235,7 @@ gulp.task('test', sequence([
             'minify:scripts',
             'minify:vendor-scripts',
             'test:copy-jquery',
+            'test:copy-cartodb',
             'test:production',
             'development',
             'copy:vendor-scripts',
