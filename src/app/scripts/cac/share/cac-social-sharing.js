@@ -40,7 +40,7 @@ CAC.Share.Social = (function ($, Settings) {
 
         // TODO: get a screenshot of the map page to post? Shouldn't be using logo.
         var pictureUrl = [options.useHost,
-                          '/static/images/logo_color.svg'
+                          '/static/images/logo_color.png'
                          ].join('');
 
         if (typeof FB !== 'undefined') {
