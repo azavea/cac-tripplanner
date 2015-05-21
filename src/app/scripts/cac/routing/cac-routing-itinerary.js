@@ -23,7 +23,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.agencies = getTransitAgencies(otpItinerary.legs);
 
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
-                                  features: getFeatures(otpItinerary.legs)});
+                                          features: getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
     }
 
