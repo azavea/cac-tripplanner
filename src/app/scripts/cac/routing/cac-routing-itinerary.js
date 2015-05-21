@@ -1,4 +1,4 @@
-CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
+CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
     'use strict';
 
     /**
@@ -22,7 +22,7 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
 
-        this.geojson = L.geoJson({type: 'FeatureCollection',
+        this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                   features: getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
     }
@@ -41,15 +41,15 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
      * @return {[L.LatLngBounds]}
      */
     Itinerary.prototype.getBounds = function(bufferRatio) {
-        var sw = L.latLng(
+        var sw = cartodb.L.latLng(
             Math.min(this.from.lat, this.to.lat),
             Math.min(this.from.lon, this.to.lon)
         );
-        var ne = L.latLng(
+        var ne = cartodb.L.latLng(
             Math.max(this.from.lat, this.to.lat),
             Math.max(this.from.lon, this.to.lon)
         );
-        var bounds = L.latLngBounds(sw, ne);
+        var bounds = cartodb.L.latLngBounds(sw, ne);
         bufferRatio = bufferRatio || 0;
         return bounds.pad(bufferRatio);
     };
@@ -212,4 +212,4 @@ CAC.Routing.Itinerary = (function ($, L, _, moment, Geocoder) {
         return defaultStyle;
     }
 
-})(jQuery, L, _, moment, CAC.Search.Geocoder);
+})(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder);
