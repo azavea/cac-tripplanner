@@ -9,7 +9,7 @@ from django.views.generic import View
 
 from .models import AboutFaq, Article
 from destinations.models import Destination
-from cac_tripplanner.settings import HOMEPAGE_RESULTS_LIMIT
+from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT
 
 
 def home(request):
@@ -28,7 +28,8 @@ def home(request):
     context = RequestContext(request,
                              dict(community_profile=community_profile,
                                   tips_and_tricks=tips_and_tricks,
-                                  destinations=destinations))
+                                  destinations=destinations,
+                                  fb_app_id=FB_APP_ID))
     return render_to_response('home.html', context_instance=context)
 
 
