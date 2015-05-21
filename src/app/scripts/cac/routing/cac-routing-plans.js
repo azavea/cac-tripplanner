@@ -1,4 +1,4 @@
-CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Settings) {
+CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings) {
     'use strict';
 
     var module = {
@@ -80,4 +80,4 @@ CAC.Routing.Plans = (function($, L, moment, _, UserPreferences, Itinerary, Setti
         return $.extend(formattedOpts, extraOptions);
     }
 
-})(jQuery, L, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);
+})(jQuery, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);
