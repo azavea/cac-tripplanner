@@ -14,13 +14,11 @@
     <meta property="og:title" content="Trip Planner" />
     <meta property="og:description"
         content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
-    <meta property="og:site_name" content="Go Philly Go" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="article:author" content="Clean Air Council" />
-    <meta property="article:publisher" content="CAC Trip Planner" />
-    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}//static/images/logo_color.png" />
+    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
+    <meta property="og:site_name" content="Go Philly Go" />
+    <meta property="og:locale" content="en_US" />
     {% endblock %}
 
     {% block cssimports %}
