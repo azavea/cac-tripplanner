@@ -226,23 +226,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
                 var destination = data.destinations[0];
-
-                // check user agent to see if mobile device; if so, redirect to Google Maps
-                // http://stackoverflow.com/questions/18739436/how-to-create-a-link-for-all-mobile-devices-that-opens-google-maps-with-a-route
-                var regex = /android|iphone|ipad|ipod/i;
-                var uaMatch = navigator.userAgent.toLowerCase().match(regex);
-                var mobileDevice = uaMatch ? uaMatch[0] : false;
-
-                if (mobileDevice) {
-                    var url = ['https://maps.google.com/maps?saddr=Current+Location',
-                               '&dirflg=r&daddr=', // default to transit mode with dirflg
-                               encodeURIComponent(addr)
-                               ].join('');
-                    window.location = url;
-                    return false;
-                }
-
-                // not a mobile device; go to map page
                 UserPreferences.setPreference('destinationText', addr);
                 UserPreferences.setPreference('destination', destination);
                 UserPreferences.setPreference('method', 'explore');
