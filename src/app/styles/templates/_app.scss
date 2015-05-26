@@ -15,7 +15,10 @@
     right: 0;
     background: $light-gray;
 
-    @media screen and #{$screen-xs} {
+    @media screen and #{$screen-sm} {
+        left: 320px;
+    }
+    @media screen and #{$screen-xxs} {
         display: none;
     }
 

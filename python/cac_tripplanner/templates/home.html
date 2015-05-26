@@ -7,8 +7,8 @@
             <div class="row">
                 <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
                     <h1 class="text-center">GoPhillyGo is a new online mapping tool for the Greater Philadelphia area.</h1>
-                    <h3 class="text-center hidden-xs hidden-sm">There are 2 easy ways to use the map:</h3>
-                    <div class="text-center toggle-search hidden-xs hidden-sm">
+                    <h3 class="text-center hidden-xs">There are 2 easy ways to use the map:</h3>
+                    <div class="text-center toggle-search hidden-xs">
                         <button class="btn btn-lg active" id="toggle-explore">Explore nearby locations</button>
                         <small>or</small>
                         <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
@@ -16,9 +16,9 @@
                 </div>
             </div>
         </div>
-        <div class="search text-center hidden-xs hidden-sm">
+        <div class="search text-center hidden-xs">
             <form id="explore">
-                <span class="text">Where can I go in</span>
+                <span class="text hidden-sm">Where can I go in</span>
                 <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
                 <span class="text">minutes from</span>
                 <input id="exploreOrigin" class="typeahead" type="search"
@@ -49,7 +49,7 @@
                 <button type="submit">&rarr;</button>
             </form>
             <form id="directions" class="hidden">
-                <span class="text">How do I get from</span>
+                <span class="text hidden-sm">How do I get from</span>
                 <input id="directionsFrom" class="typeahead" type="search"
                     data-typeahead-key="from" />
                 <span class="text">to</span>
