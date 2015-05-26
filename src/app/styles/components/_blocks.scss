@@ -39,8 +39,8 @@
                 margin-bottom: 15px;
             }
 
-            h3 { font-size: 2.1rem; bottom: 63px; 
-                @media screen and #{$screen-xs} {
+            h3 { font-size: 2.1rem; bottom: 63px;
+                @media screen and #{$screen-xs}, #{$screen-sm}, #{$screen-md} {
                     font-size: 1.8rem;
                 }
             }
@@ -87,6 +87,8 @@
         }
         img {
             bottom: 0;
+            width: auto;
+            max-width: none;
         }
     }
     &.block-recent {

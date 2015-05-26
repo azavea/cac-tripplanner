@@ -56,7 +56,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             $element.on('typeahead:selected', $.proxy(onTypeaheadSelected, this));
 
             // Add locator button and wire it up
-            var locatorTemplate = '<span class="glyphicon glyphicon-globe locate-icon"/>';
+            var locatorTemplate = '<i class="fa fa-crosshairs locate-icon"></i>';
             var $locator = $(locatorTemplate).insertBefore($element);
             if ('geolocation' in navigator) {
                 $element.parent().on('click', '.locate-icon', function() {
