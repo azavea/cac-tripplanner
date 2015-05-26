@@ -57,6 +57,30 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
     // featured destination select
     function getDestinationDirections(event, destination) {
+
+        // check user agent to see if mobile device; if so, redirect to Google Maps
+        var regex = /android|iphone|ipod/i;
+        var userAgent = navigator.userAgent.toLowerCase();
+        var uaMatch = userAgent.match(regex);
+        var mobileDevice = uaMatch ? uaMatch[0] : false;
+
+        // Tablets go to full site. Check if Android devices are tablets:
+        // no 'mobile' in user agent, or screen width >= bootstrap md breakpoint (992px)
+        if (mobileDevice === 'android' && (!userAgent.match(/mobile/i) || screen.width >= 992)) {
+            mobileDevice = false;
+        }
+
+        if (mobileDevice) {
+            var addr = [destination.address, destination.city, destination.state].join(', ');
+            var url = ['https://maps.google.com/maps?saddr=Current+Location',
+                       '&dirflg=r&daddr=', // default to transit mode with dirflg
+                       encodeURIComponent(addr)
+                       ].join('');
+            window.location = url;
+            return false;
+        }
+
+        // not a mobile device; go to directions tab
         mapControl.clearIsochrone();
         sidebarDirectionsControl.clearDirections();
         mapControl.setGeocodeMarker(null);
