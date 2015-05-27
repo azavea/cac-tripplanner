@@ -103,8 +103,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     function bikeSharePopup(share) {
-        share.properties.openTime = reformatBikeShareHours(share.properties.openTime);
-        share.properties.closeTime = reformatBikeShareHours(share.properties.closeTime);
+        // re-enable hours display if changed from 24 hours
+        //share.properties.openTime = reformatBikeShareHours(share.properties.openTime);
+        //share.properties.closeTime = reformatBikeShareHours(share.properties.closeTime);
         if (share.properties.isEventBased) {
             share.properties.eventStart = reformatBikeShareHours(share.properties.eventStart);
             share.properties.eventEnd = reformatBikeShareHours(share.properties.eventEnd);
@@ -114,10 +115,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<div class="bikeshare"><h4>{{share.name}}</h4>',
             '<p><strong>{{share.addressStreet}}</strong></p>',
             '<p>Status: {{share.kioskPublicStatus}}</p>',
-            '<p>Hours: {{share.openTime}} to {{share.closeTime}}</p>',
             '{{#if share.isEventBased}}<p>Event hours: {{share.eventStart}} to {{share.eventEnd}}</p>{{/if}}',
-            '<p>{{share.bikesAvailable}} / {{share.totalDocks}} bikes available</p>',
-            '<p>{{share.docksAvailable}} / {{share.totalDocks}} docks available</p>',
+            '<p>{{share.bikesAvailable}} bikes available</p>',
+            '<p>{{share.docksAvailable}} docks open</p>',
             '{{#if share.trikesAvailable}}<p>{{share.trikesAvailable}} trikes available</p>{{/if}}',
             '<a href="https://www.rideindego.com/" target="_blank">',
             '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a>',
