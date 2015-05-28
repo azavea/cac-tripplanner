@@ -349,15 +349,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         });
         destinationMarkers = {};
         destinationsLayer = cartodb.L.geoJson(locationGeoJSON, {
-            onEachFeature: function(feature, layer) {
-                layer.on('click', function(){
-                    // TODO: this triggers on marker click, not popup
-                });
-            },
             pointToLayer: function (geojson, latLng) {
                 var popupTemplate = ['<h4>{{geojson.properties.name}}</h4>',
-                                     '<p>{{geojson.properties.description}}',
-                                     '</p><a href="{{geojson.properties.website_url}}" ',
+                                    // HTML-formatted description
+                                     geojson.properties.description,
+                                     '<a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
                                      '<a href="#" class="destination-directions-link pull-right" ',
                                      'id="{{geojson.properties.id}}">Get Directions</a>'
