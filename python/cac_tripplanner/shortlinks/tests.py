@@ -24,7 +24,8 @@ class LinkShortenerTestCase(TestCase):
     def test_generate_key(self):
         shortener = LinkShortener()
         key_len = len(shortener.generate_key(self.long_link))
-        self.assertTrue(key_len >= 15 and key_len <= 30, 'Shortened link does not have expected length')
+        self.assertTrue(key_len >= 15 and key_len <= 30,
+                        'Shortened link does not have expected length')
 
 
 class ShortenedLinkModelsTestCase(TestCase):
