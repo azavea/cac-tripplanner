@@ -2,7 +2,10 @@
     & > .jumbotron {
         background-image: url('../images/homepage_hero@2x.jpg');
 
-        @media screen and #{$screen-xs} {
+        @media screen and #{$screen-sm} {
+            height: 575px;
+        }
+        @media screen and #{$screen-xxs} {
             height: auto;
         }
 
@@ -17,6 +20,9 @@
             @media screen and #{$screen-xs} {
                 margin: 90px 0 25px;
                 font-size: 32px;
+            }
+            @media screen and #{$screen-sm} {
+                margin-bottom: 50px;
             }
         }
         h3 {
