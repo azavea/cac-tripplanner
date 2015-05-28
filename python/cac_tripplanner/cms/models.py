@@ -4,7 +4,6 @@ from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
 
-from cac_tripplanner.settings import MEDIA_URL
 from cac_tripplanner.image_utils import generate_image_filename
 
 
