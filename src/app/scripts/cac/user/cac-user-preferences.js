@@ -33,7 +33,7 @@ CAC.User.Preferences = (function($) {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
         exploreTime: 20,
-        maxWalk: undefined, // no max
+        maxWalk: 2,
         method: 'explore',
         mode: 'TRANSIT,WALK',
         origin: cityHall,
