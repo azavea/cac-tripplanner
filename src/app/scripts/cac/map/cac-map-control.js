@@ -118,7 +118,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.clearIsochrone = clearIsochrone;
     MapControl.prototype.clearDiscoverPlaces = clearDiscoverPlaces;
     MapControl.prototype.fetchIsochrone = fetchIsochrone;
-    MapControl.prototype.setBounds = setBounds;
     MapControl.prototype.locateUser = locateUser;
     MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.plotItinerary = plotItinerary;
@@ -373,23 +372,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     }
 
     /**
-     * Set the map bounds, optionally setting options
-     * @param {[L.LatLngBounds]} bounds
-     * @param {[L.fitBoundsOptions]} options
-     */
-    function setBounds(bounds, options) {
-        var defaults = {
-            // TODO: Figure out why allowing animation causes the map to get all weird
-            // test case: 450 market st -> 200 chestnut st
-            animate: false,
-            maxZoom: maxZoom,
-            // So that origin/dest don't show under the sidebar
-            paddingTopLeft: [400, 0]
-        };
-        map.fitBounds(bounds, $.extend({}, defaults, options));
-    }
-
-    /**
      * Plots an itinerary on a map, optionally zooming to fit.
      *
      * @param {Object} itinerary CAC.Routing.Itinerary object with geojson to draw
@@ -480,7 +462,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
             marker.setLatLng(latlng, {draggable: true});
-            map.panTo(latlng); // allow user to drag marker off map
 
             var trigger = (marker.options.title === 'origin') ?
                             eventNames.originMoved : eventNames.destinationMoved;
@@ -535,7 +516,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             originMarker.on('dragend', markerDrag);
             destinationMarker.on('dragend', markerDrag);
         }
-        map.panTo(origin);
     }
 
     function highlightDestination(destinationId, opts) {

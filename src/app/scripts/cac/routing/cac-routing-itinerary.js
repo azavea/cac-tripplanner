@@ -35,25 +35,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.geojson.setStyle(getStyle(isShown, false));
     };
 
-    /**
-     * Get Itinerary bounds, based on the origin/dest lat/lngs
-     * @param  {[number]} bufferRatio optionally buffer the returned bounds object
-     * @return {[L.LatLngBounds]}
-     */
-    Itinerary.prototype.getBounds = function(bufferRatio) {
-        var sw = cartodb.L.latLng(
-            Math.min(this.from.lat, this.to.lat),
-            Math.min(this.from.lon, this.to.lon)
-        );
-        var ne = cartodb.L.latLng(
-            Math.max(this.from.lat, this.to.lat),
-            Math.max(this.from.lon, this.to.lon)
-        );
-        var bounds = cartodb.L.latLngBounds(sw, ne);
-        bufferRatio = bufferRatio || 0;
-        return bounds.pad(bufferRatio);
-    };
-
     // cache of geocoded OSM nodes (node name mapped to reverse geocode name)
     var nodeCache = {};
 
