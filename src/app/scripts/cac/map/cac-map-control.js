@@ -9,7 +9,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             destinationPopup: '.destination-directions-link'
         }
     };
-    var maxZoom = 18;
 
     var map = null;
     var userMarker = null;
