@@ -14,3 +14,4 @@ PrivateHostedZoneName: 'cac.internal.'
 PublicHostedZoneName: 'publicdns.example.com.'
 SSLCertificateARN: 'arn:aws:iam::<account>:server-certificate/<name>'
 OtpInstanceType: 'm3.large'
+ASGMaxSize: 5
