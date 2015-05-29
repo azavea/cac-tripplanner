@@ -374,7 +374,7 @@ class AppServerStack(StackNode):
             AdjustmentType='ChangeInCapacity',
             AutoScalingGroupName=Ref(autoscaling_group),
             Cooldown=600,
-            ScalingAdjustment="1"
+            ScalingAdjustment='1'
         ))
 
         autoscaling_policy_remove = self.add_resource(asg.ScalingPolicy(
@@ -382,49 +382,88 @@ class AppServerStack(StackNode):
             AdjustmentType='ChangeInCapacity',
             AutoScalingGroupName=Ref(autoscaling_group),
             Cooldown=600,
-            ScalingAdjustment="-1"
+            ScalingAdjustment='-1'
         ))
 
-        ############################################################
-        # trigger scale down if CPU avg usage < 10% for 3 consecutive 5 min periods
-        self.add_resource(cw.Alarm(
-            'alarmAppServerLowCPU',
-            AlarmActions=[Ref(self.param_notification_arn), Ref(autoscaling_policy_remove)],
-            Statistic='Average',
-            Period=300,
-            Threshold='10',
-            EvaluationPeriods=3,
-            ComparisonOperator='LessThanThreshold',
-            MetricName='CPUUtilization',
-            Namespace='AWS/EC2',
-            Dimensions=[
-                cw.MetricDimension(
-                    'metricAutoScalingGroupName',
-                    Name='AutoScalingGroupName',
-                    Value=Ref(autoscaling_group)
-                )
-            ]
-        ))
+        if self.STACK_NAME_PREFIX == 'Otp':
+            # trigger scale down if CPU avg usage < 10% for 3 consecutive 5 min periods
+            self.add_resource(cw.Alarm(
+                'alarmAppServerLowCPU',
+                AlarmActions=[Ref(autoscaling_policy_remove)],
+                Statistic='Average',
+                Period=300,
+                Threshold='10',
+                EvaluationPeriods=3,
+                ComparisonOperator='LessThanThreshold',
+                MetricName='CPUUtilization',
+                Namespace='AWS/EC2',
+                Dimensions=[
+                    cw.MetricDimension(
+                        'metricAutoScalingGroupName',
+                        Name='AutoScalingGroupName',
+                        Value=Ref(autoscaling_group)
+                    )
+                ]
+            ))
 
-        # trigger scale up if CPU avg usage >= 30% for a 5 min period
-        self.add_resource(cw.Alarm(
-            'alarmAppServerHighCPU',
-            AlarmActions=[Ref(self.param_notification_arn), Ref(autoscaling_policy_add)],
-            Statistic='Average',
-            Period=300,
-            Threshold='30',
-            EvaluationPeriods=1,
-            ComparisonOperator='GreaterThanOrEqualToThreshold',
-            MetricName='CPUUtilization',
-            Namespace='AWS/EC2',
-            Dimensions=[
-                cw.MetricDimension(
-                    'metricAutoScalingGroupName',
-                    Name='AutoScalingGroupName',
-                    Value=Ref(autoscaling_group)
-                )
-            ]
-        ))
+            # trigger scale up if CPU avg usage >= 30% for a 5 min period
+            self.add_resource(cw.Alarm(
+                'alarmAppServerHighCPU',
+                AlarmActions=[Ref(self.param_notification_arn), Ref(autoscaling_policy_add)],
+                Statistic='Average',
+                Period=300,
+                Threshold='30',
+                EvaluationPeriods=1,
+                ComparisonOperator='GreaterThanOrEqualToThreshold',
+                MetricName='CPUUtilization',
+                Namespace='AWS/EC2',
+                Dimensions=[
+                    cw.MetricDimension(
+                        'metricAutoScalingGroupName',
+                        Name='AutoScalingGroupName',
+                        Value=Ref(autoscaling_group)
+                    )
+                ]
+            ))
+        else:
+            # scale web servers based on network usage
+            self.add_resource(cw.Alarm(
+                'alarmAppServerLowNetworkUsage',
+                AlarmActions=[Ref(autoscaling_policy_remove)],
+                Statistic='Average',
+                Period=300,
+                Threshold='500000',
+                EvaluationPeriods=3,
+                ComparisonOperator='LessThanThreshold',
+                MetricName='NetworkOut',
+                Namespace='AWS/EC2',
+                Dimensions=[
+                    cw.MetricDimension(
+                        'metricAutoScalingGroupName',
+                        Name='AutoScalingGroupName',
+                        Value=Ref(autoscaling_group)
+                    )
+                ]
+            ))
+
+            self.add_resource(cw.Alarm(
+                'alarmAppServerHighNetworkUsage',
+                AlarmActions=[Ref(self.param_notification_arn), Ref(autoscaling_policy_add)],
+                Statistic='Average',
+                Period=300,
+                Threshold='10000000',
+                EvaluationPeriods=1,
+                ComparisonOperator='GreaterThanOrEqualToThreshold',
+                MetricName='NetworkOut',
+                Namespace='AWS/EC2',
+                Dimensions=[
+                    cw.MetricDimension(
+                        'metricAutoScalingGroupName',
+                        Name='AutoScalingGroupName',
+                        Value=Ref(autoscaling_group)
+                    )
+                ]
+            ))
 
         #
         # DNS name
