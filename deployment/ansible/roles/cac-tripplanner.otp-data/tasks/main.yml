@@ -25,12 +25,17 @@
 
 - name: Copy OTP Data
   copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
-  notify: Validate GTFS
+  when: develop or test
 
 - name: Build OTP Graph
   command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_jarfile }} --build {{ otp_data_dir }}
   args:
     chdir: "{{ otp_bin_dir }}"
+  when: develop or test
+
+- name: Copy Built OTP Graph to Host Data Directory
+  fetch: src={{ otp_data_dir }}/Graph.obj dest=./otp_data fail_on_missing=yes
+  when: develop
 
 - name: Create Graph Directory
   file: path="{{ otp_data_dir}}/{{ otp_router }}" state=directory
