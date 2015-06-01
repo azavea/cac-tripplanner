@@ -4,5 +4,6 @@
     - { role: "azavea.nginx" }
     - { role: "azavea.nodejs", nodejs_npm_version: "2.1.5" }
     - { role: "azavea.packer" }
+    - { role: "azavea.papertrail", when: production }
     - { role: "azavea.ruby", ruby_development: True }
     - { role: "azavea.virtualenv" }
