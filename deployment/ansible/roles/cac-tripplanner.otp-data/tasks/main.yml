@@ -50,5 +50,5 @@
   when: production
 
 - name: Set up Boundary
-  script: boundary_install.sh creates=/opt/setup_meter.sh
+  script: boundary_install.sh {{ boundary_token }} creates=/opt/setup_meter.sh
   when: production
