@@ -16,7 +16,23 @@
       "source_ami": "{{user `ubuntu_ami`}}",
       "instance_type": "{{user `instance_type`}}",
       "ssh_username": "ubuntu",
-      "ami_name": "App {{timestamp}}"
+      "ami_name": "App {{timestamp}}",
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_type": "gp2",
+          "volume_size": 16,
+          "delete_on_termination": true
+        }
+      ],
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_type": "gp2",
+          "volume_size": 16,
+          "delete_on_termination": true
+        }
+      ]
     },
     {
       "name": "bastion",
