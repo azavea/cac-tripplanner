@@ -43,8 +43,12 @@
 - name: Move Graph to Graph Directory
   command: mv {{ otp_data_dir }}/Graph.obj {{ otp_data_dir }}/{{ otp_router }}
   notify: Restart OpenTripPlanner
+  when: develop or test
+
+- name: Move Local Graph to Graph Directory
+  copy: src=./otp_data/Graph.obj dest="{{ otp_data_dir }}/{{ otp_router }}/Graph.obj" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
+  when: production
 
 - name: Set up Boundary
-  command: >
-    curl -fsS -d '{"token":"{{ boundary_token }}"}' -H 'Content-Type: application/json' https://meter.boundary.com/setup_meter > setup_meter.sh && chmod +x setup_meter.sh && ./setup_meter.sh
+  script: boundary_install.sh {{ boundary_token }} creates=/opt/setup_meter.sh
   when: production

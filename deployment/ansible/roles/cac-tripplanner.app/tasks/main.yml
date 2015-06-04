@@ -81,6 +81,5 @@
 - { include: dev-test-dependencies.yml, when: develop or test }
 
 - name: Set up Boundary
-  command: >
-    curl -fsS -d '{"token":"{{ boundary_token }}"}' -H 'Content-Type: application/json' https://meter.boundary.com/setup_meter > setup_meter.sh && chmod +x setup_meter.sh && ./setup_meter.sh
+  script: boundary_install.sh {{ boundary_token }} creates=/opt/setup_meter.sh
   when: production
