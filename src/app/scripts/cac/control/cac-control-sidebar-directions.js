@@ -304,6 +304,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     function onTypeaheadSelected(event, key, location) {
         if (!location) {
             UserPreferences.setPreference(key, undefined);
+            UserPreferences.setPreference(key + 'Text', undefined);
             setDirections(key, null);
             return;
         }
@@ -327,6 +328,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
+        var typeahead = (key === 'origin') ? typeaheadOrigin : typeaheadDest;
 
         // show spinner while loading
         itineraryListControl.hide();
@@ -343,14 +345,14 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 UserPreferences.setPreference(key + 'Text', fullAddress);
                 // The change event is triggered after setting the typeahead value
                 // in order to run the navigation icon hide/show logic
-                $(options.selectors[key]).typeahead('val', fullAddress).change();
+                typeahead.setValue(fullAddress);
                 setDirections(key, [position.lat, position.lng]);
                 planTrip();
             } else {
                 // unset location and show error
                 UserPreferences.setPreference(key, undefined);
                 UserPreferences.setPreference(key + 'Text', undefined);
-                $(options.selectors[key]).typeahead('val', '').change();
+                typeahead.setValue('');
                 setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
                 itineraryListControl.setItinerariesError({
@@ -386,8 +388,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         var mode = UserPreferences.getPreference('mode');
         bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        $(options.selectors.origin).typeahead('val', originText).change();
-        $(options.selectors.destination).typeahead('val', destinationText).change();
+        typeaheadOrigin.setValue(originText);
+        typeaheadDest.setValue(destinationText);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -459,12 +461,12 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
                 destination.feature.geometry.y,
                 destination.feature.geometry.x
             ];
-            $(options.selectors.destination).typeahead('val', destinationText).change();
+            typeaheadDest.setValue(destinationText);
         }
 
         if (origin && origin.feature && origin.feature.geometry) {
             directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
-            $(options.selectors.origin).typeahead('val', originText).change();
+            typeaheadOrigin.setValue(originText);
         }
 
         if (initialLoad && method === 'directions') {
