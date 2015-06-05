@@ -17,6 +17,7 @@ from utils.constants import (
     HTTP,
     HTTPS,
     KIBANA_PORT,
+    PAPERTRAIL_PORT,
     SSH,
     VPC_CIDR
 )
@@ -373,7 +374,7 @@ class VPC(StackNode):
                 SecurityGroupEgress=[
                     ec2.SecurityGroupRule(
                         IpProtocol='tcp', CidrIp=ALLOW_ALL_CIDR, FromPort=port, ToPort=port
-                    ) for port in [HTTP, HTTPS]
+                    ) for port in [HTTP, HTTPS, PAPERTRAIL_PORT]
                 ],
                 Tags=self.get_tags()), 'NATSecurityGroup'
             )
