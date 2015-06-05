@@ -1,5 +1,7 @@
 """Storage for constants that need to be referenced in templates"""
 
+# TODO: parametize this file, so we can specify values via group_vars
+
 ################
 ## AWS Resources
 ################
@@ -33,6 +35,7 @@ HTTPS = 443
 POSTGRES = 5432
 KIBANA_PORT = 5000
 GRAPHITE_PORT = 5601
+PAPERTRAIL_PORT = 57520
 
 ############################
 ## Monitoring instance ports

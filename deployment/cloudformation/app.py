@@ -20,6 +20,7 @@ from utils.constants import (
     ALLOW_ALL_CIDR,
     EC2_INSTANCE_TYPES,
     VPC_CIDR,
+    PAPERTRAIL_PORT,
     POSTGRES
 )
 
@@ -204,7 +205,7 @@ class AppServerStack(StackNode):
                 ec2.SecurityGroupRule(
                     IpProtocol='tcp', CidrIp=ALLOW_ALL_CIDR, FromPort=p, ToPort=p
                 )
-                for p in [80, 443]
+                for p in [80, 443, PAPERTRAIL_PORT]
             ],
             Tags=Tags(
                 Name='sgAppServer',
@@ -232,7 +233,7 @@ class AppServerStack(StackNode):
              [POSTGRES]),
             (app_server_security_group,
              self.param_nat_security_group,
-             [80, 443, 22, 587])
+             [80, 443, 22, 587, PAPERTRAIL_PORT])
         ]
         for num, (srcsg, destsg, ports) in enumerate(rules):
             for port in ports:
