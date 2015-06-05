@@ -20,6 +20,9 @@
         -webkit-backface-visibility: hidden;
         -webkit-overflow-scrolling: touch;
     }
+    @media screen and #{$screen-sm} {
+        width: 320px;
+    }
 
     .tt-hint {
         color: #999;

@@ -4,6 +4,11 @@
     top: 78px;
     bottom: 0;
 
+    .locate-icon {
+        right: 45px;
+        top: 21px;
+    }
+
     &.show-results {
         .sidebar-clip {
             //height: 100%;
@@ -229,6 +234,10 @@
                 width: auto;
                 left: auto;
                 right: auto;
+
+                @media screen and #{$screen-xs} {
+                    font-size: 18px;
+                }
             }
             h5 {
                 bottom: auto;
@@ -243,6 +252,10 @@
                 left: auto;
                 right: auto;
                 margin: 10px 30px 30px;
+            }
+            img {
+                height: 100%;
+                width: auto;
             }
         }
         .sk-spinner {
