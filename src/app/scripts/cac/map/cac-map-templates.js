@@ -165,11 +165,12 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '{{^}}https://placehold.it/300x150{{/if}}" />',
                     // the parent element of whatever is put here is a <p> tag
                 '<div class="explore-block">{{{ d.description }}}</div>',
+                '<div class="explore-block visible-xs mobile-unavailable">GoPhillyGo directions are not available on mobile at this time, but this button can give you directions from Google.</div>',
                 '<div class="explore-block">',
                     '<div class="row">',
                         // .back and .getdirections are used to select these elements for the click event
-                        '<div class="col-xs-6"><a class="back btn btn-primary btn-block">Back</a></div>',
-                        '<div class="col-xs-6"><a class="getdirections btn btn-primary btn-block">',
+                        '<div class="col-sm-6"><a class="back btn btn-primary btn-block hidden-xs">Back</a></div>',
+                        '<div class="col-sm-6"><a class="getdirections btn btn-primary btn-block">',
                             'Get Directions</a></div>',
                     '</div>',
                 '</div>',

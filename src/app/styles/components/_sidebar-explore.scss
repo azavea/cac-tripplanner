@@ -284,6 +284,11 @@
     }
 }
 
+.mobile-unavailable {
+    font-style: italic;
+    font-weight: 500;
+    color: lighten($gpg-red, 10%);
+}
 
 .explore-block {
     padding-bottom: 10px;
