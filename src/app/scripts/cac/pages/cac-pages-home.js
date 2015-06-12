@@ -20,6 +20,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             exploreMode: '#exploreMode input',
             exploreOrigin: '#exploreOrigin',
             exploreTime: '#exploreTime',
+            submitErrorModal: '#submit-error-modal',
             toggleButton: '.toggle-search button',
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
@@ -85,6 +86,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
             window.location = '/map';
+        } else {
+            $(options.selectors.submitErrorModal).modal();
         }
     };
 

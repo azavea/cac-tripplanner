@@ -198,6 +198,22 @@
         </div>
         </div>
     </section>
+    <div id="submit-error-modal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>We had trouble recognizing that address</h4>
+          </div>
+          <div class="modal-body">
+            <p>Please try again and select an option from the list.</p>
+            <p>Intersections are difficult to interpret - try using an address instead.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
     {% include "footer-mixin.html" %}
 </div>
 {% endblock %}
