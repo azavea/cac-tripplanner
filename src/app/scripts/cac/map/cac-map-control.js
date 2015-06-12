@@ -490,6 +490,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             originMarker.setLatLng(origin);
             destinationMarker.setLatLng(destination);
         } else {
+            // Due to time constraints, these two icon definitions were copied to cac-pages-directions.js
+            // for use on the static map page there. If you change them here, change them there as well
+            // Remove comment if icon definitions are abstracted elsewhere
             var originIcon = L.AwesomeMarkers.icon({
                 icon: 'home',
                 prefix: 'fa',
