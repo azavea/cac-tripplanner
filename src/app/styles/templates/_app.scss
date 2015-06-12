@@ -89,6 +89,13 @@
 }
 
 .directions-print {
+
+    #directions-map {
+        width: 100%;
+        height: 250px;
+        margin-bottom: 20px;
+    }
+
     position: static !important;
     width: auto !important;
     .block-leg {
