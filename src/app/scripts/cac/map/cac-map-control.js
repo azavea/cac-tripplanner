@@ -551,8 +551,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     function displayPoint(lon, lat) {
         if (lon && lat) {
             var latlng = new cartodb.L.LatLng(lat, lon);
-            lastDisplayPointMarker = new cartodb.L.CircleMarker(latlng);
-            lastDisplayPointMarker.addTo(map);
+            if (!lastDisplayPointMarker) {
+                lastDisplayPointMarker = new cartodb.L.CircleMarker(latlng);
+                lastDisplayPointMarker.addTo(map);
+            } else {
+                lastDisplayPointMarker.setLatLng(latlng);
+            }
         } else if (lastDisplayPointMarker) {
             map.removeLayer(lastDisplayPointMarker);
             lastDisplayPointMarker = null;
