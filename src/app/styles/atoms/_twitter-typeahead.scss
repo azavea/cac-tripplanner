@@ -43,8 +43,11 @@
 
 .locate-icon {
     position: absolute;
-    right: 16px;
-    top: 19px;
+    right: 12px;
+    top: 15px;
     cursor: pointer;
     z-index: 999;
+    background-color: white;
+    padding: 4px;
+    border-radius: 99px;
 }

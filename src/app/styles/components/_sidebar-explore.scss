@@ -5,8 +5,11 @@
     bottom: 0;
 
     .locate-icon {
-        right: 45px;
-        top: 21px;
+        right: 41px;
+        top: 17px;
+        background-color: white;
+        padding: 4px;
+        border-radius: 99px;
     }
 
     &.show-results {
@@ -172,10 +175,6 @@
         box-shadow: none;
         margin: 0;
 
-        a {
-            cursor: pointer;
-        }
-
         .destinations {
             height: 100%;
 
@@ -254,7 +253,7 @@
                 margin: 10px 30px 30px;
             }
             img {
-                height: 100%;
+                height: auto;
                 width: auto;
             }
         }
@@ -284,6 +283,11 @@
     }
 }
 
+.mobile-unavailable {
+    font-style: italic;
+    font-weight: 500;
+    color: lighten($gpg-red, 10%);
+}
 
 .explore-block {
     padding-bottom: 10px;
