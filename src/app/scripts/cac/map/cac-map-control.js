@@ -152,7 +152,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         // make sure the bike routes overlay shows on top of the new base layer.
         map.on('baselayerchange', function() {
             if (map.hasLayer(overlays['Bike Routes'])) {
-                bikeShareOverlay.bringToFront();
+                overlays['Bike Routes'].bringToFront();
             }
         });
     }
