@@ -23,8 +23,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
             facebookShareButton: '#fbShareBtn',
             twitterShareButton: '#twShareBtn',
             googlePlusShareButton: '#gpShareBtn'
-        },
-        useHost: window.location.protocol + '//' + window.location.host
+        }
     };
     var options = {};
 
@@ -105,8 +104,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
         // get URL for sharing
         var paramString = decodeURIComponent($.param(itinerary.requestParameters));
         var index = itinerary.id;
-        var directionsUrl = [options.useHost,
-                             '/directions/?',
+        var directionsUrl = ['/directions/?',
                              paramString,
                              '&itineraryIndex=',
                              index
