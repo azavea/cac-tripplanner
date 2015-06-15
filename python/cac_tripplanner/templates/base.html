@@ -17,8 +17,13 @@
     <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
-    <meta property="og:site_name" content="Go Philly Go" />
+    <meta property="og:site_name" content="GoPhillyGo" />
     <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@go_philly_go" />
+    <meta name="twitter:title" content="GoPhillyGo" />
+    <meta name="twitter:description" content="Helping you get around greater Philly" />
+    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
     {% endblock %}
 
     {% block cssimports %}
