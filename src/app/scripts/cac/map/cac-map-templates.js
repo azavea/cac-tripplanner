@@ -165,6 +165,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '{{^}}https://placehold.it/300x150{{/if}}" />',
                     // the parent element of whatever is put here is a <p> tag
                 '<div class="explore-block">{{{ d.description }}}</div>',
+                '<div class="explore-block"><a href="{{ d.website_url }}" ',
+                'target="_blank">{{ d.website_url }}</a></div>',
                 '<div class="explore-block visible-xs mobile-unavailable">GoPhillyGo directions are not available on mobile at this time, but this button can give you directions from Google.</div>',
                 '<div class="explore-block">',
                     '<div class="row">',
