@@ -214,12 +214,14 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+    {% include "contact-form-mixin.html" %}
     {% include "footer-mixin.html" %}
 </div>
 {% endblock %}
 
 {%block jspage %}
 <script type="text/javascript">
+jQuery.noConflict(); // because JotForms.
 $(document).ready(function () {
     CAC.Settings.fbAppId = '{{ fb_app_id }}';
     var home = new CAC.Pages.Home();
