@@ -64,6 +64,10 @@
     }
 }
 
+.leaflet-popup-content p {
+    max-height: 240px;
+    overflow: auto;
+}
 .leaflet-popup-content-wrapper {
     border-radius: 0;
 }
