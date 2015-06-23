@@ -446,6 +446,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             // show destination details if destination selected on homepage
             if (_.has(destination, 'id')) {
                 selectedDestination = destination;
+                // unset selected destination in preferences
+                UserPreferences.setPreference('destination', null);
+                UserPreferences.setPreference('destinationText', null);
             } else {
                 selectedDestination = null;
             }
