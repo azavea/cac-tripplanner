@@ -193,7 +193,11 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
         $(options.selectors.destinations).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
-        mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions).then(
+
+        // do not zoom to fit isochrone if going to highlight a selected destination
+        var zoomToFit = !selectedDestination;
+
+        mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions, zoomToFit).then(
             function (destinations) {
                 $(options.selectors.spinner).addClass('hidden');
                 $(options.selectors.destinations).removeClass('hidden');
@@ -365,6 +369,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         // show destination details if destination is selected
         if (selectedDestination) {
             setDestinationSidebarDetail(selectedDestination);
+            // also highlight it on the map and pan to it
+            mapControl.highlightDestination(selectedDestination.id, { panTo: true });
             selectedDestination = null;
         }
     }
@@ -442,7 +448,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         }
 
         if (method === 'explore' && exploreLatLng) {
-            fetchIsochrone(when, exploreTime, otpOptions);
             // show destination details if destination selected on homepage
             if (_.has(destination, 'id')) {
                 selectedDestination = destination;
@@ -452,6 +457,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             } else {
                 selectedDestination = null;
             }
+            fetchIsochrone(when, exploreTime, otpOptions);
         }
     }
 

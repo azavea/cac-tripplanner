@@ -213,7 +213,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     /**
      * Add isochrone outline to map
      */
-    function drawIsochrone(isochrone) {
+    function drawIsochrone(isochrone, zoomToFit) {
         isochroneLayer = cartodb.L.geoJson(isochrone, {
             clickable: false,
             style: {
@@ -228,7 +228,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
                 weight: 2
             }
         }).addTo(map);
-        map.fitBounds(isochroneLayer.getBounds());
+        if (zoomToFit) {
+            map.fitBounds(isochroneLayer.getBounds());
+        }
     }
 
     /**
@@ -257,8 +259,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      *
      * @param {Deferred} A jQuery Deferred object used for resolution
      * @param {Object} Parameters to be sent along with the request
+     * @param {boolean} Whether to pan/zoom map to fit returned isochrone
      */
-    function getIsochrone(deferred, params) {
+    function getIsochrone(deferred, params, zoomToFit) {
         // Check if there's already an active request. If there is one,
         // then we can't make a query yet -- store it as pending.
         // If there was already a pending query, immediately resolve it.
@@ -266,12 +269,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             if (pendingIsochroneRequest) {
                 pendingIsochroneRequest.deferred.resolve();
             }
-            pendingIsochroneRequest = { deferred: deferred, params: params };
+            pendingIsochroneRequest = { deferred: deferred, params: params, zoomToFit: zoomToFit };
             return;
         }
 
         // Set the active isochrone request and make query
-        activeIsochroneRequest = { deferred: deferred, params: params };
+        activeIsochroneRequest = { deferred: deferred, params: params, zoomToFit: zoomToFit };
         fetchReachable(params).then(function(data) {
             activeIsochroneRequest = null;
             if (pendingIsochroneRequest) {
@@ -281,7 +284,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
                 var pending = pendingIsochroneRequest;
                 pendingIsochroneRequest = null;
-                getIsochrone(pending.deferred, pending.params);
+                getIsochrone(pending.deferred, pending.params, zoomToFit);
                 return;
             }
 
@@ -290,7 +293,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
                 deferred.resolve();
                 return;
             }
-            drawIsochrone(data.isochrone);
+            drawIsochrone(data.isochrone, zoomToFit);
             // also draw 'matched' list of locations
             drawDestinations(data.matched);
             deferred.resolve(data.matched);
@@ -304,7 +307,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     /**
      * Get travelshed and destinations within it, then display results on map.
     */
-    function fetchIsochrone(coordsOrigin, when, exploreMinutes, otpParams) {
+    function fetchIsochrone(coordsOrigin, when, exploreMinutes, otpParams, zoomToFit) {
         var deferred = $.Deferred();
         // clear results of last search
         clearDiscoverPlaces();
@@ -328,7 +331,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         if (coordsOrigin) {
             params.fromPlace = coordsOrigin.join(',');
-            getIsochrone(deferred, params);
+            getIsochrone(deferred, params, zoomToFit);
         }
 
         return deferred.promise();
