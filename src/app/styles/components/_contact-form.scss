@@ -43,8 +43,12 @@
         }
     }
     input[type="submit"] {
+        padding: 4px;
         background: $gpg-red;
         color: white;
         font-weight: 700;
+        &:disabled {
+            opacity: 0.2;
+        }
     }
 }
