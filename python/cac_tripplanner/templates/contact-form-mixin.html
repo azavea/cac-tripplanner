@@ -13,12 +13,15 @@
             emailSubscribeButton: 'emailSubscribe'
         };
 
+        // http://badsyntax.co/post/javascript-email-validation-rfc822
+        var emailRegex = /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/;
+
         // Check email address entrered and checkbox checked before allowing submission of contact form
         var validateContactForm = function() {
             var emailAddress = document.getElementById(selectors.emailAddressBox).value;
             var checkedAgree = document.getElementById(selectors.emailAgreeCheckbox).checked;
 
-            if (checkedAgree && emailAddress.length) {
+            if (checkedAgree && emailRegex.test(emailAddress)) {
                 document.getElementById(selectors.emailSubscribeButton).disabled = false;
             } else {
                 document.getElementById(selectors.emailSubscribeButton).disabled = true;
