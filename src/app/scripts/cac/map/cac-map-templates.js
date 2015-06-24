@@ -112,16 +112,15 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         }
         share.properties.indegoLogo = Utils.getImageUrl('indego_logo.png');
         var source = [
-            '<div class="bikeshare"><h4>{{share.name}}</h4>',
-            '<p><strong>{{share.addressStreet}}</strong></p>',
-            '<p>Status: {{share.kioskPublicStatus}}</p>',
+            '<h4>{{share.name}}</h4>',
+            '<p class="bikeshare"><strong>{{share.addressStreet}}</strong></p>',
+            '<p class="bikeshare">Status: {{share.kioskPublicStatus}}</p>',
             '{{#if share.isEventBased}}<p>Event hours: {{share.eventStart}} to {{share.eventEnd}}</p>{{/if}}',
-            '<p>{{share.bikesAvailable}} bikes available</p>',
-            '<p>{{share.docksAvailable}} docks open</p>',
+            '<p class="bikeshare">{{share.bikesAvailable}} bikes available</p>',
+            '<p class="bikeshare">{{share.docksAvailable}} docks open</p>',
             '{{#if share.trikesAvailable}}<p>{{share.trikesAvailable}} trikes available</p>{{/if}}',
             '<a href="https://www.rideindego.com/" target="_blank">',
             '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a>',
-            '</div>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({share: share.properties});

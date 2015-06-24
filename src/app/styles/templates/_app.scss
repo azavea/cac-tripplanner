@@ -64,17 +64,20 @@
     }
 }
 
-.leaflet-popup-content p {
-    max-height: 240px;
-    overflow: auto;
+.leaflet-popup-content {
+    p {
+        :not(.bikeshare) {
+            max-height: 240px;
+            overflow: auto;
+        }
+        &.bikeshare {
+            line-height: 20%;
+        }
+    }
 }
+
 .leaflet-popup-content-wrapper {
     border-radius: 0;
-}
-.leaflet-popup-content .bikeshare {
-    p {
-        line-height: 20%;
-    }
 }
 
 .popup-title {
