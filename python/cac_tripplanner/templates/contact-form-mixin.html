@@ -1,0 +1,66 @@
+<script src="https://d2g9qbzl5h49rh.cloudfront.net/static/prototype.forms.js" type="text/javascript"></script>
+<script src="https://d2g9qbzl5h49rh.cloudfront.net/static/jotform.forms.js?3.2.6775" type="text/javascript"></script>
+<script type="text/javascript">
+    JotForm.init(function(){
+        JotForm.onSubmissionError="jumpToSubmit";
+    });
+
+    // do some basic validation on the contact form.  jQuery is not available here.
+    document.ready(function() {
+        var selectors = {
+            emailAddressBox:  'emailAddress',
+            emailAgreeCheckbox: 'emailAgree',
+            emailSubscribeButton: 'emailSubscribe'
+        };
+
+        // http://badsyntax.co/post/javascript-email-validation-rfc822
+        var emailRegex = /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/;
+
+        // Check email address entrered and checkbox checked before allowing submission of contact form
+        var validateContactForm = function() {
+            var emailAddress = document.getElementById(selectors.emailAddressBox).value;
+            var checkedAgree = document.getElementById(selectors.emailAgreeCheckbox).checked;
+
+            if (checkedAgree && emailRegex.test(emailAddress)) {
+                document.getElementById(selectors.emailSubscribeButton).disabled = false;
+            } else {
+                document.getElementById(selectors.emailSubscribeButton).disabled = true;
+            }
+        }
+
+        // contact form validation
+        document.getElementById(selectors.emailAddressBox).on('change', validateContactForm);
+        document.getElementById(selectors.emailAgreeCheckbox).on('change', validateContactForm);
+    });
+</script>
+<div class="contact-form">
+    <div class="container text-center form-group">
+        <h4>Contact Us</h4>
+        <p>Stay up to date on all things GoPhillyGo. Enter your information below to be updated on GoPhillyGo events and featured content from the site.</p><br />
+        <form class="jotform-form" action="https://submit.jotform.us/submit/51094584186159/" method="post"
+            target="_blank" name="form_51094584186159" id="51094584186159" accept-charset="utf-8">
+            <input type="hidden" name="formID" value="51094584186159" />
+            <ul class="list-inline">
+                <li><input class="form-control" type="text" name="q1_firstName"
+                    placeholder="First Name" value=""></li>
+                <li><input class="form-control" type="text" name="q3_lastName"
+                    placeholder="Last Name" value=""></li>
+                <li><input class="form-control" type="text" id="emailAddress"
+                    name="q4_emailAddress" placeholder="Email Address" value=""></li>
+            </ul>
+            <div class="submit">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="emailAgree" value=""
+                            name="agree"> I agree to receive emails from GoPhillyGo </label>
+                </div>
+                <br />
+                <input type="submit" id="emailSubscribe" value="subscribe" disabled />
+            </div>
+            <input type="hidden" id="simple_spc" name="simple_spc" value="51094584186159" />
+            <script type="text/javascript">
+                document.getElementById("si" + "mple" + "_spc").value = "51094584186159-51094584186159";
+            </script>
+        </form>
+    </div>
+</div>
