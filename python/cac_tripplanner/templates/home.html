@@ -222,7 +222,7 @@
 {%block jspage %}
 <script type="text/javascript">
 jQuery.noConflict(); // because JotForms.
-$(document).ready(function () {
+jQuery(document).ready(function ($) {
     CAC.Settings.fbAppId = '{{ fb_app_id }}';
     var home = new CAC.Pages.Home();
     home.initialize();
