@@ -84,7 +84,7 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js', '!**/leaflet.js'], [])
+    return copyBowerFiles(['**/*.js', '!**/leaflet.js', '!**/jquery.js', '!**/jquery.min.js'], [])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
