@@ -65,14 +65,13 @@
 }
 
 .leaflet-popup-content {
-    p {
-        :not(.bikeshare) {
-            max-height: 240px;
-            overflow: auto;
-        }
-        &.bikeshare {
-            line-height: 20%;
-        }
+    .destination-description {
+        max-height: 240px;
+        overflow: auto;
+    }
+
+    p.bikeshare {
+        line-height: 20%;
     }
 }
 
