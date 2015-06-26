@@ -354,8 +354,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         destinationsLayer = cartodb.L.geoJson(locationGeoJSON, {
             pointToLayer: function (geojson, latLng) {
                 var popupTemplate = ['<h4>{{geojson.properties.name}}</h4>',
+                                     '<div class="destination-description">',
                                     // HTML-formatted description
                                      geojson.properties.description,
+                                     '</div>',
                                      '<a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
                                      '<a href="#" class="destination-directions-link pull-right" ',
