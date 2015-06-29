@@ -123,9 +123,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     function onTypeaheadSelected(event, suggestion, dataset) {
         var typeaheadKey = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
         var events = this.events;
-        this.lastSelectedValue = suggestion.text;
 
         if (dataset === 'destinations') {
+            this.lastSelectedValue = suggestion.text;
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
                     // location will be null if no results found
@@ -135,6 +135,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 });
         } else {
             // featured locations
+            this.lastSelectedValue = suggestion.name;
             events.trigger(eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
