@@ -1,6 +1,6 @@
 .homepage {
     & > .jumbotron {
-        background-image: url('../images/homepage_hero@2x.png');
+        background-image: url('../images/homepage_hero_revised.jpg');
 
         @media screen and #{$screen-sm} {
             height: 575px;
