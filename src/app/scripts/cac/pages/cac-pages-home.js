@@ -82,6 +82,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             $(options.selectors.directionsTo).addClass(options.selectors.errorClass);
         }
 
+        // check if either input is in error status
+        if ($(options.selectors.directionsFrom).hasClass(options.selectors.errorClass) ||
+            $(options.selectors.directionsTo).hasClass(options.selectors.errorClass)) {
+
+            $(options.selectors.submitErrorModal).modal();
+            return;
+        }
+
         if (origin && destination) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
@@ -99,6 +107,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
 
         if (!origin) {
             $(options.selectors.exploreOrigin).addClass(options.selectors.errorClass);
+        }
+
+        // check if the input is in error status
+        if ($(options.selectors.exploreOrigin).hasClass(options.selectors.errorClass)) {
+            $(options.selectors.submitErrorModal).modal();
             return;
         }
 
