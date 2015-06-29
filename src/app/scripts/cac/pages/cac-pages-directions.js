@@ -61,12 +61,6 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
 
         function loadMap() {
             var mapOptions = {
-                dragging: false,
-                touchZoom: false,
-                scrollWheelZoom: false,
-                doubleClickZoom: false,
-                boxZoom: false,
-                keyboard: false,
                 zoomControl: false
             };
             var retina = '';
