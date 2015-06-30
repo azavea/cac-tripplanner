@@ -2,5 +2,4 @@
 # defined in azavea.opentripplanner
 #otp_bin_dir: /opt/opentripplanner
 #otp_data_dir: /var/otp
-otp_repo: "https://github.com/opentripplanner/OpenTripPlanner.git"
 otp_router: "default"

@@ -2,8 +2,8 @@
 app_username: "vagrant"
 
 # open trip planner vars
-otp_repo: "https://github.com/OpenTripPlanner/OpenTripPlanner.git"
-otp_version: "otp-0.15.0"
+otp_repo: "https://github.com/azavea/OpenTripPlanner.git"
+otp_version: "otp-0.15.0_no_shp"
 otp_jarfile: "./target/otp-0.15.0.jar"
 otp_session_timeout_s: 90
 
