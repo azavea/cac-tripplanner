@@ -350,4 +350,11 @@
     .back, .share, .itinerary {
         cursor: pointer;
     }
+
+    .share-dropdown > .dropdown-menu > li > a {
+        cursor: pointer;
+        &:hover {
+            color: $gpg-red;
+        }
+    }
 }
