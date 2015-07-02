@@ -284,8 +284,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
             UserPreferences.setPreference(prefKey + 'Text', $input.typeahead('val'));
         } else {
             $input.addClass(options.selectors.errorClass);
-            UserPreferences.setPreference(prefKey, null);
-            UserPreferences.setPreference(prefKey + 'Text', null);
+            UserPreferences.setPreference(prefKey, undefined);
+            UserPreferences.setPreference(prefKey + 'Text', '');
         }
     }
 
