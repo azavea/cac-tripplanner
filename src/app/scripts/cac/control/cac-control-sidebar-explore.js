@@ -452,8 +452,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             if (_.has(destination, 'id')) {
                 selectedDestination = destination;
                 // unset selected destination in preferences
-                UserPreferences.setPreference('destination', null);
-                UserPreferences.setPreference('destinationText', null);
+                UserPreferences.setPreference('destination', undefined);
+                UserPreferences.setPreference('destinationText', '');
             } else {
                 selectedDestination = null;
             }
