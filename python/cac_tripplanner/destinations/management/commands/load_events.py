@@ -22,9 +22,10 @@ class Command(BaseCommand):
     def get_property(self, item, property_name):
         """ Retrieve the value of an xml property name from another xml element """
         elements = item.getElementsByTagName(property_name)
-        if elements.length == 0:
+        if elements.length > 0 and elements[0].firstChild:
+            return elements[0].firstChild.data
+        else:
             return None
-        return elements[0].firstChild.data
 
     def parse_date(self, string_datetime):
         """ Parse a date from the feed, return datetime localized to US/Eastern """
