@@ -107,7 +107,11 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
         var directionsUrl = ['/directions/?',
                              paramString,
                              '&itineraryIndex=',
-                             index
+                             index,
+                             '&fromText=',
+                             UserPreferences.getPreference('originText'),
+                             '&toText=',
+                             UserPreferences.getPreference('destinationText')
                             ].join('');
         directionsUrl = encodeURI(directionsUrl);
 

@@ -1,4 +1,4 @@
-CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Utils) {
+CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, UserPreferences, Utils) {
     'use strict';
 
     var center = [39.95, -75.1667];
@@ -29,10 +29,23 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
             console.error('Must specify itineraryIndex URL parameter');
             return;
         }
-        var itineraryIndex = params.itineraryIndex;
 
-        // itineraryIndex is the only parameter not intended for OTP
+        // pull out the parameters not intended for OTP
+        var itineraryIndex = params.itineraryIndex;
+        var originText = params.fromText;
+        var destinationText = params.toText;
+
         delete params.itineraryIndex;
+        delete params.fromText;
+        delete params.toText;
+
+        // set into storage the origin and destination text for the directions list control
+        UserPreferences.setPreference('originText', originText);
+        UserPreferences.setPreference('destinationText', destinationText);
+
+        // unset the origin/destination objects
+        UserPreferences.setPreference('origin', undefined);
+        UserPreferences.setPreference('destination', undefined);
 
         var directionsListControl = new DirectionsList({
             showBackButton: false,
@@ -108,4 +121,4 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
 
     return Directions;
 
-})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.Utils);
+})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.User.Preferences, CAC.Utils);
