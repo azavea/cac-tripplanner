@@ -22,7 +22,6 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
             contentType: 'application/json',
             url: 'https://api.phila.gov/bike-share-stations/v1',
             success: function (data) {
-                data = JSON.parse(data);
                 $.each(data.features, function (i, share) {
                     bikeShareFeatureGroup.addLayer(getBikeShareMarker(share));
                 });
