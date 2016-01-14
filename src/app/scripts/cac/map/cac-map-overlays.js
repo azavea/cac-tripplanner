@@ -19,11 +19,9 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
     function bikeShareOverlay() {
         bikeShareFeatureGroup = cartodb.L.featureGroup([]);
         $.ajax({
-            // TODO: drop CORS proxy when endpoint allows CORS
-            //contentType: 'application/json',
-            url: 'http://cors.io/?u=https://www.rideindego.com/stations/json/',
+            contentType: 'application/json',
+            url: 'https://www.rideindego.com/stations/json/',
             success: function (data) {
-                data = JSON.parse(data);
                 $.each(data.features, function (i, share) {
                     bikeShareFeatureGroup.addLayer(getBikeShareMarker(share));
                 });
