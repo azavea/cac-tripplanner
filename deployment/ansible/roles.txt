@@ -1,5 +1,5 @@
 azavea.git,0.1.0
-azavea.java,0.2.3
+azavea.java,0.2.4
 azavea.opentripplanner,0.4.0
 azavea.nginx,0.2.1
 azavea.nodejs,0.4.0
