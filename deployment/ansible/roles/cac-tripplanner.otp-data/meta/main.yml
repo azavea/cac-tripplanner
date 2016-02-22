@@ -2,4 +2,4 @@
   dependencies:
     - { role: "cac-tripplanner.transitfeed" }
     - { role: "azavea.opentripplanner" }
-    - { role: "azavea.papertrail", when: production }
+    - { role: "cac-tripplanner.papertrail", when: production }
