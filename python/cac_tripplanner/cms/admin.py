@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.contrib import admin
+from django.utils.timezone import now
 
 from .forms import AboutFaqForm, ArticleForm
 from .models import AboutFaq, Article
@@ -41,9 +44,10 @@ class ArticleAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title', )}
 
     def make_published(self, request, queryset):
-        queryset.update(published=True)
+        queryset.update(publish_date=now())
     make_published.short_description = 'Publish selected articles'
 
     def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
+        # unpublish articles by setting their publication date far in the future
+        queryset.update(publish_date=now() + timedelta(days=200 * 365))
     make_unpublished.short_description = 'Unpublish selected articles'
