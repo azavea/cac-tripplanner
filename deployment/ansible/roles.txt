@@ -1,10 +1,10 @@
 azavea.git,0.1.0
-azavea.java,0.2.4
+azavea.java,0.2.6
 azavea.opentripplanner,0.4.0
 azavea.nginx,0.2.1
 azavea.nodejs,0.4.0
 azavea.packer,0.2.0
-azavea.papertrail,1.1.0
+azavea.papertrail,1.1.1
 azavea.pip,0.1.1
 azavea.python,0.1.0
 azavea.ruby,0.3.0
