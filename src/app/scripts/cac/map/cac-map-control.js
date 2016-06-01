@@ -160,8 +160,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     function initializeOverlays() {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
         overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
-        overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
-        overlays['Nearby Events'].addTo(map);
+
+        // TODO: re-enable when Uwishunu feed returns
+        //overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
+        //overlays['Nearby Events'].addTo(map);
     }
 
     function initializeLayerControl() {
