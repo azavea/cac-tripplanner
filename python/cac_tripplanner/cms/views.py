@@ -9,7 +9,7 @@ from django.views.generic import View
 
 from .models import AboutFaq, Article
 from destinations.models import Destination
-from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT
+from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, DEBUG
 
 
 def home(request):
@@ -29,13 +29,14 @@ def home(request):
                              dict(community_profile=community_profile,
                                   tips_and_tricks=tips_and_tricks,
                                   destinations=destinations,
-                                  fb_app_id=FB_APP_ID))
+                                  fb_app_id=FB_APP_ID,
+                                  debug=DEBUG))
     return render_to_response('home.html', context_instance=context)
 
 
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
-    context = RequestContext(request, {'page': page})
+    context = RequestContext(request, {'page': page, 'debug': DEBUG})
     return render_to_response('about-faq.html', context_instance=context)
 
 
@@ -46,7 +47,7 @@ def community_profile_detail(request, slug):
     """
     community_profile = get_object_or_404(Article.profiles.published(),
                                           slug=slug)
-    context = RequestContext(request, {'article': community_profile})
+    context = RequestContext(request, {'article': community_profile, 'debug': DEBUG})
     return render_to_response('community-profile-detail.html',
                               context_instance=context)
 
@@ -58,7 +59,7 @@ def tips_and_tricks_detail(request, slug):
     """
     tips_and_tricks = get_object_or_404(Article.tips.published(),
                                         slug=slug)
-    context = RequestContext(request, {'article': tips_and_tricks})
+    context = RequestContext(request, {'article': tips_and_tricks, 'debug': DEBUG})
     return render_to_response('tips-and-tricks-detail.html',
                               context_instance=context)
 
