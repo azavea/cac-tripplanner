@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import View
+from cac_tripplanner.settings import DEBUG
 
 import requests
 
@@ -25,7 +26,9 @@ def base_otp_view(request, page):
     :returns: A rendered response
     """
     routing_url = OTP_URL.format(router='default') + 'plan'
-    context = RequestContext(request, dict(fb_app_id=FB_APP_ID, routing_url=routing_url))
+    context = RequestContext(request, dict(fb_app_id=FB_APP_ID,
+                                           routing_url=routing_url,
+                                           debug=DEBUG))
     return render_to_response(page, context_instance=context)
 
 
