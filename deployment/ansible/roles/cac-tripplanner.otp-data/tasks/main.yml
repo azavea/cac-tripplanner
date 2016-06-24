@@ -48,7 +48,3 @@
 - name: Move Local Graph to Graph Directory
   copy: src=./otp_data/Graph.obj dest="{{ otp_data_dir }}/{{ otp_router }}/Graph.obj" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
   when: production
-
-- name: Set up Boundary
-  script: boundary_install.sh {{ boundary_token }} creates=/opt/setup_meter.sh
-  when: production
