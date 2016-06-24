@@ -79,7 +79,3 @@
 - { include: jslibs.yml }
 
 - { include: dev-test-dependencies.yml, when: develop or test }
-
-- name: Set up Boundary
-  script: boundary_install.sh {{ boundary_token }} creates=/opt/setup_meter.sh
-  when: production
