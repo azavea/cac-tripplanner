@@ -1,4 +1,4 @@
-CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
+CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences, UrlRouter) {
     'use strict';
 
     var defaults = {
@@ -12,12 +12,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
     var sidebarExploreControl = null;
     var sidebarDirectionsControl = null;
     var sidebarTabControl = null;
+    var urlRouter = null;
 
     function Map(options) {
         this.options = $.extend({}, defaults, options);
     }
 
     Map.prototype.initialize = function () {
+        urlRouter = new UrlRouter();
 
         sidebarTabControl = new CAC.Control.SidebarTab();
         window.stc = sidebarTabControl;
@@ -49,7 +51,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
 
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,
-            tabControl: sidebarTabControl
+            tabControl: sidebarTabControl,
+            urlRouter: urlRouter
         });
     };
 
@@ -119,4 +122,4 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl) {
         }
     }
 
-})(jQuery, Handlebars, _, moment, CAC.Map.Control);
+})(jQuery, Handlebars, _, moment, CAC.Map.Control, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);

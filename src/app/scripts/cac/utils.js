@@ -150,6 +150,12 @@ CAC.Utils = (function (_) {
                     if (itm.length > 1) {
                         // decode parameters before passing them on to OTP
                         itm[1] = decodeURIComponent(itm[1]);
+                        // convert boolean values stored as strings back to booleans
+                        if (itm[1] === 'false') {
+                            itm[1] = false;
+                        } else if (itm[1] === 'true') {
+                            itm[1] = true;
+                        }
                     }
                     return itm;
                 }

@@ -2,7 +2,7 @@
  *  View control for the sidebar directions tab
  *
  */
-CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder,
+CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geocoder,
                                  Routing, Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -53,6 +53,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
     var bikeModeOptions = null;
     var mapControl = null;
     var tabControl = null;
+    var urlRouter = null;
     var directionsListControl = null;
     var itineraryListControl = null;
     var typeaheadDest = null;
@@ -64,6 +65,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
+        urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
         // Plan a trip using information provided
@@ -148,11 +150,8 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         $(options.selectors.spinner).removeClass('hidden');
 
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        var date = picker.date();
-        if (!date) {
-            // use current date/time if none set
-            date = moment();
-        }
+        // use current date/time if none set
+        var date = picker.date() || moment();
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
         var origin = directions.origin;
@@ -198,8 +197,9 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
-        Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
+        urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
 
+        Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
             if (!tabControl.isTabShowing('directions')) {
                 // if user has switched away from the directions tab, do not show trip
@@ -240,6 +240,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
     function clearDirections() {
         mapControl.setOriginDestinationMarkers(null, null);
+        urlRouter.clearUrl();
         clearItineraries();
     }
 
@@ -454,7 +455,7 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
 
         if (arriveBy) {
             $(options.selectors.departAtSelect).val('arriveBy');
-         }
+        }
 
         if (destination && destination.feature && destination.feature.geometry) {
             directions.destination = [
@@ -483,5 +484,5 @@ CAC.Control.SidebarDirections = (function ($, Control, BikeModeOptions, Geocoder
         initialLoad = false;
     }
 
-})(jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,
+})(_, jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

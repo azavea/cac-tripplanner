@@ -10,6 +10,7 @@ CAC = (function () {
         Search: {},
         Share: {},
         Settings: {},
+        UrlRouting: {},
         User: {},
         Utils: {}
     };
