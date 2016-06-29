@@ -154,9 +154,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         var date = picker.date() || moment();
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
-        var origin = directions.origin;
-        var destination = directions.destination;
-
         var arriveBy = false; // depart at time by default
         if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
             arriveBy = true;
@@ -197,9 +194,17 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
+        // Update URL to match choices
         urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
 
-        Routing.planTrip(origin, destination, date, otpOptions).then(function (itineraries) {
+        var params = {
+            fromText: UserPreferences.getPreference('originText'),
+            toText: UserPreferences.getPreference('destinationText')
+        };
+        $.extend(params, otpOptions);
+
+        Routing.planTrip(directions.origin, directions.destination, date, params)
+        .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
             if (!tabControl.isTabShowing('directions')) {
                 // if user has switched away from the directions tab, do not show trip

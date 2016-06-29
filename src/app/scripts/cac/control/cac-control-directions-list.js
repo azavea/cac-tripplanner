@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferences) {
+CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferences, Utils) {
 
     'use strict';
 
@@ -101,19 +101,8 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
 
         $container.append($html);
 
-        // get URL for sharing
-        var paramString = decodeURIComponent($.param(itinerary.requestParameters));
-        var index = itinerary.id;
-        var directionsUrl = ['/directions/?',
-                             paramString,
-                             '&itineraryIndex=',
-                             index,
-                             '&fromText=',
-                             UserPreferences.getPreference('originText'),
-                             '&toText=',
-                             UserPreferences.getPreference('destinationText')
-                            ].join('');
-        directionsUrl = encodeURI(directionsUrl);
+        var params = $.extend({itineraryIndex: itinerary.id}, itinerary.requestParameters);
+        var directionsUrl = '/directions/?' + Utils.encodeUrlParams(params);
 
         socialSharing.shortenLink(directionsUrl).then(function(shortened) {
             // set up click handlers for social sharing with shortened link
@@ -140,11 +129,11 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
             showBackButton: options.showBackButton,
             showShareButton: options.showShareButton,
             start: {
-                text:  UserPreferences.getPreference('originText'),
+                text: itinerary.fromText,
                 time: itinerary.startTime
             },
             end: {
-                text:  UserPreferences.getPreference('destinationText'),
+                text: itinerary.toText,
                 time: itinerary.endTime
             },
             legs: itinerary.legs
@@ -169,4 +158,4 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
         }
     }
 
-})(_, jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences);
+})(_, jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences, CAC.Utils);

@@ -6,6 +6,7 @@ CAC.Utils = (function (_) {
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams,
+        encodeUrlParams: encodeUrlParams,
         modeStringHelper: modeStringHelper
     };
 
@@ -167,6 +168,12 @@ CAC.Utils = (function (_) {
             .object()
             // Return the value of the chain operation
             .value();
+    }
+
+    function encodeUrlParams(params) {
+        return _.map(params, function(val, key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+        }).join('&');
     }
 
     function modeStringHelper(modeString) {

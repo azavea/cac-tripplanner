@@ -62,8 +62,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
             opts[field] = UserPreferences.getPreference(field);
         });
 
-        var url = '/directions?' + _.map(opts, function(val, key) {
-            return encodeURIComponent(key) + '=' + encodeURIComponent(val); }).join('&');
+        var url = '/directions?' + Utils.encodeUrlParams(opts);
         return url;
     }
 

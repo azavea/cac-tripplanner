@@ -72,7 +72,9 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     function prepareParams(coordsFrom, coordsTo, when, extraOptions) {
         var formattedOpts = {
             fromPlace: coordsFrom.join(','),
+            fromText: extraOptions.fromText,
             toPlace: coordsTo.join(','),
+            toText: extraOptions.toText,
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
         };
