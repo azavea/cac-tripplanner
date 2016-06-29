@@ -30,22 +30,9 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
             return;
         }
 
-        // pull out the parameters not intended for OTP
+        // pull out itinerary index, since it's not needed down the line
         var itineraryIndex = params.itineraryIndex;
-        var originText = params.fromText;
-        var destinationText = params.toText;
-
         delete params.itineraryIndex;
-        delete params.fromText;
-        delete params.toText;
-
-        // set into storage the origin and destination text for the directions list control
-        UserPreferences.setPreference('originText', originText);
-        UserPreferences.setPreference('destinationText', destinationText);
-
-        // unset the origin/destination objects
-        UserPreferences.setPreference('origin', undefined);
-        UserPreferences.setPreference('destination', undefined);
 
         var directionsListControl = new DirectionsList({
             showBackButton: false,

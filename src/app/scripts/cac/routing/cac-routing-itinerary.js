@@ -25,6 +25,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
+        this.fromText = requestParameters.fromText;
+        this.toText = requestParameters.toText;
     }
 
     Itinerary.prototype.highlight = function (isHighlighted) {

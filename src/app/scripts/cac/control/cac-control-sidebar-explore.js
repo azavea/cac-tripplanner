@@ -330,8 +330,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         var dest = [destination.point.coordinates[1], destination.point.coordinates[0]];
 
-        Routing.planTrip(exploreLatLng, dest, date, otpOptions)
-            .then(function (itineraries) {
+        Routing.planTrip(exploreLatLng, dest, date, otpOptions).then(function (itineraries) {
             if (itineraries.length) {
                 var distance = itineraries[0].formattedDuration;
                 destination.formattedDuration = distance;

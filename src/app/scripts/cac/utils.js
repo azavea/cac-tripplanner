@@ -6,6 +6,7 @@ CAC.Utils = (function (_) {
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams,
+        encodeUrlParams: encodeUrlParams,
         modeStringHelper: modeStringHelper
     };
 
@@ -150,6 +151,12 @@ CAC.Utils = (function (_) {
                     if (itm.length > 1) {
                         // decode parameters before passing them on to OTP
                         itm[1] = decodeURIComponent(itm[1]);
+                        // convert boolean values stored as strings back to booleans
+                        if (itm[1] === 'false') {
+                            itm[1] = false;
+                        } else if (itm[1] === 'true') {
+                            itm[1] = true;
+                        }
                     }
                     return itm;
                 }
@@ -161,6 +168,12 @@ CAC.Utils = (function (_) {
             .object()
             // Return the value of the chain operation
             .value();
+    }
+
+    function encodeUrlParams(params) {
+        return _.map(params, function(val, key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+        }).join('&');
     }
 
     function modeStringHelper(modeString) {
