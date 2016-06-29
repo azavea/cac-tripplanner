@@ -363,7 +363,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             setDestinationSidebarDetail(selectedDestination);
             // also highlight it on the map and pan to it
             mapControl.highlightDestination(selectedDestination.id, { panTo: true });
-            selectedDestination = null;
         }
     }
 
@@ -376,6 +375,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     }
 
     function setDestinationSidebarDetail(destination) {
+        selectedDestination = destination;
+        UserPreferences.setLocation('destination', destination);
         var $detail = $(MapTemplates.destinationDetail(destination));
         $detail.find('.back').on('click', onDestinationDetailBackClicked);
         $detail.find('.getdirections').on('click', function() {
@@ -385,6 +386,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     }
 
     function onDestinationDetailBackClicked() {
+        selectedDestination = null;
+        UserPreferences.clearLocation('destination');
         setDestinationSidebar(destinationsCache);
         mapControl.highlightDestination(null);
     }
@@ -443,9 +446,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             // show destination details if destination selected on homepage
             if (_.has(destination, 'id')) {
                 selectedDestination = destination;
-                // unset selected destination in preferences
-                UserPreferences.setPreference('destination', undefined);
-                UserPreferences.setPreference('destinationText', '');
             } else {
                 selectedDestination = null;
             }
