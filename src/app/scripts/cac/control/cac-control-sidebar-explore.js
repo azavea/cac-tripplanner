@@ -215,8 +215,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     }
 
     function onTypeaheadCleared() {
-        UserPreferences.setPreference('origin', undefined);
-        UserPreferences.setPreference('originText', undefined);
+        UserPreferences.clearLocation('origin');
         exploreLatLng = null;
         selectedDestination = null;
         mapControl.clearDiscoverPlaces();
@@ -224,14 +223,12 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
     function onTypeaheadSelected(event, key, location) {
         if (!location) {
-            UserPreferences.setPreference(key, undefined);
-            UserPreferences.setPreference(key + 'Text', undefined);
+            UserPreferences.clearLocation(key);
             setAddress(null);
             return;
         }
 
-        UserPreferences.setPreference('origin', location);
-        UserPreferences.setPreference('originText', location.name);
+        UserPreferences.setLocation('origin', location);
         setAddress(location);
         selectedDestination = null;
         clickedExplore();
@@ -251,8 +248,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             return false;
         } else {
             exploreLatLng = null;
-            UserPreferences.setPreference('origin', undefined);
-            UserPreferences.setPreference('originText', undefined);
+            UserPreferences.clearLocation('origin');
             $input.addClass(options.selectors.errorClass);
             mapControl.clearDiscoverPlaces();
             return true;
@@ -306,11 +302,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         // distance not cached; go query for it
         var mode = UserPreferences.getPreference('mode');
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        var date = picker.date();
-        if (!date) {
-            // use current date/time if none set
-            date = moment();
-        }
+        // use current date/time if none set
+        var date = picker.date() || moment();
         // only request one itinerary (first returned is the shortest)
         var otpOptions = { mode: mode, numItineraries: 1 };
         if (mode.indexOf('BICYCLE') > -1) {

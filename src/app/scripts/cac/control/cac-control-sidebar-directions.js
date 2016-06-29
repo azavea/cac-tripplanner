@@ -303,21 +303,18 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     function onTypeaheadCleared(event, key) {
         clearItineraries();
         directions[key] = null;
-        UserPreferences.setPreference(key, undefined);
-        UserPreferences.setPreference(key + 'Text', undefined);
+        UserPreferences.clearLocation(key);
     }
 
     function onTypeaheadSelected(event, key, location) {
         if (!location) {
-            UserPreferences.setPreference(key, undefined);
-            UserPreferences.setPreference(key + 'Text', undefined);
+            UserPreferences.clearLocation(key);
             setDirections(key, null);
             return;
         }
 
         // save text for address to preferences
-        UserPreferences.setPreference(key, location);
-        UserPreferences.setPreference(key + 'Text', location.name);
+        UserPreferences.setLocation(key, location);
         setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
 
         planTrip();
@@ -356,8 +353,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 planTrip();
             } else {
                 // unset location and show error
-                UserPreferences.setPreference(key, undefined);
-                UserPreferences.setPreference(key + 'Text', undefined);
+                UserPreferences.clearLocation(key);
                 typeahead.setValue('');
                 setDirections(key, null);
                 $(options.selectors.spinner).addClass('hidden');
@@ -399,8 +395,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
-        UserPreferences.setPreference('destination', destination);
-        UserPreferences.setPreference('destinationText', destinationText);
+        UserPreferences.setLocation('destination', destination, destinationText);
 
         // Get directions
         planTrip();
