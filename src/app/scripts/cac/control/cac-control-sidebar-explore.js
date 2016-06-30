@@ -43,6 +43,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     var bikeModeOptions = null;
     var datepicker = null;
     var mapControl = null;
+    var urlRouter = null;
     var typeahead = null;
     var exploreLatLng = null;
     var selectedDestination = null;
@@ -51,6 +52,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
+        urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
         // initiallize date/time picker
@@ -191,6 +193,10 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
+        // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
+        // (the 'detail' functions don't update the isochrone so they update the URL themselves)
+        updateUrl();
+
         $(options.selectors.destinations).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
 
@@ -377,6 +383,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function setDestinationSidebarDetail(destination) {
         selectedDestination = destination;
         UserPreferences.setLocation('destination', destination);
+        updateUrl();
         var $detail = $(MapTemplates.destinationDetail(destination));
         $detail.find('.back').on('click', onDestinationDetailBackClicked);
         $detail.find('.getdirections').on('click', function() {
@@ -388,8 +395,18 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function onDestinationDetailBackClicked() {
         selectedDestination = null;
         UserPreferences.clearLocation('destination');
+        updateUrl();
         setDestinationSidebar(destinationsCache);
         mapControl.highlightDestination(null);
+    }
+
+    /* Update the URL based on current UserPreferences
+     *
+     * The placeId preference is set when there's a selected location and not when there's not,
+     * so loading a URL with that param will cause the selected location to be re-selected.
+     */
+    function updateUrl() {
+        urlRouter.updateUrl(urlRouter.buildExploreUrlFromPrefs());
     }
 
     function setFromUserPreferences() {

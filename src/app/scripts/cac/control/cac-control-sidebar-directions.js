@@ -471,17 +471,18 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
 
         if (initialLoad && method === 'directions') {
-            // switch tabs
+            // switch to this tab if it's set as active in UserPreferences
             tabControl.setTab('directions');
+        }
+        initialLoad = false;
 
+        if (tabControl.isTabShowing('directions')) {
             if (origin && destination) {
                 planTrip();
             } else {
                 clearDirections();
-            }
+            }  
         }
-
-        initialLoad = false;
     }
 
 })(_, jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,
