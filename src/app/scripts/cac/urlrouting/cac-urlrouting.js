@@ -10,10 +10,9 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     'use strict';
 
     // User pref parameters for different views
-    var SHARED_PREFS = ['origin', 'originText', 'method', 'mode', 'maxWalk',
-                         'wheelchair', 'bikeTriangle'];
-    var DIRECTIONS_PREFS = SHARED_PREFS.concat(['destination', 'destinationText', 'arriveBy']);
-    var EXPLORE_PREFS = SHARED_PREFS.concat(['exploreTime']);
+    var SHARED_PREFS = ['origin', 'originText', 'mode', 'maxWalk', 'wheelchair', 'bikeTriangle'];
+    var DIRECTIONS_PREFS = SHARED_PREFS.concat([ 'destination', 'destinationText', 'arriveBy']);
+    var EXPLORE_PREFS = SHARED_PREFS.concat(['placeId', 'exploreTime']);
 
     var router = null;
 
@@ -80,7 +79,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                 // Special handling for origin and destination, which are stored as GeoJSON
                 if (field === 'origin' || field === 'destination') {
                     var coords = _.map(params[field].split(','), parseFloat);
-                    UserPreferences.setPreference(field, makeFeature(coords, params[field + 'Text']));
+                    var feature = makeFeature(coords, params[field + 'Text']);
+                    UserPreferences.setPreference(field, feature);
                 } else {
                     UserPreferences.setPreference(field, params[field]);
                 }
