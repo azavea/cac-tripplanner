@@ -88,8 +88,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         mapControl.clearIsochrone();
         sidebarDirectionsControl.clearDirections();
         mapControl.setGeocodeMarker(null);
-        sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);
+        sidebarTabControl.setTab('directions');
     }
 
     function moveOrigin(event, position) {

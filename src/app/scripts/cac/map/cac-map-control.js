@@ -362,7 +362,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
                                      '</div>',
                                      '<a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
-                                     '<a href="#" class="destination-directions-link pull-right" ',
+                                     '<a class="destination-directions-link pull-right" ',
                                      'id="{{geojson.properties.id}}">Get Directions</a>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
