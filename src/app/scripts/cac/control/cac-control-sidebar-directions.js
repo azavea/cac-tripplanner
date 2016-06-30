@@ -133,7 +133,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
      * Set user preferences before planning trip.
      * Throttled to cut down on requests.
      */
-    var planTrip = _.throttle(function() {
+    var planTrip = _.throttle(function() {  // jshint ignore:line
         if (!tabControl.isTabShowing('directions')) {
             return;
         }

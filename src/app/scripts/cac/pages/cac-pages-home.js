@@ -39,33 +39,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         bikeModeOptions = new BikeModeOptions();
     }
 
-    Home.prototype.initialize = function () {
-        this.destinations = null;
-        $(options.selectors.toggleButton).on('click', function(){
-            var id = $(this).attr('id');
-            setTab(id);
-        });
-
-        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
-            var typeaheadName = 'typeahead' + id;
-            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
-            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
-            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
-            typeaheads[typeaheadName] = this[typeaheadName] = typeahead;
-        }, this));
-
-        // save form data and redirect to map when 'go' button clicked
-        $(options.selectors.exploreForm).submit(submitExplore);
-        $(options.selectors.directionsForm).submit(submitDirections);
-
-        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
-        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
-        $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
-                                                      $.proxy(clickedDestination, this));
-
-        $(document).ready(loadFromPreferences);
-    };
-
     var submitDirections = function(event) {
         event.preventDefault();
         var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
@@ -138,6 +111,33 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         typeaheads.typeaheadFrom.setValue(originText);
         typeaheads.typeaheadTo.setValue(destinationText);
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
+    };
+
+    Home.prototype.initialize = function () {
+        this.destinations = null;
+        $(options.selectors.toggleButton).on('click', function(){
+            var id = $(this).attr('id');
+            setTab(id);
+        });
+
+        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
+            var typeaheadName = 'typeahead' + id;
+            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
+            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
+            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
+            typeaheads[typeaheadName] = this[typeaheadName] = typeahead;
+        }, this));
+
+        // save form data and redirect to map when 'go' button clicked
+        $(options.selectors.exploreForm).submit(submitExplore);
+        $(options.selectors.directionsForm).submit(submitDirections);
+
+        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
+        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
+        $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
+                                                      $.proxy(clickedDestination, this));
+
+        $(document).ready(loadFromPreferences);
     };
 
     return Home;

@@ -132,7 +132,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
      * Set user preferences before fetching isochrone.
      * This function has been debounced to cut down on requests.
      */
-    var clickedExplore = _.debounce(function() {
+    var clickedExplore = _.debounce(function() {  // jshint ignore:line
         if (addressHasError(exploreLatLng)) {
             return;
         }

@@ -29,6 +29,7 @@
     "_": true,
     "cartodb": true,
     "L": true,
-    "turf": true
+    "turf": true,
+    "Navigo": true
   }
 }
