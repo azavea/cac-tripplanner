@@ -430,13 +430,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
      * When first navigating to this page, check for user preferences to load.
      */
     function setFromUserPreferences() {
+        // Look up origin with setDefault=false to allow it to be blank
+        var origin = UserPreferences.getPreference('origin', false);
+        var originText = UserPreferences.getPreference('originText', false);
+        var destination = UserPreferences.getPreference('destination');
+        var destinationText = UserPreferences.getPreference('destinationText');
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        var origin = UserPreferences.getPreference('origin');
-        var originText = UserPreferences.getPreference('originText');
-        var destination = UserPreferences.getPreference('destination');
-        var destinationText = UserPreferences.getPreference('destinationText');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
 
