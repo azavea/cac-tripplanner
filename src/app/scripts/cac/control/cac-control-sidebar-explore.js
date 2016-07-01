@@ -43,6 +43,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     var bikeModeOptions = null;
     var datepicker = null;
     var mapControl = null;
+    var tabControl = null;
     var urlRouter = null;
     var typeahead = null;
     var exploreLatLng = null;
@@ -52,6 +53,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
+        tabControl = options.tabControl;
         urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
@@ -85,7 +87,9 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
         typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
 
-        setFromUserPreferences();
+        if (tabControl.isTabShowing('explore')) {
+            setFromUserPreferences();
+        }
 
         // Respond to changes on all isochrone input fields
         $(options.selectors.isochroneInput).on('input change', clickedExplore);

@@ -59,8 +59,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     var typeaheadDest = null;
     var typeaheadOrigin = null;
 
-    var initialLoad = true;
-
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
@@ -115,7 +113,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 mapControl.displayPoint(lon, lat);
             });
 
-        setFromUserPreferences();
+        if (tabControl.isTabShowing('directions')) {
+            setFromUserPreferences();
+        }
 
         // Respond to changes on all direction input fields
         $(options.selectors.directionInput).on('input change', planTrip);
@@ -430,7 +430,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
      * When first navigating to this page, check for user preferences to load.
      */
     function setFromUserPreferences() {
-        var method = UserPreferences.getPreference('method');
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
@@ -469,12 +468,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
             typeaheadOrigin.setValue(originText);
         }
-
-        if (initialLoad && method === 'directions') {
-            // switch to this tab if it's set as active in UserPreferences
-            tabControl.setTab('directions');
-        }
-        initialLoad = false;
 
         if (tabControl.isTabShowing('directions')) {
             if (origin && destination) {

@@ -5,7 +5,7 @@
  *  @event cac:control:sidebartab:shown
  *  @property {string} tabId The tab id that was selected
  */
-CAC.Control.SidebarTab = (function ($) {
+CAC.Control.SidebarTab = (function ($, UserPreferences) {
 
     'use strict';
 
@@ -23,7 +23,6 @@ CAC.Control.SidebarTab = (function ($) {
     var $wrapper = null;
 
     function SidebarTabControl(options) {
-
         var self = this;
 
         self.options = $.extend({}, defaults, options);
@@ -35,6 +34,9 @@ CAC.Control.SidebarTab = (function ($) {
             var $element = $(this);
             self.setTab($element.data('tab'));
         });
+
+        currentTab = UserPreferences.getPreference('method');
+        self.setTab(currentTab);
     }
 
     SidebarTabControl.prototype.isTabShowing = isTabShowing;
@@ -61,4 +63,4 @@ CAC.Control.SidebarTab = (function ($) {
         this.events.trigger(eventNames.tabShown, tabId);
     }
 
-})(jQuery);
+})(jQuery, CAC.User.Preferences);
