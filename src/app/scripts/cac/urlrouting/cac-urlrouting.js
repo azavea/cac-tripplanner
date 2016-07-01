@@ -10,9 +10,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     'use strict';
 
     // User pref parameters for different views
-    var SHARED_PREFS = ['origin', 'originText', 'mode', 'maxWalk', 'wheelchair', 'bikeTriangle'];
-    var DIRECTIONS_PREFS = SHARED_PREFS.concat([ 'destination', 'destinationText', 'arriveBy']);
-    var EXPLORE_PREFS = SHARED_PREFS.concat(['placeId', 'exploreTime']);
+    var SHARED_ENCODE = ['origin', 'originText', 'mode'];
+    var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
+    var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
+    var EXPLORE_READ = EXPLORE_ENCODE.concat(SHARED_READ);
+    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText']);
+    var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy']);
 
     var router = null;
 
@@ -47,20 +50,20 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     function setExplorePrefsFromUrl() {
         UserPreferences.setPreference('method', 'explore');
-        setPrefsFromUrl(EXPLORE_PREFS);
+        setPrefsFromUrl(EXPLORE_READ);
     }
 
     function buildExploreUrlFromPrefs() {
-        return '/places?' + buildUrlParamsFromPrefs(EXPLORE_PREFS);
+        return '/places?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
     }
 
     function setDirectionsPrefsFromUrl() {
         UserPreferences.setPreference('method', 'directions');
-        setPrefsFromUrl(DIRECTIONS_PREFS);
+        setPrefsFromUrl(DIRECTIONS_READ);
     }
 
     function buildDirectionsUrlFromPrefs() {
-        return '/directions?' + buildUrlParamsFromPrefs(DIRECTIONS_PREFS);
+        return '/directions?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
     }
 
 
