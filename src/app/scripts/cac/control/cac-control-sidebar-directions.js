@@ -141,6 +141,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         if (!(directions.origin && directions.destination)) {
             setDirectionsError('origin');
             setDirectionsError('destination');
+            updateUrl();  // Still update the URL if they request one-sided directions
             return;
         }
 
@@ -194,8 +195,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
-        // Update URL to match choices
-        urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
+        // Most changes trigger this function, so doing this here keeps the URL mostly in sync
+        updateUrl();
 
         var params = {
             fromText: UserPreferences.getPreference('originText'),
@@ -223,7 +224,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             });
 
             // put markers at start and end
-            mapControl.setOriginDestinationMarkers(directions.origin, directions.destination);
+            mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
@@ -244,7 +245,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function clearDirections() {
-        mapControl.setOriginDestinationMarkers(null, null);
+        mapControl.setDirectionsMarkers(null, null);
         urlRouter.clearUrl();
         clearItineraries();
     }
@@ -255,7 +256,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.hide();
         $(options.selectors.directions).removeClass(options.selectors.resultsClass);
     }
-
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
@@ -304,6 +304,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         clearItineraries();
         directions[key] = null;
         UserPreferences.clearLocation(key);
+        mapControl.clearDirectionsMarker(key);
     }
 
     function onTypeaheadSelected(event, key, location) {
@@ -426,6 +427,12 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
     }
 
+    // Updates the URL to match the currently-selected options
+    function updateUrl() {
+        urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
+    }
+
+
     /**
      * When first navigating to this page, check for user preferences to load.
      */
@@ -473,9 +480,12 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         if (tabControl.isTabShowing('directions')) {
             if (origin && destination) {
                 planTrip();
+            } else if (origin || destination) {
+                mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
+                clearItineraries();
             } else {
                 clearDirections();
-            }  
+            }
         }
     }
 

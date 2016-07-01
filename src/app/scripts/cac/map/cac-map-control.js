@@ -13,8 +13,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     var map = null;
     var userMarker = null;
     var geocodeMarker = null;
-    var originMarker = null;
-    var destinationMarker = null;
+    var directionsMarkers = {
+        origin: null,
+        destination: null
+    };
 
     var overlaysControl = null;
     var itineraries = {};
@@ -122,7 +124,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
-    MapControl.prototype.setOriginDestinationMarkers = setOriginDestinationMarkers;
+    MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
+    MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
 
@@ -457,12 +460,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
     /**
      * Show markers for trip origin/destination.
-     * Will unset the markers if either coordinate set is null/empty.
+     * Will unset the corresponding marker if either coordinate set is null/empty.
      *
      * @param {Array} originCoords Start point coordinates [lat, lng]
      * @param {Array} destinationCoords End point coordinates [lat, lng]
+     * @param {Boolean} [zoomToFit] Zoom the view to the marker(s)
      */
-    function setOriginDestinationMarkers(originCoords, destinationCoords) {
+    function setDirectionsMarkers(originCoords, destinationCoords, zoomToFit) {
 
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
@@ -477,56 +481,64 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             events.trigger(trigger, position);
         }
 
-        if (!originCoords || !destinationCoords) {
+        // Due to time constraints, these two icon definitions were copied to cac-pages-directions.js
+        // for use on the static map page there. If you change them here, change them there as well
+        // Remove comment if icon definitions are abstracted elsewhere
+        var originIcon = L.AwesomeMarkers.icon({
+            icon: 'home',
+            prefix: 'fa',
+            markerColor: 'purple'
+        });
 
-            if (originMarker) {
-                map.removeLayer(originMarker);
+        var destIcon = L.AwesomeMarkers.icon({
+            icon: 'flag-o',
+            prefix: 'fa',
+            markerColor: 'red'
+        });
+
+        if (originCoords) {
+            var origin = cartodb.L.latLng(originCoords[0], originCoords[1]);
+
+            if (directionsMarkers.origin) {
+                directionsMarkers.origin.setLatLng(origin);
+            } else {
+                var originOptions = {icon: originIcon, draggable: true, title: 'origin' };
+                directionsMarkers.origin = new cartodb.L.marker(origin, originOptions)
+                                                        .bindPopup('<p>Origin</p>');
+                directionsMarkers.origin.addTo(map);
+                directionsMarkers.origin.on('dragend', markerDrag);
             }
-
-            if (destinationMarker) {
-                map.removeLayer(destinationMarker);
-            }
-
-            originMarker = null;
-            destinationMarker = null;
-            return;
-        }
-
-        var origin = cartodb.L.latLng(originCoords[0], originCoords[1]);
-        var destination = cartodb.L.latLng(destinationCoords[0], destinationCoords[1]);
-
-        if (originMarker && destinationMarker) {
-            originMarker.setLatLng(origin);
-            destinationMarker.setLatLng(destination);
         } else {
-            // Due to time constraints, these two icon definitions were copied to cac-pages-directions.js
-            // for use on the static map page there. If you change them here, change them there as well
-            // Remove comment if icon definitions are abstracted elsewhere
-            var originIcon = L.AwesomeMarkers.icon({
-                icon: 'home',
-                prefix: 'fa',
-                markerColor: 'purple'
-            });
-
-            var destIcon = L.AwesomeMarkers.icon({
-                icon: 'flag-o',
-                prefix: 'fa',
-                markerColor: 'red'
-            });
-
-            var originOptions = {icon: originIcon, draggable: true, title: 'origin' };
-            originMarker = new cartodb.L.marker(origin, originOptions).bindPopup('<p>Origin</p>');
-
-            var destOptions = {icon: destIcon, draggable: true, title: 'destination' };
-            destinationMarker = new cartodb.L.marker(destination, destOptions)
-                                            .bindPopup('<p>Destination</p>');
-
-            originMarker.addTo(map);
-            destinationMarker.addTo(map);
-
-            originMarker.on('dragend', markerDrag);
-            destinationMarker.on('dragend', markerDrag);
+            clearDirectionsMarker('origin');
         }
+
+        if (destinationCoords) {
+            var destination = cartodb.L.latLng(destinationCoords[0], destinationCoords[1]);
+
+            if (directionsMarkers.destination) {
+                directionsMarkers.destination.setLatLng(destination);
+            } else {
+                var destOptions = {icon: destIcon, draggable: true, title: 'destination' };
+                directionsMarkers.destination = new cartodb.L.marker(destination, destOptions)
+                                                             .bindPopup('<p>Destination</p>');
+                directionsMarkers.destination.addTo(map);
+                directionsMarkers.destination.on('dragend', markerDrag);
+            }
+        } else {
+            clearDirectionsMarker('destination');
+        }
+
+        var markers = _.compact(_.values(directionsMarkers));
+        if (zoomToFit && !_.isEmpty(markers)) {
+            map.fitBounds(L.featureGroup(markers).getBounds(), { maxZoom: defaults.zoom });
+        }
+    }
+
+    function clearDirectionsMarker(type) {
+        if (directionsMarkers[type]) {
+            map.removeLayer(directionsMarkers[type]);
+        }
+        directionsMarkers[type] = null;
     }
 
     function highlightDestination(destinationId, opts) {
