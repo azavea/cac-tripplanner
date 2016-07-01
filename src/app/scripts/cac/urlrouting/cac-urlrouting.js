@@ -91,18 +91,22 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     /* Reads values for the given fields from local storage and composes a URL query string
      * from them.
      *
-     * Fields with no value given in the URL will be skipped (not overwritten with nothing)
+     * Only fields for which the preference value is defined will be included, and it won't set
+     * undefined fields to default values during lookup.
      */
     function buildUrlParamsFromPrefs(fields) {
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {
-                var location = UserPreferences.getPreference(field);
+                var location = UserPreferences.getPreference(field, false);
                 if (location && location.feature && location.feature.geometry) {
                     opts[field] = [location.feature.geometry.y, location.feature.geometry.x].join(',');
                 }
             } else {
-                opts[field] = UserPreferences.getPreference(field);
+                var val = UserPreferences.getPreference(field, false);
+                if (!_.isUndefined(val)) {
+                    opts[field] = val;
+                }
             }
         });
         return Utils.encodeUrlParams(opts);
