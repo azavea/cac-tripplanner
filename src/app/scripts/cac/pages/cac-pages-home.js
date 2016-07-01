@@ -5,9 +5,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         selectors: {
             articlesContainer: '.articles',
             articlesSpinner: '#articlesSpinner',
-            destinationAddress: '.destination-address',
-            destinationAddressLineTwo: '.destination-address-2',
-            destinationName: '.destination-name',
             destinationBlock: '.block-destination',
             destinationsContainer: '.destinations',
             destinationsSpinner: '#destinationsSpinner',
@@ -41,32 +38,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         options = $.extend({}, defaults, params);
         bikeModeOptions = new BikeModeOptions();
     }
-
-    Home.prototype.initialize = function () {
-        this.destinations = null;
-        $(options.selectors.toggleButton).on('click', function(){
-            var id = $(this).attr('id');
-            setTab(id);
-        });
-
-        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
-            var typeaheadName = 'typeahead' + id;
-            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
-            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
-            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
-            typeaheads[typeaheadName] = this[typeaheadName] = typeahead;
-        }, this));
-
-        // save form data and redirect to map when 'go' button clicked
-        $(options.selectors.exploreForm).submit(submitExplore);
-        $(options.selectors.directionsForm).submit(submitDirections);
-
-        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
-        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
-        $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
-
-        $(document).ready(loadFromPreferences);
-    };
 
     var submitDirections = function(event) {
         event.preventDefault();
@@ -142,6 +113,33 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
 
+    Home.prototype.initialize = function () {
+        this.destinations = null;
+        $(options.selectors.toggleButton).on('click', function(){
+            var id = $(this).attr('id');
+            setTab(id);
+        });
+
+        $.each(['Explore', 'From', 'To'], $.proxy(function(i, id) {
+            var typeaheadName = 'typeahead' + id;
+            var typeahead = new CAC.Search.Typeahead(options.selectors[typeaheadName]);
+            typeahead.events.on(typeahead.eventNames.selected, $.proxy(onTypeaheadSelected, this));
+            typeahead.events.on(typeahead.eventNames.cleared, $.proxy(onTypeaheadCleared, this));
+            typeaheads[typeaheadName] = this[typeaheadName] = typeahead;
+        }, this));
+
+        // save form data and redirect to map when 'go' button clicked
+        $(options.selectors.exploreForm).submit(submitExplore);
+        $(options.selectors.directionsForm).submit(submitDirections);
+
+        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
+        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
+        $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
+                                                      $.proxy(clickedDestination, this));
+
+        $(document).ready(loadFromPreferences);
+    };
+
     return Home;
 
     function clickedViewAllArticles(event) {
@@ -196,9 +194,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
                 var html = Templates.destinations(data.destinations);
                 $(options.selectors.destinationsContainer).html(html);
 
-                // set click event on added features
-                $(options.selectors.destinationBlock).click($.proxy(clickedDestination, this));
-
                 // hide 'view all' button and spinner, and show features again
                 $(options.selectors.viewAllDestinations).addClass('hidden');
                 $(options.selectors.destinationsSpinner).addClass('hidden');
@@ -215,35 +210,16 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
      */
     function clickedDestination(event) {
         event.preventDefault();
-        var block = $(event.target).closest(options.selectors.destinationBlock);
-        var destName = block.children(options.selectors.destinationName).text();
         var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
         var exploreTime = $(options.selectors.exploreTime).val();
-        var addr = [destName + ',',
-                    block.children(options.selectors.destinationAddress).text(),
-                    block.children(options.selectors.destinationAddressLineTwo).text()
-                    ].join(' ');
-        var payload = { 'text': destName };
+        UserPreferences.setPreference('method', 'explore');
+        UserPreferences.setPreference('exploreTime', exploreTime);
+        UserPreferences.setPreference('mode', mode);
 
-        $.ajax({
-            type: 'GET',
-            data: payload,
-            cache: true,
-            url: destinationSearchUrl,
-            contentType: 'application/json'
-        }).then(function(data) {
-            if (data.destinations && data.destinations.length) {
-                var destination = data.destinations[0];
-                UserPreferences.setPreference('destinationText', addr);
-                UserPreferences.setPreference('destination', destination);
-                UserPreferences.setPreference('method', 'explore');
-                UserPreferences.setPreference('exploreTime', exploreTime);
-                UserPreferences.setPreference('mode', mode);
-                window.location = '/map';
-            } else {
-                console.error('Could not find destination ' + destName);
-            }
-        });
+        var block = $(event.target).closest(options.selectors.destinationBlock);
+        var placeId = block.data('destination-id');
+        UserPreferences.setPreference('placeId', placeId);
+        window.location = '/map';
     }
 
     function onTypeaheadCleared(event, key) {

@@ -32,7 +32,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         });
 
         sidebarExploreControl = new CAC.Control.SidebarExplore({
-            mapControl: mapControl
+            mapControl: mapControl,
+            urlRouter: urlRouter
         });
         sidebarExploreControl.events.on(sidebarExploreControl.eventNames.destinationDirections,
                                         $.proxy(getDestinationDirections, this));
@@ -87,8 +88,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         mapControl.clearIsochrone();
         sidebarDirectionsControl.clearDirections();
         mapControl.setGeocodeMarker(null);
-        sidebarTabControl.setTab('directions');
         sidebarDirectionsControl.setDestination(destination);
+        sidebarTabControl.setTab('directions');
     }
 
     function moveOrigin(event, position) {
@@ -104,6 +105,8 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
     }
 
     function onSidebarTabShown(event, tabId) {
+        urlRouter.clearUrl();
+
         // close any open map popups on tab switch
         _.each($(this.options.selectors.leafletPopups), function(closeBtn) {
             closeBtn.click();
@@ -111,12 +114,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
 
         // Load user preferences on tab switch in order to easily keep the pages in sync
         if (tabId === 'directions') {
+            UserPreferences.setPreference('method', 'directions');
             mapControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
             if (sidebarDirectionsControl) {
                 sidebarDirectionsControl.setFromUserPreferences();
             }
         } else {
+            UserPreferences.setPreference('method', 'explore');
             sidebarDirectionsControl.clearDirections();
             sidebarExploreControl.setFromUserPreferences();
         }

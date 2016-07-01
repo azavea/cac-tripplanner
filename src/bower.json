@@ -17,6 +17,6 @@
     "typeahead.js": "~0.10.5",
     "Leaflet.awesome-markers": "~2.0.2",
     "material-design-iconic-font": "~1.1.1",
-    "navigo": "master"
+    "navigo": "~2.1.1"
   }
 }

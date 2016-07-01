@@ -1,4 +1,4 @@
-CAC.User.Preferences = (function($) {
+CAC.User.Preferences = (function($, _) {
     'use strict';
 
     // set up local storage
@@ -45,7 +45,9 @@ CAC.User.Preferences = (function($) {
 
     var module = {
         getPreference: getPreference,
-        setPreference: setPreference
+        setPreference: setPreference,
+        setLocation: setLocation,
+        clearLocation: clearLocation
     };
     return module;
 
@@ -79,4 +81,25 @@ CAC.User.Preferences = (function($) {
         storage.set(preference, JSON.stringify(val));
     }
 
-})(jQuery);
+    /**
+     * Convenience method to avoid having to manually set both preferences for 'origin' and
+     * destination.
+     *
+     * 'text' is optional and defaults to location.name if omitted
+     */
+    function setLocation(key, location, text) {
+        setPreference(key, location);
+        if (!_.isUndefined(text)) {
+            setPreference(key + 'Text', text);
+        } else {
+            setPreference(key + 'Text', location.name);
+        }
+    }
+
+    // Convenience method to clear 'origin' and 'destination'
+    function clearLocation(key) {
+        setPreference(key, undefined);
+        setPreference(key + 'Text', undefined);
+    }
+
+})(jQuery, _);

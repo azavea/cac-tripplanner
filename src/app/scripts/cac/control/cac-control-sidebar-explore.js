@@ -43,14 +43,16 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     var bikeModeOptions = null;
     var datepicker = null;
     var mapControl = null;
+    var urlRouter = null;
     var typeahead = null;
     var exploreLatLng = null;
-    var selectedDestination = null;
+    var selectedPlaceId = null;
     var destinationsCache = [];
 
     function SidebarExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
+        urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
         // initiallize date/time picker
@@ -130,7 +132,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
      * Set user preferences before fetching isochrone.
      * This function has been debounced to cut down on requests.
      */
-    var clickedExplore = _.debounce(function() {
+    var clickedExplore = _.debounce(function() {  // jshint ignore:line
         if (addressHasError(exploreLatLng)) {
             return;
         }
@@ -191,11 +193,15 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
      * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
      */
     function fetchIsochrone(when, exploreMinutes, otpOptions) {
+        // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
+        // (the 'detail' functions don't update the isochrone so they update the URL themselves)
+        updateUrl();
+
         $(options.selectors.destinations).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
 
         // do not zoom to fit isochrone if going to highlight a selected destination
-        var zoomToFit = !selectedDestination;
+        var zoomToFit = !selectedPlaceId;
 
         mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions, zoomToFit).then(
             function (destinations) {
@@ -215,25 +221,22 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     }
 
     function onTypeaheadCleared() {
-        UserPreferences.setPreference('origin', undefined);
-        UserPreferences.setPreference('originText', undefined);
+        UserPreferences.clearLocation('origin');
         exploreLatLng = null;
-        selectedDestination = null;
+        selectedPlaceId = null;
         mapControl.clearDiscoverPlaces();
     }
 
     function onTypeaheadSelected(event, key, location) {
         if (!location) {
-            UserPreferences.setPreference(key, undefined);
-            UserPreferences.setPreference(key + 'Text', undefined);
+            UserPreferences.clearLocation('origin');
             setAddress(null);
             return;
         }
 
-        UserPreferences.setPreference('origin', location);
-        UserPreferences.setPreference('originText', location.name);
+        UserPreferences.setLocation('origin', location);
         setAddress(location);
-        selectedDestination = null;
+        selectedPlaceId = null;
         clickedExplore();
     }
 
@@ -251,8 +254,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             return false;
         } else {
             exploreLatLng = null;
-            UserPreferences.setPreference('origin', undefined);
-            UserPreferences.setPreference('originText', undefined);
+            UserPreferences.clearLocation('origin');
             $input.addClass(options.selectors.errorClass);
             mapControl.clearDiscoverPlaces();
             return true;
@@ -306,11 +308,8 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         // distance not cached; go query for it
         var mode = UserPreferences.getPreference('mode');
         var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        var date = picker.date();
-        if (!date) {
-            // use current date/time if none set
-            date = moment();
-        }
+        // use current date/time if none set
+        var date = picker.date() || moment();
         // only request one itinerary (first returned is the shortest)
         var otpOptions = { mode: mode, numItineraries: 1 };
         if (mode.indexOf('BICYCLE') > -1) {
@@ -348,7 +347,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         $.each(destinations, function (i, destination) {
             var $destination = $(MapTemplates.destinationBlock(destination));
             $destination.click(function () {
-                setDestinationSidebarDetail(destination);
+                setDestinationSidebarDetail(destination.id);
                 mapControl.highlightDestination(destination.id, { panTo: true });
             });
             $destination.hover(function () {
@@ -366,11 +365,10 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         $(options.selectors.sidebarContainer).height(400);
 
         // show destination details if destination is selected
-        if (selectedDestination) {
-            setDestinationSidebarDetail(selectedDestination);
+        if (selectedPlaceId) {
+            setDestinationSidebarDetail(selectedPlaceId);
             // also highlight it on the map and pan to it
-            mapControl.highlightDestination(selectedDestination.id, { panTo: true });
-            selectedDestination = null;
+            mapControl.highlightDestination(selectedPlaceId, { panTo: true });
         }
     }
 
@@ -382,30 +380,50 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         $(options.selectors.sidebarContainer).height(200);
     }
 
-    function setDestinationSidebarDetail(destination) {
-        var $detail = $(MapTemplates.destinationDetail(destination));
-        $detail.find('.back').on('click', onDestinationDetailBackClicked);
-        $detail.find('.getdirections').on('click', function() {
-            events.trigger(eventNames.destinationDirections, destination);
-        });
-        $(options.selectors.destinations).html($detail);
+    function setDestinationSidebarDetail(selectedPlaceId) {
+        var selectedPlace = _.find(destinationsCache, {id: parseInt(selectedPlaceId)});
+        if (selectedPlace && selectedPlace.name) {
+            UserPreferences.setPreference('placeId', selectedPlaceId);
+            updateUrl();
+            var $detail = $(MapTemplates.destinationDetail(selectedPlace));
+            $detail.find('.back').on('click', onDestinationDetailBackClicked);
+            $detail.find('.getdirections').on('click', function() {
+                events.trigger(eventNames.destinationDirections, selectedPlace);
+            });
+            $(options.selectors.destinations).html($detail);
+        } else {
+            onDestinationDetailBackClicked();
+        }
     }
 
     function onDestinationDetailBackClicked() {
+        selectedPlaceId = null;
+        UserPreferences.setPreference('placeId', undefined);
+        updateUrl();
         setDestinationSidebar(destinationsCache);
         mapControl.highlightDestination(null);
+    }
+
+    /* Update the URL based on current UserPreferences
+     *
+     * The placeId preference is set when there's a selected location and not when there's not,
+     * so loading a URL with that param will cause the selected location to be re-selected.
+     */
+    function updateUrl() {
+        urlRouter.updateUrl(urlRouter.buildExploreUrlFromPrefs());
     }
 
     function setFromUserPreferences() {
         var method = UserPreferences.getPreference('method');
         var mode = UserPreferences.getPreference('mode');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        var destination = UserPreferences.getPreference('destination');
         var exploreOrigin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
+
+        selectedPlaceId = UserPreferences.getPreference('placeId');
 
         if (exploreOrigin) {
             exploreLatLng = [exploreOrigin.feature.geometry.y,
@@ -447,15 +465,6 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         }
 
         if (method === 'explore' && exploreLatLng) {
-            // show destination details if destination selected on homepage
-            if (_.has(destination, 'id')) {
-                selectedDestination = destination;
-                // unset selected destination in preferences
-                UserPreferences.setPreference('destination', undefined);
-                UserPreferences.setPreference('destinationText', '');
-            } else {
-                selectedDestination = null;
-            }
             fetchIsochrone(when, exploreTime, otpOptions);
         }
     }
