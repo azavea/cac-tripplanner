@@ -100,7 +100,9 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
             if (field === 'origin' || field === 'destination') {
                 var location = UserPreferences.getPreference(field, false);
                 if (location && location.feature && location.feature.geometry) {
-                    opts[field] = [location.feature.geometry.y, location.feature.geometry.x].join(',');
+                    // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
+                    opts[field] = [_.round(location.feature.geometry.y, 7),
+                                   _.round(location.feature.geometry.x, 7)].join(',');
                 }
             } else {
                 var val = UserPreferences.getPreference(field, false);
