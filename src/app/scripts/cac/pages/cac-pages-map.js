@@ -31,13 +31,6 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
             tabControl: sidebarTabControl
         });
 
-        sidebarExploreControl = new CAC.Control.SidebarExplore({
-            mapControl: mapControl,
-            urlRouter: urlRouter
-        });
-        sidebarExploreControl.events.on(sidebarExploreControl.eventNames.destinationDirections,
-                                        $.proxy(getDestinationDirections, this));
-
         mapControl.events.on(mapControl.eventNames.destinationPopupClick,
                              $.proxy(getDestinationDirections, this));
 
@@ -49,6 +42,14 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
 
         mapControl.events.on(mapControl.eventNames.geocodeMarkerMoved,
                              $.proxy(moveIsochrone, this));
+
+        sidebarExploreControl = new CAC.Control.SidebarExplore({
+            mapControl: mapControl,
+            tabControl: sidebarTabControl,
+            urlRouter: urlRouter
+        });
+        sidebarExploreControl.events.on(sidebarExploreControl.eventNames.destinationDirections,
+                                        $.proxy(getDestinationDirections, this));
 
         sidebarDirectionsControl = new CAC.Control.SidebarDirections({
             mapControl: mapControl,

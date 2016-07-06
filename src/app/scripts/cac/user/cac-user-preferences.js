@@ -55,16 +55,20 @@ CAC.User.Preferences = (function($, _) {
      * Fetch stored setting.
      *
      * @param {String} preference Name of setting to fetch
+     * @param {Boolean} [setDefault=true] If false, don't set the default value if no value is set
      * @return {Object} setting found in storage, or default if none found
      */
-    function getPreference(preference) {
+    function getPreference(preference, setDefault) {
         var val = storage.get(preference);
         if (val) {
             val = JSON.parse(val);
         }
 
+        // Default to true
+        setDefault = _.isUndefined(setDefault) || setDefault;
+
         // If a typeahead is cleared, we want to grab the default
-        if (!val || val === '') {
+        if (setDefault && !val || val === '') {
             val = defaults[preference];
             setPreference(preference, val);
         }
