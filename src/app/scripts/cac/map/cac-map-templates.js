@@ -11,7 +11,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         destinationDetail: destinationDetail,
         eventPopup: eventPopup,
         itinerary: itinerary,
-        itineraryList: itineraryList
+        itineraryList: itineraryList,
+        septaRailWarningAlert: septaRailWarningAlert
     };
 
     // Only register these once, when the module loads
@@ -76,6 +77,35 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '</a>, '].join('');
         });
         msg = msg.substring(0, msg.length - 2); // trim off trailing comma
+
+        // message is not templated, so we can embed links
+        var source = [
+            '<div class="alert-container">',
+            '<div class="alert alert-{{type}} alert-dismissible" role="alert">',
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span></button>',
+            msg,
+            '</div></div>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template({type: 'warning'});
+        return html;
+    }
+
+    /**
+     * Build an HTML snippet for an alert with link to SEPTA rail alert
+     *
+     * @returns {String} Compiled Handlebars template for the Bootstrap alert
+     */
+    function septaRailWarningAlert() {
+        var msg = ['Until further notice, SEPTA will be operating an enhanced Saturday schedule ',
+                'during the week. The trip departure times below do not reflect the modified schedule. ',
+                'For more details and up to date information please consult ',
+                '<a class="alert-link" target="_blank" href="',
+                'http://www.septa.org/service/contingency.html',
+                '">SEPTA\'s contingency plan',
+                '</a>.'
+            ].join('');
 
         // message is not templated, so we can embed links
         var source = [
