@@ -2,7 +2,7 @@ import json
 import urlparse
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.utils import timezone
 
 from .forms import ShortenedLinkForm
@@ -93,6 +93,7 @@ class ShortenedLinkFormTestCase(TestCase):
 
 class ShortenedLinkViewsTestCase(TestCase):
     def setUp(self):
+        urls = 'shortlinks.test.urls'
         self.client = Client()
 
     def test_methods_and_url_resolution(self):
@@ -123,9 +124,8 @@ class ShortenedLinkCreateTestCase(TestCase):
         self.assertEqual(response.status_code, 201, response.content)
 
 
+@override_settings(ROOT_URLCONF='shortlinks.test.urls')
 class ShortenedLinkRedirectTestCase(TestCase):
-    urls = 'shortlinks.test.urls'
-
     def setUp(self):
         self.client = Client()
         self.path = '/?but=with&some=params'

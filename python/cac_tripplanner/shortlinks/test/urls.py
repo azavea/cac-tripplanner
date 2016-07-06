@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
+from shortlinks.test.views import stub_view
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^link/', include('shortlinks.urls')),
-    url(r'^$', 'shortlinks.test.views.stub_view', name='test-home'),
-)
+    url(r'^$', stub_view, name='test-home'),
+]
