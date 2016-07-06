@@ -3,8 +3,7 @@ from random import shuffle
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 
 from .models import AboutFaq, Article
@@ -25,19 +24,18 @@ def home(request):
     shuffle(destination_ids)
     destinations = Destination.objects.filter(id__in=destination_ids[:4])
 
-    context = RequestContext(request,
-                             dict(community_profile=community_profile,
-                                  tips_and_tricks=tips_and_tricks,
-                                  destinations=destinations,
-                                  fb_app_id=FB_APP_ID,
-                                  debug=DEBUG))
-    return render_to_response('home.html', context_instance=context)
+    context = dict(community_profile=community_profile,
+                   tips_and_tricks=tips_and_tricks,
+                   destinations=destinations,
+                   fb_app_id=FB_APP_ID,
+                   debug=DEBUG)
+    return render(request, 'home.html', context=context)
 
 
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
-    context = RequestContext(request, {'page': page, 'debug': DEBUG})
-    return render_to_response('about-faq.html', context_instance=context)
+    context = {'page': page, 'debug': DEBUG}
+    return render(request, 'about-faq.html', context=context)
 
 
 def community_profile_detail(request, slug):
@@ -47,9 +45,8 @@ def community_profile_detail(request, slug):
     """
     community_profile = get_object_or_404(Article.profiles.published(),
                                           slug=slug)
-    context = RequestContext(request, {'article': community_profile, 'debug': DEBUG})
-    return render_to_response('community-profile-detail.html',
-                              context_instance=context)
+    context = {'article': community_profile, 'debug': DEBUG}
+    return render(request, 'community-profile-detail.html', context=context)
 
 
 def tips_and_tricks_detail(request, slug):
@@ -59,9 +56,8 @@ def tips_and_tricks_detail(request, slug):
     """
     tips_and_tricks = get_object_or_404(Article.tips.published(),
                                         slug=slug)
-    context = RequestContext(request, {'article': tips_and_tricks, 'debug': DEBUG})
-    return render_to_response('tips-and-tricks-detail.html',
-                              context_instance=context)
+    context = {'article': tips_and_tricks, 'debug': DEBUG}
+    return render(request, 'tips-and-tricks-detail.html', context=context)
 
 class AllArticles(View):
     """ API endpoint for the Articles model """
