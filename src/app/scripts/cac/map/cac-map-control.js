@@ -530,7 +530,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         var markers = _.compact(_.values(directionsMarkers));
         if (zoomToFit && !_.isEmpty(markers)) {
-            map.fitBounds(L.featureGroup(markers).getBounds(), { maxZoom: defaults.zoom });
+            // zoom to fit all markers if several, or if there's only one, center on it
+            if (markers.length > 1) {
+                map.fitBounds(L.latLngBounds(markers), { maxZoom: defaults.zoom });
+            } else {
+                map.setView(markers[0].getLatLng());
+            }
         }
     }
 
