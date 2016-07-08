@@ -219,22 +219,32 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      * Add isochrone outline to map
      */
     function drawIsochrone(isochrone, zoomToFit) {
-        isochroneLayer = cartodb.L.geoJson(isochrone, {
-            clickable: false,
-            style: {
+        try {
+            isochroneLayer = cartodb.L.geoJson(isochrone, {
                 clickable: false,
-                color: '#5c2482',
-                fillColor: '#5c2482',
-                lineCap: 'round',
-                lineJoin: 'round',
-                opacity: 0.4,
-                fillOpacity: 0.3,
-                stroke: true,
-                weight: 2
+                style: {
+                    clickable: false,
+                    color: '#5c2482',
+                    fillColor: '#5c2482',
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                    opacity: 0.4,
+                    fillOpacity: 0.3,
+                    stroke: true,
+                    weight: 2
+                }
+            });
+        } catch (err) {
+            console.log('isochrone layer failed to load from GeoJSON');
+            console.log(err);
+            isochroneLayer = null;
+        }
+
+        if (isochroneLayer) {
+            isochroneLayer.addTo(map);
+            if (zoomToFit) {
+                map.fitBounds(isochroneLayer.getBounds());
             }
-        }).addTo(map);
-        if (zoomToFit) {
-            map.fitBounds(isochroneLayer.getBounds());
         }
     }
 
@@ -530,7 +540,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         var markers = _.compact(_.values(directionsMarkers));
         if (zoomToFit && !_.isEmpty(markers)) {
-            map.fitBounds(L.featureGroup(markers).getBounds(), { maxZoom: defaults.zoom });
+            // zoom to fit all markers if several, or if there's only one, center on it
+            if (markers.length > 1) {
+                map.fitBounds(L.latLngBounds(markers), { maxZoom: defaults.zoom });
+            } else {
+                map.setView(markers[0].getLatLng());
+            }
         }
     }
 

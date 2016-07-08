@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.14/themes/css/cartodb.css" />
+    <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
     <link href="{% static 'styles/main.css' %}" rel="stylesheet">
 
@@ -69,7 +69,6 @@
     {% block jsimports %}
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.14/cartodb.js"></script>
 
     {% if debug %}
 
@@ -86,6 +85,7 @@
     }(document, 'script', 'facebook-jssdk'));</script>
     {% endif %}
 
+    <script src="{% static 'scripts/vendor/cartodb.js' %}"></script>
     <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
     <script src="{% static 'scripts/vendor/jquery.storageapi.js' %}"></script>
     <script src="{% static 'scripts/vendor/lodash.js' %}"></script>
@@ -98,7 +98,6 @@
     <script src="{% static 'scripts/vendor/bootstrap-datetimepicker.min.js' %}"></script>
     <script src="{% static 'scripts/vendor/bootstrap-select.js' %}"></script>
     <script src="{% static 'scripts/vendor/navigo.js' %}"></script>
-
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
     <script src="{% static 'scripts/main/cac/utils.js' %}"></script>
