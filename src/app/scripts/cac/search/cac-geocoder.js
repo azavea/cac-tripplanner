@@ -38,51 +38,40 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
             cache: true,
             success: function (data) {
                 if (data && data.locations && data.locations.length &&
-                    data.locations[0].feature.attributes.StAddr.length) {
-                        // results with a street address are probably good
-                        dfd.resolve(data.locations[0]);
-                    } else {
-                        // Deal with geocoder not being able to handle all POI results from
-                        // suggest service when POI name comes before street address.
-                        var splitText = text.split(', ');
-                        if (splitText.length > 1) {
-                            var maybeStAddr = splitText[1].split(' ')[0];
-                            if (!isNaN(maybeStAddr)) {
-                                // probably have POI with street address after name
-                                var newText = '';
-                                for (var i = 1; i < splitText.length; i++) {
-                                    newText += splitText[i] + ', ';
-                                }
-                                // try searching again without the POI name part
-                                params.text = newText;
-                                $.ajax(url, {
-                                    data: params,
-                                    dataType: 'json',
-                                    cache: true,
-                                    success: function (data) {
-                                        if (data && data.locations && data.locations.length &&
-                                            data.locations[0].feature.attributes.StAddr.length) {
-                                            // second search got something with a street address;
-                                            // it is probably good now
-                                            dfd.resolve(data.locations[0]);
-                                        } else {
-                                            // no good geocode result found on second search
-                                            dfd.resolve(null);
-                                        }
-                                    }, error: function (error) {
-                                        dfd.reject(error);
-                                    }
-                                });
-                            } else if (data && data.locations && data.locations.length) {
-                                // might have result for searching on something that has no
-                                // street address, such as a city name or zip code
-                                dfd.resolve(data.locations[0]);
-                            } else {
-                                // no result found
-                                dfd.resolve(null);
+                        data.locations[0].feature.attributes.StAddr.length) {
+                    // results with a street address are probably good
+                    dfd.resolve(data.locations[0]);
+                } else {
+                    // Deal with geocoder not being able to handle all POI results from
+                    // suggest service when POI name comes before street address.
+                    var splitText = text.split(', ');
+                    if (splitText.length > 1) {
+                        var maybeStAddr = splitText[1].split(' ')[0];
+                        if (!isNaN(maybeStAddr)) {
+                            // probably have POI with street address after name
+                            var newText = '';
+                            for (var i = 1; i < splitText.length; i++) {
+                                newText += splitText[i] + ', ';
                             }
+                            // try searching again without the POI name part
+                            params.text = newText;
+                            $.ajax(url, {
+                                data: params,
+                                dataType: 'json',
+                                cache: true,
+                                success: function (data) {
+                                    returnLocation(data, dfd);
+                                }, error: function (error) {
+                                    dfd.reject(error);
+                                }
+                            });
+                        } else {
+                            returnLocation(data, dfd);
                         }
+                    } else {
+                        returnLocation(data, dfd);
                     }
+                }
             },
             error: function (error) {
                 dfd.reject(error);
@@ -90,6 +79,16 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
         });
 
         return dfd.promise();
+    }
+
+    // Helper function to encapsulate the "return whatever location we have, if we have one"
+    // logic, since it's needed repeatedly
+    function returnLocation(data, dfd) {
+        if (data && data.locations && data.locations.length) {
+            dfd.resolve(data.locations[0]);
+        } else {
+            dfd.resolve(null);
+        }
     }
 
     /**
