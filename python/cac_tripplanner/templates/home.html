@@ -142,7 +142,7 @@
                       {% if community_profile %}
                         <div class="col-sm-6">
                           <a class="block block-spotlight"
-                             href="{% url 'cms.views.community_profile_detail' community_profile.slug %}">
+                             href="{% url 'community-profile-detail' community_profile.slug %}">
                                 <h3 class="destination-name">{{ community_profile.title }}</h3>
                                 <h5>Community Profile</h5>
                                 {% if community_profile.narrow_image %}
@@ -156,7 +156,7 @@
                         {% if tips_and_tricks %}
                         <div class="col-sm-6">
                           <a class="block block-spotlight"
-                             href="{% url 'cms.views.tips_and_tricks_detail' tips_and_tricks.slug %}">
+                             href="{% url 'tips-and-tricks-detail' tips_and_tricks.slug %}">
                                 <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
                                 <h5>Tips & Tricks</h5>
                                 {% if tips_and_tricks.wide_image %}

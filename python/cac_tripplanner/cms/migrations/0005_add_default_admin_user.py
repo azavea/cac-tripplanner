@@ -32,6 +32,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('CMS', '0004_add_image_fields'),
+        ('auth', '0005_alter_user_last_login_null'),
     ]
 
     operations = [
