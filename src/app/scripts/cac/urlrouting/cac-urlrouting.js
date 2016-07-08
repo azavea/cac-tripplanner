@@ -72,6 +72,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * Field names in the URL must match those in UserPreferences
      * 'origin' and 'destination' get special handling to convert from coordinates to GeoJSON
      *
+     * Fields that are included but blank will be saved as blank (empty string) except
+     * for origin and destination, which get set to undefined.
+     *
+     * Fields that are omitted will be ignored, not unset, so anything that uses those params will
+     * get what's already in local storage or else the default.
+     *
      * @param {List[String]} fields : The field names to store values from
      */
     function setPrefsFromUrl(fields) {
@@ -82,8 +88,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                 // Special handling for origin and destination, which are stored as GeoJSON
                 if (field === 'origin' || field === 'destination') {
                     var coords = _.map(params[field].split(','), parseFloat);
-                    var feature = makeFeature(coords, params[field + 'Text']);
-                    UserPreferences.setPreference(field, feature);
+                    if (isNaN(coords[0])) {
+                        UserPreferences.setPreference(field, undefined);
+                    } else {
+                        var feature = makeFeature(coords, params[field + 'Text']);
+                        UserPreferences.setPreference(field, feature);
+                    }
                 } else {
                     UserPreferences.setPreference(field, params[field]);
                 }
@@ -94,8 +104,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     /* Reads values for the given fields from local storage and composes a URL query string
      * from them.
      *
-     * Only fields for which the preference value is defined will be included, and it won't set
-     * undefined fields to default values during lookup.
+     * It won't set undefined fields to default values during lookup. Undefined preferences get
+     * encoded as empty string.
      */
     function buildUrlParamsFromPrefs(fields) {
         var opts = {};
@@ -106,11 +116,15 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                     // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
                     opts[field] = [_.round(location.feature.geometry.y, 7),
                                    _.round(location.feature.geometry.x, 7)].join(',');
+                } else {
+                    opts[field] = '';
                 }
             } else {
                 var val = UserPreferences.getPreference(field, false);
                 if (!_.isUndefined(val)) {
                     opts[field] = val;
+                } else {
+                    opts[field] = '';
                 }
             }
         });
