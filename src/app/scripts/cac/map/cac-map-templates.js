@@ -99,8 +99,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
      */
     function septaRailWarningAlert() {
         var msg = ['Until further notice, SEPTA will be operating an enhanced Saturday schedule ',
-                'during the week. The trip departure times below do not reflect the modified schedule. ',
-                'For more details and up to date information please consult ',
+                'during the week. For more details and up to date information please consult ',
                 '<a class="alert-link" target="_blank" href="',
                 'http://www.septa.org/service/contingency.html',
                 '">SEPTA\'s contingency plan',
