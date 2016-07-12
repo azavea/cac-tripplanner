@@ -1,6 +1,6 @@
 ---
 - name: Create Directory for OSM and GTFS
-  file: path={{ otp_data_dir }} state=directory
+  file: path={{ otp_data_dir }} state=directory owner={{ otp_user }}
 
 - name: Copy Feed Validator
   copy: src=validate_feed.py dest="{{ otp_data_dir }}"
@@ -14,7 +14,7 @@
 - name: Change owner and mode of byport file
   file: path=/etc/authbind/byport/80 owner={{ otp_user }} mode=0755
 
-- name: Configure systemd service
+- name: Overwrite systemd service
   template: src=otp.service.j2 dest=/lib/systemd/system/otp.service
   register: otp_service_config
 
@@ -35,7 +35,7 @@
   when: develop or test
 
 - name: Build OTP Graph
-  command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_bin_dir }}/otp-{{ otp_version }}.jar --build {{ otp_data_dir }}
+  command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_bin_dir }}/otp-{{ otp_version }}{{ otp_jar_suffix }}.jar --build {{ otp_data_dir }}
   args:
     chdir: "{{ otp_bin_dir }}"
   when: develop or test
