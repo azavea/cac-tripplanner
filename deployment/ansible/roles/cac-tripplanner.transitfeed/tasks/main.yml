@@ -1,4 +1,3 @@
 ---
 - name: Install transitfeed
-  pip: name=pytz
   pip: name='git+https://github.com/google/transitfeed@1.2.15#egg=transitfeed'

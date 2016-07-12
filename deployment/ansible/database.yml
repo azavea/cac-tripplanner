@@ -1,8 +1,16 @@
 ---
 - hosts: database
   sudo: True
+  gather_facts: no
 
   pre_tasks:
+    # First install python 2 because ansible needs it to do anything, then gather facts
+    - name: Install Python 2 and simplejson
+      raw: apt-get -y install python={{python_version}} python-simplejson
+
+    - name: Gather facts
+      setup:
+
     - name: Update APT cache
       apt: update_cache=yes
 

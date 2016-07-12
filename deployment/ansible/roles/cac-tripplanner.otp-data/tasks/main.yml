@@ -9,14 +9,21 @@
   apt: pkg=authbind state=present
 
 - name: Touch AuthBind file if it does not exist
-  command: touch /etc/authbind/byport/80
-           creates=/etc/authbind/byport/80
+  file: path=/etc/authbind/byport/80 state=touch
 
 - name: Change owner and mode of byport file
   file: path=/etc/authbind/byport/80 owner={{ otp_user }} mode=0755
 
-- name: Overwrite upstart service
-  template: src=otp.conf.j2 dest=/etc/init/otp.conf
+- name: Configure systemd service
+  template: src=otp.service.j2 dest=/lib/systemd/system/otp.service
+  register: otp_service_config
+
+  # We need to reload systemd config for it to see changes.  This (and the 'register' just above)
+  # will not be necessary in Ansible 2.2 because there will be a 'systemd' module with a
+  # 'daemon_reload' option that we can use instead of 'service'.
+- name: Notify systemd of service config changes
+  command: systemctl daemon-reload
+  when: otp_service_config.changed
 
 - name: Download OTP Data
   local_action: command aws s3 sync s3://cleanair-otp-data/ ../../otp_data/
