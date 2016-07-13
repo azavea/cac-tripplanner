@@ -1,15 +1,4 @@
 ---
-- name: Install Sass
-  gem: name=sass
-       version={{ app_sass_version }}
-       user_install=no
-       state=present
-
-- name: Install Compass
-  gem: name=compass
-       user_install=no
-       state=present
-
 - name: Clear out the NPM artifacts when in production (want a fresh set)
   file: path="{{ root_src_dir }}/node_modules" state=absent
   sudo: yes

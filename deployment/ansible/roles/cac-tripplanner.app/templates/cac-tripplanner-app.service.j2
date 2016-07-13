@@ -1,0 +1,16 @@
+## NOTICE: This file is written by ansible, and any changes made here will be overwritten on
+#          next provision.
+#          Modify cac-tripplanner.app/templates/cac-tripplanner-app.service.j2 to make changes stick.
+
+[Unit]
+Description=start Gunicorn for CAC Trip Planner
+After=network-online.target
+
+[Service]
+User={{ app_username }}
+WorkingDirectory={{ root_app_dir }}
+Restart=on-failure
+ExecStart=/usr/local/bin/gunicorn --config {{ root_conf_dir }}/gunicorn.py --timeout {{ otp_session_timeout_s }} cac_tripplanner.wsgi
+
+[Install]
+WantedBy=multi-user.target

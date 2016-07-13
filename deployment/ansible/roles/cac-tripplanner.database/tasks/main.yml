@@ -3,7 +3,7 @@
   apt: name={{ item }} state=present
   with_items:
     - postgresql-9.3
-    - postgresql-9.3-postgis-2.1
+    - postgresql-9.3-postgis-2.2
 
 - name: Create postgres database
   postgresql_db: name={{ postgres_db }}

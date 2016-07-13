@@ -1,6 +1,6 @@
 ---
 - name: Restart cac-tripplanner-app
-  service: name=cac-tripplanner-app state=restarted
+  service: name=cac-tripplanner-app state=restarted enabled=yes
 
 - name: Restart nginx
-  service: name=nginx state=restarted
+  service: name=nginx state=restarted enabled=yes

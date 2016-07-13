@@ -70,7 +70,12 @@ VAGRANT_PROXYCONF_ENDPOINT = ENV["VAGRANT_PROXYCONF_ENDPOINT"]
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/xenial64"
+
+  # The image defines a name, which causes name collisions. Clear it to get default naming.
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = nil
+  end
 
   # Wire up the proxy if:
   #
