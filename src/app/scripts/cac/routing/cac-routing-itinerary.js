@@ -154,12 +154,12 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      */
     function getLegs(legs) {
         return _.map(legs, function(leg) {
-            if (leg.from.name.indexOf('osm:node') > -1) {
+            if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
                     leg.from.name = name;
                 });
             }
-            if (leg.to.name.indexOf('osm:node') > -1) {
+            if (leg.to.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.to).then(function(name) {
                     leg.to.name = name;
                 });
