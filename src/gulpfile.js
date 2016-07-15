@@ -7,6 +7,7 @@ var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
 var karma = require('karma').server;
 var mainBower = require('main-bower-files');
@@ -165,10 +166,7 @@ gulp.task('jshint:jenkins', function () {
 gulp.task('sass', function () {
     return gulp.src('app/styles/main.scss')
         .pipe(plumber())
-        .pipe($.rubySass({
-            style: 'expanded',
-            precision: 10
-        }))
+        .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
         .pipe(filterCSS)
         .pipe($.autoprefixer({browsers: ['last 2 versions'], cascade: false}))
         .pipe(filterCSS.restore())

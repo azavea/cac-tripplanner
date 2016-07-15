@@ -7,6 +7,5 @@ azavea.packer,0.2.0
 azavea.papertrail,1.1.1
 azavea.pip,0.1.1
 azavea.python,0.1.0
-azavea.ruby,0.3.0
 azavea.virtualenv,0.1.0
 azavea.postgresql-support,0.3.0
