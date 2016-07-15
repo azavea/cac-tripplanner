@@ -47,5 +47,8 @@ nosetests.xml
 # Ansible roles
 deployment/ansible/roles/azavea.*
 
+# Ansible retry files
+*.retry
+
 # AWS stack launching parameters
 deployment/default.yaml
