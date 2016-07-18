@@ -1,3 +1,3 @@
 ---
   dependencies:
-    - { role: "azavea.postgresql-support" }
+    - { role: "azavea.postgresql-support", postgresql_support_libpq_version: 9.5.* }

@@ -1,6 +1,6 @@
 ---
 - name: Create Directory for OSM and GTFS
-  file: path={{ otp_data_dir }} state=directory
+  file: path={{ otp_data_dir }} state=directory owner={{ otp_user }}
 
 - name: Copy Feed Validator
   copy: src=validate_feed.py dest="{{ otp_data_dir }}"
@@ -9,8 +9,7 @@
   apt: pkg=authbind state=present
 
 - name: Touch AuthBind file if it does not exist
-  command: touch /etc/authbind/byport/80
-           creates=/etc/authbind/byport/80
+  file: path=/etc/authbind/byport/80 state=touch
 
 - name: Change owner and mode of byport file
   file: path=/etc/authbind/byport/80 owner={{ otp_user }} mode=0755
@@ -18,33 +17,33 @@
 - name: Overwrite upstart service
   template: src=otp.conf.j2 dest=/etc/init/otp.conf
 
-- name: Download OTP Data
+- name: Download OTP Data (test)
   local_action: command aws s3 sync s3://cleanair-otp-data/ ../../otp_data/
   sudo: no
   when: test
 
-- name: Copy OTP Data
+- name: Copy OTP Data (test/develop)
   copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
   when: develop or test
 
-- name: Build OTP Graph
-  command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_bin_dir }}/otp-{{ otp_version }}.jar --build {{ otp_data_dir }}
+- name: Build OTP Graph (test/develop)
+  command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_bin_dir }}/{{ otp_jar_name }} --build {{ otp_data_dir }}
   args:
     chdir: "{{ otp_bin_dir }}"
   when: develop or test
 
-- name: Copy Built OTP Graph to Host
+- name: Copy Built OTP Graph to Host (develop)
   fetch: src={{ otp_data_dir }}/Graph.obj dest=../../otp_data/ fail_on_missing=yes flat=yes
   when: develop
 
 - name: Create Graph Directory
   file: path="{{ otp_data_dir}}/{{ otp_router }}" state=directory
 
-- name: Move Graph to Graph Directory
+- name: Move Graph to Graph Directory (test/develop)
   command: mv {{ otp_data_dir }}/Graph.obj {{ otp_data_dir }}/{{ otp_router }}
   notify: Restart OpenTripPlanner
   when: develop or test
 
-- name: Move Local Graph to Graph Directory
+- name: Copy Local Graph to Graph Directory (production)
   copy: src=./otp_data/Graph.obj dest="{{ otp_data_dir }}/{{ otp_router }}/Graph.obj" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
   when: production

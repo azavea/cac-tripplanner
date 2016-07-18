@@ -11,7 +11,7 @@
 
 - name: Install pip packages
   pip: name={{ item.name }} version={{ item.version }}
-  with_items: cac_python_dependencies
+  with_items: "{{ cac_python_dependencies }}"
 
   # Putting 'editable: false' in the entry in cac_python_dependencies should make it install
   # non-editable, but it's getting ignored
@@ -26,12 +26,8 @@
            creates=/usr/local/lib/python2.7/dist-packages/majorkirby/__init__.py
   when: develop
 
-- name: Touch log file if it does not exist
-  command: touch {{ app_log }}
-           creates={{ app_log }}
-
-- name: Set log file permissions
-  file: path={{ app_log }} owner={{ app_username }} group={{ app_username }} mode=0664
+- name: Touch log file and set permissions
+  file: path={{ app_log }} state=touch owner={{ app_username }} group={{ app_username }} mode=0664
 
 - name: Create configuration file directory
   file: path={{ root_conf_dir }}
@@ -74,8 +70,9 @@
   command: touch {{ app_cron_event_feed_log }}
            creates={{ app_cron_event_feed_log }}
 
-- name: Set cron job log file permissions
-  file: path={{ app_cron_event_feed_log }} owner={{ app_username }} group={{ app_username }} mode=0664
+- name: Touch cron job log file if it does not exist, and set permissions
+  file: path={{ app_cron_event_feed_log}} state=touch
+        owner={{ app_username }} group={{ app_username }} mode=0664
 
 # TODO: Add logic in production to only run on a single webserver
 - name: Add cron job for RSS events feed
