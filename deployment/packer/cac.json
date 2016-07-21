@@ -104,6 +104,9 @@
       "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/app.yml",
       "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.app",
       "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "extra_arguments": [
+          "--user 'ubuntu'"
+      ],
       "only": ["app"]
     },
     {
@@ -111,6 +114,9 @@
       "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/otp.yml",
       "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.otp",
       "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "extra_arguments": [
+          "--user 'ubuntu'"
+      ],
       "only": ["otp"]
     }
   ]
