@@ -98,7 +98,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
      * @returns {String} Compiled Handlebars template for the Bootstrap alert
      */
     function septaRailWarningAlert() {
-        var msg = ['Until further notice, SEPTA will be operating an enhanced Saturday schedule ',
+        var msg = ['Until further notice, SEPTA will be operating an interim weekday schedule ',
                 'during the week. For more details and up to date information please consult ',
                 '<a class="alert-link" target="_blank" href="',
                 'http://www.septa.org/service/contingency.html',
