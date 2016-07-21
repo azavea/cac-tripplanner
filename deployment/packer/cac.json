@@ -78,8 +78,7 @@
         "mkdir -p {{user `ansible_staging_directory`}}",
         "mkdir -p {{user `intermediate_directory`}}",
         "sudo apt-get -y install build-essential python-dev python-pip git",
-        "sudo pip install paramiko==1.16.0",
-        "sudo pip install ansible==1.8.4"
+        "sudo pip install ansible"
       ]
     },
     {
