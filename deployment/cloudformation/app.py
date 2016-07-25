@@ -193,11 +193,17 @@ class AppServerStack(StackNode):
                 ec2.SecurityGroupRule(
                     IpProtocol='tcp', CidrIp=VPC_CIDR, FromPort=p, ToPort=p
                 )
-                for p in [22, 80]
+                for p in [22, 80, 443]
             ] + [
                 ec2.SecurityGroupRule(
                     IpProtocol='tcp', SourceSecurityGroupId=Ref(sg),
                     FromPort=80, ToPort=80
+                )
+                for sg in [app_server_load_balancer_security_group]
+            ] + [
+                ec2.SecurityGroupRule(
+                    IpProtocol='tcp', SourceSecurityGroupId=Ref(sg),
+                    FromPort=443, ToPort=443
                 )
                 for sg in [app_server_load_balancer_security_group]
             ],
@@ -215,7 +221,7 @@ class AppServerStack(StackNode):
 
         # ELB to App Server
         self.add_resource(ec2.SecurityGroupEgress(
-            'sgEgressELBtoApp',
+            'sgEgressELBtoAppHTTP',
             GroupId=Ref(app_server_load_balancer_security_group),
             DestinationSecurityGroupId=Ref(app_server_security_group),
             IpProtocol='tcp',
@@ -223,11 +229,20 @@ class AppServerStack(StackNode):
             ToPort=80
         ))
 
+        self.add_resource(ec2.SecurityGroupEgress(
+            'sgEgressELBtoAppHTTPS',
+            GroupId=Ref(app_server_load_balancer_security_group),
+            DestinationSecurityGroupId=Ref(app_server_security_group),
+            IpProtocol='tcp',
+            FromPort=443,
+            ToPort=443
+        ))
+
         # Bastion to App Server, app server to db, app server to inet
         rules = [
             (self.param_bastion_security_group,
              app_server_security_group,
-             [80, 22]),
+             [80, 443, 22]),
             (app_server_security_group,
              self.param_database_security_group,
              [POSTGRES]),
@@ -268,13 +283,15 @@ class AppServerStack(StackNode):
             Listeners=[
                 elb.Listener(
                     LoadBalancerPort='80',
+                    Protocol='HTTP',
                     InstancePort='80',
-                    Protocol='HTTP'
+                    InstanceProtocol='HTTP'
                 ),
                 elb.Listener(
                     LoadBalancerPort='443',
-                    InstancePort='80',
                     Protocol='HTTPS',
+                    InstancePort='443',
+                    InstanceProtocol='HTTP',
                     SSLCertificateId=Ref(self.param_ssl_certificate_arn)
                 )
             ],
@@ -540,6 +557,6 @@ class WebServerStack(AppServerStack):
     """
     Web stack for Cac
     """
-    HEALTH_ENDPOINT = 'HTTP:80/'
+    HEALTH_ENDPOINT = 'HTTP:443/'
     STACK_NAME_PREFIX = 'Web'
     INPUTS = dict(BASE_INPUTS, **{'AppServerAMI': ['global:WebServerAMI']})
