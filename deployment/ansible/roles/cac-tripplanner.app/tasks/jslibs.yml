@@ -1,33 +1,33 @@
 ---
 - name: Clear out the NPM artifacts when in production (want a fresh set)
   file: path="{{ root_src_dir }}/node_modules" state=absent
-  sudo: yes
+  become: yes
   when: production
 
 - name: Install NPM dependencies
   command: npm install chdir="{{ root_src_dir }}"
-  sudo: no
+  become: no
 
 - name: Create Static Directory
   file: path="{{ root_static_dir }}" state=directory mode=0755 owner="{{ app_username }}"
-  sudo: yes
+  become: yes
 
 - name: Install application javascript dependencies with bower
   command: npm run bower-install
-  sudo: no
+  become: no
   args:
     chdir: "{{ root_src_dir }}"
 
 - name: Create static files -- development
   command: npm run gulp-development
-  sudo: no
+  become: no
   args:
     chdir: "{{ root_src_dir }}"
   when: not production and not test
 
 - name: Create static files -- production
   command: npm run gulp-production
-  sudo: no
+  become: no
   args:
     chdir: "{{ root_src_dir }}"
   when: production or test

@@ -67,8 +67,7 @@
   notify: Restart nginx
 
 - name: Touch cron job log file if it does not exist
-  command: touch {{ app_cron_event_feed_log }}
-           creates={{ app_cron_event_feed_log }}
+  copy: content="" dest="{{ app_cron_event_feed_log }}" force=no
 
 - name: Touch cron job log file if it does not exist, and set permissions
   file: path={{ app_cron_event_feed_log}} state=touch
