@@ -64,8 +64,11 @@ var copyBowerFiles = function(filter, extraFiles) {
         .pipe(addsrc(extraFiles));
 };
 
+// silence the collectstatic output
+// gulp-run hangs if the output is too large:
+// https://github.com/MrBoolean/gulp-run/issues/34
 gulp.task('collectstatic', function () {
-    return run('python ' + pythonRoot + '/manage.py collectstatic --noinput').exec();
+    return run('python ' + pythonRoot + '/manage.py collectstatic --noinput -v0').exec();
 });
 
 gulp.task('clean', function() {

@@ -23,7 +23,7 @@
   when: test
 
 - name: Copy OTP Data (test/develop)
-  copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
+  copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664
   when: develop or test
 
 - name: Build OTP Graph (test/develop)
@@ -45,5 +45,5 @@
   when: develop or test
 
 - name: Copy Local Graph to Graph Directory (production)
-  copy: src=./otp_data/Graph.obj dest="{{ otp_data_dir }}/{{ otp_router }}/Graph.obj" owner={{ansible_ssh_user}} group={{ansible_ssh_user}} mode=0664
+  copy: src=./otp_data/Graph.obj dest="{{ otp_data_dir }}/{{ otp_router }}/Graph.obj" owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664
   when: production

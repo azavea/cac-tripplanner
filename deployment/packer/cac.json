@@ -77,9 +77,8 @@
         "sudo apt-get update",
         "mkdir -p {{user `ansible_staging_directory`}}",
         "mkdir -p {{user `intermediate_directory`}}",
-        "sudo apt-get -y install build-essential python-dev python-pip git",
-        "sudo pip install paramiko==1.16.0",
-        "sudo pip install ansible==1.8.4"
+        "sudo apt-get -y install build-essential python-dev python-pip git libssl-dev libffi-dev",
+        "sudo pip install --upgrade ansible setuptools"
       ]
     },
     {
@@ -105,6 +104,9 @@
       "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/app.yml",
       "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.app",
       "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "extra_arguments": [
+          "--user 'ubuntu'"
+      ],
       "only": ["app"]
     },
     {
@@ -112,6 +114,9 @@
       "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/otp.yml",
       "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.otp",
       "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "extra_arguments": [
+          "--user 'ubuntu'"
+      ],
       "only": ["otp"]
     }
   ]

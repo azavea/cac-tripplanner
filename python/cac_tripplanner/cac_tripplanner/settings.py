@@ -34,7 +34,6 @@ except (IOError, NameError):
         # overridden via the secrets file. This can't be automatically set
         # to the host machine's DNS here, because this code runs in a VM.
         'otp_url': 'http://192.168.8.26/otp/routers/{router}/',
-        'allowed_hosts': ['127.0.0.1', 'localhost'],
         'internal_ips': ['0.0.0.0', '127.0.0.1'],
         'postgis_version': [2, 1, 5],
         'build_dir': '/opt/app/src',
@@ -63,7 +62,7 @@ SECRET_KEY = secrets['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not secrets['production']
 
-ALLOWED_HOSTS = secrets['allowed_hosts']
+ALLOWED_HOSTS = ['*']
 
 INTERNAL_IPS = tuple(secrets['internal_ips'])
 
