@@ -8,6 +8,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+from boto.utils import get_instance_metadata
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import yaml
@@ -62,7 +65,21 @@ SECRET_KEY = secrets['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not secrets['production']
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    '.gophillygo.org',
+    '.elb.amazonaws.com',
+    'localhost'
+]
+
+if secrets['production']:
+    instance_metadata = get_instance_metadata()
+
+    if not instance_metadata:
+        raise ImproperlyConfigured('Unable to access instance metadata')
+
+    # ELBs use the instance IP in the Host header and ALLOWED_HOSTS
+    # checks against the Host header.
+    ALLOWED_HOSTS.append(instance_metadata['local-ipv4'])
 
 INTERNAL_IPS = tuple(secrets['internal_ips'])
 
