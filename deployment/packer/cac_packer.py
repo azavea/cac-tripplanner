@@ -4,6 +4,7 @@ import csv
 import os
 import subprocess
 import urllib2
+import shutil
 
 
 class CacStackException(Exception):
@@ -47,6 +48,15 @@ def run_packer(machine_type, region, creds):
       region (str): AWS region id
       creds (Dict): Dictionary containing AWS credentials
     """
+
+    # Remove examples subdirectory from all Azavea roles
+    ansible_roles_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../ansible/roles')
+    for role_path in os.listdir(ansible_roles_path):
+        examples_path = os.path.join(ansible_roles_path, role_path, 'examples')
+
+        if role_path.startswith('azavea') and os.path.isdir(examples_path):
+            print('Removing {}'.format(examples_path))
+            shutil.rmtree(examples_path)
 
     aws_ubuntu_ami = get_ubuntu_ami(region)
 

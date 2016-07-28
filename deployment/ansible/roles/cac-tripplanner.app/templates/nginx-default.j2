@@ -1,18 +1,53 @@
-server {
-    listen 80 default_server;
+# Public VPC subnet CIDRs
+set_real_ip_from 10.0.0.0/24;
+set_real_ip_from 10.0.2.0/24;
+set_real_ip_from 10.0.4.0/24;
+set_real_ip_from 10.0.6.0/24;
 
-    server_name _;
+real_ip_header X-Forwarded-For;
+
+server {
+    listen 80;
+    server_name gophillygo.org www.gophillygo.org;
+    return 301 https://$host$request_uri;
+}
+
+map $http_x_forwarded_proto $policy {
+    default "";
+    https   "default-src https: data: blob: 'unsafe-inline' 'unsafe-eval'";
+}
+
+server {
+    listen 443 default_server;
+    server_name gophillygo.org www.gophillygo.org localhost;
+
+    # A set of recommended security headers:
+    #
+    #   https://scotthelme.co.uk/hardening-your-http-response-headers/
+    #
+    add_header Strict-Transport-Security "max-age=15552000; preload" always;
+    add_header Content-Security-Policy $policy always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
 
     location / {
         proxy_set_header Host $http_host;
-        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_read_timeout {{ otp_session_timeout_s }}s;
+        proxy_redirect off;
+
+        proxy_pass http://127.0.0.1:8000;
     }
 
     location /admin/destinations/destination/add/ {
         proxy_set_header Host $http_host;
-        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_redirect off;
+
         client_max_body_size 10M;
+
+        proxy_pass http://127.0.0.1:8000;
     }
 
     location /static/ {

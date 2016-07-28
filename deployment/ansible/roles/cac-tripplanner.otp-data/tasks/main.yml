@@ -19,7 +19,7 @@
 
 - name: Download OTP Data (test)
   local_action: command aws s3 sync s3://cleanair-otp-data/ ../../otp_data/
-  sudo: no
+  become: no
   when: test
 
 - name: Copy OTP Data (test/develop)

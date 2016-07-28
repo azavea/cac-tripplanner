@@ -1,0 +1,32 @@
+- src: azavea.git
+  version: 0.1.0
+
+- src: azavea.java
+  version: 0.2.6
+
+- src: azavea.opentripplanner
+  version: 1.0.1
+
+- src: azavea.nginx
+  version: 0.2.2
+
+- src: azavea.nodejs
+  version: 0.4.0
+
+- src: azavea.packer
+  version: 0.2.0
+
+- src: azavea.papertrail
+  version: 1.1.1
+
+- src: azavea.pip
+  version: 0.1.1
+
+- src: azavea.python
+  version: 0.1.0
+
+- src: azavea.virtualenv
+  version: 0.1.0
+
+- src: azavea.postgresql-support
+  version: 0.3.0
