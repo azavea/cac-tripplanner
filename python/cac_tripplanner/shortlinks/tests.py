@@ -93,7 +93,6 @@ class ShortenedLinkFormTestCase(TestCase):
 
 class ShortenedLinkViewsTestCase(TestCase):
     def setUp(self):
-        urls = 'shortlinks.test.urls'
         self.client = Client()
 
     def test_methods_and_url_resolution(self):
