@@ -31,6 +31,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             modeSelectors: '#directionsModes input',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
+            reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             wheelchairDiv: '#directionsWheelchair',
 
@@ -70,6 +71,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
 
         $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
+
+        $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -298,6 +301,31 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             currentItinerary = itinerary;
         }
+    }
+
+    function reverseOriginDestination() {
+        // read what they are now
+        var origin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
+        var destination = UserPreferences.getPreference('destination');
+        var destinationText = UserPreferences.getPreference('destinationText');
+
+        // update local storage
+        UserPreferences.setPreference('origin', destination);
+        UserPreferences.setPreference('originText', destinationText);
+        UserPreferences.setPreference('destination', origin);
+        UserPreferences.setPreference('destinationText', originText);
+
+        // update the text control
+        typeaheadOrigin.setValue(destinationText);
+        typeaheadDest.setValue(originText);
+
+        // set on this object and validate
+        setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
+        setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
+
+        // update the directions for the reverse trip
+        planTrip();
     }
 
     function onTypeaheadCleared(event, key) {
