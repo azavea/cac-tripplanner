@@ -18,7 +18,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#directionsBikeTriangle',
-            buttonPlanTrip: 'section.directions button[type=submit]',
             datepicker: '#datetimeDirections',
             departAtSelect: '#directionsDepartAt',
             destination: 'section.directions input.destination',
@@ -66,9 +65,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
-
-        // Plan a trip using information provided
-        $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
 
         $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
 
