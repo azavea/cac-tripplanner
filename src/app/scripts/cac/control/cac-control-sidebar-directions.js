@@ -329,6 +329,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directions[key] = null;
         UserPreferences.clearLocation(key);
         mapControl.clearDirectionsMarker(key);
+        // hide reverse origin/destination button
+        $(options.selectors.reverseButton).css('visibility', 'hidden');
     }
 
     function onTypeaheadSelected(event, key, location) {
@@ -337,6 +339,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             setDirections(key, null);
             return;
         }
+
+        // show reverse origin/destination button
+        $(options.selectors.reverseButton).css('visibility', 'visible');
 
         // save text for address to preferences
         UserPreferences.setLocation(key, location);
