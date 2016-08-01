@@ -18,7 +18,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     var defaults = {
         selectors: {
             bikeTriangleDiv: '#directionsBikeTriangle',
-            buttonPlanTrip: 'section.directions button[type=submit]',
             datepicker: '#datetimeDirections',
             departAtSelect: '#directionsDepartAt',
             destination: 'section.directions input.destination',
@@ -31,6 +30,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             modeSelectors: '#directionsModes input',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
+            reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             wheelchairDiv: '#directionsWheelchair',
 
@@ -66,10 +66,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
-        // Plan a trip using information provided
-        $(options.selectors.buttonPlanTrip).click($.proxy(planTrip, this));
-
         $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
+
+        $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
@@ -300,11 +299,38 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
     }
 
+    function reverseOriginDestination() {
+        // read what they are now
+        var origin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
+        var destination = UserPreferences.getPreference('destination');
+        var destinationText = UserPreferences.getPreference('destinationText');
+
+        // update local storage
+        UserPreferences.setPreference('origin', destination);
+        UserPreferences.setPreference('originText', destinationText);
+        UserPreferences.setPreference('destination', origin);
+        UserPreferences.setPreference('destinationText', originText);
+
+        // update the text control
+        typeaheadOrigin.setValue(destinationText);
+        typeaheadDest.setValue(originText);
+
+        // set on this object and validate
+        setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
+        setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
+
+        // update the directions for the reverse trip
+        planTrip();
+    }
+
     function onTypeaheadCleared(event, key) {
         clearItineraries();
         directions[key] = null;
         UserPreferences.clearLocation(key);
         mapControl.clearDirectionsMarker(key);
+        // hide reverse origin/destination button
+        $(options.selectors.reverseButton).css('visibility', 'hidden');
     }
 
     function onTypeaheadSelected(event, key, location) {
@@ -313,6 +339,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             setDirections(key, null);
             return;
         }
+
+        // show reverse origin/destination button
+        $(options.selectors.reverseButton).css('visibility', 'visible');
 
         // save text for address to preferences
         UserPreferences.setLocation(key, location);
