@@ -3,4 +3,4 @@ test: true
 develop: false
 production: false
 
-otp_process_mem: 4G
+otp_process_mem: 5G
