@@ -18,7 +18,7 @@
   template: src=otp.conf.j2 dest=/etc/init/otp.conf
 
 - name: Create data directory (test)
-  file: path=./otp_data/ owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664
+  file: path=./otp_data/ owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664 state=touch
 
 - name: Download OTP Data (test)
   local_action: command aws s3 sync s3://cleanair-otp-data/ ./otp_data/
