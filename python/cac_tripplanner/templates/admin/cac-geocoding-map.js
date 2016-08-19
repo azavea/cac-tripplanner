@@ -1,4 +1,12 @@
-{% extends 'gis/admin/osm.js' %}
+{% extends "gis/admin/openlayers.js" %}
+{% block base_layer %}
+// explicitly load via SSL to deal with redirect to HTTPS
+new OpenLayers.Layer.OSM("OpenStreetMap", [
+    'https://a.tile.openstreetmap.org/${z}/${x}/${y}.png',
+    'https://b.tile.openstreetmap.org/${z}/${x}/${y}.png',
+    'https://c.tile.openstreetmap.org/${z}/${x}/${y}.png'
+]);
+{% endblock %}
 
 {% block extra_layers %}
 

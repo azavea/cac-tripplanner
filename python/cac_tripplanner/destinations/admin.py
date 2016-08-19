@@ -18,6 +18,10 @@ class DestinationAdmin(admin.OSMGeoAdmin):
     # Override map_template for custom address geocoding behavior
     map_template = 'admin/cac-geocoding-map.html'
 
+    # Override configurable URL for openlayers.js to support SSL
+    # default is: 'http://openlayers.org/api/2.13.1/OpenLayers.js'
+    openlayers_url = 'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'
+
     # Include geocoder dependencies
     jquery = 'https://code.jquery.com/jquery-2.1.3.min.js'
     if settings.DEBUG:
@@ -25,6 +29,7 @@ class DestinationAdmin(admin.OSMGeoAdmin):
             jquery,
             '/static/scripts/vendor/lodash.js',
             '/static/scripts/main/cac/cac.js',
+            '/static/scripts/main/cac/search/cac-search-params.js',
             '/static/scripts/main/cac/search/cac-geocoder.js'
         ]
     else:
