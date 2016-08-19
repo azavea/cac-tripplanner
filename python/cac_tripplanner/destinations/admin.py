@@ -29,6 +29,7 @@ class DestinationAdmin(admin.OSMGeoAdmin):
             jquery,
             '/static/scripts/vendor/lodash.js',
             '/static/scripts/main/cac/cac.js',
+            '/static/scripts/main/cac/search/cac-search-params.js',
             '/static/scripts/main/cac/search/cac-geocoder.js'
         ]
     else:
