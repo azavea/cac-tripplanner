@@ -105,7 +105,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       DB_MEMORY_MB = ENV['CAC_DATABASE_MEMORY']
     end
 
-    config.vm.provider :virtualbox do |v|
+    database.vm.provider :virtualbox do |v|
       v.memory = DB_MEMORY_MB
       v.cpus = 2
     end
@@ -146,7 +146,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       APP_MEMORY_MB = ENV['CAC_APP_MEMORY']
     end
 
-    config.vm.provider :virtualbox do |v|
+    app.vm.provider :virtualbox do |v|
       v.memory = APP_MEMORY_MB
       v.cpus = 2
     end
@@ -169,7 +169,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.raw_arguments = ["--timeout=60"]
     end
 
-    config.vm.provider :virtualbox do |v|
+    otp.vm.provider :virtualbox do |v|
       v.memory = OTP_MEMORY_MB
       v.cpus = CPUS
     end
