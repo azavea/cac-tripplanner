@@ -441,7 +441,15 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     function editItinerary(itinerary) {
         var drawControl = new L.Control.Draw({
             edit: {
-                featureGroup: itinerary.geojson
+                featureGroup: itinerary.geojson,
+                remove: false
+            },
+            draw: {
+                polyline: false,
+                polygon: false,
+                rectangle: false,
+                circle: false,
+                marker: false
             }
         });
         map.addControl(drawControl);
