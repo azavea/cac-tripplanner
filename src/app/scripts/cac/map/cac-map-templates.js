@@ -260,7 +260,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '{{#if data.showBackButton}}<div class="pull-right"><a class="back pull-right">',
                 '<i class="md md-close"></i></a></div>{{/if}}',
                 '<div class="pull-right">',
-                '<a href="#"><i class="md md-edit"></i></a>',
+                '<a id="editRouteBtn"><i class="md md-edit"></i></a>',
                 '<span class="directions-header-divider">|</span> ',
                 '</div>',
                 '<div class="share-dropdown pull-right dropdown">{{#if data.showShareButton}}',

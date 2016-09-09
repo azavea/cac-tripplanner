@@ -235,8 +235,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
                 }
             });
         } catch (err) {
-            console.log('isochrone layer failed to load from GeoJSON');
-            console.log(err);
+            console.error('isochrone layer failed to load from GeoJSON');
+            console.error(err);
             isochroneLayer = null;
         }
 

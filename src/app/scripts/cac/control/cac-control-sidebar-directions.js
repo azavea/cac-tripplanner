@@ -87,6 +87,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
                                         onDirectionsBackClicked);
 
+        directionsListControl.events.on(directionsListControl.eventNames.routeEditClicked,
+                                        onRouteEditClicked);
+
         itineraryListControl = new Control.ItineraryList({
             selectors: {
                 container: 'section.directions .itineraries'
@@ -280,6 +283,15 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.hide();
             directionsListControl.show();
         }
+    }
+
+    /**
+     * Handle click event to start hand-editing a route
+     */
+    function onRouteEditClicked() {
+        // TODO: implement
+        console.log('edit route:');
+        console.log(currentItinerary);
     }
 
     function findItineraryBlock(id) {

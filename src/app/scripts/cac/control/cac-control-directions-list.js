@@ -19,6 +19,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
             backButton: 'a.back',
             directionItem: '.direction-item',
             directLinkButton: '#directLinkBtn',
+            editRouteButton: '#editRouteBtn',
             emailShareButton: '#emailShareBtn',
             facebookShareButton: '#fbShareBtn',
             twitterShareButton: '#twShareBtn',
@@ -31,7 +32,8 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
     var eventNames = {
         backButtonClicked: 'cac:control:directionslist:backbutton',
         listItemClicked: 'cac:control:directionslist:listitem',
-        directionHovered: 'cac:control:directionslist:directionhover'
+        directionHovered: 'cac:control:directionslist:directionhover',
+        routeEditClicked: 'cac:control:directionslist:editroute'
     };
 
     var $container = null;
@@ -90,6 +92,11 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
                 events.trigger(eventNames.directionHovered, null);
                 e.stopPropagation();
             });
+
+        // Wire up route editor
+        $html.find(options.selectors.editRouteButton).on('click', function() {
+            events.trigger(eventNames.routeEditClicked);
+        });
 
         $container.empty();
 
