@@ -128,6 +128,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.editItinerary = editItinerary;
 
     return MapControl;
 
@@ -432,6 +433,18 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         if (isochroneLayer) {
             map.removeLayer(isochroneLayer);
         }
+    }
+
+    /**
+     * Make itinerary editable in Leaflet Draw.
+     */
+    function editItinerary(itinerary) {
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: itinerary.geojson
+            }
+        });
+        map.addControl(drawControl);
     }
 
     function setGeocodeMarker(latLng) {

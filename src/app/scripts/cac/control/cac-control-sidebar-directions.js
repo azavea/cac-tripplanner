@@ -292,6 +292,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         // TODO: implement
         console.log('edit route:');
         console.log(currentItinerary);
+
+        mapControl.editItinerary(currentItinerary);
     }
 
     function findItineraryBlock(id) {
