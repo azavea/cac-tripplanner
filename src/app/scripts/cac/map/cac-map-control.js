@@ -439,9 +439,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      * Make itinerary editable in Leaflet Draw.
      */
     function editItinerary(itinerary) {
+        map.removeLayer(itinerary.geojson);
+        var simpleItinerary = turf.simplify(itinerary.geojson, 5.0, false);
+        map.addLayer(simpleItinerary);
         var drawControl = new L.Control.Draw({
             edit: {
-                featureGroup: itinerary.geojson,
+                featureGroup: simpleItinerary,
                 remove: false
             },
             draw: {
