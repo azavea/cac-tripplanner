@@ -453,6 +453,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             }
         });
         map.addControl(drawControl);
+
+        // immediately enter edit mode
+        drawControl._toolbars.edit._modes.edit.handler.enable();
     }
 
     function setGeocodeMarker(latLng) {
