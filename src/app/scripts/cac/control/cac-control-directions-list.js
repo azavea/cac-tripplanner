@@ -111,7 +111,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
         }
 
         // Show alert with link to transit agency bicycle policy for bike+transit itineraries
-        if (_.contains(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
+        if (_.includes(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
             var $alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
             $container.append($alert);
         }

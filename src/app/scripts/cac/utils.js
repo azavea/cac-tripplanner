@@ -165,7 +165,7 @@ CAC.Utils = (function (_) {
             // Remove undefined in the case the search is empty
             .compact()
             // Turn [key, value] arrays into object parameters
-            .object()
+            .zipObject()
             // Return the value of the chain operation
             .value();
     }

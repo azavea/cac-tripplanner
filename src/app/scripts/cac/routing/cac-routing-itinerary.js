@@ -18,7 +18,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.legs = getLegs(otpItinerary.legs);
-        this.from = _.first(otpItinerary.legs).from;
+        this.from = _.head(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
 
@@ -27,6 +27,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.geojson.setStyle(getStyle(true, false));
         this.fromText = requestParameters.fromText;
         this.toText = requestParameters.toText;
+
+        // expose functions
+        this.getStyle = getStyle;
+        this.getTurnPoints = getTurnPoints;
     }
 
     Itinerary.prototype.highlight = function (isHighlighted) {
@@ -49,7 +53,23 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {array} List of unique agency names traversed in this itinerary
      */
     function getTransitAgencies(legs) {
-        return _.chain(legs).pluck('agencyName').uniq().without(undefined).value();
+        return _.chain(legs).map('agencyName').uniq().without(undefined).value();
+    }
+
+    /**
+     * Get the points for trip start, end, and turn points (step start points).
+     * Not all step start points are necessarily turns; some may be to 'continue on'.
+     * Exposed as a method rather than set as a property during initialization, as
+     * these points are not needed until user chooses to edit the itinerary,
+     * at which point they can be loaded lazily.
+     */
+    function getTurnPoints() {
+        if (!this._turnPoints) {
+            this._turnPoints = _.chain(this.legs).map('steps').flatten().map(function(step) {
+                return [step.lon, step.lat];
+            }).value();
+        }
+        return this._turnPoints;
     }
 
     /**
@@ -61,7 +81,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {string} string to use for labeling an itinerary
      */
     function getVia(legs) {
-        return _.chain(legs).pluck('steps').flatten().max(function(step) {
+        return _.chain(legs).map('steps').flatten().max(function(step) {
             return step.distance;
         }).value().streetName;
     }
@@ -73,7 +93,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {array} array of strings representing modes for itinerary
      */
     function getModes(legs) {
-        return _.chain(legs).pluck('mode').uniq().value();
+        return _.chain(legs).map('mode').uniq().value();
     }
 
     /**
@@ -83,7 +103,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
      */
     function getDistanceMiles(legs) {
-        var distanceMeters = _.chain(legs).pluck('distance').reduce(function(sum, n) {
+        var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
             return sum + n;
         });
         return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
