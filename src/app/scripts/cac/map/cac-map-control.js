@@ -440,10 +440,19 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      */
     function editItinerary(itinerary) {
 
-        window.itinerary = itinerary;
+        // edit a simplified shape that just has the turn points
+        map.removeLayer(itinerary.geojson);
+        var turnPointLayer = cartodb.L.geoJson({
+            type: 'LineString',
+            coordinates: itinerary.getTurnPoints()
+        });
+
+        turnPointLayer.setStyle(itinerary.getStyle(true, true));
+        map.addLayer(turnPointLayer);
+
         var drawControl = new L.Control.Draw({
             edit: {
-                featureGroup: itinerary.geojson,
+                featureGroup: turnPointLayer,
                 remove: false
             },
             draw: {
@@ -456,7 +465,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         });
         map.addControl(drawControl);
 
-        // immediately enter edit mode
+        // immediately enter edit mode in the Leaflet Draw control
         drawControl._toolbars.edit._modes.edit.handler.enable();
 
         // listen for when user clicks to 'save' or 'cancel' leaflet draw changes
@@ -464,18 +473,28 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             map.removeControl(drawControl);
             // stop listening, to avoid error on subsequent element removals
             map.off('draw:editstop');
-            endItineraryEdit(itinerary);
+
+            // get the points from the edited linestring
+            var modified = turnPointLayer.toGeoJSON().features[0].geometry.coordinates;
+
+            map.removeLayer(turnPointLayer);
+            map.addLayer(itinerary.geojson);
+
+            endItineraryEdit(itinerary.getTurnPoints(), modified);
         });
     }
 
     /**
      * Requery for trip plans when the user finishes editing the line string.
      */
-     function endItineraryEdit(itinerary) {
-        console.log('endItineraryEdit');
-        // TODO: find modified/added turn points and requery, with added waypoints
-        var pts = itinerary.geojson.toGeoJSON().features[0].geometry.coordinates;
-        console.log(pts);
+     function endItineraryEdit(turnPoints, modified) {
+        // get the points that changed
+        var changed = _.differenceWith(modified, turnPoints, function(first, second) {
+            return first[0] === second[0] && first[1] === second[1];
+        });
+
+        // TODO: requery with the changed points as waypoints
+        console.log(changed);
      }
 
     function setGeocodeMarker(latLng) {
