@@ -27,7 +27,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
         destinationMoved: 'cac:map:control:destinationmoved',
-        geocodeMarkerMoved: 'cac:map:control:geocodemoved'
+        geocodeMarkerMoved: 'cac:map:control:geocodemoved',
+        waypointsSet: 'cac:map:control:waypointsset'
     };
     var basemaps = {};
     var overlays = {};
@@ -502,6 +503,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // TODO: requery with the changed points as waypoints
         console.log(changed);
+
+        if (changed.length) {
+            // TODO: trigger waypoint set event with waypoints
+            events.trigger(eventNames.waypointsSet, {waypoints: changed});
+        }
     }
 
     /**

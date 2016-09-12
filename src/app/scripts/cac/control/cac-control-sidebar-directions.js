@@ -58,6 +58,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     var itineraryListControl = null;
     var typeaheadDest = null;
     var typeaheadOrigin = null;
+    var waypoints = null;
 
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -99,6 +100,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                                        onItineraryClicked);
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
+
+        mapControl.events.on(mapControl.eventNames.waypointsSet, queryWithWaypoints);
 
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
@@ -167,6 +170,30 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             mode: mode,
             arriveBy: arriveBy
         };
+
+        // add intermediatePlaces if user edited route
+        if (waypoints) {
+            // intermediatePlaces are ordered. see comment on `getGraphPathsConsideringIntermediates`:
+            // https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L241
+            // if `arriveBy` is `true`, places are expected to be ordered right-to-left.
+            if (arriveBy) {
+                waypoints.reverse();
+            }
+
+            // intermediatePlaces parameter is to be passed multiple times for each waypoint.
+            // Since we can only set the parameter key once on the object, build out the string.
+            otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
+                return $.param({intermediatePlaces: waypoint.reverse().join(',')});
+            }).join('&');
+
+            console.log('encode already:');
+            console.log(otpOptions.intermediatePlaces);
+            ////////////////////////////////////////
+
+            waypoints = null; // discard waypoints once built into a single query
+        } else {
+            console.log('no waypoints here');
+        }
 
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
@@ -308,6 +335,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             currentItinerary = itinerary;
         }
+    }
+
+    /**
+     * Initiate a trip plan when user finishes editing a route.
+     */
+    function queryWithWaypoints(event, points) {
+        waypoints = points.waypoints;
+        planTrip();
     }
 
     function reverseOriginDestination() {
