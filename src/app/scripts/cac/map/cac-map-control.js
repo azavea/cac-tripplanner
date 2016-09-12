@@ -439,6 +439,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      * Make itinerary editable in Leaflet Draw.
      */
     function editItinerary(itinerary) {
+
+        window.itinerary = itinerary;
         var drawControl = new L.Control.Draw({
             edit: {
                 featureGroup: itinerary.geojson,
@@ -456,7 +458,25 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // immediately enter edit mode
         drawControl._toolbars.edit._modes.edit.handler.enable();
+
+        // listen for when user clicks to 'save' or 'cancel' leaflet draw changes
+        map.on('draw:editstop', function() {
+            map.removeControl(drawControl);
+            // stop listening, to avoid error on subsequent element removals
+            map.off('draw:editstop');
+            endItineraryEdit(itinerary);
+        });
     }
+
+    /**
+     * Requery for trip plans when the user finishes editing the line string.
+     */
+     function endItineraryEdit(itinerary) {
+        console.log('endItineraryEdit');
+        // TODO: find modified/added turn points and requery, with added waypoints
+        var pts = itinerary.geojson.toGeoJSON().features[0].geometry.coordinates;
+        console.log(pts);
+     }
 
     function setGeocodeMarker(latLng) {
         // helper for when marker dragged to new place
