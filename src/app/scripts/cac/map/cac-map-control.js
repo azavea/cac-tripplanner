@@ -38,6 +38,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     var isochroneLayer = null;
     var tabControl = null;
 
+    // itinerary edit mode state
+    var editingItinerary = null;
+    var drawControl = null;
+    var editLayer = null;
+
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
@@ -129,6 +134,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
     MapControl.prototype.editItinerary = editItinerary;
+    MapControl.prototype.cleanUpItineraryEditEnd = cleanUpItineraryEditEnd;
 
     return MapControl;
 
@@ -439,20 +445,21 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      * Make itinerary editable in Leaflet Draw.
      */
     function editItinerary(itinerary) {
+        editingItinerary = itinerary;
 
         // edit a simplified shape that just has the turn points
         map.removeLayer(itinerary.geojson);
-        var turnPointLayer = cartodb.L.geoJson({
+        editLayer = cartodb.L.geoJson({
             type: 'LineString',
             coordinates: itinerary.getTurnPoints()
         });
 
-        turnPointLayer.setStyle(itinerary.getStyle(true, true));
-        map.addLayer(turnPointLayer);
+        editLayer.setStyle(itinerary.getStyle(true, true));
+        map.addLayer(editLayer);
 
-        var drawControl = new L.Control.Draw({
+        drawControl = new L.Control.Draw({
             edit: {
-                featureGroup: turnPointLayer,
+                featureGroup: editLayer,
                 remove: false
             },
             draw: {
@@ -470,24 +477,18 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // listen for when user clicks to 'save' or 'cancel' leaflet draw changes
         map.on('draw:editstop', function() {
-            map.removeControl(drawControl);
-            // stop listening, to avoid error on subsequent element removals
-            map.off('draw:editstop');
-
             // get the points from the edited linestring
-            var modified = turnPointLayer.toGeoJSON().features[0].geometry.coordinates;
-
-            map.removeLayer(turnPointLayer);
-            map.addLayer(itinerary.geojson);
-
+            var modified = editLayer.toGeoJSON().features[0].geometry.coordinates;
+            cleanUpItineraryEditEnd();
             endItineraryEdit(itinerary.getTurnPoints(), modified);
         });
     }
 
     /**
      * Requery for trip plans when the user finishes editing the line string.
+     * Takes two arrays of points to compare for changes.
      */
-     function endItineraryEdit(turnPoints, modified) {
+    function endItineraryEdit(turnPoints, modified) {
         // Get the points that changed. If user hit 'cancel' or made no changes,
         // this will be an empty array.
         var changed = _.differenceWith(modified, turnPoints, function(first, second) {
@@ -496,7 +497,22 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // TODO: requery with the changed points as waypoints
         console.log(changed);
-     }
+    }
+
+    /**
+     * Reset state and destroy editing-related objects.
+     * Also exposes a way to programatically cancel out of route edit mode.
+     */
+    function cleanUpItineraryEditEnd() {
+        // stop listening, to avoid error on subsequent element removals
+        map.off('draw:editstop');
+        map.removeControl(drawControl);
+        drawControl = null;
+        map.removeLayer(editLayer);
+        editLayer = null;
+        map.addLayer(editingItinerary.geojson);
+        editingItinerary = null;
+    }
 
     function setGeocodeMarker(latLng) {
         // helper for when marker dragged to new place

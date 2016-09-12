@@ -261,6 +261,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
+        mapControl.cleanUpItineraryEditEnd();
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();
