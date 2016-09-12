@@ -415,6 +415,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
 
     function clearItineraries() {
+        cleanUpItineraryEditEnd(true);
         _.forIn(itineraries, function (itinerary) {
             map.removeLayer(itinerary.geojson);
         });
