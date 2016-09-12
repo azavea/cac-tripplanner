@@ -479,7 +479,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         map.on('draw:editstop', function() {
             // get the points from the edited linestring
             var modified = editLayer.toGeoJSON().features[0].geometry.coordinates;
-            cleanUpItineraryEditEnd();
+            cleanUpItineraryEditEnd(false);
             endItineraryEdit(itinerary.getTurnPoints(), modified);
         });
     }
@@ -502,21 +502,29 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     /**
      * Reset state and destroy editing-related objects.
      * Also exposes a way to programatically cancel out of route edit mode.
+     *
+     * If `hide` parameter is `true`, do not add back the itinerary linestring
+     * (to avoid flashing on marker drag).
      */
-    function cleanUpItineraryEditEnd() {
-        // stop listening, to avoid error on subsequent element removals
-        map.off('draw:editstop');
-        map.removeControl(drawControl);
-        drawControl = null;
-        map.removeLayer(editLayer);
-        editLayer = null;
-        map.addLayer(editingItinerary.geojson);
-        editingItinerary = null;
+    function cleanUpItineraryEditEnd(hide) {
+        if (drawControl) {
+            // stop listening, to avoid error on subsequent element removals
+            map.off('draw:editstop');
+            map.removeControl(drawControl);
+            drawControl = null;
+            map.removeLayer(editLayer);
+            editLayer = null;
+            if (!hide) {
+                map.addLayer(editingItinerary.geojson);
+            }
+            editingItinerary = null;
+        }
     }
 
     function setGeocodeMarker(latLng) {
         // helper for when marker dragged to new place
         function markerDrag(event) {
+            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
@@ -560,6 +568,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
+            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
