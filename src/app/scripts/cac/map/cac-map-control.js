@@ -458,6 +458,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         editLayer.setStyle(itinerary.getStyle(true, true));
         map.addLayer(editLayer);
 
+        // define missing function as workaround for:
+        // https://github.com/Leaflet/Leaflet.draw/issues/555
+        L.EditToolbar.Edit.prototype._editStyle = function() {};
+
         drawControl = new L.Control.Draw({
             edit: {
                 featureGroup: editLayer,
