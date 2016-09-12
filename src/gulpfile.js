@@ -89,7 +89,12 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js', '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'], [])
+    return copyBowerFiles(['**/*.js',
+                          // Exclude minified vendor scripts that also have a non-minified version.
+                          // We run our own minifier, and want to include each script only once.
+                          '!**/leaflet.draw.js', '!**/lodash.min.js', '!**/bootstrap-datetimepicker.min.js',
+                          // exclude leaflet and jquery (loaded over CDN)
+                          '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'], [])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -143,7 +148,9 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js', '!**/leaflet.js', '!**/leaflet-src.js'], [])
+    return copyBowerFiles(['**/*.js',
+                          // exclude leaflet
+                          '!**/leaflet.js', '!**/leaflet-src.js'], [])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 

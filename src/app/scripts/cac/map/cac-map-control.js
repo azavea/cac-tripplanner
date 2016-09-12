@@ -38,6 +38,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     var isochroneLayer = null;
     var tabControl = null;
 
+    // itinerary edit mode state
+    var editingItinerary = null;
+    var drawControl = null;
+    var editLayer = null;
+
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
@@ -128,6 +133,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.editItinerary = editItinerary;
+    MapControl.prototype.cleanUpItineraryEditEnd = cleanUpItineraryEditEnd;
 
     return MapControl;
 
@@ -235,8 +242,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
                 }
             });
         } catch (err) {
-            console.log('isochrone layer failed to load from GeoJSON');
-            console.log(err);
+            console.error('isochrone layer failed to load from GeoJSON');
+            console.error(err);
             isochroneLayer = null;
         }
 
@@ -408,6 +415,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
 
     function clearItineraries() {
+        cleanUpItineraryEditEnd(true);
         _.forIn(itineraries, function (itinerary) {
             map.removeLayer(itinerary.geojson);
         });
@@ -434,9 +442,94 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         }
     }
 
+    /**
+     * Make itinerary editable in Leaflet Draw.
+     */
+    function editItinerary(itinerary) {
+        editingItinerary = itinerary;
+
+        // edit a simplified shape that just has the turn points
+        map.removeLayer(itinerary.geojson);
+        editLayer = cartodb.L.geoJson({
+            type: 'LineString',
+            coordinates: itinerary.getTurnPoints()
+        });
+
+        editLayer.setStyle(itinerary.getStyle(true, true));
+        map.addLayer(editLayer);
+
+        // define missing function as workaround for:
+        // https://github.com/Leaflet/Leaflet.draw/issues/555
+        L.EditToolbar.Edit.prototype._editStyle = function() {};
+
+        drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: editLayer,
+                remove: false
+            },
+            draw: {
+                polyline: false,
+                polygon: false,
+                rectangle: false,
+                circle: false,
+                marker: false
+            }
+        });
+        map.addControl(drawControl);
+
+        // immediately enter edit mode in the Leaflet Draw control
+        drawControl._toolbars.edit._modes.edit.handler.enable();
+
+        // listen for when user clicks to 'save' or 'cancel' leaflet draw changes
+        map.on('draw:editstop', function() {
+            // get the points from the edited linestring
+            var modified = editLayer.toGeoJSON().features[0].geometry.coordinates;
+            cleanUpItineraryEditEnd(false);
+            endItineraryEdit(itinerary.getTurnPoints(), modified);
+        });
+    }
+
+    /**
+     * Requery for trip plans when the user finishes editing the line string.
+     * Takes two arrays of points to compare for changes.
+     */
+    function endItineraryEdit(turnPoints, modified) {
+        // Get the points that changed. If user hit 'cancel' or made no changes,
+        // this will be an empty array.
+        var changed = _.differenceWith(modified, turnPoints, function(first, second) {
+            return first[0] === second[0] && first[1] === second[1];
+        });
+
+        // TODO: requery with the changed points as waypoints
+        console.log(changed);
+    }
+
+    /**
+     * Reset state and destroy editing-related objects.
+     * Also exposes a way to programatically cancel out of route edit mode.
+     *
+     * If `hide` parameter is `true`, do not add back the itinerary linestring
+     * (to avoid flashing on marker drag).
+     */
+    function cleanUpItineraryEditEnd(hide) {
+        if (drawControl) {
+            // stop listening, to avoid error on subsequent element removals
+            map.off('draw:editstop');
+            map.removeControl(drawControl);
+            drawControl = null;
+            map.removeLayer(editLayer);
+            editLayer = null;
+            if (!hide) {
+                map.addLayer(editingItinerary.geojson);
+            }
+            editingItinerary = null;
+        }
+    }
+
     function setGeocodeMarker(latLng) {
         // helper for when marker dragged to new place
         function markerDrag(event) {
+            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
@@ -480,6 +573,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
+            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);

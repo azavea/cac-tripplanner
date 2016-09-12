@@ -122,6 +122,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
                 sidebarDirectionsControl.setFromUserPreferences();
             }
         } else {
+            mapControl.cleanUpItineraryEditEnd(true);
             UserPreferences.setPreference('method', 'explore');
             sidebarDirectionsControl.clearDirections();
             sidebarExploreControl.setFromUserPreferences();
