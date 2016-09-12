@@ -69,6 +69,12 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
                 return [step.lon, step.lat];
             }).value();
         }
+
+        // append end point
+        if (this.to) {
+            this._turnPoints.push([this.to.lon, this.to.lat]);
+        }
+
         return this._turnPoints;
     }
 

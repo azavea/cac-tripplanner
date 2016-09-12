@@ -488,7 +488,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
      * Requery for trip plans when the user finishes editing the line string.
      */
      function endItineraryEdit(turnPoints, modified) {
-        // get the points that changed
+        // Get the points that changed. If user hit 'cancel' or made no changes,
+        // this will be an empty array.
         var changed = _.differenceWith(modified, turnPoints, function(first, second) {
             return first[0] === second[0] && first[1] === second[1];
         });
