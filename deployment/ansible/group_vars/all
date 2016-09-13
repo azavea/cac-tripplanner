@@ -3,6 +3,10 @@ app_username: "vagrant"
 
 packer_version: "0.7.5"
 
+otp_version: "1.0.0"
+otp_jar_sha1: "aeed6df0e72b331fd2ea18ea03651384fa83e534"
+otp_router: "default"
+
 # used by nginx and gunicorn to set timeouts; OTP defaults to 30s
 otp_session_timeout_s: 30
 
