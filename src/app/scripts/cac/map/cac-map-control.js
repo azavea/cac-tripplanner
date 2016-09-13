@@ -463,6 +463,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         // https://github.com/Leaflet/Leaflet.draw/issues/555
         L.EditToolbar.Edit.prototype._editStyle = function() {};
 
+        // customize text
+        L.drawLocal.edit.handlers.edit.tooltip = {
+            text: 'Click cancel to undo',
+            subtext: 'Drag a box to add a waypoint' // this is actually the header
+        };
+
         drawControl = new L.Control.Draw({
             edit: {
                 featureGroup: editLayer,
