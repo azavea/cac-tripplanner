@@ -22,8 +22,6 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
         var deferred = $.Deferred();
         var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
 
-        console.log(urlParams);
-
         $.ajax({
             url: Settings.routingUrl,
             type: 'GET',

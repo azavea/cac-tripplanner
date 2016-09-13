@@ -186,13 +186,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 return $.param({intermediatePlaces: waypoint.reverse().join(',')});
             }).join('&');
 
-            console.log('encode already:');
-            console.log(otpOptions.intermediatePlaces);
-            ////////////////////////////////////////
-
             waypoints = null; // discard waypoints once built into a single query
-        } else {
-            console.log('no waypoints here');
         }
 
         if (mode.indexOf('BICYCLE') > -1) {

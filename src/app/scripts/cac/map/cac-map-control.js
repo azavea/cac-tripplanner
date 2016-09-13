@@ -501,11 +501,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             return first[0] === second[0] && first[1] === second[1];
         });
 
-        // TODO: requery with the changed points as waypoints
-        console.log(changed);
-
+        // requery with the changed points as waypoints, if any changes made
         if (changed.length) {
-            // TODO: trigger waypoint set event with waypoints
             events.trigger(eventNames.waypointsSet, {waypoints: changed});
         }
     }
