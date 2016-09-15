@@ -1,0 +1,129 @@
+.directions-form {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-bottom: $home-section-margin;
+    padding: 0 20px;
+    background-color: $gophillygo-blue;
+    box-shadow: $place-card-drop-shadow;
+
+    @include respond-to('xs') {
+        margin-bottom: 10px;
+        padding: 0 10px;
+    }
+
+    .mode-picker {
+        display: flex;
+        flex: 0 0 60px;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        color: $mode-picker-text-color;
+        font-size: 1.4rem;
+        font-weight: $font-weight-medium;
+        line-height: 3rem;
+        text-transform: uppercase;
+
+        @include respond-to('xxs') {
+            justify-content: flex-end;
+            margin-right: 10px;
+        }
+
+        i {
+            font-size: 2.2rem;
+
+            &::before {
+                margin-left: 0;
+                margin-right: .3em;
+                line-height: 3rem;
+            }
+
+            &.icon-walk::before {
+                margin-right: .2em;
+            }
+
+            &.icon-bike::before {
+                vertical-align: middle;
+            }
+
+            &.icon-transit::before {
+                vertical-align: middle;
+            }
+        }
+    }
+
+    .mode-toggle {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-right: 80px;
+
+        @include respond-to('xs') {
+            margin-right: 60px;
+        }
+
+        .walk {
+            margin-right: 30px;
+        }
+
+        .bike {
+        }
+    }
+
+    .mode-option {
+        border-top: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+
+        &.selected {
+            border-bottom-color: $mode-picker-text-color;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    .transit {
+    }
+
+    .directions-text-input {
+        display: flex;
+        position: relative;
+        flex: 0 0 40px;
+        flex-flow: row nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        margin-bottom: 15px;
+        background-color: $directions-form-text-input-background-color;
+
+        label {
+            flex: 0 0 4em;
+            padding-right: 1em;
+            font-size: 1.4rem;
+            font-weight: $font-weight-bold;
+            line-height: 40px;
+            text-align: right;
+            cursor: text;
+        }
+
+        input {
+            flex: 1;
+            border: 0;
+            font-size: 1.4rem;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .btn-geolocate {
+            padding: 0 .3em;
+            border: 0;
+            background-color: inherit;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+    }
+}

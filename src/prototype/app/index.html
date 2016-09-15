@@ -4,11 +4,153 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title>Go Philly Go | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council</title>
+    <title>GoPhillyGo | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
-    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./css/main.css">
 </head>
-<body>
+<body class="body-home">
+    <div class="the-map" id="map">
+
+    </div>
+    <header class="app-header">
+        <div class="brand">
+            <div class="slogan-start">
+                Walk. Ride. Pedal. Discover.
+            </div>
+            <div class="logo"></div>
+            <div class="slogan-end">
+                Next time bring your bike onboard.
+            </div>
+        </div>
+        <nav class="primary-nav">
+            <a class="nav-item selected" href="#">Directions</a>
+            <a class="nav-item" href="#">Explore</a>
+            <a class="nav-item" href="#">Learn</a>
+        </nav>
+    </header>
+    <div class="main">
+        <form class="" action="" method="post">
+            <div class="directions-form">
+                    <div class="mode-picker">
+                        <div class="mode-toggle">
+                            <div class="walk mode-option selected">
+                                <i class="icon-walk"></i> <span class="mode-label">Walk</span>
+                            </div>
+                            <div class="bike mode-option">
+                                <i class="icon-bike"></i> <span class="mode-label">Bike</span>
+                            </div>
+                            <input type="hidden" name="mode" value="walk">
+                        </div>
+                        <div class="transit mode-option">
+                            <i class="icon-transit"></i> <span class="mode-label">Transit</span>
+                            <input type="hidden" name="transit" value="on">
+                        </div>
+                    </div>
+                    <div class="directions-from directions-text-input">
+                        <label for="input-directions-from">from</label>
+                        <input type="text" id="input-directions-from" name="input-directions-from" value="" placeholder="Enter a starting point">
+                        <button class="btn-geolocate" title="Detect current location" type="button" name="geolocate"><i class="icon-geolocate"></i></button>
+                    </div>
+                    <div class="directions-to directions-text-input">
+                        <label for="input-directions-to">to</label>
+                        <input type="text" id="input-directions-to" name="input-directions-to" value="" placeholder="Enter a destination — or choose one below">
+                    </div>
+            </div>
+        </form>
+        <div class="places">
+            <h1>Places we love</h1>
+            <ul class="place-list">
+                <li class="place-card no-origin">
+                    <img class="place-card-photo" src="images/places/john-heinz.png" width="308" height="154" alt="John Heinz National Wildlife Refuge" />
+                    <h2>John Heinz National Wildlife Refuge</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                    </div>
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go" href="#">Go here</a>
+                        <a class="place-card-action place-action-details" href="#">More info</a>
+                    </div>
+                </li>
+                <li class="place-card no-origin">
+                    <img class="place-card-photo" src="images/places/schuylkill-center.png" width="308" height="154" alt="Schuylkill Center for Environmental Education" />
+                    <h2>Schuylkill Center for Environmental Education</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                    </div>
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go" href="#">Go here</a>
+                        <a class="place-card-action place-action-details" href="#">More info</a>
+                    </div>
+                </li>
+                <li class="place-card no-origin">
+                    <img class="place-card-photo" src="images/places/bristol-marsh.png" width="308" height="154" alt="Bristol Marsh Nature Preserve" />
+                    <h2>Bristol Marsh Nature Preserve</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                    </div>
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go" href="#">Go here</a>
+                        <a class="place-card-action place-action-details" href="#">More info</a>
+                    </div>
+                </li>
+                <li class="place-card no-origin">
+                    <img class="place-card-photo" src="images/places/bartrams-garden.png" width="308" height="154" alt="Bartram's Garden" />
+                    <h2>Bartram's Garden</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                    </div>
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go" href="#">Go here</a>
+                        <a class="place-card-action place-action-details" href="#">More info</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="post-card">
+            <a class="goto-post" href="#">
+                <img class="post-photo" src="images/posts/palmyra-cove-summary.png" width="308" height="204" alt="Video trip to Palmyra Cove" />
+                <div class="post-details">
+                    <div class="category-heading">
+                        Community Profile
+                    </div>
+                    <h2>Video trip to Palmyra Cove</h2>
+                    <p class="lede">
+                        GoPhillyGo student ambassadors, Tykee James and Stephanie Mason, used GoPhillyGo.org to plan a trip to one of our featured destinations, Palmyra Cove Nature Park. Tykee and Stephanie began their journey on bike
+                    </p>
+                    <a class="goto-more-posts" href="#">More tips, posts, and announcements</a>
+                </div>
+            </a>
+        </div>
+    </div>
+    <footer class="app-footer">
+        <div class="footer-subscribe">
+            <h2>Stay up to date</h2>
+            <p>
+                Stay up to date on all things GoPhillyGo — events, updates, featured content.
+            </p>
+            <form class="subscribe-form" action="" method="post">
+                <input class="subscribe-input" type="text" name="email" value="" placeholder="Your email address">
+                <button class="subscribe-btn" type="submit" name="subscribe-submit">Subscribe</button>
+            </form>
+        </div>
+        <div class="footer-follow">
+            <h2>Follow us</h2>
+            <ul class="social-sites">
+                <li><a class="social-twitter" target="_blank" title="Follow us on Twitter" href="https://twitter.com/go_philly_go"><i class="icon-twitter"></i></a></li>
+                <li><a class="social-facebook" target="_blank" title="Like us on Facebook" href="https://www.facebook.com/gophillygo"><i class="icon-facebook"></i></a></li>
+                <li><a class="social-instagram" target="_blank" title="Follow us on Instagram" href="https://www.instagram.com/go_philly_go/"><i class="icon-instagram"></i></a></li>
+                <li><a class="social-youtube" target="_blank" title="Watch us on YouTube" href="https://www.youtube.com/channel/UCJSbm760xytSCZdJ16kS1Cg"><i class="icon-youtube"></i></a></li>
+            </ul>
+        </div>
+        <div class="footer-about">
+            <a class="goto-about" title="Learn more about GoPhillyGo" href="#">
+                <h2>About</h2>
+                <p>
+                    GoPhillyGo is a project of the Clean Air Council, Azavea, and Warkulwiz Design Associates. The project is funded by the William Penn Foundation.
+                </p>
+            </a>
+        </div>
+    </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
     <script src="/assets/js/main.js"></script></body>

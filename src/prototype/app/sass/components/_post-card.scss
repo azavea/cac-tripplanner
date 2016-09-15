@@ -1,0 +1,76 @@
+.post-card {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: $home-section-padding $home-section-padding ($home-section-padding * 1.5);
+    background-color: $white;
+    box-shadow: $place-card-drop-shadow;
+
+    @include respond-to('xs') {
+        flex-flow: column nowrap;
+        align-items: stretch;
+        width: $place-card-width;
+        margin: 0 auto;
+    }
+
+    .goto-post {
+        @include delinkify;
+    }
+
+    .post-photo {
+        width: $place-card-width;
+        height: auto;
+        margin-right: $home-section-padding;
+
+        @include respond-to('xs') {
+            width: $place-card-width - ($home-section-padding * 2);
+            margin-bottom: 4px;
+        }
+    }
+
+    .post-details {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        justify-content: space-between;
+    }
+
+    .category-heading {
+        color: $gophillygo-red;
+        font-size: 1.4rem;
+        font-weight: $font-weight-bold;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        margin: 8px 0;
+        font-size: 2.1rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            font-size: 1.8rem;
+            line-height: 1.5;
+        }
+    }
+
+    .lede {
+        flex: 1;
+        margin-top: 0;
+        font-size: 1.3rem;
+        font-weight: $font-weight-medium;
+        line-height: 1.8;
+    }
+
+    .goto-more-posts {
+        @include delinkify;
+        display: block;
+        background-color: $gophillygo-orange;
+        font-size: 1.4rem;
+        font-weight: $font-weight-bold;
+        line-height: 2.75;
+        text-align: center;
+    }
+}

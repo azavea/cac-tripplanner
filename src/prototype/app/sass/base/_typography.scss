@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css?family=Cabin:500,600,700,700i");
+@import url("../font/fontello/css/gpg.css");
+
+$font-size-base: 1.5rem;
+
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+body {
+    color: $font-color;
+    font-family: 'Cabin', sans-serif;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    line-height: 1.5;
+}
