@@ -27,7 +27,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
         destinationMoved: 'cac:map:control:destinationmoved',
-        geocodeMarkerMoved: 'cac:map:control:geocodemoved'
+        geocodeMarkerMoved: 'cac:map:control:geocodemoved',
+        waypointsSet: 'cac:map:control:waypointsset'
     };
     var basemaps = {};
     var overlays = {};
@@ -462,6 +463,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         // https://github.com/Leaflet/Leaflet.draw/issues/555
         L.EditToolbar.Edit.prototype._editStyle = function() {};
 
+        // customize text
+        L.drawLocal.edit.handlers.edit.tooltip = {
+            text: 'Click cancel to undo',
+            subtext: 'Drag a box to add a waypoint' // this is actually the header
+        };
+
         drawControl = new L.Control.Draw({
             edit: {
                 featureGroup: editLayer,
@@ -500,8 +507,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             return first[0] === second[0] && first[1] === second[1];
         });
 
-        // TODO: requery with the changed points as waypoints
-        console.log(changed);
+        // requery with the changed points as waypoints, if any changes made
+        if (changed.length) {
+            events.trigger(eventNames.waypointsSet, {waypoints: changed});
+        }
     }
 
     /**

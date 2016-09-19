@@ -21,11 +21,13 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     function planTrip(coordsFrom, coordsTo, when, extraOptions) {
         var deferred = $.Deferred();
         var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
+
         $.ajax({
             url: Settings.routingUrl,
             type: 'GET',
             crossDomain: true,
-            data: urlParams
+            data: urlParams,
+            processData: false
         }).then(function(data) {
             if (data.plan) {
                 // Ensure unique itineraries.
@@ -60,16 +62,24 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     }
 
     /**
-     * Helper function to prepare the parameter string for consumption by the OTP api
+     * Helper function to prepare the parameter string for consumption by the OTP API
      *
      * @param {Array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {Array} coordsTo The coords in lat-lng which we would like to travel to
      * @param {Object} when Moment.js object for date/time of travel
      * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner as-is
      *
-     * @return {Object} Get parameters, ready for consumption
+     * @return {string} URL-encoded GET parameters
      */
     function prepareParams(coordsFrom, coordsTo, when, extraOptions) {
+
+        // exclude pre-formatted intermediatePlaces
+        var intermediatePlaces = '';
+        if (extraOptions.hasOwnProperty('intermediatePlaces')) {
+            intermediatePlaces = extraOptions.intermediatePlaces;
+            delete extraOptions.intermediatePlaces;
+        }
+
         var formattedOpts = {
             fromPlace: coordsFrom.join(','),
             fromText: extraOptions.fromText,
@@ -79,7 +89,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             date: when.format('MM-DD-YYYY'),
         };
 
-        return $.extend(formattedOpts, extraOptions);
+        return $.param($.extend(formattedOpts, extraOptions)) + '&' + intermediatePlaces;
     }
 
 })(jQuery, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);
