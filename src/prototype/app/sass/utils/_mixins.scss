@@ -14,3 +14,12 @@
         @content;
     }
 }
+
+@mixin sidebar-main {
+    width: $sidebar-width;
+    height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height});
+    margin: 0;
+    background-color: $body-color;
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+}

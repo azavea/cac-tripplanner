@@ -1,16 +1,56 @@
+.directions-form-element {
+    width: 100%;
+    max-width: $home-main-max-width;
+    margin: $home-section-margin auto;
+
+    @include respond-to('xs') {
+        margin-bottom: ($home-section-margin - 10px);
+    }
+
+    @include respond-to('xxs') {
+        margin: ($home-section-margin - 10px) auto;
+    }
+
+    .body-map & {
+        max-width: $sidebar-width;
+        margin: 0;
+
+        @include respond-to('xxs') {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}
+
 .directions-form {
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
-    justify-content: space-between;
-    margin-bottom: $home-section-margin;
-    padding: 0 20px;
+    justify-content: flex-start;
+    max-width: $home-main-max-width;
+    padding: 0 20px 10px;
     background-color: $gophillygo-blue;
     box-shadow: $place-card-drop-shadow;
 
     @include respond-to('xs') {
-        margin-bottom: 10px;
         padding: 0 10px;
+    }
+
+    @include respond-to('xxs') {
+        padding: 0 10px;
+    }
+
+    .body-map & {
+        width: $sidebar-width;
+        max-width: $sidebar-width;
+        height: $directions-form-sidebar-height;
+        margin: 0;
+        padding: 0 10px 10px;
+
+        @include respond-to('xxs') {
+            width: 100%;
+            max-width: 100%;
+        }
     }
 
     .mode-picker {
@@ -31,25 +71,53 @@
             margin-right: 10px;
         }
 
+        .body-map & {
+            flex-basis: 55px;
+            justify-content: flex-end;
+            margin-right: -10px;
+            padding-top: 3px;
+
+            .mode-label {
+                display: none;
+            }
+        }
+
         i {
             font-size: 2.2rem;
 
+            .body-map & {
+                font-size: 2.5rem;
+            }
+
             &::before {
-                margin-left: 0;
                 margin-right: .3em;
+                margin-left: 0;
                 line-height: 3rem;
             }
 
             &.icon-walk::before {
                 margin-right: .2em;
+
+                .body-map & {
+                    margin-right: 0;
+                }
             }
 
             &.icon-bike::before {
                 vertical-align: middle;
+
+                .body-map & {
+                    margin-right: 0;
+                }
             }
 
-            &.icon-transit::before {
-                vertical-align: middle;
+            &.icon-transit-on,
+            &.icon-transit-off {
+
+                &::before {
+                    width: 1.5em;
+                    vertical-align: middle;
+                }
             }
         }
     }
@@ -65,6 +133,18 @@
             margin-right: 60px;
         }
 
+        .body-map & {
+            margin-right: 50px;
+
+            @include respond-to('xxs') {
+                margin-right: 70px;
+            }
+        }
+
+        .mode-option.on {
+            border-bottom-color: $mode-picker-text-color;
+        }
+
         .walk {
             margin-right: 30px;
         }
@@ -74,17 +154,43 @@
     }
 
     .mode-option {
+        padding-right: .25em;
         border-top: 2px solid transparent;
         border-bottom: 2px solid transparent;
         cursor: pointer;
 
-        &.selected {
-            border-bottom-color: $mode-picker-text-color;
-            font-weight: $font-weight-bold;
+        .body-map & {
+            padding-right: 0;
+        }
+
+        &.transit.off {
+            opacity: .5;
         }
     }
 
-    .transit {
+    .btn-options {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 100%;
+        margin-top: -5px;
+        margin-left: 30px;
+        padding-top: 3px;
+        background-color: $gophillygo-blue-dark;
+        cursor: pointer;
+
+        @include respond-to('xxs') {
+            margin-left: 40px;
+        }
+
+        i::before {
+            margin-right: 0;
+        }
+
+        .body-home & {
+            display: none;
+        }
     }
 
     .directions-text-input {
@@ -97,6 +203,17 @@
         margin-bottom: 15px;
         background-color: $directions-form-text-input-background-color;
 
+        .body-map & {
+            flex: 0 0 30px;
+            margin-bottom: 0;
+            border: 1px solid $white;
+            background-color: $gophillygo-blue;
+
+            &.directions-from {
+                border-bottom-width: 0;
+            }
+        }
+
         label {
             flex: 0 0 4em;
             padding-right: 1em;
@@ -105,12 +222,31 @@
             line-height: 40px;
             text-align: right;
             cursor: text;
+
+            .body-map & {
+                font-size: 1.2rem;
+                font-weight: $font-weight-medium;
+                line-height: 30px;
+                color: rgba(255, 255, 255, .9);
+            }
         }
 
         input {
             flex: 1;
             border: 0;
             font-size: 1.4rem;
+
+            .body-map & {
+                background-color: $gophillygo-blue;
+                color: $white;
+                font-size: 1.2rem;
+                font-weight: $font-weight-medium;
+                line-height: 30px;
+
+                &::placeholder {
+                    color: $white;
+                }
+            }
 
             &:focus {
                 outline: none;
@@ -122,7 +258,33 @@
             border: 0;
             background-color: inherit;
             font-size: 1.8rem;
+            color: $lt-gray;
             cursor: pointer;
+
+            .body-map & {
+                display: none;
+            }
+        }
+
+        .btn-reverse {
+            display: none;
+            position: absolute;
+            top: -16px;
+            right: -5px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid $white;
+            border-radius: 100%;
+            background-color: $gophillygo-blue;
+            color: $white;
+            font-size: 2rem;
+            line-height: 20px;
+            cursor: pointer;
+
+            .body-map & {
+                display: block;
+            }
         }
 
     }

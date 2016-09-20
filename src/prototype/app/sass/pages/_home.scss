@@ -11,32 +11,4 @@
     width: 100%;
     height: 100%;
     overflow: scroll;
-
-    @include respond-to('xxs') {
-        .the-map {
-            display: none;
-        }
-    }
-}
-
-.main {
-    display: flex;
-    position: relative;
-    flex: 1 0 auto;
-    flex-flow: column nowrap;
-    align-items: stretch;
-    justify-content: space-around;
-    max-width: $home-main-max-width;
-    margin-right: auto;
-    margin-left: auto;
-    padding: $home-section-margin 0;
-
-    @include respond-to('xs') {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    @include respond-to('xxs') {
-        padding: ($home-section-margin - 10px) 0;
-    }
 }

@@ -8,7 +8,12 @@
     background-color: $place-card-bg-color;
     box-shadow: $place-card-drop-shadow;
 
+    .body-map & {
+        width: 100%;
+    }
+
     h2 {
+        width: 100%;
         margin: 0;
         padding: 0 1em;
         font-size: 1.5rem;

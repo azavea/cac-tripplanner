@@ -1,6 +1,3 @@
-// Icon fonts
-@import url('../fonts/fontello/css/gophillygo.css');
-
 // Utils
 @import
 'utils/variables',
@@ -30,9 +27,11 @@
 'components/directions-form',
 'components/place-card',
 'components/place-list',
-'components/post-card';
+'components/post-card',
+'components/directions-results';
 
 
 // Pages
 @import
-'pages/home';
+'pages/home',
+'pages/map';

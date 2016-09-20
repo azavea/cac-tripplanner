@@ -19,11 +19,21 @@
     }
 
     @include respond-to('xxs') {
-        margin-top: 40px;
         padding-right: calc((100vw - #{$place-card-width}) / 2);
         padding-left: calc((100vw - #{$place-card-width}) / 2);
         background-color: $gophillygo-blue;
         color: rgba(255, 255, 255, .9);
+    }
+
+    .body-map & {
+        width: $sidebar-width;
+        max-width: $sidebar-width;
+        margin: 0;
+        padding: 0;
+
+        @include respond-to('xxs') {
+            display: none;
+        }
     }
 
     h2 {
@@ -83,6 +93,10 @@
         text-align: center;
         text-transform: uppercase;
     }
+
+    .body-map & {
+        display: none;
+    }
 }
 
 .footer-follow {
@@ -109,8 +123,10 @@
         @include delinkify;
     }
 
+    .body-map & {
+        display: none;
+    }
 }
-
 
 .footer-about {
     width: 100%;
@@ -123,4 +139,27 @@
         @include delinkify;
     }
 
+    .body-map & {
+        display: none;
+    }
+}
+
+.footer-compact {
+    display: none;
+    background-color: $gophillygo-blue;
+    color: $white;
+
+    .body-map & {
+        display: flex;
+        flex: 0 0 $footer-sidebar-height;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+    }
+
+    a {
+        @include delinkify;
+        padding: 0 2em;
+        text-transform: uppercase;
+    }
 }

@@ -1,0 +1,93 @@
+.directions-results {
+    @include sidebar-main;
+
+    .body-home & {
+        display: none;
+    }
+
+    @include respond-to('xxs') {
+        flex: 0 0 $route-summary-height;
+        order: 10;
+        width: 100%;
+        height: $route-summary-height;
+        overflow: hidden;
+        z-index: 100;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: $font-weight-bold;
+        line-height: 4;
+        text-align: center;
+
+        @include respond-to('xs') {
+            font-size: 2rem;
+            line-height: 3;
+        }
+
+        @include respond-to('xxs') {
+            display: none;
+        }
+    }
+
+    .route-summary {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        height: $route-summary-height;
+        margin-bottom: 20px;
+        padding: 6px 10px 4px 22px;
+        background-color: $white;
+        box-shadow: $place-card-drop-shadow;
+        cursor: pointer;
+
+        @include respond-to('xxs') {
+            margin: 0;
+        }
+
+        .route-summary-primary-details {
+            display: flex;
+            flex: 1 0 auto;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 1.8rem;
+        }
+
+        .route-summary-secondary-details {
+            display: flex;
+            flex: 1 0 auto;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            color: $lt-gray;
+            font-weight: $font-weight-medium;
+        }
+
+        .route-duration {
+            margin-right: 1em;
+            color: $gophillygo-blue;
+            font-weight: $font-weight-bold;
+        }
+
+        .route-distance {
+            margin-right: 1em;
+            color: $lt-gray;
+            font-weight: $font-weight-semibold;
+        }
+
+        .route-name {
+            font-weight: $font-weight-semibold;
+        }
+
+        .route-start-stop {
+            font-size: 1.4rem;
+        }
+
+        .route-modes {
+            font-size: 1.6rem;
+        }
+    }
+}

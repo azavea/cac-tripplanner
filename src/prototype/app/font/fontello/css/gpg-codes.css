@@ -3,9 +3,13 @@
 .icon-bike:before { content: '\e801'; } /* '' */
 .icon-transit:before { content: '\e802'; } /* '' */
 .icon-walk:before { content: '\e803'; } /* '' */
+.icon-reverse:before { content: '\e804'; } /* '' */
+.icon-transit-off:before { content: '\e805'; } /* '' */
+.icon-transit-on:before { content: '\e806'; } /* '' */
 .icon-twitter:before { content: '\f099'; } /* '' */
 .icon-email:before { content: '\f0e0'; } /* '' */
 .icon-geolocate:before { content: '\f124'; } /* '' */
 .icon-youtube:before { content: '\f16a'; } /* '' */
 .icon-instagram:before { content: '\f16d'; } /* '' */
+.icon-sliders:before { content: '\f1de'; } /* '' */
 .icon-facebook:before { content: '\f230'; } /* '' */

@@ -1,5 +1,8 @@
 html {
+    width: 100%;
+    height: 100%;
     font-size: 62.5%;
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -12,4 +15,5 @@ html {
 body {
     position: relative;
     background-color: $body-color;
+    -webkit-overflow-scrolling: touch;
 }

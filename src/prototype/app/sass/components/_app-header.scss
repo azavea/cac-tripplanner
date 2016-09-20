@@ -30,6 +30,15 @@
         background-color: inherit;
     }
 
+    .body-map & {
+        display: block;
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        background-color: inherit;
+        z-index: 10;
+    }
+
     .logo {
         display: flex;
         flex: 0 0 66px;
@@ -42,6 +51,12 @@
         background-image: url('../images/logo.png');
         background-repeat: no-repeat;
         background-size: contain;
+
+        a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
 
         @include retina {
             background-image: url('../images/logo@2x.png');
@@ -63,12 +78,28 @@
                 background-image: url('../images/logo-blue@2x.png');
             }
         }
+
+        .body-map & {
+            width: 46px;
+            max-width: 46px;
+            height: 46px;
+            margin: 0;
+            background-image: url('../images/logo.png');
+
+            @include retina {
+                background-image: url('../images/logo@2x.png');
+            }
+        }
     }
 
     .slogan-start, .slogan-end {
         min-width: 250px;
 
         @include respond-to('xxs') {
+            display: none;
+        }
+
+        .body-map & {
             display: none;
         }
     }
@@ -94,6 +125,10 @@
         background-color: inherit;
     }
 
+    .body-map & {
+        display: none;
+    }
+
     .nav-item {
         @include delinkify;
         margin-right: 25px;
@@ -115,7 +150,7 @@
             font-size: 1.4rem;
         }
 
-        &.selected {
+        &.on {
             border-bottom-color: $primary-nav-link-color;
             font-weight: $font-weight-bold;
         }

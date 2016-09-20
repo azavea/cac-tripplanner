@@ -1,8 +1,11 @@
 .post-card {
     display: flex;
+    flex: 1 0 auto;
     flex-flow: row nowrap;
     align-items: flex-start;
     justify-content: flex-start;
+    max-width: $home-main-max-width;
+    margin: 0 auto $home-section-margin;
     padding: $home-section-padding $home-section-padding ($home-section-padding * 1.5);
     background-color: $white;
     box-shadow: $place-card-drop-shadow;
@@ -11,7 +14,14 @@
         flex-flow: column nowrap;
         align-items: stretch;
         width: $place-card-width;
-        margin: 0 auto;
+    }
+
+    @include respond-to('xxs') {
+        margin-bottom: ($home-section-margin * 2)
+    }
+
+    .body-map & {
+        display: none;
     }
 
     .goto-post {
@@ -44,7 +54,7 @@
     }
 
     h2 {
-        margin: 8px 0;
+        margin: 4px 0 7px;
         font-size: 2.1rem;
         font-weight: $font-weight-bold;
         line-height: 1.5;
