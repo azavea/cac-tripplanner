@@ -173,13 +173,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
         // add intermediatePlaces if user edited route
         if (waypoints) {
-            // intermediatePlaces are ordered. see comment on `getGraphPathsConsideringIntermediates`:
-            // https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L241
-            // if `arriveBy` is `true`, places are expected to be ordered right-to-left.
-            if (arriveBy) {
-                waypoints.reverse();
-            }
-
             // intermediatePlaces parameter is to be passed multiple times for each waypoint.
             // Since we can only set the parameter key once on the object, build out the string.
             otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
