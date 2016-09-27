@@ -40,6 +40,7 @@ CAC.User.Preferences = (function($, _) {
         originText: cityHall.name,
         destination: undefined,
         destinationText: '',
+        waypoints: undefined,
         wheelchair: false
     };
 

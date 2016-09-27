@@ -14,7 +14,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
     var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
     var EXPLORE_READ = EXPLORE_ENCODE.concat(SHARED_READ);
-    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText']);
+    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText', 'waypoints']);
     var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy']);
 
     var router = null;
