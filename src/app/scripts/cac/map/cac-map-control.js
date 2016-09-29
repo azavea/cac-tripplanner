@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -449,11 +449,15 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     function editItinerary(itinerary) {
         editingItinerary = itinerary;
 
-        // edit a simplified shape that just has the turn points
+        // edit a simplified shape that just has the start, end, and any previously added waypoints
+        var waypoints = UserPreferences.getPreference('waypoints');
+        var coordinates = _.concat([[itinerary.from.lon, itinerary.from.lat]],
+                                   waypoints,
+                                   [[itinerary.to.lon, itinerary.to.lat]]);
         map.removeLayer(itinerary.geojson);
         editLayer = cartodb.L.geoJson({
             type: 'LineString',
-            coordinates: itinerary.getTurnPoints()
+            coordinates: coordinates
         });
 
         editLayer.setStyle(itinerary.getStyle(true, true));
@@ -492,28 +496,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             // get the points from the edited linestring
             var modified = editLayer.toGeoJSON().features[0].geometry.coordinates;
             cleanUpItineraryEditEnd(false);
-            endItineraryEdit(itinerary.getTurnPoints(), modified);
+            // remove start and end points
+            modified.shift();
+            modified.pop();
+            // requery with the changed points as waypoints
+            events.trigger(eventNames.waypointsSet, {waypoints: modified});
         });
-    }
-
-    /**
-     * Requery for trip plans when the user finishes editing the line string.
-     * Takes two arrays of points to compare for changes.
-     */
-    function endItineraryEdit(turnPoints, modified) {
-        // Get the points that changed. If user hit 'cancel' or made no changes,
-        // this will be an empty array.
-        var changed = _.differenceWith(modified, turnPoints, function(first, second) {
-            return first[0] === second[0] && first[1] === second[1];
-        });
-
-        // TODO: with change to additive waypoint editing, preserve unchanged,
-        // pre-existing waypoints in the set of waypoints sent in the trigger event.
-
-        // requery with the changed points as waypoints, if any changes made
-        if (changed.length) {
-            events.trigger(eventNames.waypointsSet, {waypoints: changed});
-        }
     }
 
     /**
@@ -708,4 +696,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, _);
+})(jQuery, Handlebars, cartodb, L, _, CAC.User.Preferences);
