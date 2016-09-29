@@ -58,7 +58,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     var itineraryListControl = null;
     var typeaheadDest = null;
     var typeaheadOrigin = null;
-    var waypoints = null;
 
     function SidebarDirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -172,21 +171,13 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         };
 
         // add intermediatePlaces if user edited route
-        if (waypoints) {
-            // intermediatePlaces are ordered. see comment on `getGraphPathsConsideringIntermediates`:
-            // https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L241
-            // if `arriveBy` is `true`, places are expected to be ordered right-to-left.
-            if (arriveBy) {
-                waypoints.reverse();
-            }
-
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length) {
             // intermediatePlaces parameter is to be passed multiple times for each waypoint.
             // Since we can only set the parameter key once on the object, build out the string.
             otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
                 return $.param({intermediatePlaces: waypoint.reverse().join(',')});
             }).join('&');
-
-            waypoints = null; // discard waypoints once built into a single query
         }
 
         if (mode.indexOf('BICYCLE') > -1) {
@@ -274,6 +265,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function clearItineraries() {
+        UserPreferences.setPreference('waypoints', undefined);
         mapControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
@@ -282,6 +274,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
+        UserPreferences.setPreference('waypoints', undefined);
         mapControl.cleanUpItineraryEditEnd(true);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
@@ -335,7 +328,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
      * Initiate a trip plan when user finishes editing a route.
      */
     function queryWithWaypoints(event, points) {
-        waypoints = points.waypoints;
+        UserPreferences.setPreference('waypoints', points.waypoints);
         planTrip();
     }
 

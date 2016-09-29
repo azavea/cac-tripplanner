@@ -507,6 +507,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
             return first[0] === second[0] && first[1] === second[1];
         });
 
+        // TODO: with change to additive waypoint editing, preserve unchanged,
+        // pre-existing waypoints in the set of waypoints sent in the trigger event.
+
         // requery with the changed points as waypoints, if any changes made
         if (changed.length) {
             events.trigger(eventNames.waypointsSet, {waypoints: changed});
