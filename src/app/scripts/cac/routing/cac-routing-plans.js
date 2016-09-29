@@ -89,7 +89,11 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             date: when.format('MM-DD-YYYY'),
         };
 
-        return $.param($.extend(formattedOpts, extraOptions)) + '&' + intermediatePlaces;
+        var params = $.param($.extend(formattedOpts, extraOptions));
+        if (intermediatePlaces) {
+            params += '&' + intermediatePlaces;
+        }
+        return  params;
     }
 
 })(jQuery, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);
