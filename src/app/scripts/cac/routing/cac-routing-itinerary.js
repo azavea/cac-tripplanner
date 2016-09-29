@@ -183,7 +183,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         if (!shown) {
             return {opacity: 0};
         }
-        var defaultStyle = {clickable: false,
+        var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
                             color: '#d02d2d',
                             dashArray: null,
                             lineCap: 'round',

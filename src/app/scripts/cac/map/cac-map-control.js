@@ -36,6 +36,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
     var destinationMarkers = {};
     var lastHighlightedMarker = null;
     var lastDisplayPointMarker = null;
+    var lastItineraryHoverMarker = null;
     var isochroneLayer = null;
     var tabControl = null;
 
@@ -412,6 +413,57 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
         if (makeFit) {
             map.fitBounds(layer.getBounds());
         }
+
+        layer.on('mouseover', function(e) {
+            console.log('moused over itinerary at:');
+            console.log(e.latlng);
+
+            if (lastItineraryHoverMarker) {
+                lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
+            } else {
+                var dragging = false;
+                lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
+                        draggable: true,
+                        icon: highlightIcon
+                    }).on('dragstart', function(e) {
+                        console.log('drag me!');
+                        dragging = true;
+                    }).on('dragend', function(e) {
+                        console.log('done dragging');
+                        dragging = false;
+                        var coords = e.target.getLatLng();
+                        addWaypoint(itinerary, [coords.lat, coords.lng]);
+                    }).on('mouseout', function() {
+                        console.log('awww, mouseout!');
+                        console.log(dragging);
+                        setTimeout(function() {
+                            if (lastItineraryHoverMarker && !dragging) {
+                                map.removeLayer(lastItineraryHoverMarker);
+                                lastItineraryHoverMarker = null;
+                            }
+                        }, 1000);
+                    });
+                map.addLayer(lastItineraryHoverMarker);
+            }
+        });
+    }
+
+    function addWaypoint(itinerary, point) {
+        // edit a simplified shape that just has the start, end, and any previously added waypoints
+        var waypoints = UserPreferences.getPreference('waypoints');
+
+        // TODO: use turf point-on-line to get order waypoints
+        // https://www.npmjs.com/package/turf-point-on-line
+        /////////////////
+
+        console.log(point);
+        console.log(waypoints);
+        var coordinates = _.concat([point],waypoints);
+
+        console.log(coordinates);
+
+        // requery with the changed points as waypoints
+        events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }
 
 
