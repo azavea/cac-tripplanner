@@ -2,11 +2,14 @@
 'use strict';
 
 var addsrc = require('gulp-add-src');
+var aliasify = require('aliasify');
+var browserify = require('browserify');
 var concat = require('gulp-concat');
 var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var merge = require('merge-stream');
 var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
 var karma = require('karma').server;
@@ -17,6 +20,7 @@ var run = require('gulp-run');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
+var vinylSourceStream = require('vinyl-source-stream');
 var watch = require('gulp-watch');
 var $ = require('gulp-load-plugins')();
 
@@ -64,6 +68,42 @@ var copyBowerFiles = function(filter, extraFiles) {
         .pipe(addsrc(extraFiles));
 };
 
+// turf module needs to be run through browserify to pack it with its dependencies
+
+var buildTurfHelpers = function() {
+    return browserify('./node_modules/@turf/point-on-line/node_modules/@turf/helpers', {
+            standalone: 'turf',
+            expose: ['helpers']
+        })
+        .require('./node_modules/@turf/point-on-line/node_modules/@turf/helpers',
+                 {expose: 'turf-helpers'})
+        .bundle()
+        .pipe(vinylSourceStream('turf-helpers.js'));
+};
+
+var buildTurfPointOnLine = function() {
+    return browserify('./node_modules/@turf/point-on-line', {
+            standalone: 'turf.pointOnLine',
+            exclude: ['./node_modules/@turf/point-on-line/node_modules/@turf/helpers']
+        })
+        .transform(aliasify, {aliases: {
+            'turf-helpers': './node_modules/@turf/point-on-line/node_modules/@turf/helpers',
+            'turf-distance': './node_modules/@turf/point-on-line/node_modules/@turf/distance',
+            'turf-bearing': './node_modules/@turf/point-on-line/node_modules/@turf/bearing',
+            'turf-destination': './node_modules/@turf/point-on-line/node_modules/@turf/destination'
+        }})
+        .bundle()
+        .pipe(vinylSourceStream('turf-point-on-line.js'));
+};
+
+// combine streams from turf and the other vendor dependencies
+var copyVendorJS = function(filter, extraFiles) {
+    var bowerStream = copyBowerFiles(filter, extraFiles);
+    var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
+    vendorStream.add(bowerStream);
+    return vendorStream;
+};
+
 // silence the collectstatic output
 // gulp-run hangs if the output is too large:
 // https://github.com/MrBoolean/gulp-run/issues/34
@@ -89,12 +129,13 @@ gulp.task('minify:scripts', function() {
 });
 
 gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js',
-                          // Exclude minified vendor scripts that also have a non-minified version.
-                          // We run our own minifier, and want to include each script only once.
-                          '!**/leaflet.draw.js', '!**/lodash.min.js', '!**/bootstrap-datetimepicker.min.js',
-                          // exclude leaflet and jquery (loaded over CDN)
-                          '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'], [])
+    return copyVendorJS(['**/*.js',
+                        // Exclude minified vendor scripts that also have a non-minified version.
+                        // We run our own minifier, and want to include each script only once.
+                        '!**/lodash.min.js', '!**/bootstrap-datetimepicker.min.js',
+                        // exclude leaflet and jquery (loaded over CDN)
+                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
+                        [])
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -148,9 +189,10 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js',
-                          // exclude leaflet
-                          '!**/leaflet.js', '!**/leaflet-src.js'], [])
+    return copyVendorJS(['**/*.js',
+                        // exclude leaflet
+                        '!**/leaflet.js', '!**/leaflet-src.js'],
+                        [])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 

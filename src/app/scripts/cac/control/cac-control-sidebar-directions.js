@@ -87,9 +87,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
                                         onDirectionsBackClicked);
 
-        directionsListControl.events.on(directionsListControl.eventNames.routeEditClicked,
-                                        onRouteEditClicked);
-
         itineraryListControl = new Control.ItineraryList({
             selectors: {
                 container: 'section.directions .itineraries'
@@ -276,7 +273,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     function onDirectionsBackClicked() {
         // show the other itineraries again
         UserPreferences.setPreference('waypoints', undefined);
-        mapControl.cleanUpItineraryEditEnd(true);
+        // TODO: replace
+        //mapControl.cleanUpItineraryEditEnd(true);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();
@@ -299,13 +297,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.hide();
             directionsListControl.show();
         }
-    }
-
-    /**
-     * Handle click event to start hand-editing a route
-     */
-    function onRouteEditClicked() {
-        mapControl.editItinerary(currentItinerary);
     }
 
     function findItineraryBlock(id) {
