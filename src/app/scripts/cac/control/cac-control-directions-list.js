@@ -93,16 +93,6 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
 
         $container.empty();
 
-        // TODO: remove this SEPTA rail warning when contingency plan ends and/or update
-        // when modified rail schedule published.
-
-        // Show alert regarding current SEPTA rail status
-        if (_.some(itinerary.legs, function(leg) {
-            return leg.transitLeg && leg.mode === 'RAIL' && leg.agencyName === 'SEPTA';
-        })) {
-            $container.append(MapTemplates.septaRailWarningAlert());
-        }
-
         // Show alert with link to transit agency bicycle policy for bike+transit itineraries
         if (_.contains(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
             var $alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
