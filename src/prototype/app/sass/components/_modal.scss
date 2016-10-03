@@ -1,0 +1,142 @@
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .5);
+    z-index: 30000;
+
+    .body-modal-options &.modal-options {
+        display: flex;
+    }
+
+    .body-modal-share &.modal-share {
+        display: flex;
+    }
+
+    .modal-panel {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 220px;
+        background-color: $white;
+        box-shadow: $modal-panel-drop-shadow;
+    }
+
+    .modal-header {
+        display: flex;
+        flex: 0 0 90px;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+        color: $white;
+
+        .icon-share {
+            margin-bottom: .25em;
+            font-size: 2rem;
+        }
+    }
+
+    .modal-footer {
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 0 0 60px;
+        align-items: stretch;
+        justify-content: stretch;
+        border-top: 1px solid $lt-gray;
+
+        .btn-close-modal {
+            flex: 1 0 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: none;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+    }
+
+    &.modal-options .modal-header {
+        background-color: $gophillygo-green;
+        text-transform: uppercase;
+    }
+
+    &.modal-share .modal-header {
+        background-color: $gophillygo-blue;
+    }
+
+    .modal-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            position: relative;
+            height: 4em;
+            padding-right: 10px;
+            padding-left: 64px;
+            line-height: 4;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #eee;
+            }
+
+            &::before {
+                position: absolute;
+                top: 2rem;
+                left: 0;
+                width: 60px;
+                margin: 0;
+                padding: 0;
+                color: #5a5a5a;
+                font-family: gpg;
+                font-size: 2rem;
+                line-height: 1;
+                text-align: center;
+                content: '';
+            }
+
+            &.modal-list-indego::before {
+                font-size: 3rem;
+                content: '\e80f';
+            }
+
+            &.modal-list-timing::before {
+                content: '\e80e';
+            }
+
+            &.modal-list-ride::before {
+                content: '\e80d';
+            }
+
+            &.modal-list-link::before {
+                content: '\e80c';
+            }
+
+            &.modal-list-twitter::before {
+                content: '\f099';
+            }
+
+            &.modal-list-facebook::before {
+                content: '\f230';
+            }
+
+            &.modal-list-google::before {
+                content: '\f0d5';
+            }
+
+            &.modal-list-email::before {
+                content: '\f0e0';
+            }
+        }
+    }
+}

@@ -180,6 +180,10 @@
         background-color: $gophillygo-blue-dark;
         cursor: pointer;
 
+        i.icon-sliders {
+            font-size: 1.8rem;
+        }
+
         @include respond-to('xxs') {
             margin-left: 40px;
         }

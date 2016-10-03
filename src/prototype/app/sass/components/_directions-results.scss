@@ -1,7 +1,8 @@
 .directions-results {
     @include sidebar-main;
 
-    .body-home & {
+    .body-home &,
+    .body-map.body-step-by-step & {
         display: none;
     }
 
@@ -33,18 +34,31 @@
 
     .route-summary {
         display: flex;
-        flex-flow: column nowrap;
+        flex-flow: row nowrap;
         align-items: stretch;
         justify-content: flex-start;
         height: $route-summary-height;
         margin-bottom: 20px;
-        padding: 6px 10px 4px 22px;
+        padding: 6px 10px 4px 9px;
         background-color: $white;
         box-shadow: $place-card-drop-shadow;
         cursor: pointer;
 
         @include respond-to('xxs') {
             margin: 0;
+        }
+
+        .route-summary-path {
+            flex: 0 0 4px;
+            margin-right: 13px;
+        }
+
+        .route-summary-details {
+            display: flex;
+            flex: 1 1 auto;
+            flex-flow: column nowrap;
+            align-items: stretch;
+            justify-content: flex-start;
         }
 
         .route-summary-primary-details {

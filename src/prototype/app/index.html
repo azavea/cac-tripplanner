@@ -62,6 +62,11 @@
         </div>
     </form>
 
+    <div class="sidebar-banner indego-banner">
+        <div class="banner-message">Need wheels? Click <i class="icon-sliders"></i> for Indego bike sharing</div>
+        <button title="Dismiss this message" name="close" class="btn-dismiss-sidebar-banner"><i class="icon-cancel"></i></button>
+    </div>
+
     <div class="places">
         <h1>Places we love</h1>
         <ul class="place-list">
@@ -130,25 +135,105 @@
         <h1>Choose a route</h1>
         <div class="routes-list">
             <div class="route-summary">
-                <div class="route-summary-primary-details">
-                    <div class="route-duration">33 <span class="units">min</span></div>
-                    <div class="route-distance">9.1 <span class="units">miles</span></div>
-                    <div class="route-name">via N 10th St</div>
-                </div>
-                <div class="route-summary-secondary-details">
-                    <div class="route-start-stop">3:14pm – 3:48pm</div>
-                    <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
+                <svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331" />
+                </svg>
+                <div class="route-summary-details">
+                    <div class="route-summary-primary-details">
+                        <div class="route-duration">33 <span class="units">min</span></div>
+                        <div class="route-distance">9.1 <span class="units">miles</span></div>
+                        <div class="route-name">via N 10th St</div>
+                    </div>
+                    <div class="route-summary-secondary-details">
+                        <div class="route-start-stop">3:14pm – 3:48pm</div>
+                        <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
+                    </div>
                 </div>
             </div>
             <div class="route-summary">
-                <div class="route-summary-primary-details">
-                    <div class="route-duration">37 <span class="units">min</span></div>
-                    <div class="route-distance">9.6 <span class="units">miles</span></div>
-                    <div class="route-name">via N 8th St</div>
+                <svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#5c99c6" stroke-dasharray="7, 7"/>
+                </svg>
+                <div class="route-summary-details">
+                    <div class="route-summary-primary-details">
+                        <div class="route-duration">37 <span class="units">min</span></div>
+                        <div class="route-distance">9.6 <span class="units">miles</span></div>
+                        <div class="route-name">via N 8th St</div>
+                    </div>
+                    <div class="route-summary-secondary-details">
+                        <div class="route-start-stop">3:23pm – 4:00pm</div>
+                        <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
+                    </div>
                 </div>
-                <div class="route-summary-secondary-details">
-                    <div class="route-start-stop">3:23pm – 4:00pm</div>
-                    <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="directions-step-by-step">
+        <header class="step-by-step-header">
+            <button name="back-to-directions-results" class="back-to-directions-results"><i class="icon-left-big"></i></button>
+            <h1>Directions</h1>
+            <button name="share-directions" class="share-directions"><i class="icon-share"></i></button>
+        </header>
+        <div class="directions-list-of-steps">
+            <div class="directions-leg directions-leg-origin">
+                <div class="directions-step directions-step-origin">
+                    <div class="directions-instruction">Depart 135 S 19th St</div>
+                    <div class="directions-time">at 9:47a</div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk north on S 19th St</div>
+                    <div class="directions-distance">78 feet</div>
+                </div>
+                <div class="directions-step directions-step-arrive">
+                    <div class="directions-instruction">Arrive <strong>19th &amp; Moravian St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-bus">
+                <div class="directions-step directions-step-bus">
+                    <div class="directions-instruction">Board SEPTA 17 (20th &amp; Johnston)</div>
+                    <div class="directions-time">at 9:48a</div>
+                    <div class="directions-distance">1.35 miles</div>
+                </div>
+                <div class="directions-step directions-step-disembark">
+                    <div class="directions-instruction">Disembark <strong>19th St &amp; Tasker St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk southeast on Tasker St</div>
+                    <div class="directions-distance">98 feet</div>
+                </div>
+                <div class="directions-step directions-step-arrive">
+                    <div class="directions-instruction">Arrive <strong>Tasker St &amp; 19th St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-bus">
+                <div class="directions-step directions-step-bus">
+                    <div class="directions-instruction">Board SEPTA 1297 (33rd &amp; Dickinson)</div>
+                    <div class="directions-time">at 10:00a</div>
+                    <div class="directions-distance">0.8 miles</div>
+                </div>
+                <div class="directions-step directions-step-disembark">
+                    <div class="directions-instruction">Disembark <strong>Tasker St &amp; 28th St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk east on Tasker St</div>
+                    <div class="directions-distance">105 feet</div>
+                </div>
+                <div class="directions-step directions-step-turn-left">
+                    <div class="directions-instruction">Turn left on S Marston St</div>
+                    <div class="directions-distance">0.13 miles</div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-destination">
+                <div class="directions-step directions-step-destination">
+                    <div class="directions-instruction">Arrive S Marston St &amp; Reed St</div>
+                    <div class="directions-time">at 10:07a</div>
                 </div>
             </div>
         </div>
@@ -187,6 +272,42 @@
             <a href="#">Learn</a>
         </div>
     </footer>
+
+    <div class="modal-overlay modal-options">
+        <div class="modal-panel">
+            <header class="modal-header">
+                Bike options
+            </header>
+            <ul class="modal-list">
+                <li class="modal-list-indego">Indego bike sharing</li>
+                <li class="modal-list-timing">Arrive/depart at…</li>
+                <li class="modal-list-ride">Ride quality</li>
+            </ul>
+            <footer class="modal-footer">
+                <button name="close-modal" class="btn-close-modal">Close</button>
+            </footer>
+        </div>
+    </div>
+
+    <div class="modal-overlay modal-share">
+        <div class="modal-panel">
+            <header class="modal-header">
+                <i class="icon-share"></i>
+                Share these directions
+            </header>
+            <ul class="modal-list">
+                <li class="modal-list-link">Get a link</li>
+                <li class="modal-list-twitter">Twitter</li>
+                <li class="modal-list-facebook">Facebook</li>
+                <li class="modal-list-google">Google+</li>
+                <li class="modal-list-email">Email</li>
+            </ul>
+            <footer class="modal-footer">
+                <button name="close-modal" class="btn-close-modal">Close</button>
+            </footer>
+        </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
     <script src="/js/main.js"></script></body>

@@ -20,6 +20,10 @@
     height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height});
     margin: 0;
     background-color: $body-color;
-    overflow: scroll;
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
+
+    .body-has-sidebar-banner & {
+        height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height} - #{$sidebar-banner-height});
+    }
 }
