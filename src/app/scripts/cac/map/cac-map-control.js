@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -407,10 +407,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
             map.fitBounds(layer.getBounds());
         }
 
+        // show a draggable marker on the route line that adds a waypoint when released
         layer.on('mouseover', function(e) {
-            console.log('moused over itinerary at:');
-            console.log(e.latlng);
-
             if (lastItineraryHoverMarker) {
                 lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
             } else {
@@ -418,42 +416,97 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: highlightIcon
-                    }).on('dragstart', function(e) {
-                        console.log('drag me!');
+                    }).on('dragstart', function() {
                         dragging = true;
                     }).on('dragend', function(e) {
-                        console.log('done dragging');
                         dragging = false;
                         var coords = e.target.getLatLng();
-                        addWaypoint(itinerary, [coords.lat, coords.lng]);
+                        addWaypoint(itinerary, [coords.lng, coords.lat]);
                     }).on('mouseout', function() {
-                        console.log('awww, mouseout!');
-                        console.log(dragging);
+                        // hide marker after awhile if not dragging
                         setTimeout(function() {
                             if (lastItineraryHoverMarker && !dragging) {
                                 map.removeLayer(lastItineraryHoverMarker);
                                 lastItineraryHoverMarker = null;
+                                dragging = false;
                             }
-                        }, 1000);
+                        }, 2000);
                     });
                 map.addLayer(lastItineraryHoverMarker);
             }
         });
     }
 
+    /**
+     * Add a waypoint. If there is one or more existing waypoints, add the waypoint between
+     * the two nearest points in the sequence of waypoints + origin and destination points,
+     * ordered from origin to destination.
+     */
     function addWaypoint(itinerary, point) {
-        // edit a simplified shape that just has the start, end, and any previously added waypoints
         var waypoints = UserPreferences.getPreference('waypoints');
 
-        // TODO: use turf point-on-line to get order waypoints
-        // https://www.npmjs.com/package/turf-point-on-line
-        /////////////////
+        if (!waypoints || !waypoints.length) {
+            // first waypoint added; no need to interpolate with existing waypoints
+            events.trigger(eventNames.waypointsSet, {waypoints: [point.reverse()]});
+            return;
+        }
 
-        console.log(point);
-        console.log(waypoints);
-        var coordinates = _.concat([point],waypoints);
+        // swap for geojson y,x coordinate ordering
+        waypoints = _.map(waypoints, function(coords) {
+            return [coords[1], coords[0]];
+        });
 
-        console.log(coordinates);
+        // add start and endpoints to list of waypoints
+        var allPoints = _.concat([[itinerary.from.lon, itinerary.from.lat]],
+                                   waypoints,
+                                   [[itinerary.to.lon, itinerary.to.lat]]);
+
+        // build list of point features for turf, supplying our own index
+        // so offset will still be corerct after removing nearest point to find second nearest
+        var allFeatures = _.map(allPoints, function(point, index) {
+            return turf.point(point, {index: index});
+        });
+
+        var turfPoint = turf.point(point);
+        var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
+
+        var nearestIndex = nearest.properties.index;
+
+        // drop the nearest point to repeat search, in order to find next nearest
+        var remainingFeatures = _.concat(_.slice(allFeatures, 0, nearestIndex),
+                                       _.slice(allFeatures, nearestIndex + 1));
+
+        var nextNearest = turf.nearest(turfPoint, turf.featureCollection(remainingFeatures));
+
+        var nextNearestIndex = nextNearest.properties.index;
+
+        // determine the sequence ordering of the two nearest points, so the new point can
+        // be added between them
+        var largerIndex = nearestIndex > nextNearestIndex ? nearestIndex : nextNearestIndex;
+        var smallerIndex = largerIndex === nextNearestIndex ? nearestIndex : nextNearestIndex;
+
+        if (largerIndex - smallerIndex !== 1) {
+            // if the nearest and next nearest points are not adjacent in the existing
+            // sequence, put the new point by the closer of the two
+            if (smallerIndex === nearestIndex) {
+                largerIndex = smallerIndex + 1;
+            } else {
+                smallerIndex = largerIndex - 1;
+            }
+        }
+
+        // insert new waypoint into ordered points list
+        var coordinates = _.concat(_.slice(allPoints, 0, smallerIndex + 1),
+                                   [point],
+                                   _.slice(allPoints, largerIndex));
+
+        // remove start and end points to get new list of just waypoints
+        coordinates = _.slice(coordinates, 1, -1);
+
+        // swap from geojson y,x ordering
+        coordinates = _.map(coordinates, function(coords) {
+            return [coords[1], coords[0]];
+        });
 
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
@@ -655,4 +708,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _, UserPreferences) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, _, CAC.User.Preferences);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.User.Preferences);

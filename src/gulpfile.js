@@ -71,29 +71,28 @@ var copyBowerFiles = function(filter, extraFiles) {
 // turf module needs to be run through browserify to pack it with its dependencies
 
 var buildTurfHelpers = function() {
-    return browserify('./node_modules/@turf/point-on-line/node_modules/@turf/helpers', {
+    return browserify('./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers', {
             standalone: 'turf',
             expose: ['helpers']
         })
-        .require('./node_modules/@turf/point-on-line/node_modules/@turf/helpers',
+        .require('./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers',
                  {expose: 'turf-helpers'})
         .bundle()
         .pipe(vinylSourceStream('turf-helpers.js'));
 };
 
 var buildTurfPointOnLine = function() {
-    return browserify('./node_modules/@turf/point-on-line', {
-            standalone: 'turf.pointOnLine',
-            exclude: ['./node_modules/@turf/point-on-line/node_modules/@turf/helpers']
+    return browserify('./node_modules/@turf/nearest', {
+            standalone: 'turf.nearest',
+            exclude: ['./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers']
         })
         .transform(aliasify, {aliases: {
-            'turf-helpers': './node_modules/@turf/point-on-line/node_modules/@turf/helpers',
-            'turf-distance': './node_modules/@turf/point-on-line/node_modules/@turf/distance',
-            'turf-bearing': './node_modules/@turf/point-on-line/node_modules/@turf/bearing',
-            'turf-destination': './node_modules/@turf/point-on-line/node_modules/@turf/destination'
+            'turf-helpers': './node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers',
+            'turf-invariant': './node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/invariant',
+            'turf-distance': './node_modules/@turf/nearest/node_modules/@turf/distance'
         }})
         .bundle()
-        .pipe(vinylSourceStream('turf-point-on-line.js'));
+        .pipe(vinylSourceStream('turf-nearest.js'));
 };
 
 // combine streams from turf and the other vendor dependencies

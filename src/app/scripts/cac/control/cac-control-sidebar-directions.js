@@ -173,7 +173,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             // intermediatePlaces parameter is to be passed multiple times for each waypoint.
             // Since we can only set the parameter key once on the object, build out the string.
             otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
-                console.log(waypoint);
                 return $.param({intermediatePlaces: waypoint.join(',')});
             }).join('&');
         }
