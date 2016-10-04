@@ -20,10 +20,11 @@ var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
 var vinylSourceStream = require('vinyl-source-stream');
-var watch = require('gulp-watch');
 var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
+var pythonRoot = '/opt/app/python/cac_tripplanner';
+
 var filterCSS = gulpFilter('**/*.css', {restore: true});
 
 var stat = {
@@ -64,6 +65,10 @@ var copyBowerFiles = function(filter, extraFiles) {
         .pipe(gulpFilter(filter))
         .pipe(addsrc(extraFiles));
 };
+
+gulp.task('collectstatic', function () {
+    return shell.task(['python ' + pythonRoot + '/manage.py collectstatic --noinput -v0']);
+});
 
 // turf module needs to be run through browserify to pack it with its dependencies
 
@@ -121,10 +126,11 @@ gulp.task('minify:vendor-scripts', function() {
     return copyVendorJS(['**/*.js',
                         // Exclude minified vendor scripts that also have a non-minified version.
                         // We run our own minifier, and want to include each script only once.
-                        '!**/lodash.min.js', '!**/bootstrap-datetimepicker.min.js',
+                        '!**/*.min.js',
                         // exclude leaflet and jquery (loaded over CDN)
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
                         [])
+        .pipe(addsrc(['bootstrap-datetimepicker.js']))
         .pipe(concat('vendor.js'))
         .pipe(uglify())
         .pipe(gulp.dest(stat.scripts));
@@ -137,7 +143,13 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles('**/*.css', [bootstrapSelectRoot + 'css/bootstrap-select.css'])
+    return copyBowerFiles('**/*.css',
+                          // FIXME: excluding minified CSS results in console error
+                          // about missing font awesome webfonts
+                          //'!**/*.min.css',
+                          // leaflet loaded over CDN
+                          '!**/leaflet/dist/*.css',
+                          [bootstrapSelectRoot + 'css/bootstrap-select.css'])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -179,6 +191,10 @@ gulp.task('copy:app-images', function() {
 
 gulp.task('copy:vendor-scripts', function() {
     return copyVendorJS(['**/*.js',
+                        // exclude minified versions
+                        '!**/*.min.js',
+                        // ...except for bootstrap datetiempicker
+                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet
                         '!**/leaflet.js', '!**/leaflet-src.js'],
                         [])
@@ -257,8 +273,7 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
     }
 );
 
-gulp.task('common:build', ['clean'], function() {
-    return gulp.start(
+gulp.task('common:build', ['clean'], sequence([
         'copy:vendor-css',
         'copy:bootstrap-select-map',
         'copy:vendor-images',
@@ -266,8 +281,9 @@ gulp.task('common:build', ['clean'], function() {
         'copy:md-images',
         'copy:md-fonts',
         'copy:app-images',
-        'sass');
-});
+        'sass',
+        'collectstatic'])
+);
 
 gulp.task('test', sequence([
             'production',
