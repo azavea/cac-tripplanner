@@ -16,7 +16,6 @@ var karma = require('karma').server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
-var run = require('gulp-run');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
@@ -25,9 +24,7 @@ var watch = require('gulp-watch');
 var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
-var pythonRoot = '/opt/app/python/cac_tripplanner';
-
-var filterCSS = gulpFilter('**/*.css');
+var filterCSS = gulpFilter('**/*.css', {restore: true});
 
 var stat = {
     fonts: staticRoot + '/fonts',
@@ -102,13 +99,6 @@ var copyVendorJS = function(filter, extraFiles) {
     vendorStream.add(bowerStream);
     return vendorStream;
 };
-
-// silence the collectstatic output
-// gulp-run hangs if the output is too large:
-// https://github.com/MrBoolean/gulp-run/issues/34
-gulp.task('collectstatic', function () {
-    return run('python ' + pythonRoot + '/manage.py collectstatic --noinput -v0').exec();
-});
 
 gulp.task('clean', function() {
     // This must be done synchronously to prevent sporadic failures
@@ -220,7 +210,7 @@ gulp.task('sass', function () {
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
         .pipe(filterCSS)
         .pipe($.autoprefixer({browsers: ['last 2 versions'], cascade: false}))
-        .pipe(filterCSS.restore())
+        .pipe(filterCSS.restore)
         .pipe(gulp.dest(stat.styles));
 });
 
@@ -276,8 +266,7 @@ gulp.task('common:build', ['clean'], function() {
         'copy:md-images',
         'copy:md-fonts',
         'copy:app-images',
-        'sass',
-        'collectstatic');
+        'sass');
 });
 
 gulp.task('test', sequence([
