@@ -31,9 +31,3 @@
   args:
     chdir: "{{ root_src_dir }}"
   when: production or test
-
-- name: Create static files
-  command: python {{ root_app_dir }}/manage.py collectstatic --noinput -v0
-  become: no
-  args:
-    chdir: "{{ root_app_dir }}"
