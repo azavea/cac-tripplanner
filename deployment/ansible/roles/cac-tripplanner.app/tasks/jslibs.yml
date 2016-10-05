@@ -5,8 +5,16 @@
   when: production
 
 - name: Install NPM dependencies
-  command: npm install chdir="{{ root_src_dir }}"
+  command: npm install
   become: no
+  args:
+    chdir: "{{ root_src_dir }}"
+
+- name: Rebuild SASS bindings
+  command: npm rebuild node-sass
+  become: no
+  args:
+    chdir: "{{ root_src_dir }}"
 
 - name: Create Static Directory
   file: path="{{ root_static_dir }}" state=directory mode=0755 owner="{{ app_username }}"
