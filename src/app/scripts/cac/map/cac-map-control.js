@@ -412,16 +412,22 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
             if (lastItineraryHoverMarker) {
                 lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
             } else {
+                // flag if user currently dragging out a new waypoint or not
                 var dragging = false;
+                // track where user clicked on drag start, to find nearby line points
+                var startDragPoint = null;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: highlightIcon
-                    }).on('dragstart', function() {
+                    }).on('dragstart', function(e) {
                         dragging = true;
+                        startDragPoint = e.target.getLatLng();
                     }).on('dragend', function(e) {
                         dragging = false;
                         var coords = e.target.getLatLng();
-                        addWaypoint(itinerary, [coords.lng, coords.lat]);
+                        addWaypoint(itinerary, [coords.lng, coords.lat],
+                                    [startDragPoint.lng, startDragPoint.lat]);
+                        startDragPoint = null;
                     }).on('mouseout', function() {
                         // hide marker after awhile if not dragging
                         setTimeout(function() {
@@ -429,6 +435,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                                 map.removeLayer(lastItineraryHoverMarker);
                                 lastItineraryHoverMarker = null;
                                 dragging = false;
+                                startDragPoint = null;
                             }
                         }, 2000);
                     });
@@ -442,12 +449,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
      * the two nearest points in the sequence of waypoints + origin and destination points,
      * ordered from origin to destination.
      */
-    function addWaypoint(itinerary, point) {
+    function addWaypoint(itinerary, newWaypoint, startDragPoint) {
         var waypoints = UserPreferences.getPreference('waypoints');
 
         if (!waypoints || !waypoints.length) {
             // first waypoint added; no need to interpolate with existing waypoints
-            events.trigger(eventNames.waypointsSet, {waypoints: [point.reverse()]});
+            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint.reverse()]});
             return;
         }
 
@@ -467,7 +474,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
             return turf.point(point, {index: index});
         });
 
-        var turfPoint = turf.point(point);
+        var turfPoint = turf.point(startDragPoint);
         var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
 
         var nearestIndex = nearest.properties.index;
@@ -482,29 +489,26 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
 
         // determine the sequence ordering of the two nearest points, so the new point can
         // be added between them
-        var largerIndex = nearestIndex > nextNearestIndex ? nearestIndex : nextNearestIndex;
-        var smallerIndex = largerIndex === nextNearestIndex ? nearestIndex : nextNearestIndex;
+        var smallerIndex = Math.min(nearestIndex, nextNearestIndex);
+        var largerIndex = Math.max(nearestIndex, nextNearestIndex);
+        var newIndex = smallerIndex + 1;
 
-        if (largerIndex - smallerIndex !== 1) {
-            // if the nearest and next nearest points are not adjacent in the existing
-            // sequence, put the new point by the closer of the two
-            if (smallerIndex === nearestIndex) {
-                largerIndex = smallerIndex + 1;
-            } else {
-                smallerIndex = largerIndex - 1;
-            }
+        // If the nearest two points aren't in sequence and the larger indexed one is closer,
+        // put the new point right before that one instead of right after the 2nd nearest
+        if (largerIndex - smallerIndex !== 1 && smallerIndex !== nearestIndex) {
+            newIndex = largerIndex - 1;
         }
 
         // insert new waypoint into ordered points list
-        var coordinates = _.concat(_.slice(allPoints, 0, smallerIndex + 1),
-                                   [point],
-                                   _.slice(allPoints, largerIndex));
+        allPoints = _.concat(_.slice(allPoints, 0, newIndex),
+                                   [newWaypoint],
+                                   _.slice(allPoints, newIndex));
 
         // remove start and end points to get new list of just waypoints
-        coordinates = _.slice(coordinates, 1, -1);
+        allPoints = _.slice(allPoints, 1, -1);
 
         // swap from geojson y,x ordering
-        coordinates = _.map(coordinates, function(coords) {
+        var coordinates = _.map(allPoints, function(coords) {
             return [coords[1], coords[0]];
         });
 
