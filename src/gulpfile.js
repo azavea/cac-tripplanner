@@ -10,15 +10,17 @@ var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
 var merge = require('merge-stream');
+var pump = require('pump');
 var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
-var karma = require('karma').server;
+var KarmaServer = require('karma').Server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
+var vinylBuffer = require('vinyl-buffer');
 var vinylSourceStream = require('vinyl-source-stream');
 var $ = require('gulp-load-plugins')();
 
@@ -114,26 +116,33 @@ gulp.task('clean', function() {
     ], { force: true });
 });
 
-gulp.task('minify:scripts', function() {
-    return gulp.src('app/scripts/**/*.js')
-        .pipe(order(scriptOrder))
-        .pipe(concat('main.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(stat.scripts));
+gulp.task('minify:scripts', function(cb) {
+    pump([
+        gulp.src('app/scripts/**/*.js'),
+        order(scriptOrder),
+        vinylBuffer(),
+        concat('main.js'),
+        uglify(),
+        gulp.dest(stat.scripts)
+    ], cb);
 });
 
-gulp.task('minify:vendor-scripts', function() {
-    return copyVendorJS(['**/*.js',
+gulp.task('minify:vendor-scripts', function(cb) {
+    pump([
+         copyVendorJS(['**/*.js',
                         // Exclude minified vendor scripts that also have a non-minified version.
                         // We run our own minifier, and want to include each script only once.
                         '!**/*.min.js',
+                        // ...except for bootstrap datetiempicker
+                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet and jquery (loaded over CDN)
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
-                        [])
-        .pipe(addsrc(['bootstrap-datetimepicker.js']))
-        .pipe(concat('vendor.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(stat.scripts));
+                        []),
+        vinylBuffer(),
+        concat('vendor.js'),
+        uglify(),
+        gulp.dest(stat.scripts)
+    ], cb);
 });
 
 gulp.task('copy:scripts', function() {
@@ -242,38 +251,39 @@ gulp.task('test:copy-cartodb', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-/* TODO: fix test runner
-gulp.task('test:production', ['minify:scripts',
+gulp.task('test:production', ['test:copy-jquery',
+                              'test:copy-cartodb',
                               'minify:vendor-scripts',
-                              'test:copy-jquery',
-                              'test:copy-cartodb'],
+                              'minify:scripts'],
     function(done) {
         setTimeout(function() {
-            karma.start({
-                configFile: __dirname + '/karma/karma.conf.js'
-            }, done);
-        }, 1000);
+            new KarmaServer({
+                configFile: __dirname + '/karma/karma.conf.js',
+                singleRun: true
+            }, done).start();
+        }, 6000);
     }
 );
 
-gulp.task('test:coverage', ['copy:vendor-scripts', 'copy:scripts', 'test:copy-cartodb'],
+gulp.task('test:coverage', ['test:copy-cartodb', 'copy:vendor-scripts', 'copy:scripts'],
     function(done) {
         setTimeout(function() {
-            karma.start({
-                configFile: __dirname + '/karma/karma-coverage.conf.js'
-            }, done);
+            new KarmaServer({
+                configFile: __dirname + '/karma/karma-coverage.conf.js',
+                singleRun: true
+            }, done).start();
         }, 6000);
     }
 );
 
 gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
     function(done) {
-        karma.start({
-            configFile: __dirname + '/karma/karma-dev.conf.js'
-        }, done);
+        new KarmaServer({
+            configFile: __dirname + '/karma/karma-dev.conf.js',
+            singleRun: true
+        }, done).start();
     }
 );
-*/
 
 gulp.task('common:build', ['clean'], sequence([
         'copy:vendor-css',
@@ -289,10 +299,10 @@ gulp.task('common:build', ['clean'], sequence([
 
 gulp.task('test', sequence([
             'production',
-            'minify:scripts',
-            'minify:vendor-scripts',
             'test:copy-jquery',
             'test:copy-cartodb',
+            'minify:scripts',
+            'minify:vendor-scripts',
             'test:production',
             'development',
             'copy:vendor-scripts',

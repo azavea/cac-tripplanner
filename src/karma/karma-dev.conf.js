@@ -16,11 +16,20 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       '/srv/cac/scripts/vendor/jquery.js',
-      '/srv/cac/scripts/vendor/*.js',
-      '/srv/cac/scripts/main/cac/cac.js',
-      '/srv/cac/scripts/main/cac/search/cac-search-params.js',
-      '/srv/cac/scripts/main/cac/share/cac-social-sharing.js',
-      '/srv/cac/scripts/main/**/*.js',
+      // load moment before other vendor scripts; is requirement for bootstrap datetime picker
+      '/srv/cac/scripts/vendor/moment.js',
+      '/srv/cac/scripts/vendor/moment-duration-format.js',
+      '/srv/cac/scripts/vendor/cartodb.js',
+      '/srv/cac/scripts/vendor/bootstrap.js',
+      '/srv/cac/scripts/vendor/bootstrap-select.js',
+      '/srv/cac/scripts/vendor/bootstrap-datetimepicker.min.js',
+      '/srv/cac/scripts/vendor/leaflet.awesome-markers.js',
+      '/srv/cac/scripts/vendor/Polyline.encoded.js',
+      '/srv/cac/scripts/vendor/!(bootstrap|cartodb|Polyline|moment).js',
+      'app/scripts/cac/cac.js',
+      'app/scripts/cac/search/cac-search-params.js',
+      'app/scripts/cac/share/cac-social-sharing.js',
+      'app/scripts/**/*.js',
       'test/spec/*.js',
       'test/spec/**/*.js'
     ],
