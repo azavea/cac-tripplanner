@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -27,7 +27,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
         destinationMoved: 'cac:map:control:destinationmoved',
-        geocodeMarkerMoved: 'cac:map:control:geocodemoved'
+        geocodeMarkerMoved: 'cac:map:control:geocodemoved',
+        waypointsSet: 'cac:map:control:waypointsset'
     };
     var basemaps = {};
     var overlays = {};
@@ -35,13 +36,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     var destinationMarkers = {};
     var lastHighlightedMarker = null;
     var lastDisplayPointMarker = null;
+    var lastItineraryHoverMarker = null;
     var isochroneLayer = null;
     var tabControl = null;
-
-    // itinerary edit mode state
-    var editingItinerary = null;
-    var drawControl = null;
-    var editLayer = null;
 
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
@@ -133,8 +130,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
-    MapControl.prototype.editItinerary = editItinerary;
-    MapControl.prototype.cleanUpItineraryEditEnd = cleanUpItineraryEditEnd;
 
     return MapControl;
 
@@ -411,11 +406,118 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         if (makeFit) {
             map.fitBounds(layer.getBounds());
         }
+
+        // show a draggable marker on the route line that adds a waypoint when released
+        layer.on('mouseover', function(e) {
+            if (lastItineraryHoverMarker) {
+                lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
+            } else {
+                // flag if user currently dragging out a new waypoint or not
+                var dragging = false;
+                // track where user clicked on drag start, to find nearby line points
+                var startDragPoint = null;
+                lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
+                        draggable: true,
+                        icon: highlightIcon
+                    }).on('dragstart', function(e) {
+                        dragging = true;
+                        startDragPoint = e.target.getLatLng();
+                    }).on('dragend', function(e) {
+                        dragging = false;
+                        var coords = e.target.getLatLng();
+                        addWaypoint(itinerary, [coords.lng, coords.lat],
+                                    [startDragPoint.lng, startDragPoint.lat]);
+                        startDragPoint = null;
+                    }).on('mouseout', function() {
+                        // hide marker after awhile if not dragging
+                        setTimeout(function() {
+                            if (lastItineraryHoverMarker && !dragging) {
+                                map.removeLayer(lastItineraryHoverMarker);
+                                lastItineraryHoverMarker = null;
+                                dragging = false;
+                                startDragPoint = null;
+                            }
+                        }, 2000);
+                    });
+                map.addLayer(lastItineraryHoverMarker);
+            }
+        });
+    }
+
+    /**
+     * Add a waypoint. If there is one or more existing waypoints, add the waypoint between
+     * the two nearest points in the sequence of waypoints + origin and destination points,
+     * ordered from origin to destination.
+     */
+    function addWaypoint(itinerary, newWaypoint, startDragPoint) {
+        var waypoints = UserPreferences.getPreference('waypoints');
+
+        if (!waypoints || !waypoints.length) {
+            // first waypoint added; no need to interpolate with existing waypoints
+            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint.reverse()]});
+            return;
+        }
+
+        // swap for geojson y,x coordinate ordering
+        waypoints = _.map(waypoints, function(coords) {
+            return [coords[1], coords[0]];
+        });
+
+        // add start and endpoints to list of waypoints
+        var allPoints = _.concat([[itinerary.from.lon, itinerary.from.lat]],
+                                   waypoints,
+                                   [[itinerary.to.lon, itinerary.to.lat]]);
+
+        // build list of point features for turf, supplying our own index
+        // so offset will still be corerct after removing nearest point to find second nearest
+        var allFeatures = _.map(allPoints, function(point, index) {
+            return turf.point(point, {index: index});
+        });
+
+        var turfPoint = turf.point(startDragPoint);
+        var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
+
+        var nearestIndex = nearest.properties.index;
+
+        // drop the nearest point to repeat search, in order to find next nearest
+        var remainingFeatures = _.concat(_.slice(allFeatures, 0, nearestIndex),
+                                       _.slice(allFeatures, nearestIndex + 1));
+
+        var nextNearest = turf.nearest(turfPoint, turf.featureCollection(remainingFeatures));
+
+        var nextNearestIndex = nextNearest.properties.index;
+
+        // determine the sequence ordering of the two nearest points, so the new point can
+        // be added between them
+        var smallerIndex = Math.min(nearestIndex, nextNearestIndex);
+        var largerIndex = Math.max(nearestIndex, nextNearestIndex);
+        var newIndex = smallerIndex + 1;
+
+        // If the nearest two points aren't in sequence and the larger indexed one is closer,
+        // put the new point right before that one instead of right after the 2nd nearest
+        if (largerIndex - smallerIndex !== 1 && smallerIndex !== nearestIndex) {
+            newIndex = largerIndex - 1;
+        }
+
+        // insert new waypoint into ordered points list
+        allPoints = _.concat(_.slice(allPoints, 0, newIndex),
+                                   [newWaypoint],
+                                   _.slice(allPoints, newIndex));
+
+        // remove start and end points to get new list of just waypoints
+        allPoints = _.slice(allPoints, 1, -1);
+
+        // swap from geojson y,x ordering
+        var coordinates = _.map(allPoints, function(coords) {
+            return [coords[1], coords[0]];
+        });
+
+        // requery with the changed points as waypoints
+        events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }
 
 
     function clearItineraries() {
-        cleanUpItineraryEditEnd(true);
         _.forIn(itineraries, function (itinerary) {
             map.removeLayer(itinerary.geojson);
         });
@@ -442,94 +544,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         }
     }
 
-    /**
-     * Make itinerary editable in Leaflet Draw.
-     */
-    function editItinerary(itinerary) {
-        editingItinerary = itinerary;
-
-        // edit a simplified shape that just has the turn points
-        map.removeLayer(itinerary.geojson);
-        editLayer = cartodb.L.geoJson({
-            type: 'LineString',
-            coordinates: itinerary.getTurnPoints()
-        });
-
-        editLayer.setStyle(itinerary.getStyle(true, true));
-        map.addLayer(editLayer);
-
-        // define missing function as workaround for:
-        // https://github.com/Leaflet/Leaflet.draw/issues/555
-        L.EditToolbar.Edit.prototype._editStyle = function() {};
-
-        drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: editLayer,
-                remove: false
-            },
-            draw: {
-                polyline: false,
-                polygon: false,
-                rectangle: false,
-                circle: false,
-                marker: false
-            }
-        });
-        map.addControl(drawControl);
-
-        // immediately enter edit mode in the Leaflet Draw control
-        drawControl._toolbars.edit._modes.edit.handler.enable();
-
-        // listen for when user clicks to 'save' or 'cancel' leaflet draw changes
-        map.on('draw:editstop', function() {
-            // get the points from the edited linestring
-            var modified = editLayer.toGeoJSON().features[0].geometry.coordinates;
-            cleanUpItineraryEditEnd(false);
-            endItineraryEdit(itinerary.getTurnPoints(), modified);
-        });
-    }
-
-    /**
-     * Requery for trip plans when the user finishes editing the line string.
-     * Takes two arrays of points to compare for changes.
-     */
-    function endItineraryEdit(turnPoints, modified) {
-        // Get the points that changed. If user hit 'cancel' or made no changes,
-        // this will be an empty array.
-        var changed = _.differenceWith(modified, turnPoints, function(first, second) {
-            return first[0] === second[0] && first[1] === second[1];
-        });
-
-        // TODO: requery with the changed points as waypoints
-        console.log(changed);
-    }
-
-    /**
-     * Reset state and destroy editing-related objects.
-     * Also exposes a way to programatically cancel out of route edit mode.
-     *
-     * If `hide` parameter is `true`, do not add back the itinerary linestring
-     * (to avoid flashing on marker drag).
-     */
-    function cleanUpItineraryEditEnd(hide) {
-        if (drawControl) {
-            // stop listening, to avoid error on subsequent element removals
-            map.off('draw:editstop');
-            map.removeControl(drawControl);
-            drawControl = null;
-            map.removeLayer(editLayer);
-            editLayer = null;
-            if (!hide) {
-                map.addLayer(editingItinerary.geojson);
-            }
-            editingItinerary = null;
-        }
-    }
-
     function setGeocodeMarker(latLng) {
         // helper for when marker dragged to new place
         function markerDrag(event) {
-            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
@@ -573,7 +590,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
 
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
-            cleanUpItineraryEditEnd(true);
             var marker = event.target;
             var position = marker.getLatLng();
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
@@ -696,4 +712,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.User.Preferences);

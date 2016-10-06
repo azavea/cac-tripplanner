@@ -56,7 +56,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }, function (error) {
-            console.log('error: ', error);
+            console.error(error);
         });
 
         function loadMap() {

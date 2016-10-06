@@ -2,28 +2,32 @@
 'use strict';
 
 var addsrc = require('gulp-add-src');
+var aliasify = require('aliasify');
+var browserify = require('browserify');
 var concat = require('gulp-concat');
 var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var merge = require('merge-stream');
+var pump = require('pump');
 var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
-var karma = require('karma').server;
+var KarmaServer = require('karma').Server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
-var run = require('gulp-run');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
-var watch = require('gulp-watch');
+var vinylBuffer = require('vinyl-buffer');
+var vinylSourceStream = require('vinyl-source-stream');
 var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
 
-var filterCSS = gulpFilter('**/*.css');
+var filterCSS = gulpFilter('**/*.css', {restore: true});
 
 var stat = {
     fonts: staticRoot + '/fonts',
@@ -64,12 +68,44 @@ var copyBowerFiles = function(filter, extraFiles) {
         .pipe(addsrc(extraFiles));
 };
 
-// silence the collectstatic output
-// gulp-run hangs if the output is too large:
-// https://github.com/MrBoolean/gulp-run/issues/34
 gulp.task('collectstatic', function () {
-    return run('python ' + pythonRoot + '/manage.py collectstatic --noinput -v0').exec();
+    return shell.task(['python ' + pythonRoot + '/manage.py collectstatic --noinput -v0']);
 });
+
+// turf module needs to be run through browserify to pack it with its dependencies
+
+var buildTurfHelpers = function() {
+    return browserify('./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers', {
+            standalone: 'turf',
+            expose: ['helpers']
+        })
+        .require('./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers',
+                 {expose: 'turf-helpers'})
+        .bundle()
+        .pipe(vinylSourceStream('turf-helpers.js'));
+};
+
+var buildTurfPointOnLine = function() {
+    return browserify('./node_modules/@turf/nearest', {
+            standalone: 'turf.nearest',
+            exclude: ['./node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers']
+        })
+        .transform(aliasify, {aliases: {
+            'turf-helpers': './node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/helpers',
+            'turf-invariant': './node_modules/@turf/nearest/node_modules/@turf/distance/node_modules/@turf/invariant',
+            'turf-distance': './node_modules/@turf/nearest/node_modules/@turf/distance'
+        }})
+        .bundle()
+        .pipe(vinylSourceStream('turf-nearest.js'));
+};
+
+// combine streams from turf and the other vendor dependencies
+var copyVendorJS = function(filter, extraFiles) {
+    var bowerStream = copyBowerFiles(filter, extraFiles);
+    var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
+    vendorStream.add(bowerStream);
+    return vendorStream;
+};
 
 gulp.task('clean', function() {
     // This must be done synchronously to prevent sporadic failures
@@ -80,24 +116,33 @@ gulp.task('clean', function() {
     ], { force: true });
 });
 
-gulp.task('minify:scripts', function() {
-    return gulp.src('app/scripts/**/*.js')
-        .pipe(order(scriptOrder))
-        .pipe(concat('main.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(stat.scripts));
+gulp.task('minify:scripts', function(cb) {
+    pump([
+        gulp.src('app/scripts/**/*.js'),
+        order(scriptOrder),
+        vinylBuffer(),
+        concat('main.js'),
+        uglify(),
+        gulp.dest(stat.scripts)
+    ], cb);
 });
 
-gulp.task('minify:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js',
-                          // Exclude minified vendor scripts that also have a non-minified version.
-                          // We run our own minifier, and want to include each script only once.
-                          '!**/leaflet.draw.js', '!**/lodash.min.js', '!**/bootstrap-datetimepicker.min.js',
-                          // exclude leaflet and jquery (loaded over CDN)
-                          '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'], [])
-        .pipe(concat('vendor.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(stat.scripts));
+gulp.task('minify:vendor-scripts', function(cb) {
+    pump([
+         copyVendorJS(['**/*.js',
+                        // Exclude minified vendor scripts that also have a non-minified version.
+                        // We run our own minifier, and want to include each script only once.
+                        '!**/*.min.js',
+                        // ...except for bootstrap datetiempicker
+                        '**/bootstrap-datetimepicker.min.js',
+                        // exclude leaflet and jquery (loaded over CDN)
+                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
+                        []),
+        vinylBuffer(),
+        concat('vendor.js'),
+        uglify(),
+        gulp.dest(stat.scripts)
+    ], cb);
 });
 
 gulp.task('copy:scripts', function() {
@@ -107,7 +152,13 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles('**/*.css', [bootstrapSelectRoot + 'css/bootstrap-select.css'])
+    return copyBowerFiles('**/*.css',
+                          // FIXME: excluding minified CSS results in console error
+                          // about missing font awesome webfonts
+                          //'!**/*.min.css',
+                          // leaflet loaded over CDN
+                          '!**/leaflet/dist/*.css',
+                          [bootstrapSelectRoot + 'css/bootstrap-select.css'])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -148,9 +199,14 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyBowerFiles(['**/*.js',
-                          // exclude leaflet
-                          '!**/leaflet.js', '!**/leaflet-src.js'], [])
+    return copyVendorJS(['**/*.js',
+                        // exclude minified versions
+                        '!**/*.min.js',
+                        // ...except for bootstrap datetiempicker
+                        '**/bootstrap-datetimepicker.min.js',
+                        // exclude leaflet
+                        '!**/leaflet.js', '!**/leaflet-src.js'],
+                        [])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -179,7 +235,7 @@ gulp.task('sass', function () {
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
         .pipe(filterCSS)
         .pipe($.autoprefixer({browsers: ['last 2 versions'], cascade: false}))
-        .pipe(filterCSS.restore())
+        .pipe(filterCSS.restore)
         .pipe(gulp.dest(stat.styles));
 });
 
@@ -195,39 +251,41 @@ gulp.task('test:copy-cartodb', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-gulp.task('test:production', ['minify:scripts',
+gulp.task('test:production', ['test:copy-jquery',
+                              'test:copy-cartodb',
                               'minify:vendor-scripts',
-                              'test:copy-jquery',
-                              'test:copy-cartodb'],
+                              'minify:scripts'],
     function(done) {
         setTimeout(function() {
-            karma.start({
-                configFile: __dirname + '/karma/karma.conf.js'
-            }, done);
-        }, 1000);
+            new KarmaServer({
+                configFile: __dirname + '/karma/karma.conf.js',
+                singleRun: true
+            }, done).start();
+        }, 6000);
     }
 );
 
-gulp.task('test:coverage', ['copy:vendor-scripts', 'copy:scripts', 'test:copy-cartodb'],
+gulp.task('test:coverage', ['test:copy-cartodb', 'copy:vendor-scripts', 'copy:scripts'],
     function(done) {
         setTimeout(function() {
-            karma.start({
-                configFile: __dirname + '/karma/karma-coverage.conf.js'
-            }, done);
+            new KarmaServer({
+                configFile: __dirname + '/karma/karma-coverage.conf.js',
+                singleRun: true
+            }, done).start();
         }, 6000);
     }
 );
 
 gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
     function(done) {
-        karma.start({
-            configFile: __dirname + '/karma/karma-dev.conf.js'
-        }, done);
+        new KarmaServer({
+            configFile: __dirname + '/karma/karma-dev.conf.js',
+            singleRun: true
+        }, done).start();
     }
 );
 
-gulp.task('common:build', ['clean'], function() {
-    return gulp.start(
+gulp.task('common:build', ['clean'], sequence([
         'copy:vendor-css',
         'copy:bootstrap-select-map',
         'copy:vendor-images',
@@ -236,15 +294,15 @@ gulp.task('common:build', ['clean'], function() {
         'copy:md-fonts',
         'copy:app-images',
         'sass',
-        'collectstatic');
-});
+        'collectstatic'])
+);
 
 gulp.task('test', sequence([
             'production',
-            'minify:scripts',
-            'minify:vendor-scripts',
             'test:copy-jquery',
             'test:copy-cartodb',
+            'minify:scripts',
+            'minify:vendor-scripts',
             'test:production',
             'development',
             'copy:vendor-scripts',

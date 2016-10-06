@@ -87,9 +87,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
                                         onDirectionsBackClicked);
 
-        directionsListControl.events.on(directionsListControl.eventNames.routeEditClicked,
-                                        onRouteEditClicked);
-
         itineraryListControl = new Control.ItineraryList({
             selectors: {
                 container: 'section.directions .itineraries'
@@ -99,6 +96,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                                        onItineraryClicked);
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
+
+        mapControl.events.on(mapControl.eventNames.waypointsSet, queryWithWaypoints);
 
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
@@ -167,6 +166,16 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             mode: mode,
             arriveBy: arriveBy
         };
+
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length) {
+            // intermediatePlaces parameter is to be passed multiple times for each waypoint.
+            // Since we can only set the parameter key once on the object, build out the string.
+            otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
+                return $.param({intermediatePlaces: waypoint.join(',')});
+            }).join('&');
+        }
 
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
@@ -253,6 +262,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function clearItineraries() {
+        UserPreferences.setPreference('waypoints', undefined);
         mapControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
@@ -261,7 +271,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
-        mapControl.cleanUpItineraryEditEnd(true);
+        UserPreferences.setPreference('waypoints', undefined);
+        // TODO: replace
+        //mapControl.cleanUpItineraryEditEnd(true);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();
@@ -286,13 +298,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
     }
 
-    /**
-     * Handle click event to start hand-editing a route
-     */
-    function onRouteEditClicked() {
-        mapControl.editItinerary(currentItinerary);
-    }
-
     function findItineraryBlock(id) {
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
     }
@@ -308,6 +313,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             currentItinerary = itinerary;
         }
+    }
+
+    /**
+     * Initiate a trip plan when user finishes editing a route.
+     */
+    function queryWithWaypoints(event, points) {
+        UserPreferences.setPreference('waypoints', points.waypoints);
+        planTrip();
     }
 
     function reverseOriginDestination() {
