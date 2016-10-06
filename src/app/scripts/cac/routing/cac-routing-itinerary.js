@@ -30,7 +30,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
 
         // expose functions
         this.getStyle = getStyle;
-        this.getTurnPoints = getTurnPoints;
     }
 
     Itinerary.prototype.highlight = function (isHighlighted) {
@@ -54,28 +53,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      */
     function getTransitAgencies(legs) {
         return _.chain(legs).map('agencyName').uniq().without(undefined).value();
-    }
-
-    /**
-     * Get the points for trip start, end, and turn points (step start points).
-     * Not all step start points are necessarily turns; some may be to 'continue on'.
-     * Exposed as a method rather than set as a property during initialization, as
-     * these points are not needed until user chooses to edit the itinerary,
-     * at which point they can be loaded lazily.
-     */
-    function getTurnPoints() {
-        if (!this._turnPoints) {
-            this._turnPoints = _.chain(this.legs).map('steps').flatten().map(function(step) {
-                return [step.lon, step.lat];
-            }).value();
-        }
-
-        // append end point
-        if (this.to) {
-            this._turnPoints.push([this.to.lon, this.to.lat]);
-        }
-
-        return this._turnPoints;
     }
 
     /**
@@ -206,7 +183,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         if (!shown) {
             return {opacity: 0};
         }
-        var defaultStyle = {clickable: false,
+        var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
                             color: '#d02d2d',
                             dashArray: null,
                             lineCap: 'round',

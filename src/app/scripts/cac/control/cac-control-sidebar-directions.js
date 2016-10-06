@@ -87,9 +87,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
                                         onDirectionsBackClicked);
 
-        directionsListControl.events.on(directionsListControl.eventNames.routeEditClicked,
-                                        onRouteEditClicked);
-
         itineraryListControl = new Control.ItineraryList({
             selectors: {
                 container: 'section.directions .itineraries'
@@ -176,7 +173,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             // intermediatePlaces parameter is to be passed multiple times for each waypoint.
             // Since we can only set the parameter key once on the object, build out the string.
             otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
-                return $.param({intermediatePlaces: waypoint.reverse().join(',')});
+                return $.param({intermediatePlaces: waypoint.join(',')});
             }).join('&');
         }
 
@@ -275,7 +272,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     function onDirectionsBackClicked() {
         // show the other itineraries again
         UserPreferences.setPreference('waypoints', undefined);
-        mapControl.cleanUpItineraryEditEnd(true);
+        // TODO: replace
+        //mapControl.cleanUpItineraryEditEnd(true);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();
@@ -298,13 +296,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.hide();
             directionsListControl.show();
         }
-    }
-
-    /**
-     * Handle click event to start hand-editing a route
-     */
-    function onRouteEditClicked() {
-        mapControl.editItinerary(currentItinerary);
     }
 
     function findItineraryBlock(id) {
