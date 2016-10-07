@@ -102,9 +102,25 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
 
         $container.append($html);
 
+        /*
         var params = $.extend({itineraryIndex: itinerary.id}, itinerary.requestParameters);
         var directionsUrl = '/directions/?' + Utils.encodeUrlParams(params);
+        console.log(directionsUrl);
+        console.log(itinerary.requestParameters);
+        */
 
+        // share link to directions list page, which is relative to the current URL,
+        // has all of the current URL's parameters,
+        // does *not* have the map path (just directions, with a trailing slash),
+        // and has an added parameter for the selected itinerary
+        var href = window.location.href;
+        var directionsUrl = ['/directions/',
+                             href.slice(href.indexOf('/map/directions') + '/map/directions'.length),
+                             '&',
+                             $.param({itineraryIndex: itinerary.id})
+                            ].join('');
+
+        // TODO: postpone shortening link until user chooses to share directions
         socialSharing.shortenLink(directionsUrl).then(function(shortened) {
             // set up click handlers for social sharing with shortened link
             $(options.selectors.twitterShareButton).on('click',

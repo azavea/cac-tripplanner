@@ -1,4 +1,4 @@
-CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, UserPreferences, Utils) {
+CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, UserPreferences) {
     'use strict';
 
     var center = [39.95, -75.1667];
@@ -23,16 +23,55 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
     }
 
     Directions.prototype.initialize = function () {
-        var params = Utils.getUrlParams();
-        if (!_.has(params, 'itineraryIndex')) {
-            // TODO: show this error in the UI
+
+        // FIXME: date/time does not get passed and so defaults to now
+        // TODO: what if arriveBy is true?
+
+        var rawParams = location.search.slice(1).split('&');
+        var itineraryIndex = -1; // initialize to flag value for missing index parameter
+
+        // process parameters for consumption by OpenTripPlanner:
+        // strip out itineraryIndex, and convert singe waypoint parameter into
+        // multiple intermediatePlaces parameters.
+        var otpParams = _.map(rawParams, function(paramStr) {
+            if (paramStr.indexOf('waypoints') === 0) {
+                // parse into intermediatePlaces param string
+                var vals = paramStr.slice(paramStr.indexOf('=') + 1);
+                var waypointStrings = decodeURIComponent(vals).split(';');
+                return _.map(waypointStrings, function(waypointString) {
+                    return 'intermediatePlaces=' + waypointString;
+                }).join('&');
+
+            } else if (paramStr.indexOf('itineraryIndex') === 0) {
+                itineraryIndex = decodeURIComponent(paramStr.slice(paramStr.indexOf('=') + 1));
+                itineraryIndex = parseInt(itineraryIndex);
+                if (isNaN(itineraryIndex)) {
+                    console.error('itineraryIndex URL parameter must be an integer');
+                    return;
+                }
+            } else if (paramStr.indexOf('origin') === 0) {
+                var originValue = paramStr.slice(paramStr.indexOf('='));
+                if (paramStr.indexOf('originText') !== 0) {
+                    return 'fromPlace' + originValue;
+                } else {
+                    return 'fromText' + originValue;
+                }
+            } else if (paramStr.indexOf('destination') === 0) {
+                var destValue = paramStr.slice(paramStr.indexOf('='));
+                if (paramStr.indexOf('destinationText') !== 0) {
+                    return 'toPlace' + destValue;
+                } else {
+                    return 'toText' + destValue;
+                }
+            } else {
+                return paramStr;
+            }
+        }).join('&');
+
+        if (itineraryIndex === -1) {
             console.error('Must specify itineraryIndex URL parameter');
             return;
         }
-
-        // pull out itinerary index, since it's not needed down the line
-        var itineraryIndex = params.itineraryIndex;
-        delete params.itineraryIndex;
 
         var directionsListControl = new DirectionsList({
             showBackButton: false,
@@ -48,11 +87,13 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
             url: Settings.routingUrl,
             type: 'GET',
             crossDomain: true,
-            data: params
+            data: otpParams,
+            processData: false
         }).then(function(data) {
             var itineraries = data.plan.itineraries;
-            var params = data.requestParameters;
-            var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex, params);
+            var itinerary = new Itinerary(itineraries[itineraryIndex],
+                                          itineraryIndex,
+                                          otpParams);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }, function (error) {
@@ -108,4 +149,4 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
 
     return Directions;
 
-})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.User.Preferences, CAC.Utils);
+})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.User.Preferences);

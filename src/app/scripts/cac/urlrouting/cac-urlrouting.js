@@ -9,13 +9,16 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     'use strict';
 
+    // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
+    const COORDINATE_ROUND = 7;
+
     // User pref parameters for different views
     var SHARED_ENCODE = ['origin', 'originText', 'mode'];
     var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
     var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
     var EXPLORE_READ = EXPLORE_ENCODE.concat(SHARED_READ);
-    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText']);
-    var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy', 'waypoints']);
+    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText', 'waypoints']);
+    var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy']);
 
     var router = null;
 
@@ -94,6 +97,14 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                         var feature = makeFeature(coords, params[field + 'Text']);
                         UserPreferences.setPreference(field, feature);
                     }
+                } else if (field === 'waypoints') {
+                    var waypoints = _.map(params[field].split(';'), function(waypoint) {
+                        var coords = _.map(waypoint.split(','), parseFloat);
+                        if (!isNaN(coords[0])) {
+                            return coords;
+                        }
+                    });
+                    UserPreferences.setPreference(field, waypoints);
                 } else {
                     UserPreferences.setPreference(field, params[field]);
                 }
@@ -113,11 +124,19 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
             if (field === 'origin' || field === 'destination') {
                 var location = UserPreferences.getPreference(field, false);
                 if (location && location.feature && location.feature.geometry) {
-                    // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
-                    opts[field] = [_.round(location.feature.geometry.y, 7),
-                                   _.round(location.feature.geometry.x, 7)].join(',');
+                    opts[field] = [_.round(location.feature.geometry.y, COORDINATE_ROUND),
+                                   _.round(location.feature.geometry.x, COORDINATE_ROUND)
+                                  ].join(',');
                 } else {
                     opts[field] = '';
+                }
+            } else if (field === 'waypoints') {
+                var waypoints = UserPreferences.getPreference(field);
+                if (waypoints && waypoints.length) {
+                    opts[field] = _.map(waypoints, function(waypoint) {
+                        return [_.round(waypoint[0], COORDINATE_ROUND),
+                                _.round(waypoint[1], COORDINATE_ROUND)].join(',');
+                    }).join(';');
                 }
             } else {
                 var val = UserPreferences.getPreference(field, false);

@@ -49,7 +49,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 // return the Itinerary objects for the unique collection
                 var itineraries = _(planItineraries).map(function(itinerary, i) {
-                    return new Itinerary(itinerary, i, data.requestParameters);
+                    return new Itinerary(itinerary, i, urlParams);
                 }).value();
                 deferred.resolve(itineraries);
             } else {
@@ -87,9 +87,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
         var formattedOpts = {
             fromPlace: coordsFrom.join(','),
-            fromText: extraOptions.fromText,
             toPlace: coordsTo.join(','),
-            toText: extraOptions.toText,
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
         };
