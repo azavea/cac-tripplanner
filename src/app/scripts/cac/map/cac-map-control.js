@@ -418,7 +418,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                 var startDragPoint = null;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
-                        icon: highlightIcon
+                        icon: highlightIcon,
+                        title: 'Drag marker to change route' // tooltip
                     }).on('dragstart', function(e) {
                         dragging = true;
                         startDragPoint = e.target.getLatLng();
@@ -430,6 +431,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                         startDragPoint = null;
                     }).on('mouseout', function() {
                         // hide marker after awhile if not dragging
+                        if (dragging) {
+                            return;
+                        }
+
                         setTimeout(function() {
                             if (lastItineraryHoverMarker && !dragging) {
                                 map.removeLayer(lastItineraryHoverMarker);
@@ -437,7 +442,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                                 dragging = false;
                                 startDragPoint = null;
                             }
-                        }, 2000);
+                        }, 3000);
                     });
                 map.addLayer(lastItineraryHoverMarker);
             }

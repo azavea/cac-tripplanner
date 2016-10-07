@@ -78,10 +78,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
         // build out the waypoints portion of the encoded URL string here.
         var intermediatePlaces = '';
         if (extraOptions.hasOwnProperty('waypoints')) {
-            console.log(extraOptions.waypoints);
             intermediatePlaces = _.map(extraOptions.waypoints, function(waypoint) {
-                console.log('one waypoint is:');
-                console.log(waypoint);
                 return $.param({intermediatePlaces: waypoint.join(',')});
             }).join('&');
 
