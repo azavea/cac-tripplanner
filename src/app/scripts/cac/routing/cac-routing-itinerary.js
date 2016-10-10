@@ -6,11 +6,9 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      *
      * @param {object} otpItinerary OTP itinerary
      * @param {integer} index integer to uniquely identify itinerary
-     * @param {string} encoded parameters used for the OTP request
      */
-    function Itinerary(otpItinerary, index, requestParameters) {
+    function Itinerary(otpItinerary, index) {
         this.id = index.toString();
-        this.requestParameters = requestParameters;
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
         this.distanceMiles = getDistanceMiles(otpItinerary.legs);

@@ -49,7 +49,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 // return the Itinerary objects for the unique collection
                 var itineraries = _(planItineraries).map(function(itinerary, i) {
-                    return new Itinerary(itinerary, i, urlParams);
+                    return new Itinerary(itinerary, i);
                 }).value();
                 deferred.resolve(itineraries);
             } else {

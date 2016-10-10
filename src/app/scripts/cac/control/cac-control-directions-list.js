@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferences, Utils) {
+CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
 
     'use strict';
 
@@ -102,17 +102,10 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
 
         $container.append($html);
 
-        /*
-        var params = $.extend({itineraryIndex: itinerary.id}, itinerary.requestParameters);
-        var directionsUrl = '/directions/?' + Utils.encodeUrlParams(params);
-        console.log(directionsUrl);
-        console.log(itinerary.requestParameters);
-        */
-
-        // share link to directions list page, which is relative to the current URL,
+        // Share link to directions list page, which is relative to the current URL,
         // has all of the current URL's parameters,
         // does *not* have the map path (just directions, with a trailing slash),
-        // and has an added parameter for the selected itinerary
+        // and has an added parameter for the selected itinerary.
         var href = window.location.href;
         var directionsUrl = ['/directions/',
                              href.slice(href.indexOf('/map/directions') + '/map/directions'.length),
@@ -175,4 +168,4 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social, UserPreferen
         }
     }
 
-})(_, jQuery, CAC.Map.Templates, CAC.Share.Social, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, CAC.Map.Templates, CAC.Share.Social);

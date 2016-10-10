@@ -9,9 +9,6 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     'use strict';
 
-    // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
-    const COORDINATE_ROUND = 7;
-
     // User pref parameters for different views
     var SHARED_ENCODE = ['origin', 'originText', 'mode'];
     var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
@@ -119,6 +116,9 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * encoded as empty string.
      */
     function buildUrlParamsFromPrefs(fields) {
+        // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
+        var COORDINATE_ROUND = 7;
+
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {

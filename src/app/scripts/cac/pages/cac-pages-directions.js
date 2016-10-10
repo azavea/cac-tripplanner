@@ -1,4 +1,4 @@
-CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, UserPreferences) {
+CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
     'use strict';
 
     var center = [39.95, -75.1667];
@@ -24,8 +24,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
 
     Directions.prototype.initialize = function () {
 
-        // FIXME: date/time does not get passed and so defaults to now
-        // TODO: what if arriveBy is true?
+        // Note: date/time does not get passed and so always defaults to departing now
 
         var rawParams = location.search.slice(1).split('&');
         var itineraryIndex = -1; // initialize to flag value for missing index parameter
@@ -68,7 +67,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
             }
         }).join('&');
 
-        if (itineraryIndex === -1) {
+        if (itineraryIndex < 0) {
             console.error('Must specify itineraryIndex URL parameter');
             return;
         }
@@ -92,8 +91,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
         }).then(function(data) {
             var itineraries = data.plan.itineraries;
             var itinerary = new Itinerary(itineraries[itineraryIndex],
-                                          itineraryIndex,
-                                          otpParams);
+                                          itineraryIndex);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }, function (error) {
@@ -149,4 +147,4 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
 
     return Directions;
 
-})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.User.Preferences);
+})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings);
