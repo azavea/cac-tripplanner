@@ -230,6 +230,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 }
             });
 
+            // If there is only one itinerary, make it draggable.
+            // Only one itinerary is returned if there are waypoints, so this
+            // lets the user to continue to add or modify waypoints without
+            // having to select it in the list.
+            if (itineraries.length === 1) {
+                mapControl.draggableItinerary(currentItinerary);
+            }
+
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
@@ -283,6 +291,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.showItineraries(false);
             itinerary.show(true);
             itinerary.highlight(true);
+            mapControl.draggableItinerary(itinerary);
             currentItinerary = itinerary;
 
             directionsListControl.setItinerary(itinerary);

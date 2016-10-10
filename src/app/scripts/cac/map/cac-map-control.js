@@ -125,6 +125,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
+    MapControl.prototype.draggableItinerary = draggableItinerary;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
@@ -406,9 +407,16 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         if (makeFit) {
             map.fitBounds(layer.getBounds());
         }
+    }
 
+    /**
+     * Add listeners to an itinerary map layer to make it draggable.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object to be made draggable
+     */
+    function draggableItinerary(itinerary) {
         // show a draggable marker on the route line that adds a waypoint when released
-        layer.on('mouseover', function(e) {
+        itinerary.geojson.on('mouseover', function(e) {
             if (lastItineraryHoverMarker) {
                 lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
             } else {
@@ -510,6 +518,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     function clearItineraries() {
         _.forIn(itineraries, function (itinerary) {
+            itinerary.geojson.off();
             map.removeLayer(itinerary.geojson);
         });
         itineraries = {};
