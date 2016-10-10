@@ -71,7 +71,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get list of modes used by an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {array} array of strings representing modes for itinerary
@@ -81,7 +81,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get total distance in miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
@@ -94,7 +94,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary or leg
+     * Helper function to get formatted duration string for an itinerary or leg
      *
      * @param {object} otpItinerary OTP itinerary or leg (both have duration property)
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
@@ -114,7 +114,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get geoJSON for an itinerary
      *
      * @param {array} legs set of legs for an OTP itinerary
      * @return {array} array of geojson features
