@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     'use strict';
 
     var defaults = {
@@ -426,7 +426,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                     }).on('dragend', function(e) {
                         dragging = false;
                         var coords = e.target.getLatLng();
-                        addWaypoint(itinerary, [coords.lng, coords.lat],
+                        addWaypoint(itinerary, [coords.lat, coords.lng],
                                     [startDragPoint.lng, startDragPoint.lat]);
                         startDragPoint = null;
                     }).on('mouseout', function() {
@@ -455,29 +455,18 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
      * ordered from origin to destination.
      */
     function addWaypoint(itinerary, newWaypoint, startDragPoint) {
-        var waypoints = UserPreferences.getPreference('waypoints');
 
+        var waypoints = itinerary.waypoints;
         if (!waypoints || !waypoints.length) {
             // first waypoint added; no need to interpolate with existing waypoints
-            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint.reverse()]});
+            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint]});
             return;
         }
 
-        // swap for geojson y,x coordinate ordering
-        waypoints = _.map(waypoints, function(coords) {
-            return [coords[1], coords[0]];
-        });
+        var originPoint = turf.point([itinerary.from.lon, itinerary.from.lat], {index: -1});
+        var destPoint = turf.point([itinerary.to.lon, itinerary.to.lat], {index: waypoints.length});
 
-        // add start and endpoints to list of waypoints
-        var allPoints = _.concat([[itinerary.from.lon, itinerary.from.lat]],
-                                   waypoints,
-                                   [[itinerary.to.lon, itinerary.to.lat]]);
-
-        // build list of point features for turf, supplying our own index
-        // so offset will still be corerct after removing nearest point to find second nearest
-        var allFeatures = _.map(allPoints, function(point, index) {
-            return turf.point(point, {index: index});
-        });
+        var allFeatures = _.concat([originPoint], waypoints, [destPoint]);
 
         var turfPoint = turf.point(startDragPoint);
         var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
@@ -504,18 +493,15 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
             newIndex = largerIndex - 1;
         }
 
-        // insert new waypoint into ordered points list
-        allPoints = _.concat(_.slice(allPoints, 0, newIndex),
-                                   [newWaypoint],
-                                   _.slice(allPoints, newIndex));
-
-        // remove start and end points to get new list of just waypoints
-        allPoints = _.slice(allPoints, 1, -1);
-
-        // swap from geojson y,x ordering
-        var coordinates = _.map(allPoints, function(coords) {
-            return [coords[1], coords[0]];
+        // extract the coordinates for the existing waypoints
+        var coordinates = _.map(waypoints, function(waypoint) {
+            return waypoint.geometry.coordinates.reverse();
         });
+
+        // insert new waypoint into ordered points list
+        coordinates = _.concat(_.slice(coordinates, 0, newIndex),
+                               [newWaypoint],
+                               _.slice(coordinates, newIndex));
 
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
@@ -717,4 +703,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _, CAC.User.Preferences);
+})(jQuery, Handlebars, cartodb, L, turf, _);
