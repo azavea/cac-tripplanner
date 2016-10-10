@@ -37,6 +37,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var lastHighlightedMarker = null;
     var lastDisplayPointMarker = null;
     var lastItineraryHoverMarker = null;
+    var itineraryHoverListener = null;
     var isochroneLayer = null;
     var tabControl = null;
 
@@ -125,6 +126,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
+    MapControl.prototype.clearItineraryHoverListener = clearItineraryHoverListener;
     MapControl.prototype.draggableItinerary = draggableItinerary;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
@@ -415,8 +417,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {Object} itinerary CAC.Routing.Itinerary object to be made draggable
      */
     function draggableItinerary(itinerary) {
-        // show a draggable marker on the route line that adds a waypoint when released
-        itinerary.geojson.on('mouseover', function(e) {
+        // Show a draggable marker on the route line that adds a waypoint when released.
+        // Leaflet listeners are removed by reference, so retain a reference to the
+        // listener function to be able to turn it off later.
+        itineraryHoverListener = function(e) {
             if (lastItineraryHoverMarker) {
                 lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
             } else {
@@ -454,7 +458,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                     });
                 map.addLayer(lastItineraryHoverMarker);
             }
-        });
+        };
+
+        itinerary.geojson.on('mouseover', itineraryHoverListener);
     }
 
     /**
@@ -517,11 +523,22 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
 
     function clearItineraries() {
+        clearItineraryHoverListener();
         _.forIn(itineraries, function (itinerary) {
-            itinerary.geojson.off();
             map.removeLayer(itinerary.geojson);
         });
         itineraries = {};
+    }
+
+    function clearItineraryHoverListener() {
+        _.forIn(itineraries, function (itinerary) {
+            itinerary.geojson.off('mouseover', itineraryHoverListener);
+        });
+
+        if (lastItineraryHoverMarker) {
+            map.removeLayer(lastItineraryHoverMarker);
+            lastItineraryHoverMarker = null;
+        }
     }
 
     /**

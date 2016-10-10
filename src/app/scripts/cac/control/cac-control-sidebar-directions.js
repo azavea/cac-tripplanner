@@ -275,6 +275,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
+        mapControl.clearItineraryHoverListener();
         UserPreferences.setPreference('waypoints', undefined);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
