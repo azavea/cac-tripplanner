@@ -39,6 +39,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var lastItineraryHoverMarker = null;
     var itineraryHoverListener = null;
     var isochroneLayer = null;
+    var waypointsLayer = null;
+    var waypointsMarkers = {};
     var tabControl = null;
 
     var destinationIcon = L.AwesomeMarkers.icon({
@@ -418,6 +420,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      */
     function draggableItinerary(itinerary) {
         // Show a draggable marker on the route line that adds a waypoint when released.
+
         // Leaflet listeners are removed by reference, so retain a reference to the
         // listener function to be able to turn it off later.
         itineraryHoverListener = function(e) {
@@ -461,6 +464,19 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         };
 
         itinerary.geojson.on('mouseover', itineraryHoverListener);
+
+        // add a layer of draggable markers for the existing waypoints
+
+        // TODO: marker drag event handler?
+        waypointsMarkers = {};
+        waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
+            pointToLayer: function(geojson, latlng) {
+                var marker = new cartodb.L.marker(latlng, {icon: destinationIcon,
+                                                          title: 'Drag to change route'});
+                waypointsMarkers[geojson.properties.index] = marker;
+                return marker;
+            }
+        }).addTo(map);
     }
 
     /**
