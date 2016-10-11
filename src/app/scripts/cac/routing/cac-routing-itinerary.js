@@ -144,8 +144,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             return null;
         }
 
-        return _.map(waypoints.split(';'), function(point) {
-            return turf.point(point.split(',').reverse());
+        // explicitly set the index property so it will populate on the geoJSON properties
+        // when point array used to create FeatureCollection
+        return _.map(waypoints.split(';'), function(point, index) {
+            return turf.point(point.split(',').reverse(), {index: index});
         });
     }
 
