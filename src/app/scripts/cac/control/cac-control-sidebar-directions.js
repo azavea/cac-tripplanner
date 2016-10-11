@@ -170,11 +170,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         // add intermediatePlaces if user edited route
         var waypoints = UserPreferences.getPreference('waypoints');
         if (waypoints && waypoints.length) {
-            // intermediatePlaces parameter is to be passed multiple times for each waypoint.
-            // Since we can only set the parameter key once on the object, build out the string.
-            otpOptions.intermediatePlaces = _.map(waypoints, function(waypoint) {
-                return $.param({intermediatePlaces: waypoint.join(',')});
-            }).join('&');
+            otpOptions.waypoints = waypoints;
         }
 
         if (mode.indexOf('BICYCLE') > -1) {
@@ -272,8 +268,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     function onDirectionsBackClicked() {
         // show the other itineraries again
         UserPreferences.setPreference('waypoints', undefined);
-        // TODO: replace
-        //mapControl.cleanUpItineraryEditEnd(true);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();

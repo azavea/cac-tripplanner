@@ -1,4 +1,4 @@
-CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
+CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     'use strict';
 
     /**
@@ -6,11 +6,9 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      *
      * @param {object} otpItinerary OTP itinerary
      * @param {integer} index integer to uniquely identify itinerary
-     * @param {object} parameters used for the OTP request
      */
-    function Itinerary(otpItinerary, index, requestParameters) {
+    function Itinerary(otpItinerary, index) {
         this.id = index.toString();
-        this.requestParameters = requestParameters;
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
         this.distanceMiles = getDistanceMiles(otpItinerary.legs);
@@ -25,8 +23,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
-        this.fromText = requestParameters.fromText;
-        this.toText = requestParameters.toText;
+
+        // extract reverse-geocoded start and end addresses
+        var params = Utils.getUrlParams();
+        this.fromText = params.originText;
+        this.toText = params.destinationText;
 
         // expose functions
         this.getStyle = getStyle;
@@ -198,4 +199,4 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         return defaultStyle;
     }
 
-})(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder);
+})(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder, CAC.Utils);

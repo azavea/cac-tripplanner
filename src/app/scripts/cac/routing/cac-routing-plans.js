@@ -49,7 +49,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 // return the Itinerary objects for the unique collection
                 var itineraries = _(planItineraries).map(function(itinerary, i) {
-                    return new Itinerary(itinerary, i, data.requestParameters);
+                    return new Itinerary(itinerary, i);
                 }).value();
                 deferred.resolve(itineraries);
             } else {
@@ -67,32 +67,38 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
      * @param {Array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {Array} coordsTo The coords in lat-lng which we would like to travel to
      * @param {Object} when Moment.js object for date/time of travel
-     * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner as-is
+     * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner
      *
      * @return {string} URL-encoded GET parameters
      */
     function prepareParams(coordsFrom, coordsTo, when, extraOptions) {
 
-        // exclude pre-formatted intermediatePlaces
+        // intermediatePlaces parameter is to be passed multiple times for each waypoint.
+        // Since we can only set the parameter key once on the options object,
+        // build out the waypoints portion of the encoded URL string here.
         var intermediatePlaces = '';
-        if (extraOptions.hasOwnProperty('intermediatePlaces')) {
-            intermediatePlaces = extraOptions.intermediatePlaces;
-            delete extraOptions.intermediatePlaces;
+        if (extraOptions.hasOwnProperty('waypoints')) {
+            intermediatePlaces = _.map(extraOptions.waypoints, function(waypoint) {
+                return $.param({intermediatePlaces: waypoint.join(',')});
+            }).join('&');
+
+            delete extraOptions.waypoints;
         }
 
         var formattedOpts = {
             fromPlace: coordsFrom.join(','),
-            fromText: extraOptions.fromText,
             toPlace: coordsTo.join(','),
-            toText: extraOptions.toText,
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
         };
 
         var params = $.param($.extend(formattedOpts, extraOptions));
+
+        // append pre-formatted string for waypoints
         if (intermediatePlaces) {
             params += '&' + intermediatePlaces;
         }
+
         return  params;
     }
 
