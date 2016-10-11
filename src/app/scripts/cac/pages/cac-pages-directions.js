@@ -26,51 +26,61 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
 
         // Note: date/time does not get passed and so always defaults to departing now
 
-        var rawParams = location.search.slice(1).split('&');
-        var itineraryIndex = -1; // initialize to flag value for missing index parameter
+        var rawParams = _.map(location.search.slice(1).split('&'), function(p) {
+            return p.split('=');
+        });
 
-        // process parameters for consumption by OpenTripPlanner:
-        // strip out itineraryIndex, and convert singe waypoint parameter into
-        // multiple intermediatePlaces parameters.
-        var otpParams = _.map(rawParams, function(paramStr) {
-            if (paramStr.indexOf('waypoints') === 0) {
-                // parse into intermediatePlaces param string
-                var vals = paramStr.slice(paramStr.indexOf('=') + 1);
-                var waypointStrings = decodeURIComponent(vals).split(';');
-                return _.map(waypointStrings, function(waypointString) {
-                    return 'intermediatePlaces=' + waypointString;
-                }).join('&');
+        // Pull out the itinerary index and validate it
+        var itineraryIndex = _.remove(rawParams, function(p) {
+            return p[0] === 'itineraryIndex';
+        });
 
-            } else if (paramStr.indexOf('itineraryIndex') === 0) {
-                itineraryIndex = decodeURIComponent(paramStr.slice(paramStr.indexOf('=') + 1));
-                itineraryIndex = parseInt(itineraryIndex);
-                if (isNaN(itineraryIndex)) {
-                    console.error('itineraryIndex URL parameter must be an integer');
-                    return;
-                }
-            } else if (paramStr.indexOf('origin') === 0) {
-                var originValue = paramStr.slice(paramStr.indexOf('='));
-                if (paramStr.indexOf('originText') !== 0) {
-                    return 'fromPlace' + originValue;
-                } else {
-                    return 'fromText' + originValue;
-                }
-            } else if (paramStr.indexOf('destination') === 0) {
-                var destValue = paramStr.slice(paramStr.indexOf('='));
-                if (paramStr.indexOf('destinationText') !== 0) {
-                    return 'toPlace' + destValue;
-                } else {
-                    return 'toText' + destValue;
-                }
-            } else {
-                return paramStr;
-            }
-        }).join('&');
-
-        if (itineraryIndex < 0) {
+        if (!itineraryIndex || itineraryIndex.length < 1) {
             console.error('Must specify itineraryIndex URL parameter');
             return;
+        } else {
+            itineraryIndex = parseInt(itineraryIndex[0][1]);
+            if (isNaN(itineraryIndex)) {
+                console.error('itineraryIndex URL parameter must be an integer');
+                return;
+            }
         }
+
+        // Rules for rewriting GoPhillyGo URL params to OTP query params.
+        // If 'values' is defined, parse out the value into multiple copies of the param,
+        // one per item in the array returned by calling 'values' with the URL parameter value.
+        // Any URL param not in the mapping is passed through unchanged.
+        var mapping = {
+            origin: { paramName: 'fromPlace' },
+            originText: { paramName: 'fromText' },
+            destination: { paramName: 'toPlace' },
+            destinationText: { paramName: 'toText' },
+            waypoints: {
+                paramName: 'intermediatePlaces',
+                values: function (val) {
+                    return _.map(decodeURIComponent(val).split(';'), encodeURIComponent);
+                }
+            },
+        };
+
+        // Rewrites an array of [URLparam, value] pairs into an array of [OTPparam, value] pairs,
+        // using the mapping above.
+        var otpParams = _(rawParams).map(function (param) {
+            if (!mapping[param[0]]) {
+                return [param];
+            } else {
+                var config = mapping[param[0]];
+                if (!config.values) {
+                    return [[config.paramName, param[1]]];
+                } else {
+                    return _.map(config.values(param[1]), function (val) {
+                        return [config.paramName, val];
+                    });
+                }
+            }
+        }).flatten().value();
+        // Join array into param string
+        otpParams = _(otpParams).map(function (item) { return item.join('='); }).join('&');
 
         var directionsListControl = new DirectionsList({
             showBackButton: false,
@@ -90,8 +100,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
             processData: false
         }).then(function(data) {
             var itineraries = data.plan.itineraries;
-            var itinerary = new Itinerary(itineraries[itineraryIndex],
-                                          itineraryIndex);
+            var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }, function (error) {
