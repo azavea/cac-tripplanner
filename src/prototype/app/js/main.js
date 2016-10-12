@@ -49,7 +49,7 @@ $(function() {
     });
 
     $('body').on('click', '.btn-options', function(e) {
-        $('body').addClass('body-modal-options');
+        $('body').addClass('body-modal body-modal-options');
         e.preventDefault();
     });
 
@@ -58,12 +58,12 @@ $(function() {
     });
 
     $('body').on('click', '.btn-close-modal, .modal-overlay', function(e) {
-        $('body').removeClass('body-modal-options body-modal-share');
+        $('body').removeClass('body-modal body-modal-options body-modal-share');
         e.preventDefault();
     });
 
     $('body').on('click', '.share-directions', function(e) {
-        $('body').addClass('body-modal-share');
+        $('body').addClass('body-modal body-modal-share');
         e.preventDefault();
     });
 
