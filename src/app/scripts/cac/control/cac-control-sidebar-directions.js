@@ -275,8 +275,6 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function onDirectionsBackClicked() {
         // show the other itineraries again
-        mapControl.clearWaypointInteractivity();
-        UserPreferences.setPreference('waypoints', undefined);
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
         directionsListControl.hide();
@@ -294,9 +292,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             mapControl.draggableItinerary(itinerary);
             currentItinerary = itinerary;
-
             directionsListControl.setItinerary(itinerary);
-
             itineraryListControl.hide();
             directionsListControl.show();
         }

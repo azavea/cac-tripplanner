@@ -418,6 +418,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {Object} itinerary CAC.Routing.Itinerary object to be made draggable
      */
     function draggableItinerary(itinerary) {
+        clearWaypointInteractivity();
         // Show a draggable marker on the route line that adds a waypoint when released.
 
         // Leaflet listeners are removed by reference, so retain a reference to the
@@ -480,8 +481,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                     });
                 }
             }).addTo(map);
-        } else {
-            waypointsLayer = null;
         }
     }
 
@@ -611,19 +610,19 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     }
 
     function clearWaypointInteractivity() {
-        _.forIn(itineraries, function (itinerary) {
-            itinerary.geojson.off('mouseover', itineraryHoverListener);
-        });
+        if (waypointsLayer) {
+            map.removeLayer(waypointsLayer);
+            waypointsLayer = null;
+        }
 
         if (lastItineraryHoverMarker) {
             map.removeLayer(lastItineraryHoverMarker);
             lastItineraryHoverMarker = null;
         }
 
-        if (waypointsLayer) {
-            map.removeLayer(waypointsLayer);
-            waypointsLayer = null;
-        }
+        _.forIn(itineraries, function (itinerary) {
+            itinerary.geojson.off('mouseover', itineraryHoverListener);
+        });
     }
 
     /**
