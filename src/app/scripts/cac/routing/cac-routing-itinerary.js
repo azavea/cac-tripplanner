@@ -20,6 +20,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
 
+        // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
@@ -28,6 +29,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         var params = Utils.getUrlParams();
         this.fromText = params.originText;
         this.toText = params.destinationText;
+
+        // array of turf points, for ease of use both making into a
+        // Leaflet layer as GeoJSON, and for interpolating new waypoints.
+        this.waypoints = getWaypointFeatures(params.waypoints);
 
         // expose functions
         this.getStyle = getStyle;
@@ -71,7 +76,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get list of modes used by an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {array} array of strings representing modes for itinerary
@@ -81,7 +86,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get total distance in miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
@@ -94,7 +99,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary or leg
+     * Helper function to get formatted duration string for an itinerary or leg
      *
      * @param {object} otpItinerary OTP itinerary or leg (both have duration property)
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
@@ -114,7 +119,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get geoJSON for an itinerary
      *
      * @param {array} legs set of legs for an OTP itinerary
      * @return {array} array of geojson features
@@ -124,6 +129,25 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
             linestringGeoJson.properties = leg;
             return linestringGeoJson;
+        });
+    }
+
+    /**
+     * Helper to parse semicolon-delimited list of waypoints into
+     * array of GeoJSON point features.
+     *
+     * @param {string} waypoints from URL
+     * @return {array} GeoJSON features
+     */
+    function getWaypointFeatures(waypoints) {
+        if (!waypoints) {
+            return null;
+        }
+
+        // explicitly set the index property so it will populate on the geoJSON properties
+        // when point array used to create FeatureCollection
+        return _.map(waypoints.split(';'), function(point, index) {
+            return turf.point(point.split(',').reverse(), {index: index});
         });
     }
 

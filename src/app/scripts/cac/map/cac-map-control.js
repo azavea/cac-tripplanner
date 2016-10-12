@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     'use strict';
 
     var defaults = {
@@ -37,7 +37,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
     var lastHighlightedMarker = null;
     var lastDisplayPointMarker = null;
     var lastItineraryHoverMarker = null;
+    var itineraryHoverListener = null;
     var isochroneLayer = null;
+    var waypointsLayer = null;
     var tabControl = null;
 
     var destinationIcon = L.AwesomeMarkers.icon({
@@ -125,6 +127,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
     MapControl.prototype.drawDestinations = drawDestinations;
     MapControl.prototype.plotItinerary = plotItinerary;
     MapControl.prototype.clearItineraries = clearItineraries;
+    MapControl.prototype.clearWaypointInteractivity = clearWaypointInteractivity;
+    MapControl.prototype.draggableItinerary = draggableItinerary;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
@@ -406,9 +410,20 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
         if (makeFit) {
             map.fitBounds(layer.getBounds());
         }
+    }
 
-        // show a draggable marker on the route line that adds a waypoint when released
-        layer.on('mouseover', function(e) {
+    /**
+     * Add listeners to an itinerary map layer to make it draggable.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object to be made draggable
+     */
+    function draggableItinerary(itinerary) {
+        clearWaypointInteractivity();
+        // Show a draggable marker on the route line that adds a waypoint when released.
+
+        // Leaflet listeners are removed by reference, so retain a reference to the
+        // listener function to be able to turn it off later.
+        itineraryHoverListener = function(e) {
             if (lastItineraryHoverMarker) {
                 lastItineraryHoverMarker.setLatLng(e.latlng, {draggable: true});
             } else {
@@ -426,7 +441,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                     }).on('dragend', function(e) {
                         dragging = false;
                         var coords = e.target.getLatLng();
-                        addWaypoint(itinerary, [coords.lng, coords.lat],
+                        addWaypoint(itinerary, [coords.lat, coords.lng],
                                     [startDragPoint.lng, startDragPoint.lat]);
                         startDragPoint = null;
                     }).on('mouseout', function() {
@@ -446,38 +461,53 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
                     });
                 map.addLayer(lastItineraryHoverMarker);
             }
-        });
+        };
+
+        itinerary.geojson.on('mouseover', itineraryHoverListener);
+
+        // add a layer of draggable markers for the existing waypoints
+        var markerTitle = 'Drag to change or click to remove';
+        if (itinerary.waypoints) {
+            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
+                pointToLayer: function(geojson, latlng) {
+                    return new cartodb.L.marker(latlng, {icon: destinationIcon,
+                                                              title: markerTitle,
+                                                              draggable: true
+                    }).on('dragend', function(e) {
+                        var coords = e.target.getLatLng();
+                        moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
+                    }).on('click', function() {
+                        removeWaypoint(itinerary, geojson.properties.index);
+                    });
+                }
+            }).addTo(map);
+        }
     }
 
     /**
      * Add a waypoint. If there is one or more existing waypoints, add the waypoint between
-     * the two nearest points in the sequence of waypoints + origin and destination points,
+     * the two nearest points to where the user began the route edit on the linestring,
+     * adding the new point to the sequence of waypoints + origin and destination points,
      * ordered from origin to destination.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object with waypoint to move
+     * @param {array} newWaypoint coordinates as [lat, lng] for waypoint to add
+     * @param {array} startDragPoint geoJSON coordinates (lng, lat) of place on itinerary
+     *                line where user began dragging to change route
      */
     function addWaypoint(itinerary, newWaypoint, startDragPoint) {
-        var waypoints = UserPreferences.getPreference('waypoints');
 
+        var waypoints = itinerary.waypoints;
         if (!waypoints || !waypoints.length) {
             // first waypoint added; no need to interpolate with existing waypoints
-            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint.reverse()]});
+            events.trigger(eventNames.waypointsSet, {waypoints: [newWaypoint]});
             return;
         }
 
-        // swap for geojson y,x coordinate ordering
-        waypoints = _.map(waypoints, function(coords) {
-            return [coords[1], coords[0]];
-        });
+        var originPoint = turf.point([itinerary.from.lon, itinerary.from.lat], {index: -1});
+        var destPoint = turf.point([itinerary.to.lon, itinerary.to.lat], {index: waypoints.length});
 
-        // add start and endpoints to list of waypoints
-        var allPoints = _.concat([[itinerary.from.lon, itinerary.from.lat]],
-                                   waypoints,
-                                   [[itinerary.to.lon, itinerary.to.lat]]);
-
-        // build list of point features for turf, supplying our own index
-        // so offset will still be corerct after removing nearest point to find second nearest
-        var allFeatures = _.map(allPoints, function(point, index) {
-            return turf.point(point, {index: index});
-        });
+        var allFeatures = _.concat([originPoint], waypoints, [destPoint]);
 
         var turfPoint = turf.point(startDragPoint);
         var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
@@ -504,29 +534,95 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
             newIndex = largerIndex - 1;
         }
 
+        // extract the coordinates for the existing waypoints
+        var coordinates = _.map(waypoints, function(waypoint) {
+            return waypoint.geometry.coordinates.reverse();
+        });
+
         // insert new waypoint into ordered points list
-        allPoints = _.concat(_.slice(allPoints, 0, newIndex),
-                                   [newWaypoint],
-                                   _.slice(allPoints, newIndex));
+        coordinates = _.concat(_.slice(coordinates, 0, newIndex),
+                               [newWaypoint],
+                               _.slice(coordinates, newIndex));
 
-        // remove start and end points to get new list of just waypoints
-        allPoints = _.slice(allPoints, 1, -1);
+        // requery with the changed points as waypoints
+        events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
+    }
 
-        // swap from geojson y,x ordering
-        var coordinates = _.map(allPoints, function(coords) {
-            return [coords[1], coords[0]];
+    /**
+     * Move an existing waypoint on an itinerary.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object with waypoint to move
+     * @param {integer} waypointIndex offset of waypoint to move
+     * @param {array} newCoordinates [lat, lng] of new location for the waypoint
+     */
+    function moveWaypoint(itinerary, waypointIndex, newCoordinates) {
+        // should not happen, but sanity-check for waypoint indexing
+        if (!itinerary.waypoints || itinerary.waypoints.length <= waypointIndex) {
+            console.error('Could not find waypoint to move');
+            return;
+        }
+
+        // extract the coordinates for the existing waypoints,
+        // exchanging for new coordinates on moved waypoint
+        var coordinates = _.map(itinerary.waypoints, function(waypoint, index) {
+            if (index === waypointIndex) {
+                return newCoordinates;
+            } else {
+                return waypoint.geometry.coordinates.reverse();
+            }
         });
 
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }
 
+    /**
+     * Remove a waypoint from an itinerary.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object with waypoint to remove
+     * @param {integer} waypointIndex offset of waypoint to remove from itinerary
+     */
+    function removeWaypoint(itinerary, waypointIndex) {
+        // should not happen, but sanity-check for waypoint indexing
+        if (!itinerary.waypoints || itinerary.waypoints.length <= waypointIndex) {
+            console.error('Could not find waypoint to remove');
+            return;
+        }
+
+        // remove waypoint from ordered points list
+        itinerary.waypoints.splice(waypointIndex, 1);
+
+        // extract the coordinates for the existing waypoints
+        var coordinates = _.map(itinerary.waypoints, function(waypoint) {
+            return waypoint.geometry.coordinates.reverse();
+        });
+
+        // requery with the changed points as waypoints
+        events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
+    }
 
     function clearItineraries() {
+        clearWaypointInteractivity();
         _.forIn(itineraries, function (itinerary) {
             map.removeLayer(itinerary.geojson);
         });
         itineraries = {};
+    }
+
+    function clearWaypointInteractivity() {
+        if (waypointsLayer) {
+            map.removeLayer(waypointsLayer);
+            waypointsLayer = null;
+        }
+
+        if (lastItineraryHoverMarker) {
+            map.removeLayer(lastItineraryHoverMarker);
+            lastItineraryHoverMarker = null;
+        }
+
+        _.forIn(itineraries, function (itinerary) {
+            itinerary.geojson.off('mouseover', itineraryHoverListener);
+        });
     }
 
     /**
@@ -717,4 +813,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, UserPreferences
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _, CAC.User.Preferences);
+})(jQuery, Handlebars, cartodb, L, turf, _);
