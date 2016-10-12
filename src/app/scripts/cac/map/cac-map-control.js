@@ -421,6 +421,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         clearWaypointInteractivity();
         // Show a draggable marker on the route line that adds a waypoint when released.
 
+        var redrawWaypointDrag = _.throttle(function(event) { // jshint ignore:line
+                console.log(event.target.getLatLng());
+            }, 800);
+
         // Leaflet listeners are removed by reference, so retain a reference to the
         // listener function to be able to turn it off later.
         itineraryHoverListener = function(e) {
@@ -435,7 +439,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var popupTimeout;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
-                        icon: highlightIcon,
+                        icon: highlightIcon
                     }).on('dragstart', function(e) {
                         dragging = true;
                         startDragPoint = e.target.getLatLng();
@@ -474,8 +478,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                                 startDragPoint = null;
                             }
                         }, 3000);
-                    });
-
+                    }).on('drag', redrawWaypointDrag);
                 map.addLayer(lastItineraryHoverMarker);
             }
         };
@@ -498,7 +501,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
                     }).on('click', function() {
                         removeWaypoint(itinerary, geojson.properties.index);
-                    });
+                    })).on('drag', redrawWaypointDrag);
 
                     marker.bindPopup('Drag to change or click to remove', {closeButton: false})
                     .on('mouseover', function () {
