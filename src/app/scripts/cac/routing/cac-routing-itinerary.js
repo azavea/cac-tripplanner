@@ -194,12 +194,12 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                     leg.to.name = name;
                 });
             }
-            leg.formattedDuration = getFormattedDuration(leg);
             return leg;
         });
         if (hasWaypoints) {
             newLegs = mergeLegsAcrossWaypoints(newLegs);
         }
+        _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
         return newLegs;
     }
 
