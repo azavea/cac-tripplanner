@@ -203,8 +203,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         return newLegs;
     }
 
-    /* Waypoints always result in a step break, which ends up producing useless "To Destination"
-     * steps in the itinerary details.
+    /* Waypoints always result in a step break, which ends up producing intermediate
+     * "to Destination" steps that we don't want to show in the itinerary details.
      * See https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L305
      * and https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/api/resource/GraphPathToTripPlanConverter.java#L212
      * There's no configuration option to make OTP not do that, so instead this munges the
@@ -232,7 +232,21 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                 newLeg.duration = thisLeg.duration + nextLeg.duration;
                 newLeg.endTime = nextLeg.endTime;
                 newLeg.to = nextLeg.to;
-                newLeg.steps = _.concat(thisLeg.steps, nextLeg.steps);
+
+                // If the waypoint is in the middle of what would otherwise be a single step,
+                // merge it back into a single step
+                var lastStep = _.clone(_.last(thisLeg.steps));
+                var nextStep = _.first(nextLeg.steps);
+                if (nextStep.relativeDirection === 'CONTINUE' &&
+                        lastStep.streetName === nextStep.streetName) {
+                    lastStep.distance += nextStep.distance;
+                    lastStep.elevation = lastStep.elevation.concat(nextStep.elevation);
+                    newLeg.steps = _.concat(_.dropRight(thisLeg.steps, 1),
+                                            [lastStep],
+                                            _.tail(nextLeg.steps));
+                } else {
+                    newLeg.steps = _.concat(thisLeg.steps, nextLeg.steps);
+                }
                 legs.splice(index, 2, newLeg);
             } else {
                 index++;
