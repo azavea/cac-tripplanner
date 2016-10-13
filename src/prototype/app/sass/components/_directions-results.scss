@@ -17,15 +17,10 @@
 
     h1 {
         margin: 0;
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: $font-weight-bold;
         line-height: 4;
         text-align: center;
-
-        @include respond-to('xs') {
-            font-size: 2rem;
-            line-height: 3;
-        }
 
         @include respond-to('xxs') {
             display: none;

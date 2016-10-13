@@ -1,34 +1,49 @@
-.post-card {
+.preview-card-link {
+    @include delinkify;
+    display: flex;
+    flex: 1 0 auto;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin: 0 auto $home-section-margin;
+
+    @include respond-to('xs') {
+        width: $place-card-width;
+    }
+
+    @include respond-to('xxs') {
+        margin-bottom: ($home-section-margin * 2);
+    }
+
+    .body-map & {
+        display: none;
+    }
+}
+
+.preview-card {
     display: flex;
     flex: 1 0 auto;
     flex-flow: row nowrap;
     align-items: flex-start;
     justify-content: flex-start;
     max-width: $home-main-max-width;
-    margin: 0 auto $home-section-margin;
-    padding: $home-section-padding $home-section-padding ($home-section-padding * 1.5);
+    padding: $home-section-padding $home-section-padding;
     background-color: $white;
-    box-shadow: $place-card-drop-shadow;
+
+    &:hover {
+        @include button-hover;
+    }
 
     @include respond-to('xs') {
         flex-flow: column nowrap;
         align-items: stretch;
-        width: $place-card-width;
-    }
-
-    @include respond-to('xxs') {
-        margin-bottom: ($home-section-margin * 2)
-    }
-
-    .body-map & {
-        display: none;
     }
 
     .goto-post {
         @include delinkify;
     }
 
-    .post-photo {
+    .preview-photo {
         width: $place-card-width;
         height: auto;
         margin-right: $home-section-padding;
@@ -39,7 +54,7 @@
         }
     }
 
-    .post-details {
+    .preview-details {
         display: flex;
         flex-flow: column nowrap;
         align-items: stretch;
@@ -54,7 +69,7 @@
     }
 
     h2 {
-        margin: 4px 0 7px;
+        margin: 4px 0;
         font-size: 2.1rem;
         font-weight: $font-weight-bold;
         line-height: 1.5;
@@ -68,7 +83,7 @@
 
     .lede {
         flex: 1;
-        margin-top: 0;
+        margin: 0;
         font-size: 1.3rem;
         font-weight: $font-weight-medium;
         line-height: 1.8;
@@ -77,10 +92,19 @@
     .goto-more-posts {
         @include delinkify;
         display: block;
+        margin-top: 10px;
+        border: 0;
+        outline: 0;
         background-color: $gophillygo-orange;
         font-size: 1.4rem;
         font-weight: $font-weight-bold;
         line-height: 2.75;
         text-align: center;
+        cursor: pointer;
+        appearance: none;
+
+        &:hover {
+            @include button-hover;
+        }
     }
 }

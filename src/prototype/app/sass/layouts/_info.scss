@@ -1,0 +1,202 @@
+.body-info {
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    background-color: $body-color;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+
+    .main {
+        max-width: $home-main-max-width;
+        margin: 0 auto;
+
+        @include respond-to('xs') {
+            margin-right: 20px;
+            margin-left: 20px;
+        }
+
+        @include respond-to('xxs') {
+            width: 100%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+    }
+
+    h1 {
+        margin: 5rem auto;
+        font-size: 2.5rem;
+        font-style: italic;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+        text-align: center;
+
+        @include respond-to('xs') {
+            margin: 4rem auto;
+            font-size: 2rem;
+            line-height: 1.75;
+        }
+
+        a {
+            @include delinkify;
+        }
+    }
+
+    .preview-card {
+        @include respond-to('xxs') {
+            margin-bottom: $home-section-margin/2;
+        }
+    }
+
+    .info-article {
+        background-color: $white;
+        line-height: 2;
+        margin-bottom: 140px;
+        padding-bottom: 40px;
+        box-shadow: $place-card-drop-shadow;
+
+        @include respond-to('xxs') {
+            background-color: inherit;
+            box-shadow: none;
+        }
+
+        @include respond-to('xxs') {
+            margin-bottom: 80px;
+        }
+    }
+
+    .info-article-header {
+        text-align: center;
+    }
+
+    .info-article-image-hero {
+        height: 400px;
+        background-repeat: no-repeat;
+        background-size: cover;
+
+        @include respond-to('xxs') {
+            height: 200px;
+        }
+    }
+
+    .info-article-category {
+        margin: 20px 60px 0;
+        color: $gophillygo-red;
+        font-size: 1.4rem;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .info-article-title {
+        margin: 20px 60px;
+        font-size: 3rem;
+        font-style: italic;
+        line-height: 2;
+
+        @include respond-to('xxs') {
+            font-size: 2.5rem;
+        }
+    }
+
+    .info-article-aside {
+        width: 200px;
+        margin: 0 60px 20px 20px;
+        padding-left: 20px;
+        float: right;
+        border-left: 2px solid $gophillygo-green;
+        color: #000;
+        font-size: 1.3rem;
+        font-style: italic;
+        line-height: 2.2;
+
+        @include respond-to('xxs') {
+            width: 36%;
+            margin-right: 2rem;
+        }
+    }
+
+    .info-article-section {
+        padding: 0 4rem;
+
+        @include respond-to('xxs') {
+            padding: 0 2rem;
+        }
+
+        p {
+            margin-bottom: 2em;
+        }
+
+        a {
+            @include delinkify;
+            color: $gophillygo-blue !important;
+        }
+
+        strong {
+            font-weight: $font-weight-bold;
+        }
+
+    }
+
+    .info-article-p-image-inline {
+        text-align: center;
+
+        img {
+            max-width: 100%;
+        }
+    }
+
+    .info-article-p-link-inline {
+        text-align: center;
+
+        a {
+            @include delinkify;
+            color: $gophillygo-blue !important;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    .summaries-list {
+        h3 {
+            margin: 40px auto;
+            font-size: 2rem;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .more-link {
+            text-align: center;
+
+            a {
+                @include delinkify;
+                font-style: italic;
+                font-weight: $font-weight-bold;
+                text-transform: uppercase;
+            }
+        }
+
+    }
+
+    .faq {
+        padding-top: 4rem;
+
+        dt {
+            color: $gophillygo-red;
+            font-weight: $font-weight-bold;
+        }
+
+        dd {
+            margin: 1em 0 3em 0;
+        }
+    }
+
+    .app-footer {
+        margin-top: 10rem;
+    }
+}

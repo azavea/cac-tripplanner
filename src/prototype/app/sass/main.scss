@@ -1,20 +1,15 @@
 // Utils
 @import
 'utils/variables',
+'utils/color',
 'utils/functions',
 'utils/mixins',
 'utils/breakpoints';
 
 
-// Vendors
-// @import
-// 'vendors/foo';
-
-
 // Base
 @import
 'base/normalize',
-'base/color',
 'base/typography',
 'base/base';
 
@@ -27,11 +22,16 @@
 'components/directions-form',
 'components/place-card',
 'components/place-list',
-'components/post-card',
+'components/preview-card',
 'components/directions-results',
 'components/directions-step-by-step',
 'components/sidebar-banner',
 'components/modal';
+
+
+// Layouts
+@import
+'layouts/info';
 
 
 // Pages
