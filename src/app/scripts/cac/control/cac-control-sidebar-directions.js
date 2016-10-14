@@ -317,7 +317,10 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function liveUpdateItinerary(event, itinerary) {
-        Routing.planLiveUpdate(itinerary).then(mapControl.plotItinerary(itinerary, true));
+        var oldLayer = itinerary.geojson;
+        Routing.planLiveUpdate(itinerary).then(function(newItinerary) {
+            mapControl.updateItineraryLayer(oldLayer, newItinerary.geojson);
+        });
     }
 
     /**

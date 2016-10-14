@@ -135,6 +135,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.updateItineraryLayer = updateItineraryLayer;
 
     return MapControl;
 
@@ -663,6 +664,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
+    }
+
+    function updateItineraryLayer(oldLayer, newLayer) {
+        map.removeLayer(oldLayer);
+        newLayer.addTo(map);
     }
 
     function clearItineraries() {
