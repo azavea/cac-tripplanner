@@ -8,23 +8,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @param {integer} index integer to uniquely identify itinerary
      */
     function Itinerary(otpItinerary, index) {
-        this.id = index.toString();
-        this.via = getVia(otpItinerary.legs);
-        this.modes = getModes(otpItinerary.legs);
-        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
-        this.formattedDuration = getFormattedDuration(otpItinerary);
-        this.startTime = otpItinerary.startTime;
-        this.endTime = otpItinerary.endTime;
-        this.legs = getLegs(otpItinerary.legs);
-        this.from = _.head(otpItinerary.legs).from;
-        this.to = _.last(otpItinerary.legs).to;
-        this.agencies = getTransitAgencies(otpItinerary.legs);
-
-        // not actually GeoJSON, but a Leaflet layer made from GeoJSON
-        this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
-                                          features: getFeatures(otpItinerary.legs)});
-        this.geojson.setStyle(getStyle(true, false));
-
         // extract reverse-geocoded start and end addresses
         var params = Utils.getUrlParams();
         this.fromText = params.originText;
@@ -33,6 +16,23 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // array of turf points, for ease of use both making into a
         // Leaflet layer as GeoJSON, and for interpolating new waypoints.
         this.waypoints = getWaypointFeatures(params.waypoints);
+
+        this.id = index.toString();
+        this.via = getVia(otpItinerary.legs);
+        this.modes = getModes(otpItinerary.legs);
+        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
+        this.formattedDuration = getFormattedDuration(otpItinerary);
+        this.startTime = otpItinerary.startTime;
+        this.endTime = otpItinerary.endTime;
+        this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));
+        this.from = _.head(otpItinerary.legs).from;
+        this.to = _.last(otpItinerary.legs).to;
+        this.agencies = getTransitAgencies(otpItinerary.legs);
+
+        // not actually GeoJSON, but a Leaflet layer made from GeoJSON
+        this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
+                                          features: getFeatures(otpItinerary.legs)});
+        this.geojson.setStyle(getStyle(true, false));
 
         // expose functions
         this.getStyle = getStyle;
@@ -176,12 +176,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
 
     /**
      * Check leg from/to place name; if it's an OSM node label, reverse geocode it and update label
+     * Also, if there are waypoints, call the function to merge legs across them.
      *
      * @params {Array} legs Itinerary legs returned by OTP
+     * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
      * @returns {Array} Itinerary legs, with prettified place labels
      */
-    function getLegs(legs) {
-        return _.map(legs, function(leg) {
+    function getLegs(legs, hasWaypoints) {
+        var newLegs = _.map(legs, function(leg) {
             if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
                     leg.from.name = name;
@@ -192,9 +194,65 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                     leg.to.name = name;
                 });
             }
-            leg.formattedDuration = getFormattedDuration(leg);
             return leg;
         });
+        if (hasWaypoints) {
+            newLegs = mergeLegsAcrossWaypoints(newLegs);
+        }
+        _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
+        return newLegs;
+    }
+
+    /* Waypoints always result in a step break, which ends up producing intermediate
+     * "to Destination" steps that we don't want to show in the itinerary details.
+     * See https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L305
+     * and https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/api/resource/GraphPathToTripPlanConverter.java#L212
+     * There's no configuration option to make OTP not do that, so instead this munges the
+     * resulting separate steps into one.
+     * Specifically, it loops over the legs, checking for each one whether the next one is the same
+     * mode and, if so, summing times/distances and resetting the 'to' to turn the first leg into
+     * a combination of itself and the second.  Since there can be multiple waypoints in what would
+     * be a single leg, more than two consecutive legs can end up getting merged together.
+     *
+     * Note that this makes no attempt to merge the `legGeometry` attributes so it's important that
+     * `getFeatures`, which gets the itinerary's geometry into Leaflet, gets called on the original
+     * legs array rather than the munged one.
+     */
+    function mergeLegsAcrossWaypoints(legs) {
+        if (legs.length === 1) {
+            return legs;
+        }
+        var index = 0;
+        while(index < legs.length - 1) {
+            var thisLeg = legs[index];
+            var nextLeg = legs[index+1];
+            if (thisLeg.mode === nextLeg.mode && !nextLeg.interlineWithPreviousLeg) {
+                var newLeg = _.clone(thisLeg);
+                newLeg.distance = thisLeg.distance + nextLeg.distance;
+                newLeg.duration = thisLeg.duration + nextLeg.duration;
+                newLeg.endTime = nextLeg.endTime;
+                newLeg.to = nextLeg.to;
+
+                // If the waypoint is in the middle of what would otherwise be a single step,
+                // merge it back into a single step
+                var lastStep = _.clone(_.last(thisLeg.steps));
+                var nextStep = _.first(nextLeg.steps);
+                if (nextStep.relativeDirection === 'CONTINUE' &&
+                        lastStep.streetName === nextStep.streetName) {
+                    lastStep.distance += nextStep.distance;
+                    lastStep.elevation = lastStep.elevation.concat(nextStep.elevation);
+                    newLeg.steps = _.concat(_.dropRight(thisLeg.steps, 1),
+                                            [lastStep],
+                                            _.tail(nextLeg.steps));
+                } else {
+                    newLeg.steps = _.concat(thisLeg.steps, nextLeg.steps);
+                }
+                legs.splice(index, 2, newLeg);
+            } else {
+                index++;
+            }
+        }
+        return legs;
     }
 
     /**
