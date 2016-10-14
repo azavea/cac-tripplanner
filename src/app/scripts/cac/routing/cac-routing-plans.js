@@ -104,6 +104,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 itinerary.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: itinerary.getFeatures(otpItinerary.legs)});
+                itinerary.geojson.setStyle(itinerary.getStyle(true, true));
 
                 deferred.resolve(itinerary);
             } else {

@@ -422,20 +422,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     function draggableItinerary(itinerary) {
         clearWaypointInteractivity();
         // Show a draggable marker on the route line that adds a waypoint when released.
-
-        var lastLayer = itinerary.geojson;
         var redrawWaypointDrag = _.throttle(function(event, index) { // jshint ignore:line
-
-                // TODO: delay layer removal via held layer reference until response comes back
-
-                // TODO: why does this not work
-                map.removeLayer(lastLayer);
-
-                console.log(event.target.getLatLng());
                 var coords = event.target.getLatLng();
                 var waypoints = updateWaypointList(itinerary, index, [coords.lat, coords.lng]);
                 itinerary.routingParams.extraOptions.waypoints = waypoints;
-
                 events.trigger(eventNames.waypointMoved, itinerary);
         }, 800, {leading: true, trailing: true});
 
