@@ -28,6 +28,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         originMoved: 'cac:map:control:originmoved',
         destinationMoved: 'cac:map:control:destinationmoved',
         geocodeMarkerMoved: 'cac:map:control:geocodemoved',
+        waypointMoved: 'cac:map:control:waypointmoved',
         waypointsSet: 'cac:map:control:waypointsset'
     };
     var basemaps = {};
@@ -421,9 +422,21 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         clearWaypointInteractivity();
         // Show a draggable marker on the route line that adds a waypoint when released.
 
-        var redrawWaypointDrag = _.throttle(function(event) { // jshint ignore:line
+        var lastLayer = itinerary.geojson;
+        var redrawWaypointDrag = _.throttle(function(event, index) { // jshint ignore:line
+
+                // TODO: delay layer removal via held layer reference until response comes back
+
+                // TODO: why does this not work
+                map.removeLayer(lastLayer);
+
                 console.log(event.target.getLatLng());
-            }, 800);
+                var coords = event.target.getLatLng();
+                var waypoints = updateWaypointList(itinerary, index, [coords.lat, coords.lng]);
+                itinerary.routingParams.extraOptions.waypoints = waypoints;
+
+                events.trigger(eventNames.waypointMoved, itinerary);
+        }, 800, {leading: true, trailing: true});
 
         // Leaflet listeners are removed by reference, so retain a reference to the
         // listener function to be able to turn it off later.
@@ -478,7 +491,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                                 startDragPoint = null;
                             }
                         }, 3000);
-                    }).on('drag', redrawWaypointDrag);
+                    }); //}).on('drag', redrawWaypointDrag);
                 map.addLayer(lastItineraryHoverMarker);
             }
         };
@@ -501,9 +514,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
                     }).on('click', function() {
                         removeWaypoint(itinerary, geojson.properties.index);
-                    })).on('drag', redrawWaypointDrag);
+                    }).on('drag', function(event) {
+                            lastLayer = itinerary.geojson;
+                            redrawWaypointDrag(event, geojson.properties.index);
+                    });
 
-                    marker.bindPopup('Drag to change or click to remove', {closeButton: false})
+		    marker.bindPopup('Drag to change or click to remove', {closeButton: false})
                     .on('mouseover', function () {
                         clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
@@ -587,13 +603,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     }
 
     /**
-     * Move an existing waypoint on an itinerary.
+     * Helper to get updated list of waypoints on waypoint drag or drag end.
      *
      * @param {Object} itinerary CAC.Routing.Itinerary object with waypoint to move
      * @param {integer} waypointIndex offset of waypoint to move
      * @param {array} newCoordinates [lat, lng] of new location for the waypoint
      */
-    function moveWaypoint(itinerary, waypointIndex, newCoordinates) {
+    function updateWaypointList(itinerary, waypointIndex, newCoordinates) {
         // should not happen, but sanity-check for waypoint indexing
         if (!itinerary.waypoints || itinerary.waypoints.length <= waypointIndex) {
             console.error('Could not find waypoint to move');
@@ -602,14 +618,24 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         // extract the coordinates for the existing waypoints,
         // exchanging for new coordinates on moved waypoint
-        var coordinates = _.map(itinerary.waypoints, function(waypoint, index) {
+        return _.map(itinerary.waypoints, function(waypoint, index) {
             if (index === waypointIndex) {
                 return newCoordinates;
             } else {
                 return waypoint.geometry.coordinates.reverse();
             }
         });
+    }
 
+    /**
+     * Move an existing waypoint on an itinerary.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary object with waypoint to move
+     * @param {integer} waypointIndex offset of waypoint to move
+     * @param {array} newCoordinates [lat, lng] of new location for the waypoint
+     */
+    function moveWaypoint(itinerary, waypointIndex, newCoordinates) {
+        var coordinates = updateWaypointList(itinerary, waypointIndex, newCoordinates);
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }

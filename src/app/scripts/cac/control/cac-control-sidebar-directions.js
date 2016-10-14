@@ -98,6 +98,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                                        onItineraryHover);
 
         mapControl.events.on(mapControl.eventNames.waypointsSet, queryWithWaypoints);
+        mapControl.events.on(mapControl.eventNames.waypointMoved, liveUpdateItinerary);
 
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
@@ -313,6 +314,10 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             currentItinerary = itinerary;
         }
+    }
+
+    function liveUpdateItinerary(event, itinerary) {
+        Routing.planLiveUpdate(itinerary).then(mapControl.plotItinerary(itinerary, true));
     }
 
     /**

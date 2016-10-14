@@ -31,19 +31,38 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
 
         // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
-                                          features: getFeatures(otpItinerary.legs)});
+                                          features: this.getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
 
         // expose functions
         this.getStyle = getStyle;
+
+        // set by CAC.Routing.Plans with the arguments sent to planTrip:
+        // coordsFrom, coordsTo, when, extraOptions
+        // (not used by directions list page)
+        this.routingParams = null;
     }
 
-    Itinerary.prototype.highlight = function (isHighlighted) {
+    Itinerary.prototype.highlight = function(isHighlighted) {
         this.geojson.setStyle(getStyle(true, isHighlighted));
     };
 
-    Itinerary.prototype.show = function (isShown) {
+    Itinerary.prototype.show = function(isShown) {
         this.geojson.setStyle(getStyle(isShown, false));
+    };
+
+    /**
+     * Get geoJSON for an itinerary
+     *
+     * @param {array} legs set of legs for an OTP itinerary
+     * @return {array} array of geojson features
+     */
+    Itinerary.prototype.getFeatures = function(legs) {
+        return _.map(legs, function(leg) {
+            var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
+            linestringGeoJson.properties = leg;
+            return linestringGeoJson;
+        });
     };
 
     // cache of geocoded OSM nodes (node name mapped to reverse geocode name)
@@ -116,20 +135,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // fix hour singular
         str = str.replace('1 hrs,', '1 hr,');
         return str;
-    }
-
-    /**
-     * Helper function to get geoJSON for an itinerary
-     *
-     * @param {array} legs set of legs for an OTP itinerary
-     * @return {array} array of geojson features
-     */
-    function getFeatures(legs) {
-        return _.map(legs, function(leg) {
-            var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
-            linestringGeoJson.properties = leg;
-            return linestringGeoJson;
-        });
     }
 
     /**
