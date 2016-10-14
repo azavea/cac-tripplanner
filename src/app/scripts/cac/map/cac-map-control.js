@@ -39,6 +39,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var lastDisplayPointMarker = null;
     var lastItineraryHoverMarker = null;
     var itineraryHoverListener = null;
+    var liveUpdatingItinerary = false; // true when live update request sent but not completed
     var isochroneLayer = null;
     var waypointsLayer = null;
     var tabControl = null;
@@ -136,6 +137,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.highlightDestination = highlightDestination;
     MapControl.prototype.displayPoint = displayPoint;
     MapControl.prototype.updateItineraryLayer = updateItineraryLayer;
+    MapControl.prototype.errorLiveUpdatingLayer = errorLiveUpdatingLayer;
 
     return MapControl;
 
@@ -423,11 +425,16 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         clearWaypointInteractivity();
         // Show a draggable marker on the route line that adds a waypoint when released.
         var redrawWaypointDrag = _.throttle(function(event, index) { // jshint ignore:line
-                var coords = event.target.getLatLng();
-                var waypoints = updateWaypointList(itinerary, index, [coords.lat, coords.lng]);
-                itinerary.routingParams.extraOptions.waypoints = waypoints;
-                events.trigger(eventNames.waypointMoved, itinerary);
-        }, 800, {leading: true, trailing: true});
+            if (liveUpdatingItinerary) {
+                return; // do not send another request if one already in progress
+            }
+
+            liveUpdatingItinerary = true;
+            var coords = event.target.getLatLng();
+            var waypoints = updateWaypointList(itinerary, index, [coords.lat, coords.lng]);
+            itinerary.routingParams.extraOptions.waypoints = waypoints;
+            events.trigger(eventNames.waypointMoved, itinerary);
+        }, 600, {leading: true, trailing: true});
 
         // Leaflet listeners are removed by reference, so retain a reference to the
         // listener function to be able to turn it off later.
@@ -501,8 +508,14 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         dragging = true;
                     }).on('dragend', function(e) {
                         dragging = false;
+                        // cancel any live route updates queued
+                        redrawWaypointDrag.cancel();
+                        // get itnerary from collection to pick up newer version with
+                        // layer modified by live dragging updates
                         var coords = e.target.getLatLng();
-                        moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
+                        moveWaypoint(itineraries[itinerary.id],
+                                     geojson.properties.index,
+                                     [coords.lat, coords.lng]);
                     }).on('click', function() {
                         removeWaypoint(itinerary, geojson.properties.index);
                     }).on('drag', function(event) {
@@ -626,7 +639,19 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {array} newCoordinates [lat, lng] of new location for the waypoint
      */
     function moveWaypoint(itinerary, waypointIndex, newCoordinates) {
+        if (liveUpdatingItinerary) {
+            liveUpdatingItinerary = false;
+        }
         var coordinates = updateWaypointList(itinerary, waypointIndex, newCoordinates);
+
+        // ensure all itinerary layers are removed from the map
+        // TODO: find better way to handle potential race conditions with live updating
+        map.eachLayer(function(layer) {
+            if (layer.feature && layer.feature.properties && layer.feature.properties.from) {
+                map.removeLayer(layer);
+            }
+        });
+
         // requery with the changed points as waypoints
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }
@@ -656,9 +681,22 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         events.trigger(eventNames.waypointsSet, {waypoints: coordinates});
     }
 
-    function updateItineraryLayer(oldLayer, newLayer) {
+    function updateItineraryLayer(oldLayer, newItinerary) {
+        // If flag is false, dragged marker was released before this event could fire.
+        // Remove the old layer and do not add the new one.
+        if (!liveUpdatingItinerary) {
+            map.removeLayer(oldLayer);
+            return;
+        }
+
         map.removeLayer(oldLayer);
-        newLayer.addTo(map);
+        newItinerary.geojson.addTo(map);
+        itineraries[newItinerary.id] = newItinerary;
+        liveUpdatingItinerary = false;
+    }
+
+    function errorLiveUpdatingLayer() {
+        liveUpdatingItinerary = false;
     }
 
     function clearItineraries() {

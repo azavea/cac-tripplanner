@@ -58,7 +58,6 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
                         when: when,
                         extraOptions: extraOptions
                     };
-                    console.log(cacItinerary);
                     return cacItinerary;
                 }).value();
                 deferred.resolve(itineraries);
@@ -86,7 +85,6 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
      */
     function planLiveUpdate(itinerary) {
         var deferred = $.Deferred();
-        console.log(itinerary);
         var urlParams = prepareParams(itinerary.routingParams.coordsFrom,
                                       itinerary.routingParams.coordsTo,
                                       itinerary.routingParams.when,
@@ -133,7 +131,6 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
         // build out the waypoints portion of the encoded URL string here.
         var intermediatePlaces = '';
         if (extraOptions.hasOwnProperty('waypoints')) {
-            console.log(extraOptions.waypoints);
             intermediatePlaces = _.map(extraOptions.waypoints, function(waypoint) {
                 return $.param({intermediatePlaces: waypoint.join(',')});
             }).join('&');
