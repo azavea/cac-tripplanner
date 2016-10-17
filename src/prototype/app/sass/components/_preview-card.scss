@@ -11,10 +11,6 @@
         width: $place-card-width;
     }
 
-    @include respond-to('xxs') {
-        margin-bottom: ($home-section-margin * 2);
-    }
-
     .body-map & {
         display: none;
     }

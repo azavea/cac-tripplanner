@@ -2,7 +2,7 @@
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 0 100px;
+    padding: 0 100px 100px;
     overflow: scroll;
 
     h1 {
@@ -16,5 +16,14 @@
     .modal-panel {
         display: flex;
         margin-bottom: 80px;
+    }
+
+    .directions-step-by-step {
+        display: block;
+        height: auto;
+    }
+
+    .step-by-step-header {
+        display: none;
     }
 }

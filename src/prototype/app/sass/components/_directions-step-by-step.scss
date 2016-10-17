@@ -186,6 +186,13 @@
         }
     }
 
+    .directions-step-indego {
+        &::before {
+            color: $indego-purple;
+            content: '\e80f';
+        }
+    }
+
     .directions-step-bus {
         &::before {
             content: '\e802';
