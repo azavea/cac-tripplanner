@@ -322,6 +322,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             mapControl.updateItineraryLayer(oldLayer, newItinerary);
         }, function(error) {
             console.error(error);
+            // occasionally cannot plan route if waypoint cannot be snapped to street grid
             mapControl.errorLiveUpdatingLayer();
         });
     }
