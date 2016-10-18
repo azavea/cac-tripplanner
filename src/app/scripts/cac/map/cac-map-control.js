@@ -431,6 +431,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var dragging = false;
                 // track where user clicked on drag start, to find nearby line points
                 var startDragPoint = null;
+                // Use a timeout when closing the popup so it doesn't strobe on extraneous mouseouts
+                var popupTimeout;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: highlightIcon,
@@ -443,11 +445,22 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         addWaypoint(itinerary, [coords.lat, coords.lng],
                                     [startDragPoint.lng, startDragPoint.lat]);
                         startDragPoint = null;
-                    }).bindPopup('Drag marker to change route', {closeButton: false})
+                    });
+
+                lastItineraryHoverMarker.bindPopup('Drag marker to change route',
+                                                   {closeButton: false})
                     .on('mouseover', function() {
+                        clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function() {
-                        this.closePopup();
+                        // Close popup, but with a slight delay to avoid flickering, and with an
+                        // existence check to avoid errors if the marker has been destroyed
+                        popupTimeout = setTimeout(function() {
+                            if (lastItineraryHoverMarker) {
+                                lastItineraryHoverMarker.closePopup();
+                            }
+                         }, 50);
+
                         // hide marker after awhile if not dragging
                         if (dragging) {
                             return;
@@ -462,6 +475,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                             }
                         }, 3000);
                     });
+
                 map.addLayer(lastItineraryHoverMarker);
             }
         };
@@ -471,6 +485,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // add a layer of draggable markers for the existing waypoints
         if (itinerary.waypoints) {
             var dragging = false;
+            var popupTimeout;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
                 pointToLayer: function(geojson, latlng) {
                     var marker = new cartodb.L.marker(latlng, {icon: destinationIcon,
@@ -487,9 +502,16 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
                     marker.bindPopup('Drag to change or click to remove', {closeButton: false})
                     .on('mouseover', function () {
+                        clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function () {
-                        this.closePopup();
+                        // Close popup, but with a slight delay to avoid flickering, and with an
+                        // existence check to avoid errors if the marker has been destroyed
+                        popupTimeout = setTimeout(function() {
+                            if (marker) {
+                                marker.closePopup();
+                            }
+                        }, 50);
                     });
                     return marker;
                 }
