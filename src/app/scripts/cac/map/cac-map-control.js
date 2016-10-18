@@ -433,48 +433,71 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var startDragPoint = null;
                 // Use a timeout when closing the popup so it doesn't strobe on extraneous mouseouts
                 var popupTimeout;
-                lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
-                        draggable: true,
-                        icon: highlightIcon,
-                    }).on('dragstart', function(e) {
-                        dragging = true;
-                        startDragPoint = e.target.getLatLng();
-                    }).on('dragend', function(e) {
-                        dragging = false;
-                        var coords = e.target.getLatLng();
-                        addWaypoint(itinerary, [coords.lat, coords.lng],
-                                    [startDragPoint.lng, startDragPoint.lat]);
-                        startDragPoint = null;
-                    });
+                // The marker closes with a timeout as well, and we want to hold on to it so we can
+                // cancel it if we want to
+                var markerTimeout;
+
+                lastItineraryHoverMarker = new cartodb.L.circleMarker(e.latlng, {
+                    color: '#40a368',
+                    fillOpacity: 0.5,
+                    radius: 8,
+                });
+
+                var closePopup = function() {
+                    if (lastItineraryHoverMarker) {
+                        lastItineraryHoverMarker.closePopup();
+                    }
+                };
 
                 lastItineraryHoverMarker.bindPopup('Drag marker to change route',
-                                                   {closeButton: false})
+                                                   {closeButton: false, offset: L.point(0, -7) })
                     .on('mouseover', function() {
                         clearTimeout(popupTimeout);
+                        clearTimeout(markerTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function() {
                         // Close popup, but with a slight delay to avoid flickering, and with an
                         // existence check to avoid errors if the marker has been destroyed
-                        popupTimeout = setTimeout(function() {
-                            if (lastItineraryHoverMarker) {
-                                lastItineraryHoverMarker.closePopup();
-                            }
-                         }, 50);
+                        popupTimeout = setTimeout(closePopup, 50);
 
                         // hide marker after awhile if not dragging
-                        if (dragging) {
-                            return;
+                        if (!dragging) {
+                            markerTimeout = setTimeout(function() {
+                                if (lastItineraryHoverMarker && !dragging) {
+                                    map.removeLayer(lastItineraryHoverMarker);
+                                    lastItineraryHoverMarker = null;
+                                    dragging = false;
+                                    startDragPoint = null;
+                                }
+                            }, 3000);
                         }
-
-                        setTimeout(function() {
-                            if (lastItineraryHoverMarker && !dragging) {
-                                map.removeLayer(lastItineraryHoverMarker);
-                                lastItineraryHoverMarker = null;
-                                dragging = false;
-                                startDragPoint = null;
-                            }
-                        }, 3000);
                     });
+
+                // circleMarkers aren't draggable, so this implments dragging using mouse
+                // down/move/up events. What could go wrong?
+                var dragCircle = function(e) {
+                    dragging = true;
+                    closePopup();
+                    lastItineraryHoverMarker.setLatLng(e.latlng);
+                };
+
+                var stopDragging = function() {
+                    if (dragging) {
+                        var coords = lastItineraryHoverMarker.getLatLng();
+                        addWaypoint(itinerary, [coords.lat, coords.lng],
+                                    [startDragPoint.lng, startDragPoint.lat]);
+                        dragging = false;
+                        startDragPoint = null;
+                    }
+                    map.removeEventListener('mousemove', dragCircle);
+                    map.removeEventListener('mouseup', stopDragging);
+                };
+
+                lastItineraryHoverMarker.on('mousedown', function(e) {
+                    startDragPoint = e.target.getLatLng();
+                    map.on('mousemove', dragCircle);
+                    map.on('mouseup', stopDragging);
+                });
 
                 map.addLayer(lastItineraryHoverMarker);
             }
@@ -485,34 +508,67 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // add a layer of draggable markers for the existing waypoints
         if (itinerary.waypoints) {
             var dragging = false;
+            var dragged = false;
             var popupTimeout;
+
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
                 pointToLayer: function(geojson, latlng) {
-                    var marker = new cartodb.L.marker(latlng, {icon: destinationIcon,
-                                                               draggable: true });
-                    marker.on('dragstart', function() {
-                        dragging = true;
-                    }).on('dragend', function(e) {
-                        dragging = false;
-                        var coords = e.target.getLatLng();
-                        moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
-                    }).on('click', function() {
-                        removeWaypoint(itinerary, geojson.properties.index);
+                    var marker = new cartodb.L.circleMarker(latlng, {
+                        color: '#40a368',
+                        fillOpacity: 0.5,
+                        radius: 8,
                     });
 
-                    marker.bindPopup('Drag to change or click to remove', {closeButton: false})
-                    .on('mouseover', function () {
+                    var closePopup = function() {
+                        if (marker) {
+                            marker.closePopup();
+                        }
+                    };
+
+                    marker.bindPopup('Drag to change or click to remove',
+                                     { closeButton: false, offset: L.point(0, -7) }
+                    ).on('mouseover', function () {
                         clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function () {
                         // Close popup, but with a slight delay to avoid flickering, and with an
                         // existence check to avoid errors if the marker has been destroyed
-                        popupTimeout = setTimeout(function() {
-                            if (marker) {
-                                marker.closePopup();
-                            }
-                        }, 50);
+                        popupTimeout = setTimeout(closePopup, 50);
                     });
+
+                    // Same dragging logic as above, but for this one we don't need to track
+                    // startDragPoint and do need to track whether the point was dragged, because
+                    // 'click' fires regardless and we want to ignore it on drag but delete the
+                    // marker on regular click.
+                    function dragCircle(e) {
+                        dragging = true;
+                        dragged = true;
+                        closePopup();
+                        marker.setLatLng(e.latlng);
+                    }
+
+                    function stopDragging() {
+                        if (dragging) {
+                            var coords = marker.getLatLng();
+                            moveWaypoint(itinerary, geojson.properties.index, [coords.lat, coords.lng]);
+                            dragging = false;
+                        }
+                        map.removeEventListener('mousemove', dragCircle);
+                        map.removeEventListener('mouseup', stopDragging);
+                    }
+
+                    marker.on('mousedown', function() {
+                        map.on('mousemove', dragCircle);
+                        map.on('mouseup', stopDragging);
+                    });
+
+                    marker.on('click', function () {
+                        if (!dragged) {
+                            removeWaypoint(itinerary, geojson.properties.index);
+                            dragged = false;
+                        }
+                    });
+
                     return marker;
                 }
             }).addTo(map);
