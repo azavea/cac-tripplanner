@@ -4,6 +4,7 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.3.6",
     "bootstrap-select": "~1.11.2",
+    "console-polyfill": "~0.2.3",
     "eonasdan-bootstrap-datetimepicker": "~4.17.42",
     "handlebars": "~4.0.5",
     "jquery": "~2.1.4",
