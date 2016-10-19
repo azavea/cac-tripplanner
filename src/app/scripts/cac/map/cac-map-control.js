@@ -476,6 +476,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var newWaypointIndex = null;
 		        // Use a timeout when closing the popup so it doesn't strobe on extraneous mouseouts
                 var popupTimeout;
+                // The marker closes with a timeout as well, and holding onto it lets us avoid
+                // removing the marker while it's still under the mouse
+                var markerTimeout;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: waypointIcon
@@ -498,6 +501,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         redrawWaypointDrag(event, newWaypointIndex, true);
                     }).on('mouseover', function() {
                         clearTimeout(popupTimeout);
+                        clearTimeout(markerTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function() {
                         // Close popup, but with a slight delay to avoid flickering, and with an
@@ -509,18 +513,16 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                          }, 50);
 
                         // hide marker after awhile if not dragging
-                        if (dragging) {
-                            return;
+                        if (!dragging) {
+                            markerTimeout = setTimeout(function() {
+                                if (lastItineraryHoverMarker && !dragging) {
+                                    map.removeLayer(lastItineraryHoverMarker);
+                                    lastItineraryHoverMarker = null;
+                                    dragging = false;
+                                    newWaypointIndex = null;
+                                }
+                            }, 3000);
                         }
-
-                        setTimeout(function() {
-                            if (lastItineraryHoverMarker && !dragging) {
-                                map.removeLayer(lastItineraryHoverMarker);
-                                lastItineraryHoverMarker = null;
-                                dragging = false;
-                                newWaypointIndex = null;
-                            }
-                        }, 3000);
                     });
 
                 map.addLayer(lastItineraryHoverMarker);
