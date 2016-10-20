@@ -1,0 +1,53 @@
+.places {
+    max-width: $home-main-max-width;
+    margin: 0 auto $home-section-margin;
+    padding: 0 $home-section-padding 10px;
+    background-color: $home-section-bg-color;
+
+    @include respond-to('xs') {
+        max-width: $place-card-width + (2 * $home-section-padding);
+        margin-bottom: $home-section-margin / 2;
+    }
+
+    @include respond-to('xxs') {
+        background-color: inherit;
+    }
+
+    .body-map & {
+        display: none;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-style: italic;
+        font-weight: $font-weight-bold;
+        line-height: 3;
+        text-align: center;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            font-size: 2rem;
+            line-height: 3;
+        }
+
+        .body-map & {
+            font-size: 1.4rem;
+            line-height: 4;
+        }
+    }
+
+    .place-list {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0;
+
+        @include respond-to('xs') {
+            flex-flow: column nowrap;
+            align-items: center;
+        }
+    }
+}
