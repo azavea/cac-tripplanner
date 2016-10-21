@@ -46,18 +46,18 @@ var scriptOrder = [
     // and we should consider moving to something more manageable.
     '**/cac.js',
     '**/utils.js',
-    '**/cac/search/cac-search-params.js'
-];
+    '**/cac/search/cac-search-params.js',
     // '**/cac/map/cac-map-templates.js',
-    // '**/cac/share/*.js',
-    // '**/cac/user/*.js',
-    // '**/cac/search/*.js',
-    // '**/cac/routing/*.js',
-    // '**/cac/urlrouting/*.js',
+    '**/cac/share/*.js',
+    '**/cac/user/*.js',
+    '**/cac/search/*.js',
+    '**/cac/routing/*.js',
+    '**/cac/urlrouting/*.js',
     // '**/cac/control/*.js',
     // '**/cac/map/*.js',
-    // '**/cac/home/*.js',
-    // '**/*.js'
+    '**/cac/home/*.js',
+    //'**/*.js',
+];
 
 // Helper for copying over bower files
 var copyBowerFiles = function(filter, extraFiles) {
@@ -115,7 +115,8 @@ gulp.task('clean', function() {
 
 gulp.task('minify:scripts', function(cb) {
     pump([
-        gulp.src('app/scripts/**/*.js'),
+         // TOOD: remove map scripts exclusion when updated
+        gulp.src(['app/scripts/**/*.js', '!app/scripts/**/*map*.js']),
         order(scriptOrder),
         vinylBuffer(),
         concat('main.js'),
