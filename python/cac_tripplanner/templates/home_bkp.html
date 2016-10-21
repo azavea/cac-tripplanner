@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="homepage">
+    {% include "header-mixin.html" %}
+    <section class="jumbotron">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                    <h1 class="text-center">GoPhillyGo is a new online mapping tool for the Greater Philadelphia area.</h1>
+                    <h3 class="text-center hidden-xs">There are 2 easy ways to use the map:</h3>
+                    <div class="text-center toggle-search hidden-xs">
+                        <button class="btn btn-lg active" id="toggle-explore">Explore nearby locations</button>
+                        <small>or</small>
+                        <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="search text-center hidden-xs">
+            <form id="explore">
+                <span class="text hidden-sm">Where can I go in</span>
+                <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
+                <span class="text">minutes from</span>
+                <input id="exploreOrigin" class="typeahead" type="search"
+                    data-typeahead-key="origin" />
+                <span class="text">using</span>
+                <div id="exploreMode" class="btn-toolbar transit-types-container">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary btn-transit active" title=""
+                            data-original-title="Walking">
+                            <input type="radio" name="anytime-mode"
+                                value="WALK" checked />
+                            <i class="md md-directions-walk"></i>
+                        </label>
+                        <label class="btn btn-primary btn-transit" title=""
+                            data-original-title="Biking">
+                            <input type="radio" name="anytime-mode" value="BICYCLE" />
+                            <i class="md md-directions-bike"></i>
+                        </label>
+                    </div>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary btn-transit active" title=""
+                            data-original-title="Transit">
+                            <input type="checkbox" name="public-transit-mode" value="TRANSIT" checked/>
+                            <i class="md md-directions-transit"></i>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit">&rarr;</button>
+            </form>
+            <form id="directions" class="hidden">
+                <span class="text hidden-sm">How do I get from</span>
+                <input id="directionsFrom" class="typeahead" type="search"
+                    data-typeahead-key="from" />
+                <span class="text">to</span>
+                <input id="directionsTo" class="typeahead" type="search"
+                    data-typeahead-key="to" />
+                <span class="text">using</span>
+                <div id="directionsMode" class="btn-toolbar transit-types-container">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary btn-transit active" title=""
+                            data-original-title="Walking">
+                            <input type="radio" name="anytime-mode"
+                                value="WALK" checked />
+                            <i class="md md-directions-walk"></i>
+                        </label>
+                        <label class="btn btn-primary btn-transit" title=""
+                            data-original-title="Biking">
+                            <input type="radio" name="anytime-mode"
+                                value="BICYCLE" />
+                            <i class="md md-directions-bike"></i>
+                        </label>
+                    </div>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary btn-transit active" title=""
+                            data-original-title="Transit">
+                            <input type="checkbox" name="public-transit-mode"
+                                value="TRANSIT" checked />
+                            <i class="md md-directions-transit"></i>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit">&rarr;</button>
+            </form>
+        </div>
+    </section>
+    <section class="content content-gray">
+        <div class="container">
+            <h1>Featured Locations <small>
+                <a id="viewAllDestinations" href="#">View all &raquo;</a>
+            </small></h1>
+            <div id="#destinationsSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
+                <div class="sk-bounce1"></div>
+                <div class="sk-bounce2"></div>
+                <div class="sk-bounce3"></div>
+            </div>
+            <div class="row destinations">
+                {% for destination in destinations|slice:":2" %}
+                    <div class="col-sm-6 col-md-4">
+                        <a class="block block-destination" data-destination-id="{{ destination.id }}" href="#">
+                            <h3 class="destination-name">{{ destination.name }}</h3>
+                            <h5 class="destination-address">{{ destination.address }}</h5>
+                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
+                            {% if destination.image %}
+                            <img src="{{ destination.image.url }}" width="400" height="400"/>
+                            {% else %}
+                            <img src="https://placehold.it/400x400.jpg" />
+                            {% endif %}
+                        </a>
+                    </div>
+                {% endfor %}
+                <div class="col-sm-6 col-md-4">
+                    {% for destination in destinations|slice:"2:4" %}
+                        <a class="block block-destination block-half" data-destination-id="{{ destination.id }}" href="#">
+                            <h3 class="destination-name">{{ destination.name }}</h3>
+                            <h5 class="destination-address">{{ destination.address }}</h5>
+                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
+                            {% if destination.wide_image %}
+                            <img src="{{ destination.wide_image.url }}" width="400" height="200"/>
+                            {% else %}
+                            <img src="https://placehold.it/400x400.jpg" />
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3>GoPhillyGo Spotlight <small>
+                        <a id="viewAllArticles" href="#">View all &raquo;</a>
+                    </small></h3>
+                    <div id="articlesSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
+                        <div class="sk-bounce1"></div>
+                        <div class="sk-bounce2"></div>
+                        <div class="sk-bounce3"></div>
+                    </div>
+                    <div class="row articles">
+                      {% if community_profile %}
+                        <div class="col-sm-6">
+                          <a class="block block-spotlight"
+                             href="{% url 'community-profile-detail' community_profile.slug %}">
+                                <h3 class="destination-name">{{ community_profile.title }}</h3>
+                                <h5>Community Profile</h5>
+                                {% if community_profile.narrow_image %}
+                                <img src="{{ community_profile.narrow_image.url }}" width="400" height="600"/>
+                                {% else %}
+                                <img src="https://placehold.it/400x600.jpg" />
+                                {% endif %}
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% if tips_and_tricks %}
+                        <div class="col-sm-6">
+                          <a class="block block-spotlight"
+                             href="{% url 'tips-and-tricks-detail' tips_and_tricks.slug %}">
+                                <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
+                                <h5>Tips & Tricks</h5>
+                                {% if tips_and_tricks.wide_image %}
+                                <img src="{{ tips_and_tricks.narrow_image.url }}" width="400" height="600"/>
+                                {% else %}
+                                <img src="https://placehold.it/400x600.jpg" />
+                                {% endif %}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4 hidden-xs hidden-sm">
+                    <h3>Stay Connected</h3>
+                    <a class="twitter-timeline" href="https://twitter.com/go_philly_go"
+                        data-widget-id="591426048786587650">Tweets by @go_philly_go</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <div id="submit-error-modal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>We had trouble recognizing that address</h4>
+          </div>
+          <div class="modal-body">
+            <p>Please try again and select an option from the list.</p>
+            <p>Intersections are difficult to interpret - try using an address instead.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    {% include "contact-form-mixin.html" %}
+    {% include "footer-mixin.html" %}
+</div>
+{% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+jQuery.noConflict(); // because JotForms.
+jQuery(document).ready(function ($) {
+    CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    var home = new CAC.Pages.Home();
+    home.initialize();
+});
+</script>
+{% endblock %}
