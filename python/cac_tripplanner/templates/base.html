@@ -14,7 +14,7 @@
     <meta property="og:title" content="Trip Planner" />
     <meta property="og:description"
         content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
-    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
+    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
     <meta property="og:site_name" content="GoPhillyGo" />
@@ -23,18 +23,15 @@
     <meta name="twitter:site" content="@go_philly_go" />
     <meta name="twitter:title" content="GoPhillyGo" />
     <meta name="twitter:description" content="Helping you get around greater Philly" />
-    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
+    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     {% endblock %}
 
     {% block cssimports %}
 
-    <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
     <link href="{% static 'styles/main.css' %}" rel="stylesheet">
 
+    <!--
 	<link rel="apple-touch-icon" sizes="57x57" href="{% static 'images/apple-touch-icon-57x57.png' %}" />
 	<link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/apple-touch-icon-114x114.png' %}" />
 	<link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/apple-touch-icon-72x72.png' %}" />
@@ -44,6 +41,7 @@
 	<link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/apple-touch-icon-76x76.png' %}" />
 	<link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/apple-touch-icon-152x152.png' %}" />
 	<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" sizes="32x32" />
+    -->
 
     {% endblock %}
 
@@ -58,7 +56,7 @@
 
   <body>
 
-    <!-- Google Tag Manager -->
+    <!-- Google Tag Manager
     <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KNZ9R2"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -66,7 +64,7 @@
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KNZ9R2');</script>
-    <!-- End Google Tag Manager -->
+    End Google Tag Manager -->
 
     {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
 
@@ -79,6 +77,7 @@
     {% if fb_app_id %}
     <!-- facebook loads async; might not be there during module init! -->
     <!-- loading debug version here -->
+    <!--
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
@@ -88,21 +87,19 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
     {% endif %}
+    -->
 
     <script src="{% static 'scripts/vendor/cartodb.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
+    <!--
     <script src="{% static 'scripts/vendor/jquery.storageapi.js' %}"></script>
     <script src="{% static 'scripts/vendor/lodash.js' %}"></script>
     <script src="{% static 'scripts/vendor/handlebars.js' %}"></script>
     <script src="{% static 'scripts/vendor/Polyline.encoded.js' %}"></script>
     <script src="{% static 'scripts/vendor/typeahead.bundle.js' %}"></script>
-    <script src="{% static 'scripts/vendor/leaflet.awesome-markers.js' %}"></script>
     <script src="{% static 'scripts/vendor/turf-helpers.js' %}"></script>
     <script src="{% static 'scripts/vendor/turf-nearest.js' %}"></script>
     <script src="{% static 'scripts/vendor/moment.js' %}"></script>
     <script src="{% static 'scripts/vendor/moment-duration-format.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap-datetimepicker.min.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap-select.js' %}"></script>
     <script src="{% static 'scripts/vendor/navigo.js' %}"></script>
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
@@ -128,6 +125,7 @@
     <script src="{% static 'scripts/main/cac/pages/cac-pages-home.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-map.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-directions.js' %}"></script>
+    -->
 
     {% else %}
 
