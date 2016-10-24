@@ -320,14 +320,6 @@ jQuery(document).ready(function ($) {
     subdomains: 'abcd',
     maxZoom: 19
     }).addTo(map);
-
-    // set class on body
-    // FIXME: avoid having to do this for templating to work.
-    // also had to wrap contents here in a div with the same class
-    // leave out class on div or class on body, and either have no map,
-    // or map and no content overlay
-    $('body').removeClass();
-    $('body').addClass('body-home');
 });
 </script>
 {% endblock %}
