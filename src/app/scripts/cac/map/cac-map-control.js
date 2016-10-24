@@ -42,7 +42,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var liveUpdatingItinerary = false; // true when live update request sent but not completed
     var isochroneLayer = null;
     var waypointsLayer = null;
+
+    var layerControl = null;
     var tabControl = null;
+    var zoomControl = null;
 
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
@@ -86,10 +89,15 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
             .setView(this.options.center, this.options.zoom);
 
-        // put zoom control on top right
-        new cartodb.L.Control.Zoom({ position: 'topright' }).addTo(map);
-
         tabControl = options.tabControl;
+
+        // put zoom control on top right
+        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
+
+        // hide zoom control on home page view
+        if (tabControl) {
+            zoomControl.addTo(map);
+        }
 
         initializeBasemaps();
         initializeOverlays();
@@ -174,16 +182,28 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
         overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
 
+        // TODO: handle hiding layers on home view more cleanly.
+        // Would be better to initialize but not add to map, to avoid flashing,
+        // although it probably won't be visible due to centering of home page text.
+        if (!tabControl) {
+            overlays['Bike Share Locations'].eachLayer(function(layer) { layer.hide(); });
+            overlays['Bike Routes'].eachLayer(function(layer) { layer.hide(); });
+        }
+
         // TODO: re-enable when Uwishunu feed returns
         //overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
         //overlays['Nearby Events'].addTo(map);
     }
 
     function initializeLayerControl() {
-        cartodb.L.control.layers(basemaps, overlays, {
+        layerControl = cartodb.L.control.layers(basemaps, overlays, {
             position: 'bottomright',
             collapsed: false
-        }).addTo(map);
+        });
+
+        if (tabControl) {
+            layerControl.addTo(map);
+        }
     }
 
     /**
