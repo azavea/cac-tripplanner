@@ -48,16 +48,16 @@ var scriptOrder = [
     '**/cac.js',
     '**/utils.js',
     '**/cac/search/cac-search-params.js',
-    // '**/cac/map/cac-map-templates.js',
+    '**/cac/map/cac-map-templates.js',
     '**/cac/share/*.js',
     '**/cac/user/*.js',
     '**/cac/search/*.js',
     '**/cac/routing/*.js',
     '**/cac/urlrouting/*.js',
-    // '**/cac/control/*.js',
-    // '**/cac/map/*.js',
+    '**/cac/control/*.js',
+    '**/cac/map/*.js',
     '**/cac/home/*.js',
-    //'**/*.js',
+    '**/*.js',
 ];
 
 // Helper for copying over bower files
