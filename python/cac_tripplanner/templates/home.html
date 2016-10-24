@@ -1,213 +1,325 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block content %}
-<div class="homepage">
-    {% include "header-mixin.html" %}
-    <section class="jumbotron">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                    <h1 class="text-center">GoPhillyGo is a new online mapping tool for the Greater Philadelphia area.</h1>
-                    <h3 class="text-center hidden-xs">There are 2 easy ways to use the map:</h3>
-                    <div class="text-center toggle-search hidden-xs">
-                        <button class="btn btn-lg active" id="toggle-explore">Explore nearby locations</button>
-                        <small>or</small>
-                        <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
+<div class="body-home">
+    <div class="the-map" id="map"></div>
+
+    <header class="app-header">
+        <div class="brand">
+            <div class="slogan-start">
+                Walk. Ride. Pedal. Discover.
+            </div>
+            <div class="logo"><a href="#"></a></div>
+            <div class="slogan-end">
+                Next time bring your bike onboard.
+            </div>
+        </div>
+        <nav class="primary-nav">
+            <a class="nav-item on" href="index.html">Directions</a>
+            <a class="nav-item" href="#">Explore</a>
+            <a class="nav-item" href="learn-index.html">Learn</a>
+        </nav>
+    </header>
+
+    <form class="directions-form-element" action="" method="post">
+        <div class="directions-form">
+            <div class="mode-picker">
+                <div class="mode-toggle">
+                    <div class="walk mode-option on">
+                        <i class="icon-walk"></i> <span class="mode-label">Walk</span>
+                    </div>
+                    <div class="bike mode-option">
+                        <i class="icon-bike"></i> <span class="mode-label">Bike</span>
+                    </div>
+                    <input type="hidden" name="mode" value="walk">
+                </div>
+                <div class="transit mode-option on">
+                    <i class="icon-transit-on"></i> <span class="mode-label">Transit</span>
+                    <input type="hidden" name="transit" value="on">
+                </div>
+                <div class="btn-options" title="Route options">
+                    <i class="icon-sliders"></i>
+                </div>
+            </div>
+            <div class="directions-from directions-text-input">
+                <label for="input-directions-from">from</label>
+                <input type="text" id="input-directions-from" name="input-directions-from" value="" placeholder="Enter a starting point">
+                <button class="btn-geolocate" title="Detect current location" type="button" name="geolocate"><i class="icon-geolocate"></i></button>
+            </div>
+            <div class="directions-to directions-text-input">
+                <label for="input-directions-to">to</label>
+                <input type="text" id="input-directions-to" name="input-directions-to" value="" placeholder="Enter a destination — or choose one below">
+                <button class="btn-reverse" title="Swap starting point and destination" type="button" name="reverse"><i class="icon-reverse"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <div class="sidebar-banner indego-banner">
+        <div class="banner-message">Need wheels? Click <i class="icon-sliders"></i> for Indego bike sharing</div>
+        <button title="Dismiss this message" name="close" class="btn-dismiss-sidebar-banner"><i class="icon-cancel"></i></button>
+    </div>
+
+    <div class="places">
+        <h1>Places we love</h1>
+        <ul class="place-list">
+            <li class="place-card no-origin">
+                <img class="place-card-photo" src="{% static 'images/places/john-heinz.png' %}" width="308" height="154" alt="John Heinz National Wildlife Refuge" />
+                <h2>John Heinz National Wildlife Refuge</h2>
+                <div class="place-card-travel-logistics">
+                    <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                </div>
+                <div class="place-card-actions">
+                    <a class="place-card-action place-action-go" href="#">Go here</a>
+                    <a class="place-card-action place-action-details" href="explore-detail.html">More info</a>
+                </div>
+            </li>
+            <li class="place-card no-origin">
+                <img class="place-card-photo" src="{% static 'images/places/schuylkill-center.png' %}" width="308" height="154" alt="Schuylkill Center for Environmental Education" />
+                <h2>Schuylkill Center for Environmental Education</h2>
+                <div class="place-card-travel-logistics">
+                    <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                </div>
+                <div class="place-card-actions">
+                    <a class="place-card-action place-action-go" href="#">Go here</a>
+                    <a class="place-card-action place-action-details" href="explore-detail.html">More info</a>
+                </div>
+            </li>
+            <li class="place-card no-origin">
+                <img class="place-card-photo" src="{% static 'images/places/bristol-marsh.png' %}" width="308" height="154" alt="Bristol Marsh Nature Preserve" />
+                <h2>Bristol Marsh Nature Preserve</h2>
+                <div class="place-card-travel-logistics">
+                    <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                </div>
+                <div class="place-card-actions">
+                    <a class="place-card-action place-action-go" href="#">Go here</a>
+                    <a class="place-card-action place-action-details" href="explore-detail.html">More info</a>
+                </div>
+            </li>
+            <li class="place-card no-origin">
+                <img class="place-card-photo" src="{% static 'images/places/bartrams-garden.png' %}" width="308" height="154" alt="Bartram's Garden" />
+                <h2>Bartram's Garden</h2>
+                <div class="place-card-travel-logistics">
+                    <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                </div>
+                <div class="place-card-actions">
+                    <a class="place-card-action place-action-go" href="#">Go here</a>
+                    <a class="place-card-action place-action-details" href="explore-detail.html">More info</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <a href="learn-detail.html" class="preview-card-link">
+        <div class="preview-card">
+            <img class="preview-photo" src="{% static 'images/posts/palmyra-cove-summary.png' %}" width="308" height="204" alt="Video trip to Palmyra Cove" />
+            <div class="preview-details">
+                <div class="category-heading">
+                    Community Profile
+                </div>
+                <h2>Video trip to Palmyra Cove</h2>
+                <p class="lede">
+                    GoPhillyGo student ambassadors, Tykee James and Stephanie Mason, used GoPhillyGo.org to plan a trip to one of our featured destinations, Palmyra Cove Nature Park. Tykee and Stephanie began their journey on bike
+                </p>
+                <button class="goto-more-posts" href="learn-index.html">More tips, posts, and announcements</button>
+            </div>
+        </div>
+    </a>
+
+    <div class="directions-results">
+        <h1>Choose a route</h1>
+        <div class="routes-list">
+            <div class="route-summary">
+                <svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331"></line>
+                </svg>
+                <div class="route-summary-details">
+                    <div class="route-summary-primary-details">
+                        <div class="route-duration">33 <span class="units">min</span></div>
+                        <div class="route-distance">9.1 <span class="units">miles</span></div>
+                        <div class="route-name">via N 10th St</div>
+                    </div>
+                    <div class="route-summary-secondary-details">
+                        <div class="route-start-stop">3:14pm – 3:48pm</div>
+                        <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="route-summary">
+                <svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#5c99c6" stroke-dasharray="7, 7"></line>
+                </svg>
+                <div class="route-summary-details">
+                    <div class="route-summary-primary-details">
+                        <div class="route-duration">37 <span class="units">min</span></div>
+                        <div class="route-distance">9.6 <span class="units">miles</span></div>
+                        <div class="route-name">via N 8th St</div>
+                    </div>
+                    <div class="route-summary-secondary-details">
+                        <div class="route-start-stop">3:23pm – 4:00pm</div>
+                        <div class="route-modes"><i class="icon-transit"></i><i class="icon-walk"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="search text-center hidden-xs">
-            <form id="explore">
-                <span class="text hidden-sm">Where can I go in</span>
-                <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
-                <span class="text">minutes from</span>
-                <input id="exploreOrigin" class="typeahead" type="search"
-                    data-typeahead-key="origin" />
-                <span class="text">using</span>
-                <div id="exploreMode" class="btn-toolbar transit-types-container">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Walking">
-                            <input type="radio" name="anytime-mode"
-                                value="WALK" checked />
-                            <i class="md md-directions-walk"></i>
-                        </label>
-                        <label class="btn btn-primary btn-transit" title=""
-                            data-original-title="Biking">
-                            <input type="radio" name="anytime-mode" value="BICYCLE" />
-                            <i class="md md-directions-bike"></i>
-                        </label>
-                    </div>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Transit">
-                            <input type="checkbox" name="public-transit-mode" value="TRANSIT" checked/>
-                            <i class="md md-directions-transit"></i>
-                        </label>
-                    </div>
+    </div>
+
+    <div class="directions-step-by-step">
+        <header class="step-by-step-header">
+            <button name="back-to-directions-results" class="back-to-directions-results"><i class="icon-left-big"></i></button>
+            <h1>Directions</h1>
+            <button name="share-directions" class="share-directions"><i class="icon-share"></i></button>
+        </header>
+        <div class="directions-list-of-steps">
+            <div class="directions-leg directions-leg-origin">
+                <div class="directions-step directions-step-origin">
+                    <div class="directions-instruction">Depart 135 S 19th St</div>
+                    <div class="directions-time">at 9:47a</div>
                 </div>
-                <button type="submit">&rarr;</button>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk north on S 19th St</div>
+                    <div class="directions-distance">78 feet</div>
+                </div>
+                <div class="directions-step directions-step-arrive">
+                    <div class="directions-instruction">Arrive <strong>19th &amp; Moravian St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-bus">
+                <div class="directions-step directions-step-bus">
+                    <div class="directions-instruction">Board SEPTA 17 (20th &amp; Johnston)</div>
+                    <div class="directions-time">at 9:48a</div>
+                    <div class="directions-distance">1.35 miles</div>
+                </div>
+                <div class="directions-step directions-step-disembark">
+                    <div class="directions-instruction">Disembark <strong>19th St &amp; Tasker St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk southeast on Tasker St</div>
+                    <div class="directions-distance">98 feet</div>
+                </div>
+                <div class="directions-step directions-step-arrive">
+                    <div class="directions-instruction">Arrive <strong>Tasker St &amp; 19th St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-bus">
+                <div class="directions-step directions-step-bus">
+                    <div class="directions-instruction">Board SEPTA 1297 (33rd &amp; Dickinson)</div>
+                    <div class="directions-time">at 10:00a</div>
+                    <div class="directions-distance">0.8 miles</div>
+                </div>
+                <div class="directions-step directions-step-disembark">
+                    <div class="directions-instruction">Disembark <strong>Tasker St &amp; 28th St</strong></div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-walk">
+                <div class="directions-step directions-step-walk">
+                    <div class="directions-instruction">Walk east on Tasker St</div>
+                    <div class="directions-distance">105 feet</div>
+                </div>
+                <div class="directions-step directions-step-turn-left">
+                    <div class="directions-instruction">Turn left on S Marston St</div>
+                    <div class="directions-distance">0.13 miles</div>
+                </div>
+            </div>
+            <div class="directions-leg directions-leg-destination">
+                <div class="directions-step directions-step-destination">
+                    <div class="directions-instruction">Arrive S Marston St &amp; Reed St</div>
+                    <div class="directions-time">at 10:07a</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-subscribe">
+            <h2>Stay up to date</h2>
+            <p>
+                Stay up to date on all things GoPhillyGo — events, updates, featured content.
+            </p>
+            <form class="subscribe-form" action="" method="post">
+                <input class="subscribe-input" type="text" name="email" value="" placeholder="Your email address">
+                <button class="subscribe-btn" type="submit" name="subscribe-submit">Subscribe</button>
             </form>
-            <form id="directions" class="hidden">
-                <span class="text hidden-sm">How do I get from</span>
-                <input id="directionsFrom" class="typeahead" type="search"
-                    data-typeahead-key="from" />
-                <span class="text">to</span>
-                <input id="directionsTo" class="typeahead" type="search"
-                    data-typeahead-key="to" />
-                <span class="text">using</span>
-                <div id="directionsMode" class="btn-toolbar transit-types-container">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Walking">
-                            <input type="radio" name="anytime-mode"
-                                value="WALK" checked />
-                            <i class="md md-directions-walk"></i>
-                        </label>
-                        <label class="btn btn-primary btn-transit" title=""
-                            data-original-title="Biking">
-                            <input type="radio" name="anytime-mode"
-                                value="BICYCLE" />
-                            <i class="md md-directions-bike"></i>
-                        </label>
-                    </div>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Transit">
-                            <input type="checkbox" name="public-transit-mode"
-                                value="TRANSIT" checked />
-                            <i class="md md-directions-transit"></i>
-                        </label>
-                    </div>
-                </div>
-                <button type="submit">&rarr;</button>
-            </form>
         </div>
-    </section>
-    <section class="content content-gray">
-        <div class="container">
-            <h1>Featured Locations <small>
-                <a id="viewAllDestinations" href="#">View all &raquo;</a>
-            </small></h1>
-            <div id="#destinationsSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
-                <div class="sk-bounce1"></div>
-                <div class="sk-bounce2"></div>
-                <div class="sk-bounce3"></div>
-            </div>
-            <div class="row destinations">
-                {% for destination in destinations|slice:":2" %}
-                    <div class="col-sm-6 col-md-4">
-                        <a class="block block-destination" data-destination-id="{{ destination.id }}" href="#">
-                            <h3 class="destination-name">{{ destination.name }}</h3>
-                            <h5 class="destination-address">{{ destination.address }}</h5>
-                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
-                            {% if destination.image %}
-                            <img src="{{ destination.image.url }}" width="400" height="400"/>
-                            {% else %}
-                            <img src="https://placehold.it/400x400.jpg" />
-                            {% endif %}
-                        </a>
-                    </div>
-                {% endfor %}
-                <div class="col-sm-6 col-md-4">
-                    {% for destination in destinations|slice:"2:4" %}
-                        <a class="block block-destination block-half" data-destination-id="{{ destination.id }}" href="#">
-                            <h3 class="destination-name">{{ destination.name }}</h3>
-                            <h5 class="destination-address">{{ destination.address }}</h5>
-                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
-                            {% if destination.wide_image %}
-                            <img src="{{ destination.wide_image.url }}" width="400" height="200"/>
-                            {% else %}
-                            <img src="https://placehold.it/400x400.jpg" />
-                            {% endif %}
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
+        <div class="footer-follow">
+            <h2>Follow us</h2>
+            <ul class="social-sites">
+                <li><a class="social-twitter" target="_blank" title="Follow us on Twitter" href="https://twitter.com/go_philly_go"><i class="icon-twitter"></i></a></li>
+                <li><a class="social-facebook" target="_blank" title="Like us on Facebook" href="https://www.facebook.com/gophillygo"><i class="icon-facebook"></i></a></li>
+                <li><a class="social-instagram" target="_blank" title="Follow us on Instagram" href="https://www.instagram.com/go_philly_go/"><i class="icon-instagram"></i></a></li>
+                <li><a class="social-youtube" target="_blank" title="Watch us on YouTube" href="https://www.youtube.com/channel/UCJSbm760xytSCZdJ16kS1Cg"><i class="icon-youtube"></i></a></li>
+            </ul>
         </div>
-    </section>
-    <section class="content">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <h3>GoPhillyGo Spotlight <small>
-                        <a id="viewAllArticles" href="#">View all &raquo;</a>
-                    </small></h3>
-                    <div id="articlesSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
-                        <div class="sk-bounce1"></div>
-                        <div class="sk-bounce2"></div>
-                        <div class="sk-bounce3"></div>
-                    </div>
-                    <div class="row articles">
-                      {% if community_profile %}
-                        <div class="col-sm-6">
-                          <a class="block block-spotlight"
-                             href="{% url 'community-profile-detail' community_profile.slug %}">
-                                <h3 class="destination-name">{{ community_profile.title }}</h3>
-                                <h5>Community Profile</h5>
-                                {% if community_profile.narrow_image %}
-                                <img src="{{ community_profile.narrow_image.url }}" width="400" height="600"/>
-                                {% else %}
-                                <img src="https://placehold.it/400x600.jpg" />
-                                {% endif %}
-                            </a>
-                        </div>
-                        {% endif %}
-                        {% if tips_and_tricks %}
-                        <div class="col-sm-6">
-                          <a class="block block-spotlight"
-                             href="{% url 'tips-and-tricks-detail' tips_and_tricks.slug %}">
-                                <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
-                                <h5>Tips & Tricks</h5>
-                                {% if tips_and_tricks.wide_image %}
-                                <img src="{{ tips_and_tricks.narrow_image.url }}" width="400" height="600"/>
-                                {% else %}
-                                <img src="https://placehold.it/400x600.jpg" />
-                                {% endif %}
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-4 hidden-xs hidden-sm">
-                    <h3>Stay Connected</h3>
-                    <a class="twitter-timeline" href="https://twitter.com/go_philly_go"
-                        data-widget-id="591426048786587650">Tweets by @go_philly_go</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-                    </script>
-                </div>
-            </div>
+        <div class="footer-about">
+            <a class="goto-about" title="Learn more about GoPhillyGo" href="about.html">
+                <h2>About</h2>
+                <p>
+                    GoPhillyGo is a project of the Clean Air Council, Azavea, and Warkulwiz Design Associates. The project is funded by the William Penn Foundation.
+                </p>
+            </a>
         </div>
+        <div class="footer-compact">
+            <a href="#">Explore</a>
+            <a href="learn-index.html">Learn</a>
         </div>
-    </section>
-    <div id="submit-error-modal" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4>We had trouble recognizing that address</h4>
-          </div>
-          <div class="modal-body">
-            <p>Please try again and select an option from the list.</p>
-            <p>Intersections are difficult to interpret - try using an address instead.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-    {% include "contact-form-mixin.html" %}
-    {% include "footer-mixin.html" %}
+    </footer>
+
+    <div class="modal-overlay">
+        <div class="modal-panel modal-options">
+            <header class="modal-header">
+                Bike options
+            </header>
+            <ul class="modal-list modal-contents">
+                <li class="modal-list-indego">Indego bike sharing</li>
+                <li class="modal-list-timing">Arrive/depart at…</li>
+                <li class="modal-list-ride">Ride quality</li>
+            </ul>
+            <footer class="modal-footer">
+                <button name="close-modal" class="btn-close-modal">Close</button>
+            </footer>
+        </div>
+
+        <div class="modal-panel modal-share">
+            <header class="modal-header">
+                <i class="icon-share"></i>
+                Share
+            </header>
+            <ul class="modal-list modal-contents">
+                <li class="modal-list-link">Get a link</li>
+                <li class="modal-list-twitter">Twitter</li>
+                <li class="modal-list-facebook">Facebook</li>
+                <li class="modal-list-google">Google+</li>
+                <li class="modal-list-email">Email</li>
+            </ul>
+            <footer class="modal-footer">
+                <button name="close-modal" class="btn-close-modal">Close</button>
+            </footer>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {%block jspage %}
 <script type="text/javascript">
-jQuery.noConflict(); // because JotForms.
+//jQuery.noConflict(); // because JotForms.
 jQuery(document).ready(function ($) {
-    CAC.Settings.fbAppId = '{{ fb_app_id }}';
-    var home = new CAC.Pages.Home();
-    home.initialize();
+    //CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    //var home = new CAC.Pages.Home();
+    //home.initialize();
+
+    var map = cartodb.L.map('map', {
+        center: [40.000, -75.1639],
+        zoom: 12,
+        zoomControl: false
+    });
+    var CartoDB_Positron = cartodb.L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+    }).addTo(map);
 });
 </script>
 {% endblock %}

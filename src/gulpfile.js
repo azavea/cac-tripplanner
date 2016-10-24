@@ -9,6 +9,7 @@ var debug = require('gulp-debug');
 var del = require('del');
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var fontello = require('gulp-fontello');
 var merge = require('merge-stream');
 var pump = require('pump');
 var sass = require('gulp-sass');
@@ -27,18 +28,15 @@ var $ = require('gulp-load-plugins')();
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
 
-var filterCSS = gulpFilter('**/*.css', {restore: true});
+var filterCSS = gulpFilter(['**/*.css', '!**/leaflet.css'], {restore: true});
 
 var stat = {
-    fonts: staticRoot + '/fonts',
+    fonts: staticRoot + '/fontello',
     scripts: staticRoot + '/scripts',
     styles: staticRoot + '/styles',
     images: staticRoot + '/images'
 };
 
-var bootstrapSelectRoot = 'bower_components/bootstrap-select/dist/';
-var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
-var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
 var cartoDbRoot = 'bower_components/cartodb.js/src/';
 
 // Define the minification order for our js files
@@ -49,16 +47,16 @@ var scriptOrder = [
     '**/cac.js',
     '**/utils.js',
     '**/cac/search/cac-search-params.js',
-    '**/cac/map/cac-map-templates.js',
+    // '**/cac/map/cac-map-templates.js',
     '**/cac/share/*.js',
     '**/cac/user/*.js',
     '**/cac/search/*.js',
     '**/cac/routing/*.js',
     '**/cac/urlrouting/*.js',
-    '**/cac/control/*.js',
-    '**/cac/map/*.js',
+    // '**/cac/control/*.js',
+    // '**/cac/map/*.js',
     '**/cac/home/*.js',
-    '**/*.js'
+    //'**/*.js',
 ];
 
 // Helper for copying over bower files
@@ -111,15 +109,14 @@ var copyVendorJS = function(filter, extraFiles) {
 gulp.task('clean', function() {
     // This must be done synchronously to prevent sporadic failures
     return del.sync([
-        stat.styles + '/**',
-        stat.scripts + '/**',
-        stat.images + '/**'
+        staticRoot + '/**'
     ], { force: true });
 });
 
 gulp.task('minify:scripts', function(cb) {
     pump([
-        gulp.src('app/scripts/**/*.js'),
+         // TOOD: remove map scripts exclusion when updated
+        gulp.src(['app/scripts/**/*.js', '!app/scripts/**/*map*.js']),
         order(scriptOrder),
         vinylBuffer(),
         concat('main.js'),
@@ -134,8 +131,6 @@ gulp.task('minify:vendor-scripts', function(cb) {
                         // Exclude minified vendor scripts that also have a non-minified version.
                         // We run our own minifier, and want to include each script only once.
                         '!**/*.min.js',
-                        // ...except for bootstrap datetiempicker
-                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet and jquery (loaded over CDN)
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
                         []),
@@ -153,13 +148,10 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles('**/*.css',
-                          // FIXME: excluding minified CSS results in console error
-                          // about missing font awesome webfonts
+    return copyBowerFiles(['**/*.css',
                           //'!**/*.min.css',
                           // leaflet loaded over CDN
-                          '!**/leaflet/dist/*.css',
-                          [bootstrapSelectRoot + 'css/bootstrap-select.css'])
+                          '!**/leaflet.css'], [])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -168,30 +160,15 @@ gulp.task('copy:vendor-css', function() {
         .pipe(gulp.dest(stat.styles));
 });
 
-gulp.task('copy:bootstrap-select-map', function() {
-    return copyBowerFiles('**.*.map', [bootstrapSelectRoot + 'css/bootstrap-select.css.map'])
-        .pipe(concat('bootstrap-select.css.map'))
-        .pipe(gulp.dest(stat.styles));
-});
-
 gulp.task('copy:vendor-images', function() {
-    return copyBowerFiles('**/*.png', [])
+    return copyBowerFiles(['**/*.png', '!leaflet/dist/images/**',], [])
         .pipe(gulp.dest(stat.images + '/vendor'));
 });
 
-gulp.task('copy:fa-images', function() {
-    return copyBowerFiles('**/*.png', [awesomeIconsRoot + '/*.png'])
-        .pipe(gulp.dest(stat.styles + '/images'));
-});
-
-gulp.task('copy:md-images', function() {
-    return copyBowerFiles('**/*.svg', [materialIconsRoot + '/*.svg'])
-        .pipe(gulp.dest(stat.styles + '/images'));
-});
-
-gulp.task('copy:md-fonts', function() {
-    return copyBowerFiles('**/*.{woff,tiff,svg,eot}', [materialIconsRoot + '/*.{woff,tiff,svg,eot}'])
-        .pipe(gulp.dest(stat.fonts));
+gulp.task('copy:fontello-fonts', function() {
+    return gulp.src('app/font/fontello/config.json')
+    .pipe(fontello())
+    .pipe(gulp.dest(stat.fonts));
 });
 
 gulp.task('copy:app-images', function() {
@@ -203,8 +180,6 @@ gulp.task('copy:vendor-scripts', function() {
     return copyVendorJS(['**/*.js',
                         // exclude minified versions
                         '!**/*.min.js',
-                        // ...except for bootstrap datetiempicker
-                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet
                         '!**/leaflet.js', '!**/leaflet-src.js'],
                         [])
@@ -288,11 +263,8 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 
 gulp.task('common:build', ['clean'], sequence([
         'copy:vendor-css',
-        'copy:bootstrap-select-map',
         'copy:vendor-images',
-        'copy:fa-images',
-        'copy:md-images',
-        'copy:md-fonts',
+        'copy:fontello-fonts',
         'copy:app-images',
         'sass',
         'collectstatic'])

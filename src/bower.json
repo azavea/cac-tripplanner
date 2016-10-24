@@ -2,12 +2,9 @@
   "name": "src",
   "private": true,
   "dependencies": {
-    "bootstrap-sass-official": "~3.3.6",
-    "bootstrap-select": "~1.11.2",
     "console-polyfill": "~0.2.3",
-    "eonasdan-bootstrap-datetimepicker": "~4.17.42",
     "handlebars": "~4.0.5",
-    "jquery": "~2.1.4",
+    "jquery": "~3.1.1",
     "jQuery-Storage-API": "~1.9.1",
     "cartodb.js": "~3.15",
     "Leaflet.encoded": "~0.0.8",
@@ -16,8 +13,6 @@
     "lodash": "~4.16.3",
     "spinkit": "~1.2.5",
     "typeahead.js": "~0.10.5",
-    "Leaflet.awesome-markers": "~2.0.2",
-    "material-design-iconic-font": "~1.1.1",
     "navigo": "~3.0.0"
   }
 }
