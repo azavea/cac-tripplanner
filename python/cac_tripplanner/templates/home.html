@@ -306,30 +306,9 @@
 <script type="text/javascript">
 //jQuery.noConflict(); // because JotForms.
 jQuery(document).ready(function ($) {
-    //CAC.Settings.fbAppId = '{{ fb_app_id }}';
-    //var home = new CAC.Pages.Home();
-    //home.initialize();
-
-    var map = cartodb.L.map('map', {
-        center: [40.000, -75.1639],
-        zoom: 12,
-        zoomControl: false
-    });
-    var CartoDB_Positron = cartodb.L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-    subdomains: 'abcd',
-    maxZoom: 19
-    }).addTo(map);
-
-    var icon = L.AwesomeMarkers.icon({
-        icon: 'transit',
-        prefix: 'icon',
-        iconColor: 'black',
-        markerColor: 'lightgreen'
-    });
-
-    window.icon = icon;
-    window.map = map;
+    CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    var home = new CAC.Pages.Home();
+    home.initialize();
 });
 </script>
 {% endblock %}
