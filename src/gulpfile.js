@@ -18,6 +18,7 @@ var KarmaServer = require('karma').Server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
+var rename = require('gulp-rename');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
@@ -161,8 +162,14 @@ gulp.task('copy:vendor-css', function() {
 });
 
 gulp.task('copy:vendor-images', function() {
-    return copyBowerFiles(['**/*.png', '!leaflet/dist/images/**',], [])
+    return copyBowerFiles(['**/*.png'], [])
         .pipe(gulp.dest(stat.images + '/vendor'));
+});
+
+gulp.task('copy:marker-images', function() {
+    return gulp.src(['bower_components/*eaflet*/dist/images/*.png'])
+        .pipe(rename({dirname: ''}))
+        .pipe(gulp.dest(stat.styles + '/images'));
 });
 
 gulp.task('copy:fontello-fonts', function() {
@@ -264,6 +271,7 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 gulp.task('common:build', ['clean'], sequence([
         'copy:vendor-css',
         'copy:vendor-images',
+        'copy:marker-images',
         'copy:fontello-fonts',
         'copy:app-images',
         'sass',

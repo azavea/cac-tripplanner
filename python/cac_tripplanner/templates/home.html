@@ -320,6 +320,16 @@ jQuery(document).ready(function ($) {
     subdomains: 'abcd',
     maxZoom: 19
     }).addTo(map);
+
+    var icon = L.AwesomeMarkers.icon({
+        icon: 'transit',
+        prefix: 'icon',
+        iconColor: 'black',
+        markerColor: 'lightgreen'
+    });
+
+    window.icon = icon;
+    window.map = map;
 });
 </script>
 {% endblock %}
