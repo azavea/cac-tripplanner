@@ -6,3 +6,6 @@
 
 #npm
 node_modules/
+
+# generated CSS
+app/css/main.css
