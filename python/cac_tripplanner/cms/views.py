@@ -62,22 +62,25 @@ def tips_and_tricks_detail(request, slug):
 class AllArticles(View):
     """ API endpoint for the Articles model """
 
+    def serialize_article(self, request, article):
+        if article.content_type == 'prof':
+            relative_url = reverse(community_profile_detail, args=[article.slug])
+        else:
+            relative_url = reverse(tips_and_tricks_detail, args=[article.slug])
+        return {
+            'wide_image': article.wide_image.url,
+            'narrow_image': article.narrow_image.url,
+            'title': article.title,
+            'url': request.build_absolute_uri(relative_url)
+        }
+
     def get(self, request, *args, **kwargs):
-        """ GET title, URL, and images for the 20 most recent articles that are published"""
-        results = Article.objects.published().order_by('-publish_date')[:HOMEPAGE_RESULTS_LIMIT]
+        """ GET title, URL, and images for published articles """
+        try:
+            limit = int(request.GET.get('limit'))
+        except (ValueError, TypeError):
+            limit = HOMEPAGE_RESULTS_LIMIT
 
-        # resolve full URLs to articles and their images
-        response = []
-        for obj in results:
-            article = {}
-            article['wide_image'] = obj.wide_image.url
-            article['narrow_image'] = obj.narrow_image.url
-            article['title'] = obj.title
-            if obj.content_type == 'prof':
-                relative_url = reverse(community_profile_detail, args=[obj.slug])
-            else:
-                relative_url = reverse(tips_and_tricks_detail, args=[obj.slug])
-            article['url'] = request.build_absolute_uri(relative_url)
-            response.append(article)
-
+        results = Article.objects.published().order_by('-publish_date')[:limit]
+        response = [self.serialize_article(request, article) for article in results]
         return HttpResponse(json.dumps(response), 'application/json')
