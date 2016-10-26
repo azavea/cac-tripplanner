@@ -66,11 +66,11 @@
             <li class="place-card no-origin">
                 <img class="place-card-photo"
                     {% if destination.image %}
-                        src="{{ destination.image.url }}"
+                        src="{{ destination.wide_image.url }}"
                     {% else %}
                         src="https://placehold.it/400x400.jpg"
                     {% endif %}
-                    width="308" height="154"
+                    width="400" height="200"
                     alt="{{ destination.name }}" />
                 <h2>{{ destination.name }}</h2>
                 <div class="place-card-travel-logistics">
