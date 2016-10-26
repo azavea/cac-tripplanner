@@ -3,6 +3,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var defaults = {
         id: 'map',
+        homepage: true,
         center: [39.95, -75.1667],
         zoom: 14,
         selectors: {
@@ -47,6 +48,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var tabControl = null;
     var zoomControl = null;
 
+    var homepage = true; // whether currently displaying home page view TODO: rework
+
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'beenhere',
         prefix: 'md',
@@ -90,12 +93,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             .setView(this.options.center, this.options.zoom);
 
         tabControl = options.tabControl;
+        homepage = options.homepage;
 
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
 
         // hide zoom control on home page view
-        if (tabControl) {
+        if (!homepage) {
             zoomControl.addTo(map);
         }
 
@@ -185,7 +189,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // TODO: handle hiding layers on home view more cleanly.
         // Would be better to initialize but not add to map, to avoid flashing,
         // although it probably won't be visible due to centering of home page text.
-        if (!tabControl) {
+        if (homepage) {
             overlays['Bike Share Locations'].eachLayer(function(layer) { layer.hide(); });
             overlays['Bike Routes'].eachLayer(function(layer) { layer.hide(); });
         }
@@ -201,7 +205,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             collapsed: false
         });
 
-        if (tabControl) {
+        if (!homepage) {
             layerControl.addTo(map);
         }
     }

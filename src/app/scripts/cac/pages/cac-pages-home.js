@@ -36,6 +36,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
     var mapControl = null;
 
+    // TODO: rework tab control
+    var sidebarTabControl = null;
+
     function Home(params) {
         options = $.extend({}, defaults, params);
         bikeModeOptions = new BikeModeOptions();
@@ -118,9 +121,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     Home.prototype.initialize = function () {
 
         // Map initialization logic and event binding
-        // TODO: rework tab control and set it here
+        // TODO: rework tab control
+        sidebarTabControl = new CAC.Control.SidebarTab();
+
         mapControl = new MapControl({
-            tabControl: null
+            homepage: true,
+            tabControl: sidebarTabControl
         });
 
         this.destinations = null;
