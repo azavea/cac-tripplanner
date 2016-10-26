@@ -116,8 +116,7 @@ gulp.task('clean', function() {
 
 gulp.task('minify:scripts', function(cb) {
     pump([
-         // TOOD: remove map scripts exclusion when updated
-        gulp.src(['app/scripts/**/*.js', '!app/scripts/**/*map*.js']),
+        gulp.src(['app/scripts/**/*.js']),
         order(scriptOrder),
         vinylBuffer(),
         concat('main.js'),
