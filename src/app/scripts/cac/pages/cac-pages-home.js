@@ -118,6 +118,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     Home.prototype.initialize = function () {
 
         // Map initialization logic and event binding
+        // TODO: rework tab control and set it here
         mapControl = new MapControl({
             tabControl: null
         });
