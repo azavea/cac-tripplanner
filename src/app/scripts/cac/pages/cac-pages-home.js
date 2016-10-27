@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
+CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -33,6 +33,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     var options = {};
     var bikeModeOptions = null;
     var typeaheads = {};
+
+    var mapControl = null;
+
+    // TODO: rework tab control
+    var sidebarTabControl = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -114,6 +119,16 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
     };
 
     Home.prototype.initialize = function () {
+
+        // Map initialization logic and event binding
+        // TODO: rework tab control
+        sidebarTabControl = new CAC.Control.SidebarTab();
+
+        mapControl = new MapControl({
+            homepage: true,
+            tabControl: sidebarTabControl
+        });
+
         this.destinations = null;
         $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
@@ -279,4 +294,4 @@ CAC.Pages.Home = (function ($, BikeModeOptions, Templates, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.Control.BikeModeOptions, CAC.Home.Templates, CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences);

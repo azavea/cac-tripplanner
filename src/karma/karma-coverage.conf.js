@@ -34,25 +34,19 @@ module.exports = function(config) {
       'app/scripts/cac/routing/cac-routing-itinerary.js',
       'app/scripts/cac/routing/cac-routing-plans.js',
       'app/scripts/cac/urlrouting/cac-urlrouting.js',
-      /*
       'app/scripts/cac/map/cac-map-control.js',
       'app/scripts/cac/map/cac-map-overlays.js',
       'app/scripts/cac/map/cac-map-templates.js',
-      */
       'app/scripts/cac/control/cac-control-bike-mode-options.js',
-      /*
       'app/scripts/cac/control/cac-control-sidebar-tab.js',
       'app/scripts/cac/control/cac-control-sidebar-explore.js',
       'app/scripts/cac/control/cac-control-sidebar-directions.js',
       'app/scripts/cac/control/cac-control-itinerary-list.js',
       'app/scripts/cac/control/cac-control-directions-list.js',
-      */
       'app/scripts/cac/home/cac-home-templates.js',
       'app/scripts/cac/pages/cac-pages-home.js',
-      /*
       'app/scripts/cac/pages/cac-pages-map.js',
       'app/scripts/cac/pages/cac-pages-directions.js',
-      */
 
       'test/spec/*.js',
       'test/spec/**/*.js'
