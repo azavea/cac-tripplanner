@@ -9,6 +9,7 @@
     "handlebars": "~4.0.5",
     "jquery": "~2.1.4",
     "jQuery-Storage-API": "~1.9.1",
+    "leaflet": "~0.7.7",
     "cartodb.js": "~3.15",
     "Leaflet.encoded": "~0.0.8",
     "moment": "~2.15.1",

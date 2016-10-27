@@ -55,6 +55,18 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         iconColor: 'black',
         markerColor: 'lightgreen'
     });
+    var waypointRadius = 6;
+    var waypointColor = '#444';
+    var waypointCircle = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
+        'width="' + waypointRadius * 2 + '" height="' + waypointRadius * 2 + '">' +
+        '<circle cx="' + waypointRadius + '" cy="' + waypointRadius +
+        '" r="' + waypointRadius + '" fill="' + waypointColor + '"/></svg>';
+    var waypointIcon = L.icon( {
+        iconUrl: 'data:image/svg+xml;base64,' + btoa(waypointCircle),
+        iconSize: [waypointRadius * 2, waypointRadius * 2],
+        iconAnchor: [waypointRadius, waypointRadius],
+        popupAnchor: [0, -2 - waypointRadius]
+    } );
 
     var esriSatelliteAttribution = [
         '&copy; <a href="http://www.esri.com/">Esri</a> ',
@@ -464,9 +476,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var newWaypointIndex = null;
 		        // Use a timeout when closing the popup so it doesn't strobe on extraneous mouseouts
                 var popupTimeout;
+                // The marker closes with a timeout as well, and holding onto it lets us avoid
+                // removing the marker while it's still under the mouse
+                var markerTimeout;
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
-                        icon: highlightIcon
+                        icon: waypointIcon
                     }).bindPopup('Drag marker to change route', {closeButton: false}
                     ).on('dragstart', function(e) {
                         dragging = true;
@@ -486,6 +501,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                         redrawWaypointDrag(event, newWaypointIndex, true);
                     }).on('mouseover', function() {
                         clearTimeout(popupTimeout);
+                        clearTimeout(markerTimeout);
                         return dragging || this.openPopup();
                     }).on('mouseout', function() {
                         // Close popup, but with a slight delay to avoid flickering, and with an
@@ -497,18 +513,16 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                          }, 50);
 
                         // hide marker after awhile if not dragging
-                        if (dragging) {
-                            return;
+                        if (!dragging) {
+                            markerTimeout = setTimeout(function() {
+                                if (lastItineraryHoverMarker && !dragging) {
+                                    map.removeLayer(lastItineraryHoverMarker);
+                                    lastItineraryHoverMarker = null;
+                                    dragging = false;
+                                    newWaypointIndex = null;
+                                }
+                            }, 3000);
                         }
-
-                        setTimeout(function() {
-                            if (lastItineraryHoverMarker && !dragging) {
-                                map.removeLayer(lastItineraryHoverMarker);
-                                lastItineraryHoverMarker = null;
-                                dragging = false;
-                                newWaypointIndex = null;
-                            }
-                        }, 3000);
                     });
 
                 map.addLayer(lastItineraryHoverMarker);
@@ -523,7 +537,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             var popupTimeout;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
                 pointToLayer: function(geojson, latlng) {
-                    var marker = new cartodb.L.marker(latlng, {icon: destinationIcon,
+                    var marker = new cartodb.L.marker(latlng, {icon: waypointIcon,
                                                                draggable: true });
                     marker.on('dragstart', function() {
                         dragging = true;
