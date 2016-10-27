@@ -157,10 +157,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         var date = picker.date() || moment();
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
-        var arriveBy = false; // depart at time by default
-        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
-            arriveBy = true;
-        }
+        var arriveBy = isArriveBy(); // depart at time by default
 
         // options to pass to OTP as-is
         var otpOptions = {
@@ -170,7 +167,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
         // add intermediatePlaces if user edited route
         var waypoints = UserPreferences.getPreference('waypoints');
-        if (waypoints && waypoints.length) {
+        if (waypoints && waypoints.length && !arriveBy) {
             otpOptions.waypoints = waypoints;
         }
 
@@ -235,7 +232,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1) {
+            if (itineraries.length === 1 && !isArriveBy()) {
                 mapControl.draggableItinerary(currentItinerary);
             }
 
@@ -291,7 +288,11 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.showItineraries(false);
             itinerary.show(true);
             itinerary.highlight(true);
-            mapControl.draggableItinerary(itinerary);
+
+            if (!isArriveBy()) {
+                mapControl.draggableItinerary(itinerary);
+            }
+
             currentItinerary = itinerary;
             directionsListControl.setItinerary(itinerary);
             itineraryListControl.hide();
@@ -301,6 +302,19 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function findItineraryBlock(id) {
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
+    }
+
+    /**
+     * Helper to check if user has selected to route by arrive-by time
+     * rather than default depart-at time.
+     *
+     * @returns boolean True if user has selected arrive-by
+     */
+    function isArriveBy() {
+        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
+            return true;
+        }
+        return false;
     }
 
     /**
