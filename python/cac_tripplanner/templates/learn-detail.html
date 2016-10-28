@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+    {% include "partials/header.html" %}
     <div class="main">
         <h1><a href="{% url 'learn-list' %}">Tips, Posts, and Announcements</a></h1>
-        {% include "article-detail.html" %}
+        {% include "partials/article-detail.html" %}
 
         <div class="summaries-list">
             <h3>More tips, post, and announcements</h3>
             {% for article in more_articles %}
-                {% include "article-card.html" %}
+                {% include "partials/article-card.html" %}
             {% endfor %}
             <div class="more-link">
                 <a href="{% url 'learn-list' %}">See them all</a>
             </div>
         </div>
     </div>
-
+    {% include "partials/footer.html" %}
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+    {% include "partials/header.html" %}
 
     <div class="the-map" id="map"></div>
 
@@ -70,7 +71,7 @@
     </div>
 
     {% if article %}
-        {% include "article-card.html" with show_link=True %}
+        {% include "partials/article-card.html" with show_link=True %}
     {% endif %}
 
     <div class="directions-results">
@@ -214,6 +215,8 @@
             </footer>
         </div>
     </div>
+
+    {% include "partials/footer.html" %}
 {% endblock %}
 
 {%block jspage %}
