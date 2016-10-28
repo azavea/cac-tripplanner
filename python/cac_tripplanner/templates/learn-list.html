@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+    <div class="main">
+        <h1>Tips, Posts, and Announcements</h1>
+        <div class="summaries-list">
+            {% for article in articles %}
+                {% include "article-card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
