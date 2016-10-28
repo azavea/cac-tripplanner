@@ -1,4 +1,4 @@
-CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
+CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     'use strict';
 
     /**
@@ -6,35 +6,63 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      *
      * @param {object} otpItinerary OTP itinerary
      * @param {integer} index integer to uniquely identify itinerary
-     * @param {object} parameters used for the OTP request
      */
-    function Itinerary(otpItinerary, index, requestParameters) {
+    function Itinerary(otpItinerary, index) {
+        // extract reverse-geocoded start and end addresses
+        var params = Utils.getUrlParams();
+        this.fromText = params.originText;
+        this.toText = params.destinationText;
+
+        // array of turf points, for ease of use both making into a
+        // Leaflet layer as GeoJSON, and for interpolating new waypoints.
+        this.waypoints = getWaypointFeatures(params.waypoints);
+
         this.id = index.toString();
-        this.requestParameters = requestParameters;
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
         this.distanceMiles = getDistanceMiles(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.legs = getLegs(otpItinerary.legs);
-        this.from = _.first(otpItinerary.legs).from;
+        this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));
+        this.from = _.head(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
 
+        // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
-                                          features: getFeatures(otpItinerary.legs)});
+                                          features: this.getFeatures(otpItinerary.legs)});
         this.geojson.setStyle(getStyle(true, false));
-        this.fromText = requestParameters.fromText;
-        this.toText = requestParameters.toText;
+
+        // expose functions
+        this.getStyle = getStyle;
+
+        // set by CAC.Routing.Plans with the arguments sent to planTrip:
+        // coordsFrom, coordsTo, when, extraOptions
+        // (not used by directions list page)
+        this.routingParams = null;
     }
 
-    Itinerary.prototype.highlight = function (isHighlighted) {
+    Itinerary.prototype.highlight = function(isHighlighted) {
         this.geojson.setStyle(getStyle(true, isHighlighted));
     };
 
-    Itinerary.prototype.show = function (isShown) {
+    Itinerary.prototype.show = function(isShown) {
         this.geojson.setStyle(getStyle(isShown, false));
+    };
+
+    /**
+     * Get geoJSON for an itinerary
+     *
+     * @param {array} legs set of legs for an OTP itinerary
+     * @return {array} array of geojson features
+     */
+    Itinerary.prototype.getFeatures = function(legs) {
+        return _.map(legs, function(leg) {
+            var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
+            linestringGeoJson.properties = leg;
+            return linestringGeoJson;
+        });
     };
 
     // cache of geocoded OSM nodes (node name mapped to reverse geocode name)
@@ -49,7 +77,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {array} List of unique agency names traversed in this itinerary
      */
     function getTransitAgencies(legs) {
-        return _.chain(legs).pluck('agencyName').uniq().without(undefined).value();
+        return _.chain(legs).map('agencyName').uniq().without(undefined).value();
     }
 
     /**
@@ -61,36 +89,36 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
      * @return {string} string to use for labeling an itinerary
      */
     function getVia(legs) {
-        return _.chain(legs).pluck('steps').flatten().max(function(step) {
+        return _.chain(legs).map('steps').flatten().max(function(step) {
             return step.distance;
         }).value().streetName;
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get list of modes used by an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {array} array of strings representing modes for itinerary
      */
     function getModes(legs) {
-        return _.chain(legs).pluck('mode').uniq().value();
+        return _.chain(legs).map('mode').uniq().value();
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper function to get total distance in miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
      * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
      */
     function getDistanceMiles(legs) {
-        var distanceMeters = _.chain(legs).pluck('distance').reduce(function(sum, n) {
+        var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
             return sum + n;
         });
         return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary or leg
+     * Helper function to get formatted duration string for an itinerary or leg
      *
      * @param {object} otpItinerary OTP itinerary or leg (both have duration property)
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
@@ -110,16 +138,21 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
     }
 
     /**
-     * Helper function to get label/via summary for an itinerary
+     * Helper to parse semicolon-delimited list of waypoints into
+     * array of GeoJSON point features.
      *
-     * @param {array} legs set of legs for an OTP itinerary
-     * @return {array} array of geojson features
+     * @param {string} waypoints from URL
+     * @return {array} GeoJSON features
      */
-    function getFeatures(legs) {
-        return _.map(legs, function(leg) {
-            var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
-            linestringGeoJson.properties = leg;
-            return linestringGeoJson;
+    function getWaypointFeatures(waypoints) {
+        if (!waypoints) {
+            return null;
+        }
+
+        // explicitly set the index property so it will populate on the geoJSON properties
+        // when point array used to create FeatureCollection
+        return _.map(waypoints.split(';'), function(point, index) {
+            return turf.point(point.split(',').reverse(), {index: index});
         });
     }
 
@@ -148,12 +181,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
 
     /**
      * Check leg from/to place name; if it's an OSM node label, reverse geocode it and update label
+     * Also, if there are waypoints, call the function to merge legs across them.
      *
      * @params {Array} legs Itinerary legs returned by OTP
+     * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
      * @returns {Array} Itinerary legs, with prettified place labels
      */
-    function getLegs(legs) {
-        return _.map(legs, function(leg) {
+    function getLegs(legs, hasWaypoints) {
+        var newLegs = _.map(legs, function(leg) {
             if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
                     leg.from.name = name;
@@ -164,9 +199,65 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
                     leg.to.name = name;
                 });
             }
-            leg.formattedDuration = getFormattedDuration(leg);
             return leg;
         });
+        if (hasWaypoints) {
+            newLegs = mergeLegsAcrossWaypoints(newLegs);
+        }
+        _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
+        return newLegs;
+    }
+
+    /* Waypoints always result in a step break, which ends up producing intermediate
+     * "to Destination" steps that we don't want to show in the itinerary details.
+     * See https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/routing/impl/GraphPathFinder.java#L305
+     * and https://github.com/opentripplanner/OpenTripPlanner/blob/otp-1.0.0/src/main/java/org/opentripplanner/api/resource/GraphPathToTripPlanConverter.java#L212
+     * There's no configuration option to make OTP not do that, so instead this munges the
+     * resulting separate steps into one.
+     * Specifically, it loops over the legs, checking for each one whether the next one is the same
+     * mode and, if so, summing times/distances and resetting the 'to' to turn the first leg into
+     * a combination of itself and the second.  Since there can be multiple waypoints in what would
+     * be a single leg, more than two consecutive legs can end up getting merged together.
+     *
+     * Note that this makes no attempt to merge the `legGeometry` attributes so it's important that
+     * `getFeatures`, which gets the itinerary's geometry into Leaflet, gets called on the original
+     * legs array rather than the munged one.
+     */
+    function mergeLegsAcrossWaypoints(legs) {
+        if (legs.length === 1) {
+            return legs;
+        }
+        var index = 0;
+        while(index < legs.length - 1) {
+            var thisLeg = legs[index];
+            var nextLeg = legs[index+1];
+            if (thisLeg.mode === nextLeg.mode && !nextLeg.interlineWithPreviousLeg) {
+                var newLeg = _.clone(thisLeg);
+                newLeg.distance = thisLeg.distance + nextLeg.distance;
+                newLeg.duration = thisLeg.duration + nextLeg.duration;
+                newLeg.endTime = nextLeg.endTime;
+                newLeg.to = nextLeg.to;
+
+                // If the waypoint is in the middle of what would otherwise be a single step,
+                // merge it back into a single step
+                var lastStep = _.clone(_.last(thisLeg.steps));
+                var nextStep = _.first(nextLeg.steps);
+                if (nextStep.relativeDirection === 'CONTINUE' &&
+                        lastStep.streetName === nextStep.streetName) {
+                    lastStep.distance += nextStep.distance;
+                    lastStep.elevation = lastStep.elevation.concat(nextStep.elevation);
+                    newLeg.steps = _.concat(_.dropRight(thisLeg.steps, 1),
+                                            [lastStep],
+                                            _.tail(nextLeg.steps));
+                } else {
+                    newLeg.steps = _.concat(thisLeg.steps, nextLeg.steps);
+                }
+                legs.splice(index, 2, newLeg);
+            } else {
+                index++;
+            }
+        }
+        return legs;
     }
 
     /**
@@ -180,7 +271,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         if (!shown) {
             return {opacity: 0};
         }
-        var defaultStyle = {clickable: false,
+        var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
                             color: '#d02d2d',
                             dashArray: null,
                             lineCap: 'round',
@@ -195,4 +286,4 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder) {
         return defaultStyle;
     }
 
-})(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder);
+})(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder, CAC.Utils);

@@ -1,0 +1,106 @@
+.preview-card-link {
+    @include delinkify;
+    display: flex;
+    flex: 1 0 auto;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin: 0 auto $home-section-margin;
+
+    @include respond-to('xs') {
+        width: $place-card-width;
+    }
+
+    .body-map & {
+        display: none;
+    }
+}
+
+.preview-card {
+    display: flex;
+    flex: 1 0 auto;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    max-width: $home-main-max-width;
+    padding: $home-section-padding $home-section-padding;
+    background-color: $white;
+
+    &:hover {
+        @include button-hover;
+    }
+
+    @include respond-to('xs') {
+        flex-flow: column nowrap;
+        align-items: stretch;
+    }
+
+    .goto-post {
+        @include delinkify;
+    }
+
+    .preview-photo {
+        width: $place-card-width;
+        height: auto;
+        margin-right: $home-section-padding;
+
+        @include respond-to('xs') {
+            width: $place-card-width - ($home-section-padding * 2);
+            margin-bottom: 4px;
+        }
+    }
+
+    .preview-details {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        justify-content: space-between;
+    }
+
+    .category-heading {
+        color: $gophillygo-red;
+        font-size: 1.4rem;
+        font-weight: $font-weight-bold;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        margin: 4px 0;
+        font-size: 2.1rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            font-size: 1.8rem;
+            line-height: 1.5;
+        }
+    }
+
+    .lede {
+        flex: 1;
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: $font-weight-medium;
+        line-height: 1.8;
+    }
+
+    .goto-more-posts {
+        @include delinkify;
+        display: block;
+        margin-top: 10px;
+        border: 0;
+        outline: 0;
+        background-color: $gophillygo-orange;
+        font-size: 1.4rem;
+        font-weight: $font-weight-bold;
+        line-height: 2.75;
+        text-align: center;
+        cursor: pointer;
+        appearance: none;
+
+        &:hover {
+            @include button-hover;
+        }
+    }
+}

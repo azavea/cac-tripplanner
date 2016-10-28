@@ -97,6 +97,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
 
+        mapControl.events.on(mapControl.eventNames.waypointsSet, queryWithWaypoints);
+        mapControl.events.on(mapControl.eventNames.waypointMoved, liveUpdateItinerary);
+
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
         typeaheadDest.events.on(typeaheadDest.eventNames.cleared, onTypeaheadCleared);
@@ -154,16 +157,19 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         var date = picker.date() || moment();
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
-        var arriveBy = false; // depart at time by default
-        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
-            arriveBy = true;
-        }
+        var arriveBy = isArriveBy(); // depart at time by default
 
         // options to pass to OTP as-is
         var otpOptions = {
             mode: mode,
             arriveBy: arriveBy
         };
+
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length && !arriveBy) {
+            otpOptions.waypoints = waypoints;
+        }
 
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
@@ -222,6 +228,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 }
             });
 
+            // If there is only one itinerary, make it draggable.
+            // Only one itinerary is returned if there are waypoints, so this
+            // lets the user to continue to add or modify waypoints without
+            // having to select it in the list.
+            if (itineraries.length === 1 && !isArriveBy()) {
+                mapControl.draggableItinerary(currentItinerary);
+            }
+
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
@@ -250,6 +264,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function clearItineraries() {
+        UserPreferences.setPreference('waypoints', undefined);
         mapControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
@@ -273,10 +288,13 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.showItineraries(false);
             itinerary.show(true);
             itinerary.highlight(true);
+
+            if (!isArriveBy()) {
+                mapControl.draggableItinerary(itinerary);
+            }
+
             currentItinerary = itinerary;
-
             directionsListControl.setItinerary(itinerary);
-
             itineraryListControl.hide();
             directionsListControl.show();
         }
@@ -284,6 +302,19 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function findItineraryBlock(id) {
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
+    }
+
+    /**
+     * Helper to check if user has selected to route by arrive-by time
+     * rather than default depart-at time.
+     *
+     * @returns boolean True if user has selected arrive-by
+     */
+    function isArriveBy() {
+        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -297,6 +328,25 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
             currentItinerary = itinerary;
         }
+    }
+
+    function liveUpdateItinerary(event, itinerary) {
+        var oldLayer = itinerary.geojson;
+        Routing.planLiveUpdate(itinerary).then(function(newItinerary) {
+            mapControl.updateItineraryLayer(oldLayer, newItinerary);
+        }, function(error) {
+            console.error(error);
+            // occasionally cannot plan route if waypoint cannot be snapped to street grid
+            mapControl.errorLiveUpdatingLayer();
+        });
+    }
+
+    /**
+     * Initiate a trip plan when user finishes editing a route.
+     */
+    function queryWithWaypoints(event, points) {
+        UserPreferences.setPreference('waypoints', points.waypoints);
+        planTrip();
     }
 
     function reverseOriginDestination() {

@@ -2,13 +2,14 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     'use strict';
 
     var module = {
-        planTrip: planTrip
+        planTrip: planTrip,
+        planLiveUpdate: planLiveUpdate
     };
 
     return module;
 
     /**
-     * Find shortest path from one point to another
+     * Query OpenTripPlanner back-end for available routes.
      *
      * @param {array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {array} coordsTo The coords in lat-lng which we would like to travel to
@@ -21,11 +22,13 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     function planTrip(coordsFrom, coordsTo, when, extraOptions) {
         var deferred = $.Deferred();
         var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
+
         $.ajax({
             url: Settings.routingUrl,
             type: 'GET',
             crossDomain: true,
-            data: urlParams
+            data: urlParams,
+            processData: false
         }).then(function(data) {
             if (data.plan) {
                 // Ensure unique itineraries.
@@ -47,7 +50,15 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 // return the Itinerary objects for the unique collection
                 var itineraries = _(planItineraries).map(function(itinerary, i) {
-                    return new Itinerary(itinerary, i, data.requestParameters);
+                    var cacItinerary = new Itinerary(itinerary, i);
+                    // keep parameters used to plan this trip
+                    cacItinerary.routingParams = {
+                        coordsFrom: coordsFrom,
+                        coordsTo: coordsTo,
+                        when: when,
+                        extraOptions: extraOptions
+                    };
+                    return cacItinerary;
                 }).value();
                 deferred.resolve(itineraries);
             } else {
@@ -60,26 +71,88 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     }
 
     /**
-     * Helper function to prepare the parameter string for consumption by the OTP api
+     * Query OpenTripPlanner to live update a route with waypoints as user edits it.
+     * Used to redraw route while user is dragging.
+     *
+     * If the existing itinerary.geojson layer is on the map, it must be removed before
+     * calling this function, as this function changes the layer reference.
+     *
+     * @param {Object} itinerary CAC.Routing.Itinerary previously returned from planTrip,
+                        with updated waypoint(s) on itinerary.routingParams.extraOptions
+     *
+     * @return {promise} The promise object which - if successful - resolves to updated itinerary
+     *                   with modified `geojson` features layer
+     */
+    function planLiveUpdate(itinerary) {
+        var deferred = $.Deferred();
+        var urlParams = prepareParams(itinerary.routingParams.coordsFrom,
+                                      itinerary.routingParams.coordsTo,
+                                      itinerary.routingParams.when,
+                                      itinerary.routingParams.extraOptions);
+
+        $.ajax({
+            url: Settings.routingUrl,
+            type: 'GET',
+            crossDomain: true,
+            data: urlParams,
+            processData: false
+        }).then(function(data) {
+            if (data.plan) {
+                var otpItinerary = data.plan.itineraries[0];
+
+                itinerary.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
+                                          features: itinerary.getFeatures(otpItinerary.legs)});
+                itinerary.geojson.setStyle(itinerary.getStyle(true, true));
+
+                deferred.resolve(itinerary);
+            } else {
+                deferred.reject(data.error);
+            }
+        }, function (error) {
+            deferred.reject(error);
+        });
+        return deferred.promise();
+    }
+
+    /**
+     * Helper function to prepare the parameter string for consumption by the OTP API
      *
      * @param {Array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {Array} coordsTo The coords in lat-lng which we would like to travel to
      * @param {Object} when Moment.js object for date/time of travel
-     * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner as-is
+     * @param {Object} extraOptions Other parameters to pass to OpenTripPlanner
      *
-     * @return {Object} Get parameters, ready for consumption
+     * @return {string} URL-encoded GET parameters
      */
     function prepareParams(coordsFrom, coordsTo, when, extraOptions) {
+
+        // intermediatePlaces parameter is to be passed multiple times for each waypoint.
+        // Since we can only set the parameter key once on the options object,
+        // build out the waypoints portion of the encoded URL string here.
+        var intermediatePlaces = '';
+        if (extraOptions.hasOwnProperty('waypoints')) {
+            intermediatePlaces = _.map(extraOptions.waypoints, function(waypoint) {
+                return $.param({intermediatePlaces: waypoint.join(',')});
+            }).join('&');
+
+            delete extraOptions.waypoints;
+        }
+
         var formattedOpts = {
             fromPlace: coordsFrom.join(','),
-            fromText: extraOptions.fromText,
             toPlace: coordsTo.join(','),
-            toText: extraOptions.toText,
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
         };
 
-        return $.extend(formattedOpts, extraOptions);
+        var params = $.param($.extend(formattedOpts, extraOptions));
+
+        // append pre-formatted string for waypoints
+        if (intermediatePlaces) {
+            params += '&' + intermediatePlaces;
+        }
+
+        return  params;
     }
 
 })(jQuery, moment, _, CAC.User.Preferences, CAC.Routing.Itinerary, CAC.Settings);

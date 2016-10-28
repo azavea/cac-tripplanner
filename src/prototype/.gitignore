@@ -1,0 +1,8 @@
+# MacOS
+.DS_Store
+
+# SASS
+.sass-cache/
+
+#npm
+node_modules/
