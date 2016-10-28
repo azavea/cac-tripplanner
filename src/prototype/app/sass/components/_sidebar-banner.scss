@@ -1,0 +1,41 @@
+.sidebar-banner {
+    display: none;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    width: $sidebar-width;
+    max-width: $sidebar-width;
+    height: $sidebar-banner-height;
+    background-color: $gophillygo-green;
+    color: $white;
+    font-size: 1.3rem;
+    text-align: center;
+
+    .body-has-sidebar-banner & {
+        display: flex;
+    }
+
+    @include respond-to('xxs') {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &.indego-banner {
+        justify-content: space-between;
+        padding-right: 10px;
+        padding-left: 12px;
+        background-color: $indego-purple;
+        text-align: left;
+
+        button {
+            flex: 0 0 20px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: none;
+            color: $white;
+            text-align: center;
+            cursor: pointer;
+        }
+    }
+}

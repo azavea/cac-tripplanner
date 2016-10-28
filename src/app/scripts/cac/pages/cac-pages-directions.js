@@ -1,4 +1,4 @@
-CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, UserPreferences, Utils) {
+CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
     'use strict';
 
     var center = [39.95, -75.1667];
@@ -23,16 +23,64 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
     }
 
     Directions.prototype.initialize = function () {
-        var params = Utils.getUrlParams();
-        if (!_.has(params, 'itineraryIndex')) {
-            // TODO: show this error in the UI
+
+        // Note: date/time does not get passed and so always defaults to departing now
+
+        var rawParams = _.map(location.search.slice(1).split('&'), function(p) {
+            return p.split('=');
+        });
+
+        // Pull out the itinerary index and validate it
+        var itineraryIndex = _.remove(rawParams, function(p) {
+            return p[0] === 'itineraryIndex';
+        });
+
+        if (!itineraryIndex || itineraryIndex.length < 1) {
             console.error('Must specify itineraryIndex URL parameter');
             return;
+        } else {
+            itineraryIndex = parseInt(itineraryIndex[0][1]);
+            if (isNaN(itineraryIndex)) {
+                console.error('itineraryIndex URL parameter must be an integer');
+                return;
+            }
         }
 
-        // pull out itinerary index, since it's not needed down the line
-        var itineraryIndex = params.itineraryIndex;
-        delete params.itineraryIndex;
+        // Rules for rewriting GoPhillyGo URL params to OTP query params.
+        // If 'values' is defined, parse out the value into multiple copies of the param,
+        // one per item in the array returned by calling 'values' with the URL parameter value.
+        // Any URL param not in the mapping is passed through unchanged.
+        var mapping = {
+            origin: { paramName: 'fromPlace' },
+            originText: { paramName: 'fromText' },
+            destination: { paramName: 'toPlace' },
+            destinationText: { paramName: 'toText' },
+            waypoints: {
+                paramName: 'intermediatePlaces',
+                values: function (val) {
+                    return _.map(decodeURIComponent(val).split(';'), encodeURIComponent);
+                }
+            },
+        };
+
+        // Rewrites an array of [URLparam, value] pairs into an array of [OTPparam, value] pairs,
+        // using the mapping above.
+        var otpParams = _(rawParams).map(function (param) {
+            if (!mapping[param[0]]) {
+                return [param];
+            } else {
+                var config = mapping[param[0]];
+                if (!config.values) {
+                    return [[config.paramName, param[1]]];
+                } else {
+                    return _.map(config.values(param[1]), function (val) {
+                        return [config.paramName, val];
+                    });
+                }
+            }
+        }).flatten().value();
+        // Join array into param string
+        otpParams = _(otpParams).map(function (item) { return item.join('='); }).join('&');
 
         var directionsListControl = new DirectionsList({
             showBackButton: false,
@@ -48,15 +96,15 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
             url: Settings.routingUrl,
             type: 'GET',
             crossDomain: true,
-            data: params
+            data: otpParams,
+            processData: false
         }).then(function(data) {
             var itineraries = data.plan.itineraries;
-            var params = data.requestParameters;
-            var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex, params);
+            var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }, function (error) {
-            console.log('error: ', error);
+            console.error(error);
         });
 
         function loadMap() {
@@ -108,4 +156,4 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Use
 
     return Directions;
 
-})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.User.Preferences, CAC.Utils);
+})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings);

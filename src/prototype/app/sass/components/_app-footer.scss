@@ -1,0 +1,165 @@
+.app-footer {
+    display: flex;
+    position: relative;
+    flex: 0 0 auto;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: $home-main-max-width;
+    margin-right: auto;
+    margin-left: auto;
+    padding: $home-section-padding $home-section-padding 10px;
+    background-color: $home-section-bg-color;
+    text-align: center;
+
+    @include respond-to('xs') {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    @include respond-to('xxs') {
+        padding-right: calc((100vw - #{$place-card-width}) / 2);
+        padding-left: calc((100vw - #{$place-card-width}) / 2);
+        background-color: $gophillygo-blue;
+        color: rgba(255, 255, 255, .9);
+    }
+
+    .body-map & {
+        width: $sidebar-width;
+        max-width: $sidebar-width;
+        margin: 0;
+        padding: 0;
+
+        @include respond-to('xxs') {
+            display: none;
+        }
+    }
+
+    h2 {
+        margin: 0 0 10px;
+        font-size: 1.6rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+        text-transform: uppercase;
+    }
+
+    p {
+        margin: 0 0 20px;
+        font-size: 1.3rem;
+        font-weight: $font-weight-medium;
+
+        @include respond-to('xxs') {
+            font-size: 1.2rem;
+        }
+    }
+}
+
+.footer-subscribe {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin-bottom: $home-section-margin * 1.5;
+
+    .subscribe-form {
+        display: flex;
+        flex: 0 0 40px;
+        flex-flow: row nowrap;
+        align-items: stretch;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 480px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .subscribe-input {
+        flex: 1;
+        margin-right: 10px;
+        padding: 0 1em;
+        font-size: 1.3rem;
+    }
+
+    .subscribe-btn {
+        flex: 0 0 auto;
+        border: 1px solid $gophillygo-green;
+        padding: 0 1em;
+        background-color: $gophillygo-green;
+        color: $white;
+        font-size: 1.2rem;
+        font-weight: $font-weight-semibold;
+        line-height: 2.5;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .body-map & {
+        display: none;
+    }
+}
+
+.footer-follow {
+    margin-right: auto;
+    margin-bottom: $home-section-margin;
+    margin-left: auto;
+
+    .social-sites {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    li {
+        margin: 0 20px;
+        font-size: 3rem;
+    }
+
+    a {
+        @include delinkify;
+    }
+
+    .body-map & {
+        display: none;
+    }
+}
+
+.footer-about {
+    width: 100%;
+    max-width: 480px;
+    margin-right: auto;
+    margin-left: auto;
+    line-height: 1.65;
+
+    .goto-about {
+        @include delinkify;
+    }
+
+    .body-map & {
+        display: none;
+    }
+}
+
+.footer-compact {
+    display: none;
+    background-color: $gophillygo-blue;
+    color: $white;
+
+    .body-map & {
+        display: flex;
+        flex: 0 0 $footer-sidebar-height;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+    }
+
+    a {
+        @include delinkify;
+        padding: 0 2em;
+        text-transform: uppercase;
+    }
+}
