@@ -27,12 +27,7 @@ class ArticleManager(models.Manager):
         """Returns a randomized article"""
         # Need to use the full object, because there is a magic transformation of the URL
         # at some point which is needed for assembling the s3 url.
-        randomized = self.published().order_by('?')[:1]
-
-        if randomized:
-            return randomized[0]
-        else:
-            None
+        return self.published().order_by('?').first()
 
 
 class CommunityProfileManager(ArticleManager):

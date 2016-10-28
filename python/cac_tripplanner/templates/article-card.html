@@ -11,6 +11,9 @@
             <p class="lede">
                 {{ article.content|safe }}
             </p>
+            {% if show_link %}
+                <button class="goto-more-posts" href="{% url 'learn-list' %}">More tips, posts, and announcements</button>
+            {% endif %}
         </div>
     </div>
 </a>

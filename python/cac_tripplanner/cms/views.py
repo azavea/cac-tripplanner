@@ -18,11 +18,8 @@ DEFAULT_CONTEXT = {
 
 def home(request):
 
-    # get randomized community profile
-    community_profile = Article.profiles.random()
-
-    # get randomized tips and tricks
-    tips_and_tricks = Article.tips.random()
+    # Get a random article
+    article = Article.objects.random()
 
     # get a few randomized destinations
     destination_ids = list(Destination.objects.published().values_list('id', flat=True))
@@ -30,8 +27,7 @@ def home(request):
     destinations = Destination.objects.filter(id__in=destination_ids[:4])
 
     context = dict(tab='home',
-                   community_profile=community_profile,
-                   tips_and_tricks=tips_and_tricks,
+                   article=article,
                    destinations=destinations,
                    **DEFAULT_CONTEXT)
     return render(request, 'home.html', context=context)
