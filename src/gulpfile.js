@@ -110,7 +110,10 @@ var copyVendorJS = function(filter, extraFiles) {
 gulp.task('clean', function() {
     // This must be done synchronously to prevent sporadic failures
     return del.sync([
-        staticRoot + '/**'
+        stat.fonts,
+        stat.scripts,
+        stat.styles,
+        stat.images
     ], { force: true });
 });
 
@@ -149,7 +152,7 @@ gulp.task('copy:scripts', function() {
 
 gulp.task('copy:vendor-css', function() {
     return copyBowerFiles(['**/*.css',
-                          //'!**/*.min.css',
+                          '!**/*.min.css',
                           // leaflet loaded over CDN
                           '!**/leaflet.css'], [])
         .pipe(concat('vendor.css'))

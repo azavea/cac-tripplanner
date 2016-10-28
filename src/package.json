@@ -68,6 +68,7 @@
     "bower-install": "bower install",
     "bower-clean": "bower cache clean",
     "bower-prune": "bower prune",
+    "gulp-clean": "gulp clean",
     "gulp-development": "gulp development",
     "gulp-production": "gulp production",
     "gulp-test": "gulp test",
