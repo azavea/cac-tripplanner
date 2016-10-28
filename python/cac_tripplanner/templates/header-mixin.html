@@ -1,3 +1,16 @@
-<header>
-    <a href="{% url 'home' %}"><img src="/static/images/logo_blue.png" alt="GoPhillyGo" /></a>
+<header class="app-header">
+    <div class="brand">
+        <div class="slogan-start">
+            Walk. Ride. Pedal. Discover.
+        </div>
+        <div class="logo"><a href="#"></a></div>
+        <div class="slogan-end">
+            Next time bring your bike onboard.
+        </div>
+    </div>
+    <nav class="primary-nav">
+        <a class="nav-item {% if not tab or tab == 'home'%} on {% endif %}" href="/">Directions</a>
+        <a class="nav-item {% if tab == 'explore'%} on {% endif %}" href="#">Explore</a>
+        <a class="nav-item {% if tab == 'info'%} on {% endif %}" href="{% url 'learn-list' %}">Learn</a>
+    </nav>
 </header>

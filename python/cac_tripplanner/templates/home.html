@@ -1,25 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
-<div class="body-home">
-    <div class="the-map" id="map"></div>
 
-    <header class="app-header">
-        <div class="brand">
-            <div class="slogan-start">
-                Walk. Ride. Pedal. Discover.
-            </div>
-            <div class="logo"><a href="#"></a></div>
-            <div class="slogan-end">
-                Next time bring your bike onboard.
-            </div>
-        </div>
-        <nav class="primary-nav">
-            <a class="nav-item on" href="index.html">Directions</a>
-            <a class="nav-item" href="#">Explore</a>
-            <a class="nav-item" href="learn-index.html">Learn</a>
-        </nav>
-    </header>
+    <div class="the-map" id="map"></div>
 
     <form class="directions-form-element" action="" method="post">
         <div class="directions-form">
@@ -210,39 +193,6 @@
         </div>
     </div>
 
-    <footer class="app-footer">
-        <div class="footer-subscribe">
-            <h2>Stay up to date</h2>
-            <p>
-                Stay up to date on all things GoPhillyGo — events, updates, featured content.
-            </p>
-            <form class="subscribe-form" action="" method="post">
-                <input class="subscribe-input" type="text" name="email" value="" placeholder="Your email address">
-                <button class="subscribe-btn" type="submit" name="subscribe-submit">Subscribe</button>
-            </form>
-        </div>
-        <div class="footer-follow">
-            <h2>Follow us</h2>
-            <ul class="social-sites">
-                <li><a class="social-twitter" target="_blank" title="Follow us on Twitter" href="https://twitter.com/go_philly_go"><i class="icon-twitter"></i></a></li>
-                <li><a class="social-facebook" target="_blank" title="Like us on Facebook" href="https://www.facebook.com/gophillygo"><i class="icon-facebook"></i></a></li>
-                <li><a class="social-instagram" target="_blank" title="Follow us on Instagram" href="https://www.instagram.com/go_philly_go/"><i class="icon-instagram"></i></a></li>
-                <li><a class="social-youtube" target="_blank" title="Watch us on YouTube" href="https://www.youtube.com/channel/UCJSbm760xytSCZdJ16kS1Cg"><i class="icon-youtube"></i></a></li>
-            </ul>
-        </div>
-        <div class="footer-about">
-            <a class="goto-about" title="Learn more about GoPhillyGo" href="about.html">
-                <h2>About</h2>
-                <p>
-                    GoPhillyGo is a project of the Clean Air Council, Azavea, and Warkulwiz Design Associates. The project is funded by the William Penn Foundation.
-                </p>
-            </a>
-        </div>
-        <div class="footer-compact">
-            <a href="#">Explore</a>
-            <a href="learn-index.html">Learn</a>
-        </div>
-    </footer>
 
     <div class="modal-overlay">
         <div class="modal-panel modal-options">
@@ -276,7 +226,6 @@
             </footer>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {%block jspage %}
