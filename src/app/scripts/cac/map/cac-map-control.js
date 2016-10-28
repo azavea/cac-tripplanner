@@ -574,6 +574,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 }
             }).addTo(map);
         }
+
+        // Explicitly bring selected layer to foreground.
+        // Fixes issue with Firefox inconsistently adding/removing interactivity
+        // when there are multiple overlapping itinerary paths.
+        itinerary.geojson.bringToFront();
     }
 
     function getNewWaypointIndex(itinerary, startDragPoint) {
