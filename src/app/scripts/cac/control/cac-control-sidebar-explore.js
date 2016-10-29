@@ -207,7 +207,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         // do not zoom to fit isochrone if going to highlight a selected destination
         var zoomToFit = !selectedPlaceId;
 
-        mapControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions, zoomToFit).then(
+        mapControl.isochroneControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions, zoomToFit).then(
             function (destinations) {
                 $(options.selectors.spinner).addClass('hidden');
                 $(options.selectors.destinations).removeClass('hidden');
@@ -228,7 +228,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         UserPreferences.clearLocation('origin');
         exploreLatLng = null;
         selectedPlaceId = null;
-        mapControl.clearDiscoverPlaces();
+        mapControl.isochroneControl.clearDiscoverPlaces();
     }
 
     function onTypeaheadSelected(event, key, location) {
@@ -260,7 +260,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             exploreLatLng = null;
             UserPreferences.clearLocation('origin');
             $input.addClass(options.selectors.errorClass);
-            mapControl.clearDiscoverPlaces();
+            mapControl.isochroneControl.clearDiscoverPlaces();
             return true;
         }
     }
@@ -352,12 +352,12 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             var $destination = $(MapTemplates.destinationBlock(destination));
             $destination.click(function () {
                 setDestinationSidebarDetail(destination.id);
-                mapControl.highlightDestination(destination.id, { panTo: true });
+                mapControl.isochroneControl.highlightDestination(destination.id, { panTo: true });
             });
             $destination.hover(function () {
-                mapControl.highlightDestination(destination.id);
+                mapControl.isochroneControl.highlightDestination(destination.id);
             }, function () {
-                mapControl.highlightDestination(null);
+                mapControl.isochroneControl.highlightDestination(null);
             });
             $container.append($destination);
         });
@@ -372,7 +372,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         if (selectedPlaceId) {
             setDestinationSidebarDetail(selectedPlaceId);
             // also highlight it on the map and pan to it
-            mapControl.highlightDestination(selectedPlaceId, { panTo: true });
+            mapControl.isochroneControl.highlightDestination(selectedPlaceId, { panTo: true });
         }
     }
 
@@ -405,7 +405,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         UserPreferences.setPreference('placeId', undefined);
         updateUrl();
         setDestinationSidebar(destinationsCache);
-        mapControl.highlightDestination(null);
+        mapControl.isochroneControl.highlightDestination(null);
     }
 
     /* Update the URL based on current UserPreferences

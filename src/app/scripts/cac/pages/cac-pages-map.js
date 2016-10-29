@@ -86,7 +86,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         }
 
         // not a mobile device; go to directions tab
-        mapControl.clearIsochrone();
+        mapControl.isochroneControl.clearIsochrone();
         sidebarDirectionsControl.clearDirections();
         mapControl.setGeocodeMarker(null);
         sidebarDirectionsControl.setDestination(destination);
@@ -116,7 +116,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         // Load user preferences on tab switch in order to easily keep the pages in sync
         if (tabId === 'directions') {
             UserPreferences.setPreference('method', 'directions');
-            mapControl.clearIsochrone();
+            mapControl.isochroneControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
             if (sidebarDirectionsControl) {
                 sidebarDirectionsControl.setFromUserPreferences();
