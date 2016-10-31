@@ -9,22 +9,27 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
             // directions form selectors
             directionsForm: '.directions-form-element',
-            directionsFromInput: '.directions-from',
-            directionsToInput: '.directions-to',
+            directionsFrom: '.directions-from',
+            directionsTo: '.directions-to',
 
             // mode related selectors
             modeToggle: '.mode-toggle',
             modeOption: '.mode-option',
-            transitModeOption: '.mode-option.transit',
             onClass: 'on',
             offClass: 'off',
+            selectedModes: '.mode-option.on',
             transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
+            transitModeOption: '.mode-option.transit',
 
             // typeahead
             typeaheadFrom: '#input-directions-from',
             typeaheadTo: '#input-directions-to',
 
-            // TODO: update below
+            // top-level classes
+            homePageClass: 'body-home',
+            mapPageClasses: 'body-map body-has-sidebar-banner',
+
+            // TODO: update or remove old selectors below
             directionsMode: '#directionsMode input',
             errorClass: 'error',
             exploreForm: '#explore',
@@ -35,9 +40,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             toggleButton: '.toggle-search button',
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
-
             typeaheadExplore: '#exploreOrigin',
-
             viewAllDestinations: '#viewAllDestinations'
         }
     };
@@ -57,8 +60,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     }
 
     var submitDirections = function(event) {
-        event.preventDefault();
-        var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
+        if (event) {
+            event.preventDefault();
+        }
+        var mode = bikeModeOptions.getMode(options.selectors.selectedModes);
+
         var origin = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destinationText');
 
@@ -74,16 +80,23 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         if ($(options.selectors.directionsFrom).hasClass(options.selectors.errorClass) ||
             $(options.selectors.directionsTo).hasClass(options.selectors.errorClass)) {
 
-            $(options.selectors.submitErrorModal).modal();
+            console.error('error! danger will robinson!');
+            //$(options.selectors.submitErrorModal).modal();
             return;
         }
 
         if (origin && destination) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
-            window.location = '/map';
+
+            // change to map view
+            $('.' + options.selectors.homePageClass)
+                .blur()
+                .removeClass(options.selectors.homePageClass)
+                .addClass(options.selectors.mapPageClasses);
         } else {
-            $(options.selectors.submitErrorModal).modal();
+            //$(options.selectors.submitErrorModal).modal();
+            console.error('missing origin or destination.');
         }
     };
 
@@ -126,6 +139,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         // 'directions' tab options
         var destinationText = UserPreferences.getPreference('destinationText');
         typeaheads.typeaheadFrom.setValue(originText);
+
         typeaheads.typeaheadTo.setValue(destinationText);
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
@@ -170,6 +184,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         }, this));
 
         // save form data and redirect to map when 'go' button clicked
+
+        // TODO: redesign has form, but no way to submit. remove this?
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
@@ -262,7 +278,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             }
         } else if (key === 'to') {
             prefKey = 'destination';
-            $input = $(options.selectors.directionsTo);
+            $input = $(options.selectors.typeaheadTo);
         } else {
             return;
         }
@@ -271,6 +287,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             $input.removeClass(options.selectors.errorClass);
             UserPreferences.setPreference(prefKey, location);
             UserPreferences.setPreference(prefKey + 'Text', $input.typeahead('val'));
+
+            submitDirections(event);
         } else {
             $input.addClass(options.selectors.errorClass);
             UserPreferences.setPreference(prefKey, undefined);
