@@ -80,7 +80,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         if ($(options.selectors.directionsFrom).hasClass(options.selectors.errorClass) ||
             $(options.selectors.directionsTo).hasClass(options.selectors.errorClass)) {
 
-            console.error('error! danger will robinson!');
+            // TODO: update or remove error modals
+            console.error('error with origin or destination');
             //$(options.selectors.submitErrorModal).modal();
             return;
         }
@@ -95,6 +96,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
                 .removeClass(options.selectors.homePageClass)
                 .addClass(options.selectors.mapPageClasses);
         } else {
+            // TODO: update or remove error modals
             //$(options.selectors.submitErrorModal).modal();
             console.error('missing origin or destination.');
         }

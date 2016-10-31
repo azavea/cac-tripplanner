@@ -88,7 +88,7 @@ CAC.Control.BikeModeOptions = (function ($) {
         });
 
         // slice off trailing comma
-        mode = mode ? mode.substr(0, mode.length-1) : options.defaultMode;
+        mode = mode ? mode.substr(0, mode.length - 1) : options.defaultMode;
         return mode;
     }
 
