@@ -3,15 +3,23 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
     var defaults = {
         selectors: {
-            articlesContainer: '.articles',
-            articlesSpinner: '#articlesSpinner',
-            destinationBlock: '.block-destination',
-            destinationsContainer: '.destinations',
-            destinationsSpinner: '#destinationsSpinner',
-            directionsForm: '#directions',
-            directionsFrom: '#directionsFrom',
+            placeCard: '.place-card',
+            placeList: '.place-list',
+
+            // directions form selectors
+            directionsForm: '.directions-form-element',
+            directionsFrom: '.directions-from',
+            directionsTo: '.directions-to',
+
+            // mode related selectors
+            modeToggle: '.mode-toggle',
+            modeOption: '.mode-option',
+            transitModeOption: '.mode-option.transit',
+            onClass: 'on',
+            offClass: 'off',
+            transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
+
             directionsMode: '#directionsMode input',
-            directionsTo: '#directionsTo',
             errorClass: 'error',
             exploreForm: '#explore',
             exploreMode: '#exploreMode input',
@@ -127,6 +135,20 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             tabControl: sidebarTabControl
         });
 
+        // handle mode toggle buttons
+        $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
+            $(this).toggleClass(options.selectors.onClass)
+                .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);
+            e.preventDefault();
+        });
+
+        $(options.selectors.transitModeOption).on('click', function(e) {
+            $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
+                .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
+            e.preventDefault();
+        });
+
+        // TODO: update below for redesign
         this.destinations = null;
         $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
@@ -146,7 +168,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         $(options.selectors.directionsForm).submit(submitDirections);
 
         $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
-        $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
+        $(options.selectors.placeList).on('click', options.selectors.placeCard,
                                                       $.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
@@ -158,7 +180,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         event.preventDefault();
 
         // hide existing destinations list and show loading spinner
-        $(options.selectors.destinationsContainer).addClass('hidden');
+        $(options.selectors.placeList).addClass('hidden');
         $(options.selectors.destinationsSpinner).removeClass('hidden');
 
         var origin = UserPreferences.getPreference('origin');
@@ -176,15 +198,15 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         }).then(function(data) {
             if (data.destinations && data.destinations.length) {
                 var html = Templates.destinations(data.destinations);
-                $(options.selectors.destinationsContainer).html(html);
+                $(options.selectors.placeList).html(html);
 
                 // hide 'view all' button and spinner, and show features again
                 $(options.selectors.viewAllDestinations).addClass('hidden');
                 $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.destinationsContainer).removeClass('hidden');
+                $(options.selectors.placeList).removeClass('hidden');
             } else {
                 $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.destinationsContainer).removeClass('hidden');
+                $(options.selectors.placeList).removeClass('hidden');
             }
         });
     }
@@ -200,7 +222,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         UserPreferences.setPreference('exploreTime', exploreTime);
         UserPreferences.setPreference('mode', mode);
 
-        var block = $(event.target).closest(options.selectors.destinationBlock);
+        var block = $(event.target).closest(options.selectors.placeCard);
         var placeId = block.data('destination-id');
         UserPreferences.setPreference('placeId', placeId);
         window.location = '/map';
