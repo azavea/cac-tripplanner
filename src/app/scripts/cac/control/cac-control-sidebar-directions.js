@@ -52,6 +52,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     var bikeModeOptions = null;
     var mapControl = null;
+    var itineraryControl = null;
     var tabControl = null;
     var urlRouter = null;
     var directionsListControl = null;
@@ -63,6 +64,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
+        itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
@@ -97,8 +99,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
 
-        mapControl.events.on(mapControl.eventNames.waypointsSet, queryWithWaypoints);
-        mapControl.events.on(mapControl.eventNames.waypointMoved, liveUpdateItinerary);
+        itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
+        itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
@@ -218,9 +220,9 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             }
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
-            mapControl.clearItineraries();
+            itineraryControl.clearItineraries();
             _.forIn(itineraries, function (itinerary) {
-                mapControl.plotItinerary(itinerary, isFirst);
+                itineraryControl.plotItinerary(itinerary, isFirst);
                 itinerary.highlight(isFirst);
                 if (isFirst) {
                     currentItinerary = itinerary;
@@ -233,7 +235,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
             if (itineraries.length === 1 && !isArriveBy()) {
-                mapControl.draggableItinerary(currentItinerary);
+                itineraryControl.draggableItinerary(currentItinerary);
             }
 
             // put markers at start and end
@@ -243,7 +245,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryListControl.show();
         }, function (error) {
             $(options.selectors.spinner).addClass('hidden');
-            mapControl.clearItineraries();
+            itineraryControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
@@ -265,7 +267,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function clearItineraries() {
         UserPreferences.setPreference('waypoints', undefined);
-        mapControl.clearItineraries();
+        itineraryControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
         $(options.selectors.directions).removeClass(options.selectors.resultsClass);
@@ -290,7 +292,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itinerary.highlight(true);
 
             if (!isArriveBy()) {
-                mapControl.draggableItinerary(itinerary);
+                itineraryControl.draggableItinerary(itinerary);
             }
 
             currentItinerary = itinerary;
@@ -333,11 +335,11 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     function liveUpdateItinerary(event, itinerary) {
         var oldLayer = itinerary.geojson;
         Routing.planLiveUpdate(itinerary).then(function(newItinerary) {
-            mapControl.updateItineraryLayer(oldLayer, newItinerary);
+            itineraryControl.updateItineraryLayer(oldLayer, newItinerary);
         }, function(error) {
             console.error(error);
             // occasionally cannot plan route if waypoint cannot be snapped to street grid
-            mapControl.errorLiveUpdatingLayer();
+            itineraryControl.errorLiveUpdatingLayer();
         });
     }
 
