@@ -25,10 +25,12 @@ CAC.Control.BikeModeOptions = (function ($) {
                 triangleTimeFactor: 0.17
             }
         },
+        defaultMode: 'WALK,TRANSIT',
+        // map button class names to OpenTripPlanner mode parameters
         modes: {
-            // used to suffix to mode inputs selector
-            walkBike: ':radio[name="anytime-mode"]',
-            transit: '[name="public-transit-mode"]'
+            walk: 'WALK',
+            bike: 'BICYCLE',
+            transit: 'TRANSIT'
         }
     };
 
@@ -67,12 +69,26 @@ CAC.Control.BikeModeOptions = (function ($) {
     /**
      * Helper to return the mode string based on the buttons within the given input selector.
      *
-     * * @param modeSelectors {String} jQuery selector like '#someId input'
+     * @param modeSelectors {String} jQuery selector like '#someId input'
+     * @returns {String} comma-separated list of OpenTripPlanner mode parameters
      */
     function getMode(modeSelectors) {
-        var mode = $(modeSelectors + options.modes.walkBike + ':checked').val() || 'WALK';
-        var transit = $(modeSelectors + options.modes.transit).prop('checked');
-        mode = transit ? 'TRANSIT,' + mode : mode;
+        var mode = '';
+        var $selected = $(modeSelectors);
+
+        if (!$selected) {
+            console.error('no mode controls found');
+            return options.defaultMode;
+        }
+
+        _.each(options.modes, function(val, key) {
+            if ($selected.hasClass(key)) {
+                mode += val + ',';
+            }
+        });
+
+        // slice off trailing comma
+        mode = mode ? mode.substr(0, mode.length-1) : options.defaultMode;
         return mode;
     }
 
