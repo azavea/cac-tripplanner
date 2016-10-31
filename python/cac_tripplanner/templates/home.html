@@ -27,20 +27,28 @@
             </div>
             <div class="directions-from directions-text-input">
                 <label for="input-directions-from">from</label>
-                <input type="text" id="input-directions-from" name="input-directions-from" value="" placeholder="Enter a starting point">
-                <button class="btn-geolocate" title="Detect current location" type="button" name="geolocate"><i class="icon-geolocate"></i></button>
+                <input type="text" id="input-directions-from" name="input-directions-from"
+                    value="" placeholder="Enter a starting point"
+                    class="typeahead" type="search" data-typeahead-key="from">
+                <button class="btn-geolocate" title="Detect current location" type="button"
+                    name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
             <div class="directions-to directions-text-input">
                 <label for="input-directions-to">to</label>
-                <input type="text" id="input-directions-to" name="input-directions-to" value="" placeholder="Enter a destination — or choose one below">
-                <button class="btn-reverse" title="Swap starting point and destination" type="button" name="reverse"><i class="icon-reverse"></i></button>
+                <input type="text" id="input-directions-to" name="input-directions-to" value=""
+                    placeholder="Enter a destination — or choose one below"
+                    class="typeahead" type="search" data-typeahead-key="to">
+                <button class="btn-reverse" title="Swap starting point and destination"
+                    type="button" name="reverse"><i class="icon-reverse"></i></button>
             </div>
         </div>
     </form>
 
     <div class="sidebar-banner indego-banner">
         <div class="banner-message">Need wheels? Click <i class="icon-sliders"></i> for Indego bike sharing</div>
-        <button title="Dismiss this message" name="close" class="btn-dismiss-sidebar-banner"><i class="icon-cancel"></i></button>
+        <button title="Dismiss this message" name="close"
+            class="btn-dismiss-sidebar-banner"><i class="icon-cancel"></i>
+        </button>
     </div>
 
     <div class="places">

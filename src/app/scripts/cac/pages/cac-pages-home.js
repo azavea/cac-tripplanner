@@ -3,13 +3,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
     var defaults = {
         selectors: {
+            // destinations
             placeCard: '.place-card',
             placeList: '.place-list',
 
             // directions form selectors
             directionsForm: '.directions-form-element',
-            directionsFrom: '.directions-from',
-            directionsTo: '.directions-to',
+            directionsFromInput: '.directions-from',
+            directionsToInput: '.directions-to',
 
             // mode related selectors
             modeToggle: '.mode-toggle',
@@ -19,6 +20,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             offClass: 'off',
             transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
 
+            // typeahead
+            typeaheadFrom: '#input-directions-from',
+            typeaheadTo: '#input-directions-to',
+
+            // TODO: update below
             directionsMode: '#directionsMode input',
             errorClass: 'error',
             exploreForm: '#explore',
@@ -29,9 +35,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             toggleButton: '.toggle-search button',
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
+
             typeaheadExplore: '#exploreOrigin',
-            typeaheadFrom: '#directionsFrom',
-            typeaheadTo: '#directionsTo',
+
             viewAllDestinations: '#viewAllDestinations'
         }
     };
@@ -168,8 +174,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         $(options.selectors.directionsForm).submit(submitDirections);
 
         $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
-        $(options.selectors.placeList).on('click', options.selectors.placeCard,
-                                                      $.proxy(clickedDestination, this));
+        $(options.selectors.placeList).on('click',
+                                          options.selectors.placeCard,
+                                          $.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
     };
