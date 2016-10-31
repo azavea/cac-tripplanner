@@ -1,0 +1,19 @@
+<article class="info-article">
+    <header class="info-article-header">
+        <div class="info-article-image-hero"style="background-image: url('{{ article.wide_image.url }}');"></div>
+        <div class="info-article-category">
+            {% if article.content_type == 'prof' %}Community Profile{% endif %}
+            {% if article.content_type == 'tips' %}Tips and Tricks{% endif %}
+        </div>
+        <h2 class="info-article-title">{{ article.title }}</h2>
+    </header>
+    <aside class="info-article-aside">
+        {{ article.teaser|safe }}
+    </aside>
+    <section class="info-article-section">
+        {{ article.content|safe }}
+        <p class="info-article-p-image-inline">
+            <img class="info-article-image-inline" src="{{ article.narrow_image.url }}" alt="" />
+        </p>
+    </section>
+</article>

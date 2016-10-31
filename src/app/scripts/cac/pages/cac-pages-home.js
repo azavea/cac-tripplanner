@@ -24,11 +24,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             typeaheadExplore: '#exploreOrigin',
             typeaheadFrom: '#directionsFrom',
             typeaheadTo: '#directionsTo',
-            viewAllArticles: '#viewAllArticles',
             viewAllDestinations: '#viewAllDestinations'
         }
     };
-    var articleUrl = '/api/articles';
     var destinationSearchUrl = '/api/destinations/search';
     var options = {};
     var bikeModeOptions = null;
@@ -147,7 +145,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
-        $(options.selectors.viewAllArticles).click($.proxy(clickedViewAllArticles, this));
         $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
         $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
                                                       $.proxy(clickedDestination, this));
@@ -156,34 +153,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     };
 
     return Home;
-
-    function clickedViewAllArticles(event) {
-        event.preventDefault();
-
-        // hide existing articles and show loading spinner
-        $(options.selectors.articlesContainer).addClass('hidden');
-        $(options.selectors.articlesSpinner).removeClass('hidden');
-
-        $.ajax({
-            type: 'GET',
-            cache: true,
-            url: articleUrl,
-            contentType: 'application/json'
-        }).then(function(data) {
-            if (data && data.length) {
-                var html = Templates.articles(data);
-                $(options.selectors.articlesContainer).html(html);
-
-                // hide 'view all' button and spinner, and show features again
-                $(options.selectors.viewAllArticles).addClass('hidden');
-                $(options.selectors.articlesSpinner).addClass('hidden');
-                $(options.selectors.articlesContainer).removeClass('hidden');
-            } else {
-                $(options.selectors.articlesSpinner).addClass('hidden');
-                $(options.selectors.articlesContainer).removeClass('hidden');
-            }
-        });
-    }
 
     function clickedViewAllDestinations(event) {
         event.preventDefault();

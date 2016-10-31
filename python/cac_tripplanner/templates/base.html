@@ -64,7 +64,11 @@
     })(window,document,'script','dataLayer','GTM-KNZ9R2');</script>
     <!-- End Google Tag Manager -->
 
-    {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
+    {% block body %}
+    <div id="body-div" class="body-{{ tab|default:'home' }}">
+        {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
+    </div>
+    {% endblock body %}
 
     {% block jsimports %}
 

@@ -26,14 +26,8 @@ urlpatterns = [
     url(r'^api/articles$', cms_views.AllArticles.as_view(), name='api_articles'),
 
     # Community Profiles
-    url(r'^community-profile/(?P<slug>[\w-]+)/$',
-        cms_views.community_profile_detail,
-        name='community-profile-detail'),
-
-    # Tips and Tricks
-    url(r'^tips-and-tricks/(?P<slug>[\w-]+)/$',
-        cms_views.tips_and_tricks_detail,
-        name='tips-and-tricks-detail'),
+    url(r'^learn/$', cms_views.learn_list, name='learn-list'),
+    url(r'^learn/(?P<slug>[\w-]+)/$', cms_views.learn_detail, name='learn-detail'),
 
     # Link Shortening
     url(r'^link/', include('shortlinks.urls')),
