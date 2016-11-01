@@ -72,9 +72,10 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
+        // TODO: updated time/date control
         // initiallize date/time picker
-        datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
-        datepicker.on('dp.change', planTrip);
+        //datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
+        //datepicker.on('dp.change', planTrip);
 
         directionsListControl = new Control.DirectionsList({
             showBackButton: true,
@@ -154,9 +155,11 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
-        var picker = $(options.selectors.datepicker).data('DateTimePicker');
+        // TODO: updated date/time control
+        //var picker = $(options.selectors.datepicker).data('DateTimePicker');
         // use current date/time if none set
-        var date = picker.date() || moment();
+        //var date = picker.date() || moment();
+        var date = moment();
 
         var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
         var arriveBy = isArriveBy(); // depart at time by default

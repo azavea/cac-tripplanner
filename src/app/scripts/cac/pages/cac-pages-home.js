@@ -1,4 +1,5 @@
-CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPreferences) {
+CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPreferences,
+                            UrlRouter) {
     'use strict';
 
     var defaults = {
@@ -50,6 +51,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     var typeaheads = {};
 
     var mapControl = null;
+    var urlRouter = null;
+    var sidebarDirectionsControl = null;
 
     // TODO: rework tab control
     var sidebarTabControl = null;
@@ -147,6 +150,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     };
 
     Home.prototype.initialize = function () {
+        urlRouter = new UrlRouter();
 
         // Map initialization logic and event binding
         // TODO: rework tab control
@@ -155,6 +159,12 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         mapControl = new MapControl({
             homepage: true,
             tabControl: sidebarTabControl
+        });
+
+        sidebarDirectionsControl = new CAC.Control.SidebarDirections({
+            mapControl: mapControl,
+            tabControl: sidebarTabControl,
+            urlRouter: urlRouter
         });
 
         // handle mode toggle buttons
@@ -276,4 +286,5 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         }
     }
 
-})(jQuery, CAC.Control.BikeModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences);
+})(jQuery, CAC.Control.BikeModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences,
+    CAC.UrlRouting.UrlRouter);
