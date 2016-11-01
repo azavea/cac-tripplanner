@@ -1,0 +1,16 @@
+<article class="info-article">
+    <header class="info-article-header">
+        <div class="info-article-image-hero"
+             style="background-image: url('{{ destination.image.url }}');"></div>
+        <h2 class="info-article-title">{{ destination.name }}</h2>
+    </header>
+    <section class="info-article-section">
+        {{ destination.description|safe }}
+        <p class="info-article-p-link-inline">
+            <a href="#" target="_blank">Event Calendar</a>
+        </p>
+        <p class="info-article-p-link-inline">
+            <a href="{{ destination.website_url }}" target="_blank">{{ destination.website_url }}</a>
+        </p>
+    </section>
+</article>

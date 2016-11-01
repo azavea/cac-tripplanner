@@ -63,7 +63,8 @@
                 <div class="place-card-actions">
                     <a class="place-card-action place-action-go"
                         data-destination-id="{{ destination.id }}" href="#">Go here</a>
-                    <a class="place-card-action place-action-details" href="explore-detail.html">More info</a>
+                    <a class="place-card-action place-action-details"
+                       href="{% url 'place-detail' pk=destination.pk %}">More info</a>
                 </div>
             </li>
         {% endfor %}

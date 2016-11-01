@@ -38,6 +38,12 @@ def about_faq(request, slug):
     context = dict(tab='info', page=page, **DEFAULT_CONTEXT)
     return render(request, 'about-faq.html', context=context)
 
+def place_detail(request, pk):
+    destination = get_object_or_404(Destination.objects.published(), pk=pk)
+    more_destinations = Destination.objects.published().order_by('?').exclude(pk=destination.pk)[:3]
+    context = dict(tab='explore', destination=destination, more_destinations=more_destinations, **DEFAULT_CONTEXT)
+    return render(request, 'place-detail.html', context=context)
+
 def learn_list(request):
     articles = Article.objects.published().order_by('-publish_date')
     context = dict(tab='info', articles=articles, **DEFAULT_CONTEXT)

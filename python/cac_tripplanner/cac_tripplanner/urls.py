@@ -28,6 +28,7 @@ urlpatterns = [
     # Community Profiles
     url(r'^learn/$', cms_views.learn_list, name='learn-list'),
     url(r'^learn/(?P<slug>[\w-]+)/$', cms_views.learn_detail, name='learn-detail'),
+    url(r'^place/(?P<pk>[\d-]+)/$', cms_views.place_detail, name='place-detail'),
 
     # Link Shortening
     url(r'^link/', include('shortlinks.urls')),

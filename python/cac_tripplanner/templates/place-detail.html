@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+    {% include "partials/header.html" %}
+    <div class="main">
+        <h1><a href="{% url 'home' %}">Places We Love</a></h1>
+        {% include "partials/destination-detail.html" %}
+
+        <div class="summaries-list">
+            <h3>More great, green places around Philly</h3>
+            {% for destination in more_destinations %}
+                {% include "partials/destination-card.html" %}
+            {% endfor %}
+            <div class="more-link">
+                <a href="{% url 'home' %}">See them all</a>
+            </div>
+        </div>
+    </div>
+    {% include "partials/footer.html" %}
+{% endblock %}
