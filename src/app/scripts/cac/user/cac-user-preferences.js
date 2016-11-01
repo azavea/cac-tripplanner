@@ -1,9 +1,9 @@
-CAC.User.Preferences = (function($, _) {
+CAC.User.Preferences = (function(Storages, _) {
     'use strict';
 
     // set up local storage
     var namespace = 'cac_otp';
-    var namespaceStorage = $.initNamespaceStorage(namespace);
+    var namespaceStorage = Storages.initNamespaceStorage(namespace);
     var storage = namespaceStorage.localStorage;
 
     // store to use for default location
@@ -107,4 +107,4 @@ CAC.User.Preferences = (function($, _) {
         setPreference(key + 'Text', undefined);
     }
 
-})(jQuery, _);
+})(Storages, _);
