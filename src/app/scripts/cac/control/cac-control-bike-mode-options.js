@@ -73,23 +73,15 @@ CAC.Control.BikeModeOptions = (function ($) {
      * @returns {String} comma-separated list of OpenTripPlanner mode parameters
      */
     function getMode(modeSelectors) {
-        var mode = '';
         var $selected = $(modeSelectors);
-
         if (!$selected) {
             console.error('no mode controls found');
             return options.defaultMode;
         }
-
-        _.each(options.modes, function(val, key) {
-            if ($selected.hasClass(key)) {
-                mode += val + ',';
-            }
-        });
-
-        // slice off trailing comma
-        mode = mode ? mode.substr(0, mode.length - 1) : options.defaultMode;
-        return mode;
+        var mode = _(options.modes).filter(function(val, key) {
+            return $selected.hasClass(key);
+        }).join(',');
+        return mode || options.defaultMode;
     }
 
     /**

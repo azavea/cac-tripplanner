@@ -41,10 +41,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
             typeaheadExplore: '#exploreOrigin',
-            viewAllDestinations: '#viewAllDestinations'
         }
     };
-    var destinationSearchUrl = '/api/destinations/search';
+
     var options = {};
     var bikeModeOptions = null;
     var typeaheads = {};
@@ -191,7 +190,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
-        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
         $(options.selectors.placeList).on('click',
                                           options.selectors.placeCard,
                                           $.proxy(clickedDestination, this));
@@ -200,41 +198,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     };
 
     return Home;
-
-    function clickedViewAllDestinations(event) {
-        event.preventDefault();
-
-        // hide existing destinations list and show loading spinner
-        $(options.selectors.placeList).addClass('hidden');
-        $(options.selectors.destinationsSpinner).removeClass('hidden');
-
-        var origin = UserPreferences.getPreference('origin');
-        var payload = {
-            'lat': origin.feature.geometry.y,
-            'lon': origin.feature.geometry.x
-        };
-
-        $.ajax({
-            type: 'GET',
-            data: payload,
-            cache: true,
-            url: destinationSearchUrl,
-            contentType: 'application/json'
-        }).then(function(data) {
-            if (data.destinations && data.destinations.length) {
-                var html = Templates.destinations(data.destinations);
-                $(options.selectors.placeList).html(html);
-
-                // hide 'view all' button and spinner, and show features again
-                $(options.selectors.viewAllDestinations).addClass('hidden');
-                $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.placeList).removeClass('hidden');
-            } else {
-                $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.placeList).removeClass('hidden');
-            }
-        });
-    }
 
     /**
      * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
