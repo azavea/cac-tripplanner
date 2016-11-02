@@ -147,7 +147,10 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         if (!(directions.origin && directions.destination)) {
             setDirectionsError('origin');
             setDirectionsError('input-directions-to');
-            updateUrl();  // Still update the URL if they request one-sided directions
+
+            // TODO: fix URL routing for redesign
+            //updateUrl();  // Still update the URL if they request one-sided directions
+
             console.error('error getting directions: missing origin and/or destination');
             return;
         }
@@ -207,8 +210,9 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
+        // TODO: fix URL handling for redesign
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
-        updateUrl();
+        //updateUrl();
 
         var params = {
             fromText: UserPreferences.getPreference('originText'),

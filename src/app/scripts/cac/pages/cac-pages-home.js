@@ -92,7 +92,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
                                           options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
 
-        $(document).ready(directionsControl.setFromUserPreferences());
+        // TODO: re-enable loading settings from user preferences
+        // once routing figured out. Currently there is no way to go back
+        // to the home page, so if there is an origin and destination in
+        // preferences, the app will jump directly to the map page with no way back.
+        //$(document).ready(directionsControl.setFromUserPreferences());
     };
 
     return Home;
