@@ -88,10 +88,11 @@ CAC.Control.BikeModeOptions = (function ($) {
      * Helper to set the appropriate buttons within the given input selector
      * so that they match the mode string.
      *
-     * @param modeSelectors {String} jQuery selector like '#someId input'
+     * @param modeSelectors {String} jQuery selector like '.mode-class'
      * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
      */
     function setMode(modeSelectors, mode) {
+
         var radioSelector = modeSelectors + options.modes.walkBike;
         var transitSelector = modeSelectors + options.modes.transit;
 

@@ -17,6 +17,15 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     var defaults = {
         selectors: {
+
+            selectedModes: '.mode-option.on',
+            modes: '.mode-option',
+
+            typeaheadDest: '#input-directions-to',
+            typeaheadOrigin: '#input-directions-from',
+
+
+            // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
             datepicker: '#datetimeDirections',
             departAtSelect: '#directionsDepartAt',
@@ -27,23 +36,17 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryBlock: '.block-itinerary',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
-            modeSelectors: '#directionsModes input',
             origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             wheelchairDiv: '#directionsWheelchair',
-
-            // Use separate typeahead selectors for dest/origin so we they aren't
-            // treated as a single entity (e.g. so clearing doesn't clear both).
-            typeaheadDest: 'section.directions input.typeahead.destination',
-            typeaheadOrigin: 'section.directions input.typeahead.origin'
         }
     };
     var options = {};
 
     var currentItinerary = null;
-    var datepicker = null;
+    //var datepicker = null; // TODO: build new datepicker controls
 
     var directions = {
         origin: null,
@@ -68,7 +71,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         urlRouter = options.urlRouter;
         bikeModeOptions = new BikeModeOptions();
 
-        $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
+        $(options.selectors.modes).change($.proxy(changeMode, this));
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
@@ -103,6 +106,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
+        /*
         typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
         typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
         typeaheadDest.events.on(typeaheadDest.eventNames.cleared, onTypeaheadCleared);
@@ -110,6 +114,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         typeaheadOrigin = new Typeahead(options.selectors.typeaheadOrigin);
         typeaheadOrigin.events.on(typeaheadOrigin.eventNames.selected, onTypeaheadSelected);
         typeaheadOrigin.events.on(typeaheadOrigin.eventNames.cleared, onTypeaheadCleared);
+        */
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
@@ -144,8 +149,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
 
         if (!(directions.origin && directions.destination)) {
-            setDirectionsError('origin');
-            setDirectionsError('destination');
+            setDirectionsError('from');
+            setDirectionsError('input-directions-to');
             updateUrl();  // Still update the URL if they request one-sided directions
             return;
         }
@@ -161,7 +166,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         //var date = picker.date() || moment();
         var date = moment();
 
-        var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
+        var mode = bikeModeOptions.getMode(options.selectors.selectedModes);
         var arriveBy = isArriveBy(); // depart at time by default
 
         // options to pass to OTP as-is
@@ -372,8 +377,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         typeaheadDest.setValue(originText);
 
         // set on this object and validate
-        setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
-        setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
+        setDirections('from', [destination.feature.geometry.y, destination.feature.geometry.x]);
+        setDirections('to', [origin.feature.geometry.y, origin.feature.geometry.x]);
 
         // update the directions for the reverse trip
         planTrip();
@@ -473,7 +478,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
-        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
+        bikeModeOptions.setMode(options.selectors.modes, mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         typeaheadOrigin.setValue(originText);
         typeaheadDest.setValue(destinationText);
@@ -488,7 +493,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function setDirections(key, value) {
         clearItineraries();
-        if (key === 'origin' || key === 'destination') {
+        if (key === 'from' || key === 'to') {
             directions[key] = value;
             setDirectionsError(key);
         } else {
@@ -498,7 +503,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     function setDirectionsError(key) {
         var $input = null;
-        if (key === 'origin') {
+        if (key === 'from') {
             $input = $(options.selectors.origin);
         } else {
             $input = $(options.selectors.destination);
