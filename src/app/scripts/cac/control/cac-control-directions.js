@@ -17,13 +17,18 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
     var defaults = {
         selectors: {
+            // directions form selectors
+            directionsForm: '.directions-form-element',
+            directionsFrom: '.directions-from',
+            directionsTo: '.directions-to',
 
-            selectedModes: '.mode-option.on',
-            modes: '.mode-option',
+            // typeahead
+            typeaheadFrom: '#input-directions-from',
+            typeaheadTo: '#input-directions-to',
 
-            typeaheadDest: '#input-directions-to',
-            typeaheadOrigin: '#input-directions-from',
-
+            // top-level classes
+            homePageClass: 'body-home',
+            mapPageClasses: 'body-map body-has-sidebar-banner',
 
             // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
@@ -36,7 +41,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             itineraryBlock: '.block-itinerary',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
-            origin: 'section.directions input.origin',
             resultsClass: 'show-results',
             reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
@@ -60,8 +64,8 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
     var urlRouter = null;
     var directionsListControl = null;
     var itineraryListControl = null;
-    var typeaheadDest = null;
-    var typeaheadOrigin = null;
+    var typeaheadTo = null;
+    var typeaheadFrom = null;
 
     function DirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -106,15 +110,13 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
-        /*
-        typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
-        typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
-        typeaheadDest.events.on(typeaheadDest.eventNames.cleared, onTypeaheadCleared);
+        typeaheadTo = new Typeahead(options.selectors.typeaheadTo);
+        typeaheadTo.events.on(typeaheadTo.eventNames.selected, onTypeaheadSelected);
+        typeaheadTo.events.on(typeaheadTo.eventNames.cleared, onTypeaheadCleared);
 
-        typeaheadOrigin = new Typeahead(options.selectors.typeaheadOrigin);
-        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.selected, onTypeaheadSelected);
-        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.cleared, onTypeaheadCleared);
-        */
+        typeaheadFrom = new Typeahead(options.selectors.typeaheadFrom);
+        typeaheadFrom.events.on(typeaheadFrom.eventNames.selected, onTypeaheadSelected);
+        typeaheadFrom.events.on(typeaheadFrom.eventNames.cleared, onTypeaheadCleared);
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
@@ -122,11 +124,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             function(e, lon, lat) {
                 mapControl.displayPoint(lon, lat);
             });
-
-        if (tabControl.isTabShowing('directions')) {
-            console.error('TODO: implement directions form value set from local storage');
-            //setFromUserPreferences();
-        }
 
         // Respond to changes on all direction input fields
         $(options.selectors.directionInput).on('input change', planTrip);
@@ -145,14 +142,11 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
-        if (!tabControl.isTabShowing('directions')) {
-            return;
-        }
-
         if (!(directions.origin && directions.destination)) {
-            setDirectionsError('from');
+            setDirectionsError('origin');
             setDirectionsError('input-directions-to');
             updateUrl();  // Still update the URL if they request one-sided directions
+            console.error('error getting directions: missing origin and/or destination');
             return;
         }
 
@@ -220,6 +214,21 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         };
         $.extend(params, otpOptions);
 
+        console.log('origin:');
+        console.log(directions.origin);
+        console.log('destination:');
+        console.log(directions.destination);
+        console.log(date);
+        console.log(params);
+
+        // change to map view, if not there already
+        var $homepage = $('.' + options.selectors.homePageClass);
+        if ($homepage) {
+            $homepage.blur()
+                     .removeClass(options.selectors.homePageClass)
+                     .addClass(options.selectors.mapPageClasses);
+        }
+
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
@@ -253,6 +262,8 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         }, function (error) {
+            console.error('failed to plan trip');
+            console.error(error);
             $(options.selectors.spinner).addClass('hidden');
             itineraryControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
@@ -374,12 +385,12 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         UserPreferences.setPreference('destinationText', originText);
 
         // update the text control
-        typeaheadOrigin.setValue(destinationText);
-        typeaheadDest.setValue(originText);
+        typeaheadFrom.setValue(destinationText);
+        typeaheadTo.setValue(originText);
 
         // set on this object and validate
-        setDirections('from', [destination.feature.geometry.y, destination.feature.geometry.x]);
-        setDirections('to', [origin.feature.geometry.y, origin.feature.geometry.x]);
+        setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
+        setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
 
         // update the directions for the reverse trip
         planTrip();
@@ -395,6 +406,25 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
     }
 
     function onTypeaheadSelected(event, key, location) {
+
+        event.preventDefault();  // do not submit form
+
+        var $input;
+        var prefKey;
+
+        // Make sure to keep the directionsFrom origin in sync with the explore origin
+        if (key === 'origin') {
+            prefKey = 'origin';
+            $input = $(options.selectors.directionsFrom);
+        } else if (key === 'destination') {
+            prefKey = 'destination';
+            $input = $(options.selectors.typeaheadTo);
+        } else {
+            console.error('unrecognized typeahead key ' + key);
+            return;
+        }
+
+
         if (!location) {
             UserPreferences.clearLocation(key);
             setDirections(key, null);
@@ -408,6 +438,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         UserPreferences.setLocation(key, location);
         setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
 
+        console.log('go plan trip!');
         planTrip();
     }
 
@@ -422,7 +453,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
-        var typeahead = (key === 'origin') ? typeaheadOrigin : typeaheadDest;
+        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
 
         // show spinner while loading
         itineraryListControl.hide();
@@ -481,8 +512,8 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         var mode = UserPreferences.getPreference('mode');
         modeOptionsControl.setMode(mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        typeaheadOrigin.setValue(originText);
-        typeaheadDest.setValue(destinationText);
+        typeaheadFrom.setValue(originText);
+        typeaheadTo.setValue(destinationText);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -494,7 +525,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
     function setDirections(key, value) {
         clearItineraries();
-        if (key === 'from' || key === 'to') {
+        if (key === 'origin' || key === 'destination') {
             directions[key] = value;
             setDirectionsError(key);
         } else {
@@ -504,7 +535,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
     function setDirectionsError(key) {
         var $input = null;
-        if (key === 'from') {
+        if (key === 'origin') {
             $input = $(options.selectors.origin);
         } else {
             $input = $(options.selectors.destination);
@@ -559,12 +590,12 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
                 destination.feature.geometry.y,
                 destination.feature.geometry.x
             ];
-            typeaheadDest.setValue(destinationText);
+            typeaheadTo.setValue(destinationText);
         }
 
         if (origin && origin.feature && origin.feature.geometry) {
             directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
-            typeaheadOrigin.setValue(originText);
+            typeaheadFrom.setValue(originText);
         }
 
         if (tabControl.isTabShowing('directions')) {
