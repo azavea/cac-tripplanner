@@ -6,16 +6,21 @@ from pytz import timezone
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import get_object_or_404, render, render_to_response
 from django.template import RequestContext
 from django.views.generic import View
 from cac_tripplanner.settings import DEBUG
 
 import requests
 
-from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, OTP_URL
+from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, OTP_URL, DEBUG
 from .models import Destination, FeedEvent
 
+
+DEFAULT_CONTEXT = {
+    'debug': DEBUG,
+    'fb_app_id': FB_APP_ID,
+}
 
 def base_otp_view(request, page):
     """
@@ -51,6 +56,7 @@ def directions(request):
     """
     return base_otp_view(request, 'directions.html')
 
+
 def image_to_url(dest_dict, field_name):
     """Helper for converting an image object to a url for a json response
 
@@ -60,6 +66,14 @@ def image_to_url(dest_dict, field_name):
     """
     image = dest_dict.get(field_name)
     return image.url if image else ''
+
+
+def place_detail(request, pk):
+    destination = get_object_or_404(Destination.objects.published(), pk=pk)
+    more_destinations = Destination.objects.published().order_by('?').exclude(pk=destination.pk)[:3]
+    context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
+                   **DEFAULT_CONTEXT)
+    return render(request, 'place-detail.html', context=context)
 
 
 class FindReachableDestinations(View):
