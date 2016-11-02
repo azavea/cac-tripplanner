@@ -31,6 +31,17 @@ CAC.Control.ModeOptions = (function ($) {
             walk: 'WALK',
             bike: 'BICYCLE',
             transit: 'TRANSIT'
+        },
+        selectors: {
+            // mode related selectors
+            modeToggle: '.mode-toggle',
+            modeOption: '.mode-option',
+            modePicker: '.mode-picker', // parent to modeOption
+            onClass: 'on',
+            offClass: 'off',
+            selectedModes: '.mode-option.on',
+            transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
+            transitModeOption: '.mode-option.transit'
         }
     };
 
@@ -39,9 +50,11 @@ CAC.Control.ModeOptions = (function ($) {
     function ModeOptionsControl(params) {
         options = $.extend({}, defaults, params);
         this.options = options;
+        this.initialize();
     }
 
     ModeOptionsControl.prototype = {
+        initialize: initialize,
         changeMode: changeMode,
         getMode: getMode,
         setMode: setMode
@@ -49,31 +62,47 @@ CAC.Control.ModeOptions = (function ($) {
 
     return ModeOptionsControl;
 
+    function initialize() {
+        console.log('initialize mode buttons');
+        // handle mode toggle buttons
+        // TODO: check which option before toggle
+        $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
+            $(this).toggleClass(options.selectors.onClass)
+                .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);
+            e.preventDefault();
+        });
+
+        $(options.selectors.transitModeOption).on('click', function(e) {
+            $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
+                .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
+            e.preventDefault();
+        });
+    }
+
     /**
      * Show/hide sidebar options based on the selected mode.
      * Expects both tabs to have the same selector names for the toggleable divs.
      */
-    function changeMode(selectors) {
-        var mode = getMode(selectors.modeSelectors);
+    function changeMode() {
+        var mode = getMode();
         if (mode && mode.indexOf('BICYCLE') > -1) {
-            $(selectors.bikeTriangleDiv).removeClass('hidden');
-            $(selectors.maxWalkDiv).addClass('hidden');
-            $(selectors.wheelchairDiv).addClass('hidden');
+            $(options.selectors.bikeTriangleDiv).removeClass('hidden');
+            $(options.selectors.maxWalkDiv).addClass('hidden');
+            $(options.selectors.wheelchairDiv).addClass('hidden');
         } else {
-            $(selectors.bikeTriangleDiv).addClass('hidden');
-            $(selectors.maxWalkDiv).removeClass('hidden');
-            $(selectors.wheelchairDiv).removeClass('hidden');
+            $(options.selectors.bikeTriangleDiv).addClass('hidden');
+            $(options.selectors.maxWalkDiv).removeClass('hidden');
+            $(options.selectors.wheelchairDiv).removeClass('hidden');
         }
     }
 
     /**
      * Helper to return the mode string based on the buttons within the given input selector.
      *
-     * @param modeSelectors {String} jQuery selector like '#someId input'
      * @returns {String} comma-separated list of OpenTripPlanner mode parameters
      */
-    function getMode(modeSelectors) {
-        var $selected = $(modeSelectors);
+    function getMode() {
+        var $selected = $(options.selectors.selectedModes);
         if (!$selected) {
             console.error('no mode controls found to read');
             return options.defaultMode;
@@ -88,14 +117,15 @@ CAC.Control.ModeOptions = (function ($) {
      * Helper to set the appropriate buttons within the given input selector
      * so that they match the mode string.
      *
-     * @param modeSelectors {String} jQuery selector like '.mode-class'
      * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
      */
-    function setMode(modeSelectors, mode) {
+    function setMode(mode) {
+
+        console.log('set mode');
 
         // TODO: move out selectors from here
 
-        var $modes = $(modeSelectors);
+        var $modes = $(options.selectors.modePicker);
         if (!$modes) {
             console.error('no mode controls found to set');
             return;

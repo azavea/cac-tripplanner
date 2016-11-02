@@ -14,16 +14,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
             directionsFrom: '.directions-from',
             directionsTo: '.directions-to',
 
-            // mode related selectors
-            modeToggle: '.mode-toggle',
-            modeOption: '.mode-option',
-            modePicker: '.mode-picker', // parent to modeOption
-            onClass: 'on',
-            offClass: 'off',
-            selectedModes: '.mode-option.on',
-            transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
-            transitModeOption: '.mode-option.transit',
-
             // typeahead
             typeaheadFrom: '#input-directions-from',
             typeaheadTo: '#input-directions-to',
@@ -66,7 +56,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
         if (event) {
             event.preventDefault();
         }
-        var mode = modeOptionsControl.getMode(options.selectors.selectedModes);
+        var mode = modeOptionsControl.getMode();
 
         var origin = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destinationText');
@@ -108,7 +98,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
     var submitExplore = function(event) {
         event.preventDefault();
         var exploreTime = $(options.selectors.exploreTime).val();
-        var mode = modeOptionsControl.getMode(options.selectors.exploreMode);
+        var mode = modeOptionsControl.getMode();
         var origin = UserPreferences.getPreference('originText');
 
         if (!origin) {
@@ -147,7 +137,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
         typeaheads.typeaheadFrom.setValue(originText);
 
         typeaheads.typeaheadTo.setValue(destinationText);
-        modeOptionsControl.setMode(options.selectors.modePicker, mode);
+        modeOptionsControl.setMode(mode);
     };
 
     Home.prototype.initialize = function () {
@@ -164,22 +154,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
 
         directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
+            modeOptionsControl: modeOptionsControl,
             tabControl: sidebarTabControl,
             urlRouter: urlRouter
-        });
-
-        // handle mode toggle buttons
-        // TODO: check which option before toggle
-        $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
-            $(this).toggleClass(options.selectors.onClass)
-                .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);
-            e.preventDefault();
-        });
-
-        $(options.selectors.transitModeOption).on('click', function(e) {
-            $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
-                .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
-            e.preventDefault();
         });
 
         // TODO: update below for redesign
@@ -217,7 +194,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
      */
     function clickedDestination(event) {
         event.preventDefault();
-        var mode = modeOptionsControl.getMode(options.selectors.exploreMode);
+        var mode = modeOptionsControl.getMode();
         var exploreTime = $(options.selectors.exploreTime).val();
         UserPreferences.setPreference('method', 'explore');
         UserPreferences.setPreference('exploreTime', exploreTime);

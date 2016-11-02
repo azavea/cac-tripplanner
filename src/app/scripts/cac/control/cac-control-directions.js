@@ -69,7 +69,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         tabControl = options.tabControl;
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
-        modeOptionsControl = new ModeOptions();
+        modeOptionsControl = options.modeOptionsControl;
 
         $(options.selectors.modes).change($.proxy(changeMode, this));
 
@@ -167,7 +167,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         //var date = picker.date() || moment();
         var date = moment();
 
-        var mode = modeOptionsControl.getMode(options.selectors.selectedModes);
+        var mode = modeOptionsControl.getMode();
         var arriveBy = isArriveBy(); // depart at time by default
 
         // options to pass to OTP as-is
@@ -264,7 +264,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
     return DirectionsControl;
 
     function changeMode() {
-        modeOptionsControl.changeMode(options.selectors);
+        modeOptionsControl.changeMode();
         planTrip();
     }
 
@@ -479,7 +479,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
-        modeOptionsControl.setMode(options.selectors.modes, mode);
+        modeOptionsControl.setMode(mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         typeaheadOrigin.setValue(originText);
         typeaheadDest.setValue(destinationText);
@@ -546,7 +546,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        modeOptionsControl.setMode(options.selectors.modeSelectors, mode);
+        modeOptionsControl.setMode(mode);
 
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
