@@ -40,6 +40,7 @@ CAC.Control.ModeOptions = (function ($) {
             onClass: 'on',
             offClass: 'off',
             selectedModes: '.mode-option.on',
+            transitIconClassPrefix: 'icon-transit-',
             transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
             transitModeOption: '.mode-option.transit'
         }
@@ -63,19 +64,23 @@ CAC.Control.ModeOptions = (function ($) {
     return ModeOptionsControl;
 
     function initialize() {
-        console.log('initialize mode buttons');
-        // handle mode toggle buttons
-        // TODO: check which option before toggle
+        // update classes on mode toggle buttons
+        // TODO: trigger event to notify that input changed
         $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
-            $(this).toggleClass(options.selectors.onClass)
-                .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);
             e.preventDefault();
+
+            $(this).addClass(options.selectors.onClass)
+                .removeClass(options.selectors.offClass)
+                .siblings(options.selectors.modeOption)
+                    .removeClass(options.selectors.onClass)
+                    .addClass(options.selectors.offClass);
         });
 
         $(options.selectors.transitModeOption).on('click', function(e) {
+            e.preventDefault();
+
             $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
                 .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
-            e.preventDefault();
         });
     }
 
@@ -120,11 +125,6 @@ CAC.Control.ModeOptions = (function ($) {
      * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
      */
     function setMode(mode) {
-
-        console.log('set mode');
-
-        // TODO: move out selectors from here
-
         var $modes = $(options.selectors.modePicker);
         if (!$modes) {
             console.error('no mode controls found to set');
@@ -134,11 +134,11 @@ CAC.Control.ModeOptions = (function ($) {
         _.each(options.modes, function(val, key) {
             var $thisMode = $modes.find('.' + key);
 
-            var addClass = 'off';
-            var removeClass = 'on';
+            var addClass = options.selectors.offClass;
+            var removeClass =  options.selectors.onClass;
             if (mode.indexOf(val) > -1) {
-                addClass = 'on';
-                removeClass = 'off';
+                addClass = removeClass;
+                removeClass = options.selectors.offClass;
             }
 
             $thisMode.addClass(addClass);
@@ -146,8 +146,9 @@ CAC.Control.ModeOptions = (function ($) {
 
             if (key === 'transit') {
                 var $modeIcon = $thisMode.find('i');
-                $modeIcon.addClass('icon-transit-' + addClass);
-                $modeIcon.removeClass('icon-transit-' + removeClass);
+                var prefix = options.selectors.transitIconClassPrefix;
+                $modeIcon.addClass(prefix + addClass);
+                $modeIcon.removeClass(prefix + removeClass);
             }
         });
     }
