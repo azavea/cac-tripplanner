@@ -76,14 +76,22 @@
         text-align: center;
     }
 
-    .info-article-image-hero {
-        height: 200px;
+    .info-article-image-hero,
+    .info-place-image-hero {
         background-repeat: no-repeat;
         background-size: cover;
 
         @include respond-to('xxs') {
             height: 200px;
         }
+    }
+
+    .info-article-image-hero {
+        height: 200px;
+    }
+
+    .info-place-image-hero {
+        height: 400px;
     }
 
     .info-article-category {
