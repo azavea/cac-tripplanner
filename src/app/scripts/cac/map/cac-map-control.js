@@ -9,7 +9,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     };
 
     var map = null;
-    var userMarker = null;
     var geocodeMarker = null;
     var directionsMarkers = {
         origin: null,
@@ -154,45 +153,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         if (!homepage) {
             layerControl.addTo(map);
         }
-    }
-
-    /**
-     * Use HTML5 navigator to locate user and place a circle at their estimated location.
-     *
-     * @return {object} (promise) which should resolve to the current coordinates of a user
-     */
-    function locateUser() {
-        var deferred = $.Deferred();
-        var options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        };
-        var success = function(pos) {
-            var latlng = [pos.coords.latitude, pos.coords.longitude];
-            if (userMarker) {
-                userMarker.setLatLng(latlng);
-            } else {
-                userMarker = new cartodb.L.CircleMarker(latlng)
-                  .on('click', function() {
-                      // TODO: not implemented
-                      events.trigger(eventNames.currentLocationClick, latlng);
-                  });
-                userMarker.setRadius(5);
-                map.addLayer(userMarker);
-            }
-            deferred.resolve(latlng);
-        };
-        var failure = function(error) {
-            deferred.fail(function(){return 'ERROR(' + error.code + '): ' + error.message; });
-        };
-
-        if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(success, failure, options);
-        } else {
-            deferred.fail(function() { return 'geolocation not supported on this device'; });
-        }
-        return deferred.promise();
     }
 
     function setGeocodeMarker(latLng) {
