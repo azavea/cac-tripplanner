@@ -3,15 +3,34 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
     var defaults = {
         selectors: {
-            articlesContainer: '.articles',
-            articlesSpinner: '#articlesSpinner',
-            destinationBlock: '.block-destination',
-            destinationsContainer: '.destinations',
-            destinationsSpinner: '#destinationsSpinner',
-            directionsForm: '#directions',
-            directionsFrom: '#directionsFrom',
+            // destinations
+            placeCard: '.place-card',
+            placeList: '.place-list',
+
+            // directions form selectors
+            directionsForm: '.directions-form-element',
+            directionsFrom: '.directions-from',
+            directionsTo: '.directions-to',
+
+            // mode related selectors
+            modeToggle: '.mode-toggle',
+            modeOption: '.mode-option',
+            onClass: 'on',
+            offClass: 'off',
+            selectedModes: '.mode-option.on',
+            transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
+            transitModeOption: '.mode-option.transit',
+
+            // typeahead
+            typeaheadFrom: '#input-directions-from',
+            typeaheadTo: '#input-directions-to',
+
+            // top-level classes
+            homePageClass: 'body-home',
+            mapPageClasses: 'body-map body-has-sidebar-banner',
+
+            // TODO: update or remove old selectors below
             directionsMode: '#directionsMode input',
-            directionsTo: '#directionsTo',
             errorClass: 'error',
             exploreForm: '#explore',
             exploreMode: '#exploreMode input',
@@ -22,12 +41,9 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
             typeaheadExplore: '#exploreOrigin',
-            typeaheadFrom: '#directionsFrom',
-            typeaheadTo: '#directionsTo',
-            viewAllDestinations: '#viewAllDestinations'
         }
     };
-    var destinationSearchUrl = '/api/destinations/search';
+
     var options = {};
     var bikeModeOptions = null;
     var typeaheads = {};
@@ -43,8 +59,11 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     }
 
     var submitDirections = function(event) {
-        event.preventDefault();
-        var mode = bikeModeOptions.getMode(options.selectors.directionsMode);
+        if (event) {
+            event.preventDefault();
+        }
+        var mode = bikeModeOptions.getMode(options.selectors.selectedModes);
+
         var origin = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destinationText');
 
@@ -60,16 +79,25 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         if ($(options.selectors.directionsFrom).hasClass(options.selectors.errorClass) ||
             $(options.selectors.directionsTo).hasClass(options.selectors.errorClass)) {
 
-            $(options.selectors.submitErrorModal).modal();
+            // TODO: update or remove error modals
+            console.error('error with origin or destination');
+            //$(options.selectors.submitErrorModal).modal();
             return;
         }
 
         if (origin && destination) {
             UserPreferences.setPreference('method', 'directions');
             UserPreferences.setPreference('mode', mode);
-            window.location = '/map';
+
+            // change to map view
+            $('.' + options.selectors.homePageClass)
+                .blur()
+                .removeClass(options.selectors.homePageClass)
+                .addClass(options.selectors.mapPageClasses);
         } else {
-            $(options.selectors.submitErrorModal).modal();
+            // TODO: update or remove error modals
+            //$(options.selectors.submitErrorModal).modal();
+            console.error('missing origin or destination.');
         }
     };
 
@@ -112,6 +140,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         // 'directions' tab options
         var destinationText = UserPreferences.getPreference('destinationText');
         typeaheads.typeaheadFrom.setValue(originText);
+
         typeaheads.typeaheadTo.setValue(destinationText);
         bikeModeOptions.setMode(options.selectors.directionsMode, mode);
     };
@@ -127,6 +156,20 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             tabControl: sidebarTabControl
         });
 
+        // handle mode toggle buttons
+        $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
+            $(this).toggleClass(options.selectors.onClass)
+                .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);
+            e.preventDefault();
+        });
+
+        $(options.selectors.transitModeOption).on('click', function(e) {
+            $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
+                .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
+            e.preventDefault();
+        });
+
+        // TODO: update below for redesign
         this.destinations = null;
         $(options.selectors.toggleButton).on('click', function(){
             var id = $(this).attr('id');
@@ -142,52 +185,19 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         }, this));
 
         // save form data and redirect to map when 'go' button clicked
+
+        // TODO: redesign has form, but no way to submit. remove this?
         $(options.selectors.exploreForm).submit(submitExplore);
         $(options.selectors.directionsForm).submit(submitDirections);
 
-        $(options.selectors.viewAllDestinations).click($.proxy(clickedViewAllDestinations, this));
-        $(options.selectors.destinationsContainer).on('click', options.selectors.destinationBlock,
-                                                      $.proxy(clickedDestination, this));
+        $(options.selectors.placeList).on('click',
+                                          options.selectors.placeCard,
+                                          $.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
     };
 
     return Home;
-
-    function clickedViewAllDestinations(event) {
-        event.preventDefault();
-
-        // hide existing destinations list and show loading spinner
-        $(options.selectors.destinationsContainer).addClass('hidden');
-        $(options.selectors.destinationsSpinner).removeClass('hidden');
-
-        var origin = UserPreferences.getPreference('origin');
-        var payload = {
-            'lat': origin.feature.geometry.y,
-            'lon': origin.feature.geometry.x
-        };
-
-        $.ajax({
-            type: 'GET',
-            data: payload,
-            cache: true,
-            url: destinationSearchUrl,
-            contentType: 'application/json'
-        }).then(function(data) {
-            if (data.destinations && data.destinations.length) {
-                var html = Templates.destinations(data.destinations);
-                $(options.selectors.destinationsContainer).html(html);
-
-                // hide 'view all' button and spinner, and show features again
-                $(options.selectors.viewAllDestinations).addClass('hidden');
-                $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.destinationsContainer).removeClass('hidden');
-            } else {
-                $(options.selectors.destinationsSpinner).addClass('hidden');
-                $(options.selectors.destinationsContainer).removeClass('hidden');
-            }
-        });
-    }
 
     /**
      * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
@@ -200,7 +210,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         UserPreferences.setPreference('exploreTime', exploreTime);
         UserPreferences.setPreference('mode', mode);
 
-        var block = $(event.target).closest(options.selectors.destinationBlock);
+        var block = $(event.target).closest(options.selectors.placeCard);
         var placeId = block.data('destination-id');
         UserPreferences.setPreference('placeId', placeId);
         window.location = '/map';
@@ -233,7 +243,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             }
         } else if (key === 'to') {
             prefKey = 'destination';
-            $input = $(options.selectors.directionsTo);
+            $input = $(options.selectors.typeaheadTo);
         } else {
             return;
         }
@@ -242,6 +252,8 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             $input.removeClass(options.selectors.errorClass);
             UserPreferences.setPreference(prefKey, location);
             UserPreferences.setPreference(prefKey + 'Text', $input.typeahead('val'));
+
+            submitDirections(event);
         } else {
             $input.addClass(options.selectors.errorClass);
             UserPreferences.setPreference(prefKey, undefined);

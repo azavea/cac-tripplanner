@@ -58,13 +58,15 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
 
-        // hide zoom control on home page view
+        initializeBasemaps();
+
         if (!homepage) {
+            // hide zoom control on home page view
             zoomControl.addTo(map);
+            // delay loading overlays
+            initializeOverlays();
         }
 
-        initializeBasemaps();
-        initializeOverlays();
         initializeLayerControl();
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
@@ -131,7 +133,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
         overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
 
-        // TODO: handle hiding layers on home view more cleanly.
+        // TODO: handle hiding layers on home view more cleanly
+        // when user switches back to home view from map view
         // Would be better to initialize but not add to map, to avoid flashing,
         // although it probably won't be visible due to centering of home page text.
         if (homepage) {

@@ -30,6 +30,10 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         selected: 'cac:typeahead:selected'
     };
 
+    var selectors = {
+        geolocate: '.icon-geolocate'
+    };
+
     function CACTypeahead(selector, options) {
         this.options = $.extend({}, defaults, options);
         this.suggestAdapter = suggestAdapterFactory();
@@ -71,11 +75,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 }
             }, this));
 
-            // Add locator button and wire it up
-            var locatorTemplate = '<i class="fa fa-crosshairs locate-icon"></i>';
-            var $locator = $(locatorTemplate).insertBefore($element);
+            // Wire up locator button
             if ('geolocation' in navigator) {
-                $element.parent().on('click', '.locate-icon', function() {
+                $element.parent().parent().find(selectors.geolocate).on('click', function() {
                     navigator.geolocation.getCurrentPosition(function(pos) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
@@ -90,6 +92,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                             }
                         });
 
+                    }, function(error) {
+                        console.error('geolocation error:');
+                        console.error(error);
                     });
                 });
             }
@@ -97,11 +102,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             // Trigger cleared event when user clears the input via keyboard or clicking the x
             $element.on('keyup search change', function() {
                 if ($element.val()) {
-                    $locator.hide();
                 } else {
                     $element.typeahead('close');
                     events.trigger(eventNames.cleared, [typeaheadKey]);
-                    $locator.show();
                 }
             });
         }, this);
