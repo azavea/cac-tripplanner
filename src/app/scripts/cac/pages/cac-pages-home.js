@@ -52,7 +52,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
 
     var mapControl = null;
     var urlRouter = null;
-    var sidebarDirectionsControl = null;
+    var directionsControl = null;
 
     // TODO: rework tab control
     var sidebarTabControl = null;
@@ -162,7 +162,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
             tabControl: sidebarTabControl
         });
 
-        sidebarDirectionsControl = new CAC.Control.SidebarDirections({
+        directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
             tabControl: sidebarTabControl,
             urlRouter: urlRouter

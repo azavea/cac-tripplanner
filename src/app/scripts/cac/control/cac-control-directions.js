@@ -1,9 +1,9 @@
 /**
- *  View control for the sidebar directions tab
+ *  View control for the directions form
  *
  */
-CAC.Control.SidebarDirections = (function (_, $, Control, ModeOptions, Geocoder,
-                                 Routing, Typeahead, UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routing, Typeahead,
+                                    UserPreferences, Utils) {
 
     'use strict';
 
@@ -63,7 +63,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, ModeOptions, Geocoder,
     var typeaheadDest = null;
     var typeaheadOrigin = null;
 
-    function SidebarDirectionsControl(params) {
+    function DirectionsControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
@@ -124,7 +124,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, ModeOptions, Geocoder,
             });
 
         if (tabControl.isTabShowing('directions')) {
-            console.error('TODO: implement sidebar value set from local storage');
+            console.error('TODO: implement directions form value set from local storage');
             //setFromUserPreferences();
         }
 
@@ -132,7 +132,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, ModeOptions, Geocoder,
         $(options.selectors.directionInput).on('input change', planTrip);
     }
 
-    SidebarDirectionsControl.prototype = {
+    DirectionsControl.prototype = {
         clearDirections: clearDirections,
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
@@ -261,7 +261,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, ModeOptions, Geocoder,
         });
     }, DIRECTION_THROTTLE_MILLIS);
 
-    return SidebarDirectionsControl;
+    return DirectionsControl;
 
     function changeMode() {
         modeOptionsControl.changeMode(options.selectors);

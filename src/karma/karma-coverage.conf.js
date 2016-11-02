@@ -42,7 +42,7 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-mode-options.js',
       'app/scripts/cac/control/cac-control-sidebar-tab.js',
       'app/scripts/cac/control/cac-control-sidebar-explore.js',
-      'app/scripts/cac/control/cac-control-sidebar-directions.js',
+      'app/scripts/cac/control/cac-control-directions.js',
       'app/scripts/cac/control/cac-control-itinerary-list.js',
       'app/scripts/cac/control/cac-control-directions-list.js',
       'app/scripts/cac/home/cac-home-templates.js',

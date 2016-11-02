@@ -22,7 +22,7 @@
 
     describe('CAC Trip Planner Home Page', function() {
         it('Should have typeahead available', function(done) {
-            expect(HomePages.typeaheadExplore).toBeDefined();
+            expect(HomePages.typeaheadTo).toBeDefined();
             done();
         });
     });
