@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemplates, Routing,
+CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
                               Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -40,7 +40,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
     };
 
-    var bikeModeOptions = null;
+    var modeOptionsControl = null;
     var datepicker = null;
     var mapControl = null;
     var tabControl = null;
@@ -55,7 +55,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         mapControl = options.mapControl;
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
-        bikeModeOptions = new BikeModeOptions();
+        modeOptionsControl = new ModeOptions();
 
         // initiallize date/time picker
         datepicker = $(options.selectors.datepicker).datetimepicker({
@@ -150,13 +150,13 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             date = moment();
         }
 
-        var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
+        var mode = modeOptionsControl.getMode(options.selectors.modeSelectors);
         var otpOptions = { mode: mode };
 
         if (mode.indexOf('BICYCLE') > -1) {
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeModeOptions.options.bikeTriangle[bikeTriangle]);
+            $.extend(otpOptions, {optimize: 'TRIANGLE'}, modeOptionsControl.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
@@ -184,7 +184,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
     return SidebarExploreControl;
 
     function changeMode() {
-        bikeModeOptions.changeMode(options.selectors);
+        modeOptionsControl.changeMode(options.selectors);
         clickedExplore();
     }
 
@@ -320,7 +320,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
             $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     bikeModeOptions.options.bikeTriangle[bikeTriangle]);
+                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
         } else {
             var maxWalk = $('input', options.selectors.maxWalkDiv).val();
             if (maxWalk) {
@@ -441,7 +441,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         $(options.selectors.exploreTime).val(exploreTime);
 
-        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
+        modeOptionsControl.setMode(options.selectors.modeSelectors, mode);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // use current date/time when loading from preferences
@@ -452,7 +452,7 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
 
         if (mode.indexOf('BICYCLE') > -1) {
             $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     bikeModeOptions.options.bikeTriangle[bikeTriangle]);
+                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
         } else {
             if (maxWalk) {
                 $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
@@ -473,5 +473,5 @@ CAC.Control.SidebarExplore = (function (_, $, BikeModeOptions, Geocoder, MapTemp
         }
     }
 
-})(_, jQuery, CAC.Control.BikeModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
+})(_, jQuery, CAC.Control.ModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPreferences,
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferences,
                             UrlRouter) {
     'use strict';
 
@@ -47,7 +47,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     };
 
     var options = {};
-    var bikeModeOptions = null;
+    var modeOptionsControl = null;
     var typeaheads = {};
 
     var mapControl = null;
@@ -59,14 +59,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
     function Home(params) {
         options = $.extend({}, defaults, params);
-        bikeModeOptions = new BikeModeOptions();
+        modeOptionsControl = new ModeOptions();
     }
 
     var submitDirections = function(event) {
         if (event) {
             event.preventDefault();
         }
-        var mode = bikeModeOptions.getMode(options.selectors.selectedModes);
+        var mode = modeOptionsControl.getMode(options.selectors.selectedModes);
 
         var origin = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destinationText');
@@ -108,7 +108,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
     var submitExplore = function(event) {
         event.preventDefault();
         var exploreTime = $(options.selectors.exploreTime).val();
-        var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
+        var mode = modeOptionsControl.getMode(options.selectors.exploreMode);
         var origin = UserPreferences.getPreference('originText');
 
         if (!origin) {
@@ -140,14 +140,14 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
 
         typeaheads.typeaheadExplore.setValue(originText);
         $(options.selectors.exploreTime).val(exploreTime);
-        //bikeModeOptions.setMode(options.selectors.exploreMode, mode);
+        //modeOptionsControl.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
         var destinationText = UserPreferences.getPreference('destinationText');
         typeaheads.typeaheadFrom.setValue(originText);
 
         typeaheads.typeaheadTo.setValue(destinationText);
-        bikeModeOptions.setMode(options.selectors.modePicker, mode);
+        modeOptionsControl.setMode(options.selectors.modePicker, mode);
     };
 
     Home.prototype.initialize = function () {
@@ -217,7 +217,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
      */
     function clickedDestination(event) {
         event.preventDefault();
-        var mode = bikeModeOptions.getMode(options.selectors.exploreMode);
+        var mode = modeOptionsControl.getMode(options.selectors.exploreMode);
         var exploreTime = $(options.selectors.exploreTime).val();
         UserPreferences.setPreference('method', 'explore');
         UserPreferences.setPreference('exploreTime', exploreTime);
@@ -288,5 +288,5 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         }
     }
 
-})(jQuery, CAC.Control.BikeModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences,
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences,
     CAC.UrlRouting.UrlRouter);

@@ -1,4 +1,4 @@
-CAC.Control.BikeModeOptions = (function ($) {
+CAC.Control.ModeOptions = (function ($) {
     'use strict';
 
     var defaults = {
@@ -36,18 +36,18 @@ CAC.Control.BikeModeOptions = (function ($) {
 
     var options = {};
 
-    function BikeModeOptionsControl(params) {
+    function ModeOptionsControl(params) {
         options = $.extend({}, defaults, params);
         this.options = options;
     }
 
-    BikeModeOptionsControl.prototype = {
+    ModeOptionsControl.prototype = {
         changeMode: changeMode,
         getMode: getMode,
         setMode: setMode
     };
 
-    return BikeModeOptionsControl;
+    return ModeOptionsControl;
 
     /**
      * Show/hide sidebar options based on the selected mode.
