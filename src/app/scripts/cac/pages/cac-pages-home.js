@@ -17,6 +17,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             // mode related selectors
             modeToggle: '.mode-toggle',
             modeOption: '.mode-option',
+            modePicker: '.mode-picker', // parent to modeOption
             onClass: 'on',
             offClass: 'off',
             selectedModes: '.mode-option.on',
@@ -32,7 +33,6 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
             mapPageClasses: 'body-map body-has-sidebar-banner',
 
             // TODO: update or remove old selectors below
-            directionsMode: '#directionsMode input',
             errorClass: 'error',
             exploreForm: '#explore',
             exploreMode: '#exploreMode input',
@@ -133,20 +133,21 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         var mode = UserPreferences.getPreference('mode');
         setTab(method);
 
+        // TODO: update for 'explore' mode
         // 'explore' tab options
         var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
 
         typeaheads.typeaheadExplore.setValue(originText);
         $(options.selectors.exploreTime).val(exploreTime);
-        bikeModeOptions.setMode(options.selectors.exploreMode, mode);
+        //bikeModeOptions.setMode(options.selectors.exploreMode, mode);
 
         // 'directions' tab options
         var destinationText = UserPreferences.getPreference('destinationText');
         typeaheads.typeaheadFrom.setValue(originText);
 
         typeaheads.typeaheadTo.setValue(destinationText);
-        bikeModeOptions.setMode(options.selectors.directionsMode, mode);
+        bikeModeOptions.setMode(options.selectors.modePicker, mode);
     };
 
     Home.prototype.initialize = function () {
@@ -168,6 +169,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         });
 
         // handle mode toggle buttons
+        // TODO: check which option before toggle
         $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
             $(this).toggleClass(options.selectors.onClass)
                 .siblings(options.selectors.modeOption).toggleClass(options.selectors.onClass);

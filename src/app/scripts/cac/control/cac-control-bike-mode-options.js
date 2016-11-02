@@ -75,7 +75,7 @@ CAC.Control.BikeModeOptions = (function ($) {
     function getMode(modeSelectors) {
         var $selected = $(modeSelectors);
         if (!$selected) {
-            console.error('no mode controls found');
+            console.error('no mode controls found to read');
             return options.defaultMode;
         }
         var mode = _(options.modes).filter(function(val, key) {
@@ -93,37 +93,33 @@ CAC.Control.BikeModeOptions = (function ($) {
      */
     function setMode(modeSelectors, mode) {
 
-        var radioSelector = modeSelectors + options.modes.walkBike;
-        var transitSelector = modeSelectors + options.modes.transit;
+        // TODO: move out selectors from here
 
-        var walkBikeVal = $(radioSelector + ':checked').val();
-        var haveTransit = $(transitSelector + ':checked').val();
-
-        // toggle transit button selection, if needed
-        // NB: cannot just .click() button here, or wind up in inconsistent state,
-        // particularly on page load.
-        if (mode.indexOf('TRANSIT') > -1 && !haveTransit) {
-            $(transitSelector).prop('checked', true);
-            $(transitSelector).parents('label').addClass('active');
-        } else if (mode.indexOf('TRANSIT') === -1 && haveTransit) {
-            $(transitSelector).prop('checked', false);
-            $(transitSelector).parents('label').removeClass('active');
+        var $modes = $(modeSelectors);
+        if (!$modes) {
+            console.error('no mode controls found to set');
+            return;
         }
 
-        // switch walk/bike selection, if needed
-        var $bikeButton = $(radioSelector + '[value=BICYCLE]');
-        var $walkButton = $(radioSelector + '[value=WALK]');
-        if (mode.indexOf('BICYCLE') > -1 && walkBikeVal !== 'BICYCLE') {
-            $bikeButton.prop('checked', true);
-            $bikeButton.parents('label').addClass('active');
-            $walkButton.prop('checked', false);
-            $walkButton.parents('label').removeClass('active');
-        } else if (mode.indexOf('BICYCLE') === -1 && walkBikeVal !== 'WALK') {
-            $walkButton.prop('checked', true);
-            $walkButton.parents('label').addClass('active');
-            $bikeButton.prop('checked', false);
-            $bikeButton.parents('label').removeClass('active');
-        }
+        _.each(options.modes, function(val, key) {
+            var $thisMode = $modes.find('.' + key);
+
+            var addClass = 'off';
+            var removeClass = 'on';
+            if (mode.indexOf(val) > -1) {
+                addClass = 'on';
+                removeClass = 'off';
+            }
+
+            $thisMode.addClass(addClass);
+            $thisMode.removeClass(removeClass);
+
+            if (key === 'transit') {
+                var $modeIcon = $thisMode.find('i');
+                $modeIcon.addClass('icon-transit-' + addClass);
+                $modeIcon.removeClass('icon-transit-' + removeClass);
+            }
+        });
     }
 
 })(jQuery);

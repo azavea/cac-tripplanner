@@ -124,7 +124,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             });
 
         if (tabControl.isTabShowing('directions')) {
-            setFromUserPreferences();
+            console.error('TODO: implement sidebar value set from local storage');
+            //setFromUserPreferences();
         }
 
         // Respond to changes on all direction input fields
