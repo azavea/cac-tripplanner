@@ -25,7 +25,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
 
     var options = {};
     var modeOptionsControl = null;
-    var typeaheads = {};
 
     var mapControl = null;
     var urlRouter = null;
@@ -39,6 +38,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
         modeOptionsControl = new ModeOptions();
     }
 
+    /* TODO: update for redesign or remove
     var submitExplore = function(event) {
         event.preventDefault();
         var exploreTime = $(options.selectors.exploreTime).val();
@@ -61,6 +61,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
 
         window.location = '/map';
     };
+    */
 
     Home.prototype.initialize = function () {
         urlRouter = new UrlRouter();
@@ -81,17 +82,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
             urlRouter: urlRouter
         });
 
-        // TODO: update below for redesign
         this.destinations = null;
-        $(options.selectors.toggleButton).on('click', function(){
+        $(options.selectors.toggleButton).on('click', function() {
             var id = $(this).attr('id');
             setTab(id);
         });
-
-        // save form data and redirect to map when 'go' button clicked
-
-        // TODO: redesign has form, but no way to submit. remove this?
-        $(options.selectors.exploreForm).submit(submitExplore);
 
         $(options.selectors.placeList).on('click',
                                           options.selectors.placeCardDirectionsLink,

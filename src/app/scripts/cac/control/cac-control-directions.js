@@ -17,6 +17,9 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
     var defaults = {
         selectors: {
+            // origin/destination switcher
+            reverseButton: '.btn-reverse',
+
             // directions form selectors
             directionsForm: '.directions-form-element',
             directionsFrom: '.directions-from',
@@ -42,7 +45,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
             resultsClass: 'show-results',
-            reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             wheelchairDiv: '#directionsWheelchair',
         }
@@ -213,13 +215,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             toText: UserPreferences.getPreference('destinationText')
         };
         $.extend(params, otpOptions);
-
-        console.log('origin:');
-        console.log(directions.origin);
-        console.log('destination:');
-        console.log(directions.destination);
-        console.log(date);
-        console.log(params);
 
         // change to map view, if not there already
         var $homepage = $('.' + options.selectors.homePageClass);
@@ -438,7 +433,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         UserPreferences.setLocation(key, location);
         setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
 
-        console.log('go plan trip!');
         planTrip();
     }
 
