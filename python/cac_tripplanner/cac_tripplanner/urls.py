@@ -4,8 +4,12 @@ from django.contrib.gis import admin
 from django.contrib.staticfiles import views as staticviews
 
 from cms import views as cms_views
-from destinations.views import (FindReachableDestinations, SearchDestinations, FeedEvents,
-                                map as map_view, directions as directions_view)
+from destinations.views import (FindReachableDestinations,
+                                SearchDestinations,
+                                FeedEvents,
+                                map as map_view,
+                                directions as directions_view,
+                                place_detail as place_detail_view)
 import settings
 
 urlpatterns = [
@@ -18,6 +22,9 @@ urlpatterns = [
     url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
     url(r'^map/', map_view, name='map'),
     url(r'^directions/', directions_view, name='directions'),
+
+    # Places
+    url(r'^place/(?P<pk>[\d-]+)/$', place_detail_view, name='place-detail'),
 
     # About and FAQ
     url(r'^info/(?P<slug>[\w-]+)/$', cms_views.about_faq, name='about-faq'),
