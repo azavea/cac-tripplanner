@@ -233,6 +233,7 @@
 //jQuery.noConflict(); // because JotForms.
 jQuery(document).ready(function ($) {
     CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    CAC.Settings.routingUrl = '{{ routing_url }}';
     var home = new CAC.Pages.Home();
     home.initialize();
 });

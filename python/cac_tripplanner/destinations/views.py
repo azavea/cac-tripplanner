@@ -16,11 +16,15 @@ import requests
 from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, OTP_URL, DEBUG
 from .models import Destination, FeedEvent
 
+ROUTING_URL = OTP_URL.format(router='default') + 'plan'
+
 
 DEFAULT_CONTEXT = {
     'debug': DEBUG,
     'fb_app_id': FB_APP_ID,
+    'routing_url': ROUTING_URL
 }
+
 
 def base_otp_view(request, page):
     """
@@ -30,9 +34,9 @@ def base_otp_view(request, page):
     :param page: String representation of the HTML template
     :returns: A rendered response
     """
-    routing_url = OTP_URL.format(router='default') + 'plan'
+
     context = RequestContext(request, dict(fb_app_id=FB_APP_ID,
-                                           routing_url=routing_url,
+                                           routing_url=ROUTING_URL,
                                            debug=DEBUG))
     return render_to_response(page, context_instance=context)
 
@@ -134,6 +138,7 @@ class FindReachableDestinations(View):
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
 
+
 class SearchDestinations(View):
     """ View for searching destinations via an http endpoint """
 
@@ -210,6 +215,7 @@ class SearchDestinations(View):
 
         response = {'destinations': data}
         return HttpResponse(json.dumps(response), 'application/json')
+
 
 class FeedEvents(View):
     """ API endpoint for the FeedEvent model """
