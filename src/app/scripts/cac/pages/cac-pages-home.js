@@ -5,6 +5,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         selectors: {
             // destinations
             placeCard: '.place-card',
+            placeCardDirectionsLink: '.place-card .place-action-go',
             placeList: '.place-list',
 
             // directions form selectors
@@ -191,7 +192,7 @@ CAC.Pages.Home = (function ($, BikeModeOptions,  MapControl, Templates, UserPref
         $(options.selectors.directionsForm).submit(submitDirections);
 
         $(options.selectors.placeList).on('click',
-                                          options.selectors.placeCard,
+                                          options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
 
         $(document).ready(loadFromPreferences);
