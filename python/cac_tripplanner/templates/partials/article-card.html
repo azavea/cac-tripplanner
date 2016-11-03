@@ -9,7 +9,7 @@
             </div>
             <h2>{{ article.title }}</h2>
             <p class="lede">
-                {{ article.content|safe }}
+                {{ article.teaser|safe }}
             </p>
             {% if show_link %}
                 <button class="goto-more-posts" href="{% url 'learn-list' %}">More tips, posts, and announcements</button>
