@@ -93,6 +93,7 @@
     position: absolute;
     bottom: $home-section-padding;
     right: $home-section-padding;
+    left: calc(50% + #{($home-section-padding / 2)});
     display: block;
     padding: 0 10px;
     border: 0;
