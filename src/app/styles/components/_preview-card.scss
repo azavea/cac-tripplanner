@@ -1,3 +1,5 @@
+$goto-more-button-height: 4rem;
+
 .preview-card {
     display: flex;
     position: relative;
@@ -56,7 +58,7 @@
         flex-flow: column nowrap;
         align-items: stretch;
         justify-content: space-between;
-        margin-bottom: 5rem;
+        margin-bottom: calc(#{$goto-more-button-height} + #{$home-section-padding});
     }
 
     .category-heading {
