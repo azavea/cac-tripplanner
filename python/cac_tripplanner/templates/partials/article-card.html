@@ -1,5 +1,5 @@
-<a href="{% url 'learn-detail' slug=article.slug %}" class="preview-card-link">
-    <div class="preview-card">
+<div class="preview-card">
+    <a href="{% url 'learn-detail' slug=article.slug %}" class="preview-card-link">
         <img class="preview-photo" src="{{ article.narrow_image.url }}" width="308" height="204"
              alt="{{ article.title }}" />
         <div class="preview-details">
@@ -8,12 +8,10 @@
                 {% if article.content_type == 'tips' %}Tips and Tricks{% endif %}
             </div>
             <h2>{{ article.title }}</h2>
-            <p class="lede">
-                {{ article.content|safe }}
-            </p>
-            {% if show_link %}
-                <button class="goto-more-posts" href="{% url 'learn-list' %}">More tips, posts, and announcements</button>
-            {% endif %}
+            {{ article.teaser|safe }}
         </div>
-    </div>
-</a>
+    </a>
+    {% if show_link %}
+    <a class="goto-more-posts" href="{% url 'learn-list' %}">More tips, posts, and announcements</a>
+    {% endif %}
+</div>

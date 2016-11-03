@@ -1,6 +1,8 @@
-.preview-card-link {
-    @include delinkify;
+$goto-more-button-height: 4rem;
+
+.preview-card {
     display: flex;
+    position: relative;
     flex: 1 0 auto;
     flex-flow: column nowrap;
     align-items: stretch;
@@ -16,7 +18,8 @@
     }
 }
 
-.preview-card {
+.preview-card-link {
+    @include delinkify;
     display: flex;
     flex: 1 0 auto;
     flex-flow: row nowrap;
@@ -55,6 +58,7 @@
         flex-flow: column nowrap;
         align-items: stretch;
         justify-content: space-between;
+        margin-bottom: calc(#{$goto-more-button-height} + #{$home-section-padding});
     }
 
     .category-heading {
@@ -84,23 +88,31 @@
         font-weight: $font-weight-medium;
         line-height: 1.8;
     }
+}
 
-    .goto-more-posts {
-        @include delinkify;
-        display: block;
-        margin-top: 10px;
-        border: 0;
-        outline: 0;
-        background-color: $gophillygo-orange;
-        font-size: 1.4rem;
-        font-weight: $font-weight-bold;
-        line-height: 2.75;
-        text-align: center;
-        cursor: pointer;
-        appearance: none;
+.goto-more-posts {
+    @include delinkify;
+    position: absolute;
+    bottom: $home-section-padding;
+    right: $home-section-padding;
+    left: calc(50% + #{($home-section-padding / 2)});
+    display: block;
+    padding: 0 10px;
+    border: 0;
+    outline: 0;
+    background-color: $gophillygo-orange;
+    font-size: 1.4rem;
+    font-weight: $font-weight-bold;
+    line-height: 2.75;
+    text-align: center;
+    cursor: pointer;
+    appearance: none;
 
-        &:hover {
-            @include button-hover;
-        }
+    @include respond-to('xs') {
+        left: $home-section-padding;
+    }
+
+    &:hover {
+        @include button-hover;
     }
 }
