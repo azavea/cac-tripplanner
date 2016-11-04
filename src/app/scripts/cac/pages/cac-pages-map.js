@@ -10,7 +10,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
 
     var mapControl = null;
     var sidebarExploreControl = null;
-    var sidebarDirectionsControl = null;
+    var directionsControl = null;
     var sidebarTabControl = null;
     var urlRouter = null;
 
@@ -51,7 +51,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
         sidebarExploreControl.events.on(sidebarExploreControl.eventNames.destinationDirections,
                                         $.proxy(getDestinationDirections, this));
 
-        sidebarDirectionsControl = new CAC.Control.SidebarDirections({
+        directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
             tabControl: sidebarTabControl,
             urlRouter: urlRouter
@@ -87,18 +87,18 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
 
         // not a mobile device; go to directions tab
         mapControl.isochroneControl.clearIsochrone();
-        sidebarDirectionsControl.clearDirections();
+        directionsControl.clearDirections();
         mapControl.setGeocodeMarker(null);
-        sidebarDirectionsControl.setDestination(destination);
+        directionsControl.setDestination(destination);
         sidebarTabControl.setTab('directions');
     }
 
     function moveOrigin(event, position) {
-        sidebarDirectionsControl.moveOriginDestination('origin', position);
+        directionsControl.moveOriginDestination('origin', position);
     }
 
     function moveDestination(event, position) {
-        sidebarDirectionsControl.moveOriginDestination('destination', position);
+        directionsControl.moveOriginDestination('destination', position);
     }
 
     function moveIsochrone(event, position) {
@@ -118,13 +118,13 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
             UserPreferences.setPreference('method', 'directions');
             mapControl.isochroneControl.clearIsochrone();
             mapControl.setGeocodeMarker(null);
-            if (sidebarDirectionsControl) {
-                sidebarDirectionsControl.setFromUserPreferences();
+            if (directionsControl) {
+                directionsControl.setFromUserPreferences();
             }
         } else {
             UserPreferences.setPreference('waypoints', undefined);
             UserPreferences.setPreference('method', 'explore');
-            sidebarDirectionsControl.clearDirections();
+            directionsControl.clearDirections();
             sidebarExploreControl.setFromUserPreferences();
         }
     }

@@ -21,8 +21,7 @@
     });
 
     describe('CAC Trip Planner Home Page', function() {
-        it('Should have typeahead available', function(done) {
-            expect(HomePages.typeaheadExplore).toBeDefined();
+        it('Should load', function(done) {
             done();
         });
     });

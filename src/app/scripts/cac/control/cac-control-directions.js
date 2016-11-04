@@ -1,9 +1,9 @@
 /**
- *  View control for the sidebar directions tab
+ *  View control for the directions form
  *
  */
-CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geocoder,
-                                 Routing, Typeahead, UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routing, Typeahead,
+                                    UserPreferences, Utils) {
 
     'use strict';
 
@@ -17,6 +17,23 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
     var defaults = {
         selectors: {
+            // origin/destination switcher
+            reverseButton: '.btn-reverse',
+
+            // directions form selectors
+            directionsForm: '.directions-form-element',
+            directionsFrom: '.directions-from',
+            directionsTo: '.directions-to',
+
+            // typeahead
+            typeaheadFrom: '#input-directions-from',
+            typeaheadTo: '#input-directions-to',
+
+            // top-level classes
+            homePageClass: 'body-home',
+            mapPageClasses: 'body-map body-has-sidebar-banner',
+
+            // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
             datepicker: '#datetimeDirections',
             departAtSelect: '#directionsDepartAt',
@@ -27,54 +44,47 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             itineraryBlock: '.block-itinerary',
             itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
-            modeSelectors: '#directionsModes input',
-            origin: 'section.directions input.origin',
             resultsClass: 'show-results',
-            reverseButton: '#reverse',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
             wheelchairDiv: '#directionsWheelchair',
-
-            // Use separate typeahead selectors for dest/origin so we they aren't
-            // treated as a single entity (e.g. so clearing doesn't clear both).
-            typeaheadDest: 'section.directions input.typeahead.destination',
-            typeaheadOrigin: 'section.directions input.typeahead.origin'
         }
     };
     var options = {};
 
     var currentItinerary = null;
-    var datepicker = null;
+    //var datepicker = null; // TODO: build new datepicker controls
 
     var directions = {
         origin: null,
         destination: null
     };
 
-    var bikeModeOptions = null;
+    var modeOptionsControl = null;
     var mapControl = null;
     var itineraryControl = null;
     var tabControl = null;
     var urlRouter = null;
     var directionsListControl = null;
     var itineraryListControl = null;
-    var typeaheadDest = null;
-    var typeaheadOrigin = null;
+    var typeaheadTo = null;
+    var typeaheadFrom = null;
 
-    function SidebarDirectionsControl(params) {
+    function DirectionsControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
-        bikeModeOptions = new BikeModeOptions();
+        modeOptionsControl = options.modeOptionsControl;
 
-        $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
+        $(options.selectors.modes).change($.proxy(changeMode, this));
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
+        // TODO: updated time/date control
         // initiallize date/time picker
-        datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
-        datepicker.on('dp.change', planTrip);
+        //datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
+        //datepicker.on('dp.change', planTrip);
 
         directionsListControl = new Control.DirectionsList({
             showBackButton: true,
@@ -102,13 +112,13 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
-        typeaheadDest = new Typeahead(options.selectors.typeaheadDest);
-        typeaheadDest.events.on(typeaheadDest.eventNames.selected, onTypeaheadSelected);
-        typeaheadDest.events.on(typeaheadDest.eventNames.cleared, onTypeaheadCleared);
+        typeaheadTo = new Typeahead(options.selectors.typeaheadTo);
+        typeaheadTo.events.on(typeaheadTo.eventNames.selected, onTypeaheadSelected);
+        typeaheadTo.events.on(typeaheadTo.eventNames.cleared, onTypeaheadCleared);
 
-        typeaheadOrigin = new Typeahead(options.selectors.typeaheadOrigin);
-        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.selected, onTypeaheadSelected);
-        typeaheadOrigin.events.on(typeaheadOrigin.eventNames.cleared, onTypeaheadCleared);
+        typeaheadFrom = new Typeahead(options.selectors.typeaheadFrom);
+        typeaheadFrom.events.on(typeaheadFrom.eventNames.selected, onTypeaheadSelected);
+        typeaheadFrom.events.on(typeaheadFrom.eventNames.cleared, onTypeaheadCleared);
 
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
@@ -117,15 +127,11 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 mapControl.displayPoint(lon, lat);
             });
 
-        if (tabControl.isTabShowing('directions')) {
-            setFromUserPreferences();
-        }
-
         // Respond to changes on all direction input fields
         $(options.selectors.directionInput).on('input change', planTrip);
     }
 
-    SidebarDirectionsControl.prototype = {
+    DirectionsControl.prototype = {
         clearDirections: clearDirections,
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
@@ -138,14 +144,14 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
-        if (!tabControl.isTabShowing('directions')) {
-            return;
-        }
-
         if (!(directions.origin && directions.destination)) {
             setDirectionsError('origin');
-            setDirectionsError('destination');
-            updateUrl();  // Still update the URL if they request one-sided directions
+            setDirectionsError('input-directions-to');
+
+            // TODO: fix URL routing for redesign
+            //updateUrl();  // Still update the URL if they request one-sided directions
+
+            console.error('error getting directions: missing origin and/or destination');
             return;
         }
 
@@ -154,11 +160,13 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
-        var picker = $(options.selectors.datepicker).data('DateTimePicker');
+        // TODO: updated date/time control
+        //var picker = $(options.selectors.datepicker).data('DateTimePicker');
         // use current date/time if none set
-        var date = picker.date() || moment();
+        //var date = picker.date() || moment();
+        var date = moment();
 
-        var mode = bikeModeOptions.getMode(options.selectors.modeSelectors);
+        var mode = modeOptionsControl.getMode();
         var arriveBy = isArriveBy(); // depart at time by default
 
         // options to pass to OTP as-is
@@ -177,7 +185,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
             var bikeTriangle = bikeTriangleOpt.val();
             $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     bikeModeOptions.options.bikeTriangle[bikeTriangle]);
+                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
             UserPreferences.setPreference('bikeTriangle', bikeTriangle);
 
             // allow longer bike riding when using public transit
@@ -202,14 +210,23 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
+        // TODO: fix URL handling for redesign
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
-        updateUrl();
+        //updateUrl();
 
         var params = {
             fromText: UserPreferences.getPreference('originText'),
             toText: UserPreferences.getPreference('destinationText')
         };
         $.extend(params, otpOptions);
+
+        // change to map view, if not there already
+        var $homepage = $('.' + options.selectors.homePageClass);
+        if ($homepage) {
+            $homepage.blur()
+                     .removeClass(options.selectors.homePageClass)
+                     .addClass(options.selectors.mapPageClasses);
+        }
 
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
@@ -244,6 +261,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         }, function (error) {
+            console.error('failed to plan trip');
+            console.error(error);
             $(options.selectors.spinner).addClass('hidden');
             itineraryControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
@@ -252,10 +271,10 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         });
     }, DIRECTION_THROTTLE_MILLIS);
 
-    return SidebarDirectionsControl;
+    return DirectionsControl;
 
     function changeMode() {
-        bikeModeOptions.changeMode(options.selectors);
+        modeOptionsControl.changeMode();
         planTrip();
     }
 
@@ -365,8 +384,8 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         UserPreferences.setPreference('destinationText', originText);
 
         // update the text control
-        typeaheadOrigin.setValue(destinationText);
-        typeaheadDest.setValue(originText);
+        typeaheadFrom.setValue(destinationText);
+        typeaheadTo.setValue(originText);
 
         // set on this object and validate
         setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
@@ -386,6 +405,25 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
     }
 
     function onTypeaheadSelected(event, key, location) {
+
+        event.preventDefault();  // do not submit form
+
+        var $input;
+        var prefKey;
+
+        // Make sure to keep the directionsFrom origin in sync with the explore origin
+        if (key === 'origin') {
+            prefKey = 'origin';
+            $input = $(options.selectors.directionsFrom);
+        } else if (key === 'destination') {
+            prefKey = 'destination';
+            $input = $(options.selectors.typeaheadTo);
+        } else {
+            console.error('unrecognized typeahead key ' + key);
+            return;
+        }
+
+
         if (!location) {
             UserPreferences.clearLocation(key);
             setDirections(key, null);
@@ -413,7 +451,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
-        var typeahead = (key === 'origin') ? typeaheadOrigin : typeaheadDest;
+        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
 
         // show spinner while loading
         itineraryListControl.hide();
@@ -470,10 +508,10 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
 
         // set in UI
         var mode = UserPreferences.getPreference('mode');
-        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
+        modeOptionsControl.setMode(mode);
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        typeaheadOrigin.setValue(originText);
-        typeaheadDest.setValue(destinationText);
+        typeaheadFrom.setValue(originText);
+        typeaheadTo.setValue(destinationText);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Save selections to user preferences
@@ -537,7 +575,7 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
             $('input', options.selectors.maxWalkDiv).val(maxWalk);
         }
 
-        bikeModeOptions.setMode(options.selectors.modeSelectors, mode);
+        modeOptionsControl.setMode(mode);
 
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
@@ -550,12 +588,12 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
                 destination.feature.geometry.y,
                 destination.feature.geometry.x
             ];
-            typeaheadDest.setValue(destinationText);
+            typeaheadTo.setValue(destinationText);
         }
 
         if (origin && origin.feature && origin.feature.geometry) {
             directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
-            typeaheadOrigin.setValue(originText);
+            typeaheadFrom.setValue(originText);
         }
 
         if (tabControl.isTabShowing('directions')) {
@@ -570,5 +608,5 @@ CAC.Control.SidebarDirections = (function (_, $, Control, BikeModeOptions, Geoco
         }
     }
 
-})(_, jQuery, CAC.Control, CAC.Control.BikeModeOptions, CAC.Search.Geocoder,
+})(_, jQuery, CAC.Control, CAC.Control.ModeOptions, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

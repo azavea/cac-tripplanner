@@ -207,6 +207,14 @@
         margin-bottom: 15px;
         background-color: $directions-form-text-input-background-color;
 
+        .tt-input, .twitter-typeahead {
+            width: 100%;
+        }
+
+        .tt-dropdown-menu {
+            background-color: $directions-form-text-input-background-color;
+        }
+
         .body-map & {
             flex: 0 0 30px;
             margin-bottom: 0;
@@ -241,8 +249,8 @@
             font-size: 1.4rem;
 
             .body-map & {
-                background-color: $gophillygo-blue;
-                color: $white;
+                background-color: $gophillygo-blue !important;
+                color: $white !important;
                 font-weight: $font-weight-medium;
                 line-height: 30px;
 

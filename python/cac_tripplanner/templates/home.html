@@ -29,7 +29,7 @@
                 <label for="input-directions-from">from</label>
                 <input type="text" id="input-directions-from" name="input-directions-from"
                     value="" placeholder="Enter a starting point"
-                    class="typeahead" type="search" data-typeahead-key="from">
+                    class="typeahead" type="search" data-typeahead-key="origin">
                 <button class="btn-geolocate" title="Detect current location" type="button"
                     name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
@@ -37,7 +37,7 @@
                 <label for="input-directions-to">to</label>
                 <input type="text" id="input-directions-to" name="input-directions-to" value=""
                     placeholder="Enter a destination — or choose one below"
-                    class="typeahead" type="search" data-typeahead-key="to">
+                    class="typeahead" type="search" data-typeahead-key="destination">
                 <button class="btn-reverse" title="Swap starting point and destination"
                     type="button" name="reverse"><i class="icon-reverse"></i></button>
             </div>
@@ -233,6 +233,7 @@
 //jQuery.noConflict(); // because JotForms.
 jQuery(document).ready(function ($) {
     CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    CAC.Settings.routingUrl = '{{ routing_url }}';
     var home = new CAC.Pages.Home();
     home.initialize();
 });

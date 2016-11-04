@@ -8,12 +8,13 @@ from django.views.generic import View
 
 from .models import AboutFaq, Article
 from destinations.models import Destination
-from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, DEBUG
+from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, DEBUG, OTP_URL
 
 
 DEFAULT_CONTEXT = {
     'debug': DEBUG,
     'fb_app_id': FB_APP_ID,
+    'routing_url': OTP_URL.format(router='default') + 'plan'
 }
 
 def home(request):
