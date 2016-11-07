@@ -25,10 +25,11 @@
                 document.getElementById(selectors.emailSubscribeButton).disabled = true;
             }
         }
+        var debouncedValidate = _.debounce(validateContactForm, 400);
 
         // contact form validation
         document.getElementById(selectors.emailAddressBox).on('change', validateContactForm);
-        document.getElementById(selectors.emailAddressBox).on('keyup', validateContactForm);
+        document.getElementById(selectors.emailAddressBox).on('keyup', debouncedValidate);
     });
 </script>
 
