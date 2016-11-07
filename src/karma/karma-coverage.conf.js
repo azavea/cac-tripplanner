@@ -39,6 +39,7 @@ module.exports = function(config) {
       'app/scripts/cac/map/cac-map-itinerary.js',
       'app/scripts/cac/map/cac-map-overlays.js',
       'app/scripts/cac/map/cac-map-templates.js',
+      'app/scripts/cac/control/cac-control-modal.js',
       'app/scripts/cac/control/cac-control-mode-options.js',
       'app/scripts/cac/control/cac-control-sidebar-tab.js',
       'app/scripts/cac/control/cac-control-sidebar-explore.js',
