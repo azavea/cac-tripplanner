@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferences,
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserPreferences,
                             UrlRouter) {
     'use strict';
 
@@ -25,6 +25,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
 
     var options = {};
     var modeOptionsControl = null;
+    var shareModal = null;
+    var transitOptionsModal = null;
 
     var mapControl = null;
     var urlRouter = null;
@@ -36,6 +38,15 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
     function Home(params) {
         options = $.extend({}, defaults, params);
         modeOptionsControl = new ModeOptions();
+
+        shareModal = new Modal({modalClass: 'modal-share'});
+        // TODO: Open share modal once view with button exists
+
+        transitOptionsModal = new Modal({
+            modalClass: 'modal-options',
+            clickHandler: onOptionsModalItemClicked
+        });
+        $('.btn-options').on('click', transitOptionsModal.open);
     }
 
     /* TODO: update for redesign or remove
@@ -132,5 +143,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Templates, UserPreferen
         }
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Home.Templates, CAC.User.Preferences,
+    function onOptionsModalItemClicked(event) {
+        // TODO: Replace with actual functionality once this item is
+        console.log($(event.target).html());
+    }
+
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Home.Templates, CAC.User.Preferences,
     CAC.UrlRouting.UrlRouter);
