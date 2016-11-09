@@ -240,7 +240,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();
-            _.forIn(itineraries, function (itinerary) {
+            _.forEach(itineraries, function (itinerary) {
                 itineraryControl.plotItinerary(itinerary, isFirst);
                 itinerary.highlight(isFirst);
                 if (isFirst) {
