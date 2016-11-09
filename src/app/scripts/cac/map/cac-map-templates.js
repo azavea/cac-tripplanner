@@ -213,7 +213,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '<div class="route-name">via {{this.via}}</div>',
                 '</div>',
                 '<div class="route-summary-secondary-details">',
-                    // TODO: add formatted start and end times to itinerary info
                     '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
                     '<div class="route-modes">',
                         '{{#each this.modes}}',
@@ -223,9 +222,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '</div>',
             '</div>',
         '</div>{{/each}}'].join('');
-
-        // TODO: split out units from formatted duration to go in separate span
-        //<div class="route-duration">33 <span class="units">min</span></div>',
 
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
