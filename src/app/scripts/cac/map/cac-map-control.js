@@ -235,13 +235,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // Remove comment if icon definitions are abstracted elsewhere
         var originIcon = L.AwesomeMarkers.icon({
             icon: 'home',
-            prefix: 'fa',
+            prefix: 'icon',
             markerColor: 'purple'
         });
 
         var destIcon = L.AwesomeMarkers.icon({
-            icon: 'flag-o',
-            prefix: 'fa',
+            icon: 'flag',
+            prefix: 'icon',
             markerColor: 'red'
         });
 

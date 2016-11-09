@@ -273,6 +273,18 @@
       "search": [
         "icon-indego"
       ]
+    },
+    {
+      "uid": "57a0ac800df728aad61a7cf9e12f5fef",
+      "css": "flag",
+      "code": 62009,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "d7271d490b71df4311e32cdacae8b331",
+      "css": "home",
+      "code": 62016,
+      "src": "fontawesome"
     }
   ]
 }
