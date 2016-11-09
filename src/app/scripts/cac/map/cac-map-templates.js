@@ -201,23 +201,32 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     // Template for itinerary summaries
     function itineraryList(itineraries) {
-        var source = '{{#each itineraries}}' +
-                '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
-                    '<div class="trip-numbers">' +
-                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
-                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
-                    '</div>' +
-                    '<div class="trip-details">' +
-                        '{{#each this.modes}}' +
-                            '<div class="direction-icon">' +
-                                ' {{modeIcon this}}' +
-                            '</div>' +
-                        '{{/each}}' +
-                        '<span class="short-description"> via {{this.via}}</span>' +
-                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
-                    '</div>' +
-                '</div>' +
-                '{{/each}}';
+        var source = ['{{#each itineraries}}',
+            '<div class="route-summary" data-itinerary="{{this.id}}">',
+            '<svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">',
+                '<line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331"></line>',
+            '</svg>',
+            '<div class="route-summary-details">',
+                '<div class="route-summary-primary-details">',
+                    '<div class="route-duration units">{{this.formattedDuration}}</div>',
+                    '<div class="route-distance">{{this.distanceMiles}}  <span class="units">miles</span></div>',
+                    '<div class="route-name">via {{this.via}}</div>',
+                '</div>',
+                '<div class="route-summary-secondary-details">',
+                    // TODO: add formatted start and end times to itinerary info
+                    '<div class="route-start-stop">3:14pm – 3:48pm</div>',
+                    '<div class="route-modes">',
+                        '{{#each this.modes}}',
+                            ' {{modeIcon this}}',
+                        '{{/each}}',
+                    '</div>',
+                '</div>',
+            '</div>',
+        '</div>{{/each}}'].join('');
+
+        // TODO: split out units from formatted duration to go in separate span
+        //<div class="route-duration">33 <span class="units">min</span></div>',
+
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
         return html;

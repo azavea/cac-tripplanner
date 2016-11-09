@@ -14,7 +14,8 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
-            container: '.itineraries'
+            container: '.routes-list',
+            itineraryItem: '.route-summary'
         }
     };
     var options = {};
@@ -53,12 +54,11 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     function setItineraries(newItineraries) {
         itineraries = newItineraries;
 
-
         // Show the directions div and populate with itineraries
         var html = MapTemplates.itineraryList(itineraries);
         $container.html(html);
-        $('.block-itinerary').on('click', onItineraryClicked);
-        $('.block-itinerary').hover(onItineraryHover);
+        $(options.selectors.itineraryItem).on('click', onItineraryClicked);
+        $(options.selectors.itineraryItem).hover(onItineraryHover);
     }
 
     /**
@@ -102,9 +102,9 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {Boolean} show If false, will make all itineraries transparent (hide them)
      */
     function showItineraries(show) {
-        for (var i in itineraries) {
-            itineraries[i].show(show);
-        }
+        _.forEach(itineraries, function(itinerary) {
+            itinerary.show(show);
+        });
     }
 
     function hide() {

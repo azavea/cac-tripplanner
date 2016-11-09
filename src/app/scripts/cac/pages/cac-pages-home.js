@@ -150,15 +150,17 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
     }
 
     function onOptionsModalItemClicked(event) {
-        // TODO: Replace with actual functionality once this item is
+        // TODO: implement modals
         console.log($(event.target).html());
     }
 
     function moveOrigin(event, position) {
+        event.preventDefault();
         directionsControl.moveOriginDestination('origin', position);
     }
 
     function moveDestination(event, position) {
+        event.preventDefault(); // necessary to prevent typeahead dropdown from opening
         directionsControl.moveOriginDestination('destination', position);
     }
 

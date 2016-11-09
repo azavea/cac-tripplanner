@@ -33,6 +33,8 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             homePageClass: 'body-home',
             mapPageClasses: 'body-map body-has-sidebar-banner',
 
+            itineraryBlock: '.route-summary',
+
             // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
             datepicker: '#datetimeDirections',
@@ -41,8 +43,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             directions: '.directions',
             directionInput: '.direction-input',
             errorClass: 'error',
-            itineraryBlock: '.block-itinerary',
-            itineraryList: 'section.directions .itineraries',
             maxWalkDiv: '#directionsMaxWalk',
             resultsClass: 'show-results',
             spinner: 'section.directions div.sidebar-details > .sk-spinner',
@@ -90,7 +90,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             showBackButton: true,
             showShareButton: true,
             selectors: {
-                container: 'section.directions .directions-list',
+                container: options.selectors.itineraryList,
                 directionItem: '.direction-item',
                 backButton: 'a.back',
                 shareButton: 'a.share'
@@ -99,11 +99,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,
                                         onDirectionsBackClicked);
 
-        itineraryListControl = new Control.ItineraryList({
-            selectors: {
-                container: 'section.directions .itineraries'
-            }
-        });
+        itineraryListControl = new Control.ItineraryList();
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryClicked,
                                        onItineraryClicked);
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
