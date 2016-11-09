@@ -214,7 +214,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '</div>',
                 '<div class="route-summary-secondary-details">',
                     // TODO: add formatted start and end times to itinerary info
-                    '<div class="route-start-stop">3:14pm – 3:48pm</div>',
+                    '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
                     '<div class="route-modes">',
                         '{{#each this.modes}}',
                             ' {{modeIcon this}}',
@@ -329,7 +329,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         });
 
         Handlebars.registerHelper('datetime', function(dateTime) {
-            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
+            // round to the nearest minute
+            var dt = moment(dateTime).add(1, 'minute').startOf('minute');
+            return new Handlebars.SafeString(dt.format('h:m a'));
         });
 
         Handlebars.registerHelper('inMiles', function(meters) {
