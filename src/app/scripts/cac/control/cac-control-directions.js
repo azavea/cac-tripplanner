@@ -150,8 +150,6 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
 
             // TODO: fix URL routing for redesign
             //updateUrl();  // Still update the URL if they request one-sided directions
-
-            console.error('error getting directions: missing origin and/or destination');
             return;
         }
 
