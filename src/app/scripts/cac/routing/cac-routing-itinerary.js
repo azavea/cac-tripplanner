@@ -124,17 +124,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
     function getFormattedDuration(otpItineraryLeg) {
-        // x hrs, y min, z s (will trim empty units from left)
-        var fmt = 'h [hrs], m [min], ss [s]';
-        var str = moment.duration(otpItineraryLeg.duration, 'seconds').format(fmt);
-        // trim empty seconds from right of string
-        var emptySecIdx = str.indexOf(', 00 s');
-        if (emptySecIdx > 0) {
-            str = str.substring(0, emptySecIdx);
-        }
-        // fix hour singular
-        str = str.replace('1 hrs,', '1 hr,');
-        return str;
+        return moment.duration(otpItineraryLeg.duration, 'seconds').humanize();
     }
 
     /**
