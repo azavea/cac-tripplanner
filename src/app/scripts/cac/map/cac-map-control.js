@@ -97,8 +97,23 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.goToMapPage = goToMapPage;
 
     return MapControl;
+
+    /**
+     * Display map components not shown on the homepage.
+     */
+    function goToMapPage() {
+        if (!homepage) {
+            return; // already on map page; do nothing
+        }
+
+        homepage = false;
+        zoomControl.addTo(map);
+        initializeOverlays();
+        layerControl.addTo(map);
+    }
 
     function initializeBasemaps() {
         var retina = '';

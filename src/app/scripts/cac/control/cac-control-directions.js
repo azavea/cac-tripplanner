@@ -228,6 +228,8 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
                      .addClass(options.selectors.mapPageClasses);
         }
 
+        mapControl.goToMapPage();
+
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
