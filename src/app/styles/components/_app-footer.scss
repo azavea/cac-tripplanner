@@ -92,6 +92,11 @@
         line-height: 2.5;
         text-align: center;
         text-transform: uppercase;
+        cursor: pointer;
+
+        &[disabled], &[disabled]:hover {
+            background-color: lighten($gophillygo-green, 30%);
+        }
     }
 
     .body-map & {
