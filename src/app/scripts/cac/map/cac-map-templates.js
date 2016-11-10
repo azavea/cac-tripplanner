@@ -326,8 +326,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
         Handlebars.registerHelper('datetime', function(dateTime) {
             // round to the nearest minute
-            var dt = moment(dateTime).add(1, 'minute').startOf('minute');
-            return new Handlebars.SafeString(dt.format('h:m a'));
+            var COEFF = 60000; // to round Unix timestamp to nearest minute
+            var dt = moment(Math.round(dateTime / COEFF) * COEFF);
+            return new Handlebars.SafeString(dt.format('hh:mm A'));
         });
 
         Handlebars.registerHelper('inMiles', function(meters) {
