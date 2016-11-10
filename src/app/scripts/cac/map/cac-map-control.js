@@ -97,8 +97,23 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.goToMapPage = goToMapPage;
 
     return MapControl;
+
+    /**
+     * Display map components not shown on the homepage.
+     */
+    function goToMapPage() {
+        if (!homepage) {
+            return; // already on map page; do nothing
+        }
+
+        homepage = false;
+        zoomControl.addTo(map);
+        initializeOverlays();
+        layerControl.addTo(map);
+    }
 
     function initializeBasemaps() {
         var retina = '';
@@ -220,13 +235,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // Remove comment if icon definitions are abstracted elsewhere
         var originIcon = L.AwesomeMarkers.icon({
             icon: 'home',
-            prefix: 'fa',
+            prefix: 'icon',
             markerColor: 'purple'
         });
 
         var destIcon = L.AwesomeMarkers.icon({
-            icon: 'flag-o',
-            prefix: 'fa',
+            icon: 'flag',
+            prefix: 'icon',
             markerColor: 'red'
         });
 

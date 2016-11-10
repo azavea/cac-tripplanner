@@ -103,6 +103,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
                                           options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
 
+        mapControl.events.on(mapControl.eventNames.originMoved,
+                             $.proxy(moveOrigin, this));
+
+        mapControl.events.on(mapControl.eventNames.destinationMoved,
+                             $.proxy(moveDestination, this));
+
         // TODO: re-enable loading settings from user preferences
         // once routing figured out. Currently there is no way to go back
         // to the home page, so if there is an origin and destination in
@@ -144,8 +150,18 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
     }
 
     function onOptionsModalItemClicked(event) {
-        // TODO: Replace with actual functionality once this item is
+        // TODO: implement modals
         console.log($(event.target).html());
+    }
+
+    function moveOrigin(event, position) {
+        event.preventDefault();
+        directionsControl.moveOriginDestination('origin', position);
+    }
+
+    function moveDestination(event, position) {
+        event.preventDefault(); // necessary to prevent typeahead dropdown from opening
+        directionsControl.moveOriginDestination('destination', position);
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Home.Templates, CAC.User.Preferences,

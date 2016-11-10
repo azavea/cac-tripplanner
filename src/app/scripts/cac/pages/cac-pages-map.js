@@ -63,6 +63,10 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
     // featured destination select
     function getDestinationDirections(event, destination) {
 
+        /* TODO: remove this UA check
+        // Leaving for now as checking for mobile may be useful for delaying
+        // map loading.
+        //
         // check user agent to see if mobile device; if so, redirect to Google Maps
         var regex = /android|iphone|ipod/i;
         var userAgent = navigator.userAgent.toLowerCase();
@@ -84,6 +88,7 @@ CAC.Pages.Map = (function ($, Handlebars, _, moment, MapControl, UserPreferences
             window.location = url;
             return false;
         }
+        */
 
         // not a mobile device; go to directions tab
         mapControl.isochroneControl.clearIsochrone();

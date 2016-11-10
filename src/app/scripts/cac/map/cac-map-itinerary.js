@@ -391,7 +391,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     function clearItineraries() {
         clearWaypointInteractivity();
-        _.forIn(itineraries, function (itinerary) {
+        _.forEach(itineraries, function (itinerary) {
             map.removeLayer(itinerary.geojson);
         });
         itineraries = {};
@@ -423,7 +423,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
             lastItineraryHoverMarker = null;
         }
 
-        _.forIn(itineraries, function (itinerary) {
+        _.forEach(itineraries, function (itinerary) {
             itinerary.geojson.off('mouseover', itineraryHoverListener);
         });
     }

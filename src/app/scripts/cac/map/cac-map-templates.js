@@ -201,23 +201,28 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     // Template for itinerary summaries
     function itineraryList(itineraries) {
-        var source = '{{#each itineraries}}' +
-                '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
-                    '<div class="trip-numbers">' +
-                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
-                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
-                    '</div>' +
-                    '<div class="trip-details">' +
-                        '{{#each this.modes}}' +
-                            '<div class="direction-icon">' +
-                                ' {{modeIcon this}}' +
-                            '</div>' +
-                        '{{/each}}' +
-                        '<span class="short-description"> via {{this.via}}</span>' +
-                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
-                    '</div>' +
-                '</div>' +
-                '{{/each}}';
+        var source = ['{{#each itineraries}}',
+            '<div class="route-summary" data-itinerary="{{this.id}}">',
+            '<svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">',
+                '<line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331"></line>',
+            '</svg>',
+            '<div class="route-summary-details">',
+                '<div class="route-summary-primary-details">',
+                    '<div class="route-duration units">{{this.formattedDuration}}</div>',
+                    '<div class="route-distance">{{this.distanceMiles}}  <span class="units">miles</span></div>',
+                    '<div class="route-name">via {{this.via}}</div>',
+                '</div>',
+                '<div class="route-summary-secondary-details">',
+                    '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
+                    '<div class="route-modes">',
+                        '{{#each this.modes}}',
+                            ' {{modeIcon this}}',
+                        '{{/each}}',
+                    '</div>',
+                '</div>',
+            '</div>',
+        '</div>{{/each}}'].join('');
+
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
         return html;
@@ -320,7 +325,10 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         });
 
         Handlebars.registerHelper('datetime', function(dateTime) {
-            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
+            // round to the nearest minute
+            var COEFF = 60000; // to round Unix timestamp to nearest minute
+            var dt = moment(Math.round(dateTime / COEFF) * COEFF);
+            return new Handlebars.SafeString(dt.format('hh:mm A'));
         });
 
         Handlebars.registerHelper('inMiles', function(meters) {
