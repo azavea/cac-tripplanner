@@ -1,4 +1,4 @@
-.body-info, .body-explore {
+.body-info, .body-explore, .body-about {
     display: flex;
     position: absolute;
     top: 0;
@@ -194,12 +194,15 @@
     .faq {
         padding-top: 4rem;
 
-        dt {
+        /* Redesign prototype uses `dt` and `dd` but existing About page in database uses
+         * `h3` and `p`, so applying the styles to both. */
+        dt, h3 {
             color: $gophillygo-red;
             font-weight: $font-weight-bold;
+            font-size: $font-size-base;
         }
 
-        dd {
+        dd, p {
             margin: 1em 0 3em 0;
         }
     }
