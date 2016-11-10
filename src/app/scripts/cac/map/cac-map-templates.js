@@ -340,25 +340,25 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         switch (turnType) {
             case 'DEPART':
             case 'CONTINUE':
-                return 'glyphicon-arrow-up';
+                return 'glyphicon-arrow-up'; // TODO: update icon
             // Temporarily fall through to similar cases for left/right
             case 'LEFT':
             case 'SLIGHTLY_LEFT':
             case 'HARD_LEFT':
             case 'UTURN_LEFT':
-                return 'glyphicon-arrow-left';
+                return 'icon-turn-left';
             case 'RIGHT':
             case 'SLIGHTLY_RIGHT':
             case 'HARD_RIGHT':
             case 'UTURN_RIGHT':
-                return 'glyphicon-arrow-right';
+                return 'icon-turn-right';
             case 'CIRCLE_CLOCKWISE':
             case 'CIRCLE_COUNTERCLOCKWISE':
-                return 'glyphicon-repeat';
+                return 'glyphicon-repeat'; // TODO: update icon
             case 'ELEVATOR':
-                return 'glyphicon-cloud-upload';
+                return 'glyphicon-cloud-upload'; // TODO: update icon
             default:
-                return 'glyphicon-remove-circle';
+                return 'glyphicon-remove-circle'; // TODO: update icon
         }
     }
 
