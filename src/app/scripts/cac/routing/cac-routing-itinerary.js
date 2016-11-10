@@ -242,7 +242,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                 // merge it back into a single step
                 var lastStep = _.clone(_.last(thisLeg.steps));
                 var nextStep = _.first(nextLeg.steps);
-                if (nextStep.relativeDirection === 'CONTINUE' &&
+                if (nextStep && nextStep.relativeDirection === 'CONTINUE' &&
                         lastStep.streetName === nextStep.streetName) {
                     lastStep.distance += nextStep.distance;
                     lastStep.elevation = lastStep.elevation.concat(nextStep.elevation);
