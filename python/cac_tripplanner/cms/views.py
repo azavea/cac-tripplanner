@@ -36,7 +36,7 @@ def home(request):
 
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
-    context = dict(tab='info', page=page, **DEFAULT_CONTEXT)
+    context = dict(tab='about', page=page, **DEFAULT_CONTEXT)
     return render(request, 'about-faq.html', context=context)
 
 def learn_list(request):

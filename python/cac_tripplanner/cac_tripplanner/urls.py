@@ -26,8 +26,8 @@ urlpatterns = [
     # Places
     url(r'^place/(?P<pk>[\d-]+)/$', place_detail_view, name='place-detail'),
 
-    # About and FAQ
-    url(r'^info/(?P<slug>[\w-]+)/$', cms_views.about_faq, name='about-faq'),
+    # About (no more FAQ)
+    url(r'^(?P<slug>about)/$', cms_views.about_faq, name='about'),
 
     # All Published Articles
     url(r'^api/articles$', cms_views.AllArticles.as_view(), name='api_articles'),
