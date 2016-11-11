@@ -18,7 +18,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
             container: '.directions-step-by-step',
             mapContainer: '.body-map',
             backButton: '.back-to-directions-results',
-            directionItem: '.directions-leg',
+            directionItem: '.directions-leg .directions-step',
             directLinkButton: '.modal-list-link',
             emailShareButton: '.modal-list-email',
             facebookShareButton: '.modal-list-facebook',
