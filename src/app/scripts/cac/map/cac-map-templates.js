@@ -257,13 +257,15 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
                     // transit step directions
                     '{{#if this.transitLeg}}',
-                    '<div class="directions-step {{modeClass this.mode}}">',
+                    '<div class="directions-step {{modeClass this.mode}}" ',
+                        'data-lat="{{ this.from.lat }}" data-lon="{{ this.from.lon }}">',
                         '<div class="directions-instruction">Board {{this.agencyName}} {{this.route}} ',
                         '{{this.headsign}}</div>',
                         '<div class="directions-time">at {{datetime this.startTime}}</div>',
                         '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
                     '</div>',
-                    '<div class="directions-step directions-step-disembark">',
+                    '<div class="directions-step directions-step-disembark" ',
+                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
                         '<div class="directions-instruction">Disembark <strong>',
                             '{{this.to.name}}</strong></div>',
                     '</div>',
@@ -277,7 +279,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '</div>',
                     '{{/each}}',
                     '{{#unless this.lastLeg}}',
-                    '<div class="directions-step directions-step-arrive">',
+                    '<div class="directions-step directions-step-arrive" ',
+                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
                         '<div class="directions-instruction"><strong>Arrive {{this.to.name}}</strong></div>',
                     '</div>',
                     '{{/unless}}', // unless last step
@@ -292,6 +295,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '</div>'
         ].join('');
         var template = Handlebars.compile(source);
+        // set a flag on the last leg, so we can avoid diplaying arriving there right above
+        // also arriving at the final destination
         templateData.legs[templateData.legs.length - 1].lastLeg = true;
         var html = template({data: templateData});
         return html;
