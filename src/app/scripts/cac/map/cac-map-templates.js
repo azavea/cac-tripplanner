@@ -267,7 +267,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '<div class="directions-instruction">Disembark <strong>',
                             '{{this.to.name}}</strong></div>',
                     '</div>',
-                    '{{/if}}',
+                    '{{else}}',
                     // non-tranist step directions
                     '{{#each steps}}',
                         '<div class="directions-step {{directionClass this.relativeDirection ../this.mode}}" ',
@@ -276,6 +276,12 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
                         '</div>',
                     '{{/each}}',
+                    '{{#unless this.lastLeg}}',
+                    '<div class="directions-step directions-step-arrive">',
+                        '<div class="directions-instruction"><strong>Arrive {{this.to.name}}</strong></div>',
+                    '</div>',
+                    '{{/unless}}', // unless last step
+                    '{{/if}}', // end if transit or not
                 '</div>',
             '{{/each}}',
             '<div class="directions-leg directions-leg-destination">',
@@ -286,7 +292,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '</div>'
         ].join('');
         var template = Handlebars.compile(source);
-        console.log(templateData);
+        templateData.legs[templateData.legs.length - 1].lastLeg = true;
         var html = template({data: templateData});
         return html;
     }
@@ -322,7 +328,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     function getModeClass(modeText) {
-        console.log('getting mode class for ' + modeText);
         switch (modeText) {
             case 'BIKE':
                 return 'directions-step-bike'; // TODO: bike share has separate icon
