@@ -90,10 +90,7 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
             showBackButton: true,
             showShareButton: true,
             selectors: {
-                container: options.selectors.itineraryList,
-                directionItem: '.direction-item',
-                backButton: 'a.back',
-                shareButton: 'a.share'
+                container: options.selectors.itineraryList
             }
         });
         directionsListControl.events.on(directionsListControl.eventNames.backButtonClicked,

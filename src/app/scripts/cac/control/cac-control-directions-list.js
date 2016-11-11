@@ -15,14 +15,17 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
-            container: '.routes-list',
+            container: '.directions-step-by-step',
+            mapContainer: '.body-map',
             backButton: '.back-to-directions-results',
             directionItem: '.directions-leg',
             directLinkButton: '.modal-list-link',
             emailShareButton: '.modal-list-email',
             facebookShareButton: '.modal-list-facebook',
             twitterShareButton: '.modal-list-twitter',
-            googlePlusShareButton: '.modal-list-google'
+            googlePlusShareButton: '.modal-list-google',
+            stepByStepClass: 'body-step-by-step',
+            sidebarBannerClass: 'body-has-sidebar-banner'
         }
     };
     var options = {};
@@ -153,15 +156,17 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
     }
 
     function show() {
-        $container.removeClass('hidden');
+        $(options.selectors.mapContainer).removeClass(options.selectors.sidebarBannerClass);
+        $(options.selectors.mapContainer).addClass(options.selectors.stepByStepClass);
     }
 
     function hide() {
-        $container.addClass('hidden');
+        $(options.selectors.mapContainer).removeClass(options.selectors.stepByStepClass);
+        $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
     }
 
     function toggle() {
-        if ($container.hasClass('hidden')) {
+        if ($(options.selectors.mapContainer).hasClass(options.selectors.sidebarBannerClass)) {
             show();
         } else {
             hide();
