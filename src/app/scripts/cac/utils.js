@@ -179,7 +179,7 @@ CAC.Utils = (function (_) {
     function modeStringHelper(modeString) {
         var modeIcons = {
             // TODO: add appropriate mode icons
-            BUS: {name: 'train', font: 'icon'}, // TODO
+            BUS: {name: 'bus', font: 'icon'},
             SUBWAY: {name: 'train', font: 'icon'}, // TODO
             CAR: {name: 'train', font: 'icon'}, // TODO
             TRAIN: {name: 'train', font: 'icon'},

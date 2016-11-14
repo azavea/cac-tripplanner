@@ -14,7 +14,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
-            container: '.routes-list',
+            container: '.directions-results',
             itineraryItem: '.route-summary'
         }
     };

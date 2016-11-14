@@ -201,7 +201,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     // Template for itinerary summaries
     function itineraryList(itineraries) {
-        var source = ['{{#each itineraries}}',
+        var source = [
+        '<h1>Choose a route</h1><div class="routes-list"></div>',
+        '{{#each itineraries}}',
             '<div class="route-summary" data-itinerary="{{this.id}}">',
             '<svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">',
                 '<line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331"></line>',
@@ -231,93 +233,87 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function itinerary(templateData) {
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
-            '<div class="block block-step directions-header">',
-                'Directions',
-                '{{#if data.showBackButton}}<div class="pull-right"><a class="back pull-right">',
-                '<i class="md md-close"></i></a></div>{{/if}}',
-                '<div class="share-dropdown pull-right dropdown">{{#if data.showShareButton}}',
-                    '<a class="share dropdown-toggle" data-toggle="dropdown">',
-                    '<i class="md md-share"></i></a>',
-                    '<ul class="dropdown-menu">',
-                        '<li><a id="directLinkBtn" title="Link" data-toggle="tooltip" ',
-                            'data-target="link-modal" data-toggle="link-modal" ',
-                                '<i class="fa fa-2x fa-link"></i>',
-                        '</a></li>',
-                        '<li><a id="twShareBtn" title="Twitter" data-toggle="tooltip"',
-                            'data-target="#" <i class="fa fa-2x fa-twitter-square"></i>',
-                        '</a></li>',
-                        '<li><a id="fbShareBtn" title="Facebook" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-facebook-official"></i>',
-                        '</a></li>',
-                        '<li><a id="gpShareBtn" title="Google+" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-google-plus"></i>',
-                        '</a></li>',
-                        '<li><a id="emailShareBtn" title="E-Mail" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-envelope"></i>',
-                        '</a></li>',
-                    '</ul>{{/if}} ',
-                    '<span class="directions-header-divider">|</span> ',
+            '<header class="step-by-step-header">',
+                '{{#if data.showBackButton}}',
+                    '<button name="back-to-directions-results" class="back-to-directions-results">',
+                    '<i class="icon-left-big"></i></button>',
+                '{{/if}}',
+                '<h1>Directions</h1>',
+                '{{#if data.showShareButton}}',
+                    '<button name="share-directions" class="share-directions">',
+                        '<i class="icon-share"></i>',
+                    '</button>',
+                '{{/if}}',
+            '</header>',
+            '<div class="directions-list-of-steps">',
+                '<div class="directions-leg directions-leg-origin">',
+                    '<div class="directions-step directions-step-origin">',
+                    '<div class="directions-instruction">Depart {{data.start.text}}</div>',
+                    '<div class="directions-time">at {{datetime data.start.time}}</div>',
                 '</div>',
             '</div>',
-            '<div class="block block-step direction-depart">',
-                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
-                    '<td>Depart from <strong>{{data.start.text}} at {{datetime data.start.time}}</td>',
-                '</tr></table></strong>',
-            '</div>',
-            '<div class="block-legs">',
-                '{{#each data.legs}}',
-                    '<div class="block block-leg">',
-                        '<div class="trip-numbers">',
-                            '<div class="trip-duration">',
-                                '{{this.formattedDuration}}',
-                            '</div>',
-                            '<div class="trip-distance">',
-                                '{{inMiles this.distance}} mi',
-                            '</div>',
-                        '</div>',
-                        '<div class="trip-details">',
-                            '<div class="direction-section"><table><tr>',
-                            '<td class="direction-icon">',
-                            '{{modeIcon this.mode}}</td><td class="direction-text direction-item"',
-                            ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
-                            '{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} ',
-                                '{{this.headsign}}{{/if}} ',
-                            'to {{this.to.name}}',
-                            '{{#if this.transitLeg }} at {{datetime this.startTime}}{{/if}}',
-                            '</td></tr></table></div>',
-                            '<div class="block direction-item"',
-                            ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
-                                '{{#each steps}}',
-                                    '<div class="block block-step direction-item"',
-                                        ' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
-                                        '<span>{{ directionText }}</span>',
-                                        '<span class="pull-right">{{ inMiles this.distance }} mi</span>',
-                                    '</div>',
-                                '{{/each}}',
-                            '</div>',
-                        '</div>',
+            '{{#each data.legs}}',
+                '<div class="directions-leg" ',
+                    'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
+                    // transit step directions
+                    '{{#if this.transitLeg}}',
+                    '<div class="directions-step {{modeClass this.mode}}" ',
+                        'data-lat="{{ this.from.lat }}" data-lon="{{ this.from.lon }}">',
+                        '<div class="directions-instruction">Board {{this.agencyName}} {{this.route}} ',
+                        '{{this.headsign}}</div>',
+                        '<div class="directions-time">at {{datetime this.startTime}}</div>',
+                        '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
                     '</div>',
-                '{{/each}}',
-            '</div>',
-            '<div class="block block-step direction-arrive">',
-                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
-                    '<td>Arrive at <strong>{{data.end.text}} at {{datetime data.end.time}}</td>',
-                '</tr></table></strong>',
-            '</div>',
+                    '<div class="directions-step directions-step-disembark" ',
+                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                        '<div class="directions-instruction">Disembark <strong>',
+                            '{{this.to.name}}</strong></div>',
+                    '</div>',
+                    '{{else}}',
+                    // non-tranist step directions
+                    '{{#each steps}}',
+                        '<div class="directions-step {{directionClass this.relativeDirection ../this.mode}}" ',
+                            'data-lat="{{ lat }}" data-lon="{{ lon }}">',
+                            '<div class="directions-instruction">{{directionText}}</div>',
+                            '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
+                        '</div>',
+                    '{{/each}}',
+                    '{{#unless this.lastLeg}}',
+                    '<div class="directions-step directions-step-arrive" ',
+                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                        '<div class="directions-instruction"><strong>Arrive {{this.to.name}}</strong></div>',
+                    '</div>',
+                    '{{/unless}}', // unless last step
+                    '{{/if}}', // end if transit or not
+                '</div>',
+            '{{/each}}',
+            '<div class="directions-leg directions-leg-destination">',
+                '<div class="directions-step directions-step-destination">',
+                    '<div class="directions-instruction">Arrive {{data.end.text}}</div>',
+                    '<div class="directions-time">at {{datetime data.end.time}}</div>',
+                '</div>',
+            '</div>'
         ].join('');
         var template = Handlebars.compile(source);
+        // set a flag on the last leg, so we can avoid diplaying arriving there right above
+        // also arriving at the final destination
+        templateData.legs[templateData.legs.length - 1].lastLeg = true;
         var html = template({data: templateData});
         return html;
     }
 
     function registerListItemHelpers() {
-        Handlebars.registerHelper('directionIcon', function(direction) {
-            return new Handlebars.SafeString('<span class="glyphicon '+
-                                             getTurnIconName(direction) + '"></span>');
+        Handlebars.registerHelper('directionClass', function(direction, mode) {
+            return new Handlebars.SafeString(getTurnIconClass(direction, mode));
         });
+
         Handlebars.registerHelper('directionText', function () {
             var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
             return new Handlebars.SafeString('<span>' + text + '</span>');
+        });
+
+        Handlebars.registerHelper('modeClass', function(modeString) {
+            return new Handlebars.SafeString(getModeClass(modeString));
         });
 
         Handlebars.registerHelper('modeIcon', function(modeString) {
@@ -336,29 +332,39 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         });
     }
 
-    function getTurnIconName(turnType) {
+    function getModeClass(modeText) {
+        switch (modeText) {
+            case 'BIKE':
+                return 'directions-step-bike'; // TODO: bike share has separate icon
+            default:
+                return 'directions-step-' + modeText.toLowerCase();
+        }
+    }
+
+    function getTurnIconClass(turnType, modeText) {
         switch (turnType) {
             case 'DEPART':
+                return getModeClass(modeText);
             case 'CONTINUE':
-                return 'glyphicon-arrow-up';
-            // Temporarily fall through to similar cases for left/right
+                return '';
+            // fall through to similar cases for left/right
             case 'LEFT':
             case 'SLIGHTLY_LEFT':
             case 'HARD_LEFT':
             case 'UTURN_LEFT':
-                return 'glyphicon-arrow-left';
+                return 'directions-step-turn-left';
             case 'RIGHT':
             case 'SLIGHTLY_RIGHT':
             case 'HARD_RIGHT':
             case 'UTURN_RIGHT':
-                return 'glyphicon-arrow-right';
+                return 'directions-step-turn-right';
             case 'CIRCLE_CLOCKWISE':
             case 'CIRCLE_COUNTERCLOCKWISE':
-                return 'glyphicon-repeat';
+                return 'directions-step-circle'; // TODO: icon/class does not exist
             case 'ELEVATOR':
-                return 'glyphicon-cloud-upload';
+                return 'directions-step-elevator'; // TODO: icon/class does not exist
             default:
-                return 'glyphicon-remove-circle';
+                return '';
         }
     }
 
