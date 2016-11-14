@@ -63,34 +63,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         if (!homepage) {
             // hide zoom control on home page view
             zoomControl.addTo(map);
-            // delay loading overlays
+            // delay loading overlays and layer switcher
             initializeOverlays();
+            initializeLayerControl();
         }
-
-        initializeLayerControl();
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
         this.itineraryControl = new CAC.Map.ItineraryControl({map: map});
-
-        // add minimize button to layer control
-        var leafletMinimizer = '.leaflet-minimize';
-        var leafletLayerList = '.leaflet-control-layers-list';
-        var $layerContainer = $('.leaflet-control-layers');
-
-        $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
-        $(leafletMinimizer).click(function() {
-            if ($(leafletMinimizer).hasClass('minimized')) {
-                // show again
-                $(leafletLayerList).show();
-                $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
-                $(leafletMinimizer).removeClass('minimized');
-            } else {
-                // minimize it
-                $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
-                $(leafletMinimizer).addClass('minimized');
-                $(leafletLayerList).hide();
-            }
-        });
     }
 
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
@@ -112,7 +91,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         homepage = false;
         zoomControl.addTo(map);
         initializeOverlays();
-        layerControl.addTo(map);
+        initializeLayerControl();
     }
 
     function initializeBasemaps() {
@@ -168,9 +147,27 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             collapsed: false
         });
 
-        if (!homepage) {
-            layerControl.addTo(map);
-        }
+        layerControl.addTo(map);
+
+        // add minimize button to layer control
+        var leafletMinimizer = '.leaflet-minimize';
+        var leafletLayerList = '.leaflet-control-layers-list';
+        var $layerContainer = $('.leaflet-control-layers');
+
+        $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
+        $(leafletMinimizer).click(function() {
+            if ($(leafletMinimizer).hasClass('minimized')) {
+                // show again
+                $(leafletLayerList).show();
+                $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
+                $(leafletMinimizer).removeClass('minimized');
+            } else {
+                // minimize it
+                $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
+                $(leafletMinimizer).addClass('minimized');
+                $(leafletLayerList).hide();
+            }
+        });
     }
 
     function setGeocodeMarker(latLng) {
