@@ -19,6 +19,7 @@ var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
@@ -38,7 +39,7 @@ var stat = {
     images: staticRoot + '/images'
 };
 
-var cartoDbRoot = 'bower_components/cartodb.js/src/';
+var cartoDbRoot = 'bower_components/cartodb.js/cartodb.uncompressed.js';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -105,6 +106,10 @@ var copyVendorJS = function(filter, extraFiles) {
     var bowerStream = copyBowerFiles(filter, extraFiles);
     var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
     vendorStream.add(bowerStream);
+    // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
+    // running jQuery in noConflict mode for JotForms.
+    // (Breaks loading Carto layers when it tries to reference $.ajax.)
+    vendorStream.pipe(replace(/\$\.ajax/g, 'jQuery.ajax'));
     return vendorStream;
 };
 
@@ -191,8 +196,10 @@ gulp.task('copy:vendor-scripts', function() {
                         // exclude minified versions
                         '!**/*.min.js',
                         // exclude leaflet
-                        '!**/leaflet.js', '!**/leaflet-src.js'],
-                        [])
+                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/cartodb**'],
+                        // load the uncompressed version of CartoDB in development,
+                        // for easier debugging
+                        ['bower_components/cartodb.js/cartodb.uncompressed.js'])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
