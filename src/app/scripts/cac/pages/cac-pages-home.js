@@ -13,6 +13,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
             placeCardDirectionsLink: '.place-card .place-action-go',
             placeList: '.place-list',
 
+            map: '.the-map',
+
             // TODO: update or remove old selectors below
             errorClass: 'error',
             exploreForm: '#explore',
@@ -112,6 +114,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
 
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
+
+        // Listen to window resize on mobile view; if map becomes visible, load tiles.
+        if (!$(options.selectors.map).is(':visible')) {
+            $(window).resize(function() {
+                if ($(options.selectors.map).is(':visible')) {
+                    if (!mapControl.isLoaded()) {
+                        mapControl.loadMap(mapControl);
+                    }
+
+                    // done listening to resizes after map loads
+                    $(window).off('resize');
+                }
+            });
+        }
 
         // TODO: re-enable loading settings from user preferences
         // once routing figured out. Currently there is no way to go back

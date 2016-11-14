@@ -39,8 +39,13 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     ItineraryControl.prototype.draggableItinerary = draggableItinerary;
     ItineraryControl.prototype.updateItineraryLayer = updateItineraryLayer;
     ItineraryControl.prototype.errorLiveUpdatingLayer = errorLiveUpdatingLayer;
+    ItineraryControl.prototype.setMap = setMap;
 
     return ItineraryControl;
+
+    function setMap(newMap) {
+        map = newMap;
+    }
 
 
     /**
