@@ -9,7 +9,7 @@
   "devDependencies": {
     "aliasify": "^2.0.0",
     "apache-server-configs": "~2.14.0",
-    "bower": "~1.7.9",
+    "bower": "~1.8.0",
     "browserify": "~13.1.0",
     "chai": "~3.5.0",
     "connect": "~3.5.0",
@@ -19,7 +19,7 @@
     "gulp-add-src": "~0.2.0",
     "gulp-autoprefixer": "~3.1.1",
     "gulp-cache": "~0.4.5",
-    "gulp-concat": "~2.6.0",
+    "gulp-concat": "~2.6.1",
     "gulp-csso": "~2.0.0",
     "gulp-debug": "~2.1.2",
     "gulp-filter": "~4.0.0",
