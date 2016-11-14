@@ -7,7 +7,7 @@
     "jquery": "~3.1.1",
     "js-storage": "~1.0.1",
     "leaflet": "~0.7.7",
-    "cartodb.js": "~3.15",
+    "cartodb.js": "~3.15.9",
     "Leaflet.awesome-markers": "~2.0.2",
     "Leaflet.encoded": "~0.0.8",
     "moment": "~2.16.0",
