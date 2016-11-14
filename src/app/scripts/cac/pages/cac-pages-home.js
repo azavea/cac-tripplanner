@@ -4,6 +4,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
 
     var defaults = {
         selectors: {
+            // modal
+            optionsButton: '.btn-options',
+            shareModalClass: 'modal-share',
+
             // destinations
             placeCard: '.place-card',
             placeCardDirectionsLink: '.place-card .place-action-go',
@@ -39,14 +43,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
         options = $.extend({}, defaults, params);
         modeOptionsControl = new ModeOptions();
 
-        shareModal = new Modal({modalClass: 'modal-share'});
+        shareModal = new Modal({modalClass: options.selectors.shareModalClass});
         // TODO: Open share modal once view with button exists
 
         transitOptionsModal = new Modal({
-            modalClass: 'modal-options',
+            modalClass: options.selectors.shareModalClass,
             clickHandler: onOptionsModalItemClicked
         });
-        $('.btn-options').on('click', transitOptionsModal.open);
+        $(options.selectors.optionsButton).on('click', transitOptionsModal.open);
     }
 
     /* TODO: update for redesign or remove
