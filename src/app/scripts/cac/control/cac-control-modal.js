@@ -2,8 +2,14 @@ CAC.Control.Modal = (function ($) {
     'use strict';
 
     var defaults = {
-        // Class to search the DOM for to attach this modal to. Required.
+        // Class name to search the DOM for to attach the modal control to. Required.
         modalClass: null,
+        selectors: {
+            body: 'body',
+            buttonClose: '.btn-close-modal',
+            clickHandlerFilter: 'li',
+            modal: '.modal-overlay'
+        },
         // Triggered directly by jQuery when a list item in the modal is clicked. NOOP by default.
         clickHandler: function (event) { }
     };
@@ -29,24 +35,28 @@ CAC.Control.Modal = (function ($) {
             throw 'CAC.Control.Modal options.modalClass required.';
         }
 
-        $('.modal-overlay .' + options.modalClass).on('click', 'li', options.clickHandler);
-        $('.modal-overlay .' + options.modalClass).on('click', '.btn-close-modal', close);
+        $(options.selectors.modal + ' .' + options.modalClass).on('click',
+            options.selectors.clickHandlerFilter, options.clickHandler);
+        $(options.selectors.modal + ' .' + options.modalClass).on('click',
+            options.selectors.buttonClose, close);
     }
 
     function open(event) {
-        var bodyModalClass = 'body-' + options.modalClass;
-        $('body').addClass('body-modal ' + bodyModalClass);
+        $(options.selectors.body).addClass(_getBodyClass());
         if (event && event.preventDefault) {
             event.preventDefault();
         }
     }
 
     function close(event) {
-        var bodyModalClass = 'body-' + options.modalClass;
-        $('body').removeClass('body-modal ' + bodyModalClass);
+        $(options.selectors.body).removeClass(_getBodyClass());
         if (event && event.preventDefault) {
             event.preventDefault();
         }
+    }
+
+    function _getBodyClass() {
+        return 'body-modal body-' + options.modalClass;
     }
 
 })(jQuery);
