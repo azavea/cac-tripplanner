@@ -41,11 +41,16 @@ CAC.Control.ModeOptions = (function ($) {
             offClass: 'off',
             selectedModes: '.mode-option.on',
             transitIconClassPrefix: 'icon-transit-',
+            transitIconOnClass: 'icon-transit-on',
             transitIconOnOffClasses: 'icon-transit-on icon-transit-off',
             transitModeOption: '.mode-option.transit'
         }
     };
-
+    var events = $({});
+    var eventNames = {
+        toggle: 'cac:control:modeoptions:toggle',
+        transitChanged: 'cac:control:modeoptions:transitchanged'
+    };
     var options = {};
 
     function ModeOptionsControl(params) {
@@ -57,6 +62,8 @@ CAC.Control.ModeOptions = (function ($) {
     ModeOptionsControl.prototype = {
         initialize: initialize,
         changeMode: changeMode,
+        events: events,
+        eventNames: eventNames,
         getMode: getMode,
         setMode: setMode
     };
@@ -74,6 +81,8 @@ CAC.Control.ModeOptions = (function ($) {
                 .siblings(options.selectors.modeOption)
                     .removeClass(options.selectors.onClass)
                     .addClass(options.selectors.offClass);
+
+            events.trigger(eventNames.toggle, getMode());
         });
 
         $(options.selectors.transitModeOption).on('click', function(e) {
@@ -81,6 +90,9 @@ CAC.Control.ModeOptions = (function ($) {
 
             $(this).toggleClass(options.selectors.onClass + ' ' + options.selectors.offClass)
                 .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
+
+            var active = $(this).find('i').hasClass(options.selectors.transitIconOnClass);
+            events.trigger(eventNames.transitChanged, active);
         });
     }
 

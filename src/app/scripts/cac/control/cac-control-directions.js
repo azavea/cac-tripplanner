@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routing, Typeahead,
+CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
                                     UserPreferences, Utils) {
 
     'use strict';
@@ -76,6 +76,11 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
         modeOptionsControl = options.modeOptionsControl;
+        // TODO: We may need to manually remove these events if the DirectionsControl
+        //       is reinstantiated when the routing changes. That doesn't currently appear to be
+        //       the case though
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, planTrip);
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, planTrip);
 
         $(options.selectors.modes).change($.proxy(changeMode, this));
 
@@ -601,5 +606,5 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         }
     }
 
-})(_, jQuery, CAC.Control, CAC.Control.ModeOptions, CAC.Search.Geocoder,
+})(_, jQuery, CAC.Control, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
