@@ -230,6 +230,8 @@ FB_APP_ID = secrets['fb_app_id']
 
 # OTP CONFIGURATION
 OTP_URL = secrets['otp_url']
+ROUTING_URL = OTP_URL.format(router='default') + 'plan'
+ISOCHRONE_URL = OTP_URL.format(router='default') + 'isochrone'
 
 # Settings for S3 storage
 # No need to specify AWS access and secret keys -- they are pulled from

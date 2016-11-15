@@ -1,20 +1,19 @@
 import json
-from random import shuffle
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 
-from .models import AboutFaq, Article
 from destinations.models import Destination
-from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, DEBUG, OTP_URL
+from .models import AboutFaq, Article
 
 
 DEFAULT_CONTEXT = {
-    'debug': DEBUG,
-    'fb_app_id': FB_APP_ID,
-    'routing_url': OTP_URL.format(router='default') + 'plan'
+    'debug': settings.DEBUG,
+    'fb_app_id': settings.FB_APP_ID,
+    'routing_url': settings.ROUTING_URL
 }
 
 def home(request):
@@ -67,7 +66,7 @@ class AllArticles(View):
         try:
             limit = int(request.GET.get('limit'))
         except (ValueError, TypeError):
-            limit = HOMEPAGE_RESULTS_LIMIT
+            limit = settings.HOMEPAGE_RESULTS_LIMIT
 
         results = Article.objects.published().order_by('-publish_date')[:limit]
         response = [self.serialize_article(request, article) for article in results]

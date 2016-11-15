@@ -1,54 +1,37 @@
 from datetime import datetime
-import json
-
 from pytz import timezone
+import json
+import requests
 
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
-from cac_tripplanner.settings import DEBUG
 
-import requests
-
-from cac_tripplanner.settings import FB_APP_ID, HOMEPAGE_RESULTS_LIMIT, OTP_URL, DEBUG
 from .models import Destination, FeedEvent
-
-ROUTING_URL = OTP_URL.format(router='default') + 'plan'
 
 
 DEFAULT_CONTEXT = {
-    'debug': DEBUG,
-    'fb_app_id': FB_APP_ID,
-    'routing_url': ROUTING_URL
+    'debug': settings.DEBUG,
+    'fb_app_id': settings.FB_APP_ID,
+    'routing_url': settings.ROUTING_URL
 }
 
 
-def base_otp_view(request, page):
+def base_view(request, page, context):
     """
     Base view that sets the OTP routing_url variable and Facebook app ID
 
     :param request: Request object
     :param page: String representation of the HTML template
+    :param context: Additional context
     :returns: A rendered response
     """
-
-    context = RequestContext(request, dict(fb_app_id=FB_APP_ID,
-                                           routing_url=ROUTING_URL,
-                                           debug=DEBUG))
-    return render_to_response(page, context_instance=context)
-
-
-def map(request):
-    """
-    The map view
-
-    :param request: Request object
-    :returns: A rendered response
-    """
-    return base_otp_view(request, 'map.html')
+    all_context = dict(**DEFAULT_CONTEXT)
+    all_context.update(**context)
+    return render(request, page, context=all_context)
 
 
 def directions(request):
@@ -58,7 +41,15 @@ def directions(request):
     :param request: Request object
     :returns: A rendered response
     """
-    return base_otp_view(request, 'directions.html')
+    return base_view(request, 'directions.html')
+
+
+def place_detail(request, pk):
+    destination = get_object_or_404(Destination.objects.published(), pk=pk)
+    more_destinations = Destination.objects.published().order_by('?').exclude(pk=destination.pk)[:3]
+    context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
+                   **DEFAULT_CONTEXT)
+    return base_view(request, 'place-detail.html', context=context)
 
 
 def image_to_url(dest_dict, field_name):
@@ -72,20 +63,12 @@ def image_to_url(dest_dict, field_name):
     return image.url if image else ''
 
 
-def place_detail(request, pk):
-    destination = get_object_or_404(Destination.objects.published(), pk=pk)
-    more_destinations = Destination.objects.published().order_by('?').exclude(pk=destination.pk)[:3]
-    context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
-                   **DEFAULT_CONTEXT)
-    return render(request, 'place-detail.html', context=context)
-
-
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
     # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
     otp_router = 'default'
-    isochrone_url = OTP_URL.format(router=otp_router) + 'isochrone'
+    isochrone_url = settings.ISOCHRONE_URL
     algorithm = 'accSampling'
 
     def isochrone(self, payload):
@@ -223,13 +206,17 @@ class FeedEvents(View):
     def get(self, request, *args, **kwargs):
         """ GET 20 most recent feed events that are published
 
-        TODO: Additional filtering, dynamic limits?
-
+        TODO: Additional filtering
         """
         utc = timezone('UTC')
         epoch = utc.localize(datetime(1970, 1, 1))
 
-        results = FeedEvent.objects.published().order_by('end_date')[:HOMEPAGE_RESULTS_LIMIT]
+        try:
+            limit = int(request.GET.get('limit'))
+        except (ValueError, TypeError):
+            limit = settings.HOMEPAGE_RESULTS_LIMIT
+
+        results = FeedEvent.objects.published().order_by('end_date')[:limit]
         response = [model_to_dict(x) for x in results]
         for obj in response:
             pnt = obj['point']
