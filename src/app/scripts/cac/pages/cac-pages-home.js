@@ -113,7 +113,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
         // once routing figured out. Currently there is no way to go back
         // to the home page, so if there is an origin and destination in
         // preferences, the app will jump directly to the map page with no way back.
-        //$(document).ready(directionsControl.setFromUserPreferences());
+        $(document).ready(directionsControl.setFromUserPreferences());
     };
 
     return Home;

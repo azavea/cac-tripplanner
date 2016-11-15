@@ -20,10 +20,13 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var router = null;
 
     function UrlRouter() {
-        router = new Navigo('/map');
+        router = new Navigo('');
 
-        router.on(new RegExp('/places/?\?'), setExplorePrefsFromUrl);
-        router.on(new RegExp('/directions/?\?'), setDirectionsPrefsFromUrl);
+        // TODO: disabling explore since it's not re-implemented yet for redesign.
+        //       probably explore will also be on the root path and we'll need one URL parsing
+        //       function that handles both cases
+        // router.on(new RegExp('/places/?\?'), setExplorePrefsFromUrl);
+        router.on(new RegExp('/\\?'), setDirectionsPrefsFromUrl);
 
         router.resolve();
     }
@@ -63,7 +66,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
     function buildDirectionsUrlFromPrefs() {
-        return '/directions?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
+        return '?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
     }
 
 
