@@ -4,10 +4,16 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
 
     var defaults = {
         selectors: {
+            // modal
+            optionsButton: '.btn-options',
+            shareModalClass: 'modal-share',
+
             // destinations
             placeCard: '.place-card',
             placeCardDirectionsLink: '.place-card .place-action-go',
             placeList: '.place-list',
+
+            map: '.the-map',
 
             // TODO: update or remove old selectors below
             errorClass: 'error',
@@ -39,14 +45,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
         options = $.extend({}, defaults, params);
         modeOptionsControl = new ModeOptions();
 
-        shareModal = new Modal({modalClass: 'modal-share'});
+        shareModal = new Modal({modalClass: options.selectors.shareModalClass});
         // TODO: Open share modal once view with button exists
 
         transitOptionsModal = new Modal({
-            modalClass: 'modal-options',
+            modalClass: options.selectors.shareModalClass,
             clickHandler: onOptionsModalItemClicked
         });
-        $('.btn-options').on('click', transitOptionsModal.open);
+        $(options.selectors.optionsButton).on('click', transitOptionsModal.open);
     }
 
     /* TODO: update for redesign or remove
@@ -108,6 +114,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
 
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
+
+        // Listen to window resize on mobile view; if map becomes visible, load tiles.
+        if (!$(options.selectors.map).is(':visible')) {
+            $(window).resize(function() {
+                if ($(options.selectors.map).is(':visible')) {
+                    if (!mapControl.isLoaded()) {
+                        mapControl.loadMap.apply(mapControl, null);
+                    }
+
+                    // done listening to resizes after map loads
+                    $(window).off('resize');
+                }
+            });
+        }
 
         // TODO: re-enable loading settings from user preferences
         // once routing figured out. Currently there is no way to go back

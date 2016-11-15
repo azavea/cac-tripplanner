@@ -3,6 +3,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var defaults = {
         id: 'map',
+        selector: '#map',
         homepage: true,
         center: [39.95, -75.1667],
         zoom: 14,
@@ -32,7 +33,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var tabControl = null;
     var zoomControl = null;
 
-    var homepage = true; // whether currently displaying home page view TODO: rework
+    var homepage = true; // whether currently displaying home page view
+    var loaded = false; // whether map tiles loaded yet (delay on mobile until in view)
 
     var esriSatelliteAttribution = [
         '&copy; <a href="http://www.esri.com/">Esri</a> ',
@@ -49,11 +51,66 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         this.eventNames = eventNames;
         this.options = $.extend({}, defaults, options);
         overlaysControl = new CAC.Map.OverlaysControl();
+
+        this.itineraryControl = new CAC.Map.ItineraryControl({map: null});
+
+        // only load map tiles if map visible
+        if (!homepage || $(this.options.selector).is(':visible')) {
+            loadMap.apply(this, null);
+        }
+    }
+
+    MapControl.prototype.isLoaded = isLoaded;
+    MapControl.prototype.loadMap = loadMap;
+    MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
+    MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
+    MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
+    MapControl.prototype.displayPoint = displayPoint;
+    MapControl.prototype.goToMapPage = goToMapPage;
+
+    return MapControl;
+
+    /**
+     * Display map components not shown on the homepage.
+     */
+    function goToMapPage() {
+        if (!loaded) {
+            loadMap.apply(this, null); // load map tiles and layers if not loaded already
+        }
+
+        if (!homepage) {
+            return; // already on map page; do nothing
+        }
+
+        homepage = false;
+        zoomControl.addTo(map);
+        initializeOverlays();
+        initializeLayerControl();
+    }
+
+    /**
+     * Helper to determine if Leaflet base map has already loaded tiles.
+     *
+     * @returns {boolean} True if base map tiles have already been loaded
+     */
+    function isLoaded() {
+        return loaded;
+    }
+
+    /**
+     * Load base map tiles and set map on associated controls.
+     *
+     */
+    function loadMap() {
+        if (loaded) {
+            return; // already loaded; nothing to do
+        }
+
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
                            .setView(this.options.center, this.options.zoom);
 
-        tabControl = options.tabControl;
-        homepage = options.homepage;
+        tabControl = this.options.tabControl;
+        homepage = this.options.homepage;
 
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
@@ -69,29 +126,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         }
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
-        this.itineraryControl = new CAC.Map.ItineraryControl({map: map});
-    }
-
-    MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
-    MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
-    MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
-    MapControl.prototype.displayPoint = displayPoint;
-    MapControl.prototype.goToMapPage = goToMapPage;
-
-    return MapControl;
-
-    /**
-     * Display map components not shown on the homepage.
-     */
-    function goToMapPage() {
-        if (!homepage) {
-            return; // already on map page; do nothing
-        }
-
-        homepage = false;
-        zoomControl.addTo(map);
-        initializeOverlays();
-        initializeLayerControl();
+        this.itineraryControl.setMap(map);
+        loaded = true;
     }
 
     function initializeBasemaps() {
