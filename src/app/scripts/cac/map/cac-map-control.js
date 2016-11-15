@@ -160,24 +160,24 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 collapsed: false
             });
             // add minimize button to layer control
-            var leafletMinimizer = '.leaflet-minimize';
-            var leafletLayerList = '.leaflet-control-layers-list';
-            var $layerContainer = $('.leaflet-control-layers');
+    	    var leafletMinimizer = '.leaflet-minimize';
+    	    var leafletLayerList = '.leaflet-control-layers-list';
+    	    var $layerContainer = $('.leaflet-control-layers');
 
-            $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
-            $(leafletMinimizer).click(function() {
-                if ($(leafletMinimizer).hasClass('minimized')) {
-                    // show again
-                    $(leafletLayerList).show();
-                    $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
-                    $(leafletMinimizer).removeClass('minimized');
-                } else {
-                    // minimize it
-                    $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
-                    $(leafletMinimizer).addClass('minimized');
-                    $(leafletLayerList).hide();
-                }
-            });
+    	    $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
+    	    $(leafletMinimizer).click(function() {
+    	        if ($(leafletMinimizer).hasClass('minimized')) {
+    		    // show again
+    		    $(leafletLayerList).show();
+    		    $(leafletMinimizer).html('<i class="icon-layers"></i>');
+    		    $(leafletMinimizer).removeClass('minimized');
+    	        } else {
+    		    // minimize it
+    		    $(leafletMinimizer).html('<i class="icon-layers"></i>');
+    		    $(leafletMinimizer).addClass('minimized');
+    		    $(leafletLayerList).hide();
+    	        }
+    	    });
         }
 
         layerControl.addTo(map);
