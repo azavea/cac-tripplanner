@@ -2,7 +2,7 @@ CAC.Control.Modal = (function ($) {
     'use strict';
 
     var defaults = {
-        // Class to search the DOM for to attach this modal to. Required.
+        // Class name to search the DOM for to attach the modal control to. Required.
         modalClass: null,
         selectors: {
             body: 'body',
@@ -42,19 +42,21 @@ CAC.Control.Modal = (function ($) {
     }
 
     function open(event) {
-        var bodyModalClass = 'body-' + options.modalClass;
-        $(options.selectors.body).addClass('body-modal ' + bodyModalClass);
+        $(options.selectors.body).addClass(_getBodyClass());
         if (event && event.preventDefault) {
             event.preventDefault();
         }
     }
 
     function close(event) {
-        var bodyModalClass = 'body-' + options.modalClass;
-        $(options.selectors.body).removeClass('body-modal ' + bodyModalClass);
+        $(options.selectors.body).removeClass(_getBodyClass());
         if (event && event.preventDefault) {
             event.preventDefault();
         }
+    }
+
+    function _getBodyClass() {
+        return 'body-modal body-' + options.modalClass;
     }
 
 })(jQuery);
