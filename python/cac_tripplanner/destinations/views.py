@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
 from .models import Destination, FeedEvent
+from cms.models import Article
 
 
 DEFAULT_CONTEXT = {
@@ -32,6 +33,27 @@ def base_view(request, page, context):
     all_context = dict(**DEFAULT_CONTEXT)
     all_context.update(**context)
     return render(request, page, context=all_context)
+
+
+def home(request):
+    if request.GET.get('destination') is not None:
+        # If there's a destination in the URL, go right to directions
+        context = {'tab': 'map'}
+    elif request.GET.get('origin') is not None:
+        # If there's no destination but there is an origin, go to Explore
+        context = {'tab': 'explore'}
+    else:
+        # Otherwise show the home view
+        # Show one random article
+        article = Article.objects.random()
+        # Show all destinations, in random order
+        destinations = Destination.objects.order_by('?').all()
+        context = {
+            'tab': 'home',
+            'article': article,
+            'destinations': destinations
+        }
+    return base_view(request, 'home.html', context=context)
 
 
 def directions(request):

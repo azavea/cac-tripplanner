@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 
-from destinations.models import Destination
 from .models import AboutFaq, Article
 
 
@@ -15,23 +14,6 @@ DEFAULT_CONTEXT = {
     'fb_app_id': settings.FB_APP_ID,
     'routing_url': settings.ROUTING_URL
 }
-
-def home(request):
-
-    # Get a random article
-    article = Article.objects.random()
-
-    # get a few randomized destinations
-    destination_ids = list(Destination.objects.published().values_list('id', flat=True))
-    shuffle(destination_ids)
-    destinations = Destination.objects.filter(id__in=destination_ids[:4])
-
-    context = dict(tab='home',
-                   article=article,
-                   destinations=destinations,
-                   **DEFAULT_CONTEXT)
-    return render(request, 'home.html', context=context)
-
 
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
