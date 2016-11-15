@@ -346,7 +346,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             case 'DEPART':
                 return getModeClass(modeText);
             case 'CONTINUE':
-                return '';
+                return 'directions-step-continue';
             // fall through to similar cases for left/right
             case 'LEFT':
             case 'SLIGHTLY_LEFT':
@@ -359,10 +359,11 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             case 'UTURN_RIGHT':
                 return 'directions-step-turn-right';
             case 'CIRCLE_CLOCKWISE':
+                return 'directions-step-clockwise';
             case 'CIRCLE_COUNTERCLOCKWISE':
-                return 'directions-step-circle'; // TODO: icon/class does not exist
+                return 'directions-step-counterclockwise';
             case 'ELEVATOR':
-                return 'directions-step-elevator'; // TODO: icon/class does not exist
+                return 'directions-step-elevator';
             default:
                 return '';
         }
