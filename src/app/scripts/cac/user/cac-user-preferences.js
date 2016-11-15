@@ -1,10 +1,22 @@
 CAC.User.Preferences = (function(Storages, _) {
     'use strict';
 
+    // TODO: figure out local storage strategy
     // set up local storage
-    var namespace = 'cac_otp';
-    var namespaceStorage = Storages.initNamespaceStorage(namespace);
-    var storage = namespaceStorage.localStorage;
+    // var namespaceStorage = Storages.initNamespaceStorage('cac_otp');
+    // var storage = namespaceStorage.localStorage;
+
+    // Initialize preference storage object.
+    // Currently it just uses an 'options' dictionary, so preferences lives only as long as
+    // the page for which this is initialized.
+    // With this setup we have the flexibility to store all or some of the parameters to local
+    // storage if we decide that's valuable, and components that use these parameters don't need
+    // to know the difference.
+    var options = {};
+    var storage = {
+        set: function (pref, val) { options[pref] = val; },
+        get: function (pref) { return options[pref]; }
+    };
 
     // store to use for default location
     var cityHall = {
