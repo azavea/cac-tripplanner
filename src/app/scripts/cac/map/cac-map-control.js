@@ -3,7 +3,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var defaults = {
         id: 'map',
-        selector: '#map',
+        selectors: {
+            id: '#map',
+            leafletMinimizer: '.leaflet-minimize',
+            leafletLayerList: '.leaflet-control-layers-list',
+            leafletLayerControl: '.leaflet-control-layers',
+            layerListMinimizedClass: 'minimized'
+        },
         center: [39.95, -75.1667],
         zoom: 14,
     };
@@ -31,6 +37,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var layerControl = null;
     var tabControl = null;
     var zoomControl = null;
+
 
     var loaded = false; // whether map tiles loaded yet (delay on mobile until in view)
 
@@ -105,6 +112,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
                            .setView(this.options.center, this.options.zoom);
 
+        tabControl = this.options.tabControl;
+        homepage = this.options.homepage;
+
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
 
@@ -160,24 +170,25 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 collapsed: false
             });
             // add minimize button to layer control
-    	    var leafletMinimizer = '.leaflet-minimize';
-    	    var leafletLayerList = '.leaflet-control-layers-list';
-    	    var $layerContainer = $('.leaflet-control-layers');
+		var $layerContainer = $(this.options.selectors.leafletLayerControl);
+		$layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
 
-    	    $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
-    	    $(leafletMinimizer).click(function() {
-    	        if ($(leafletMinimizer).hasClass('minimized')) {
-    		    // show again
-    		    $(leafletLayerList).show();
-    		    $(leafletMinimizer).html('<i class="icon-layers"></i>');
-    		    $(leafletMinimizer).removeClass('minimized');
-    	        } else {
-    		    // minimize it
-    		    $(leafletMinimizer).html('<i class="icon-layers"></i>');
-    		    $(leafletMinimizer).addClass('minimized');
-    		    $(leafletLayerList).hide();
-    	        }
-    	    });
+		var $minimizer = $(this.options.selectors.leafletMinimizer);
+		var selectors = this.options.selectors;
+		$minimizer.click(function() {
+		    if ($minimizer.hasClass(selectors.layerListMinimizedClass)) {
+		        // show again
+		        $(selectors.leafletLayerList).show();
+		        // TODO: use a separeate icon/styling for minimize button?
+		        $minimizer.html('<i class="icon-layers"></i>');
+		        $minimizer.removeClass(selectors.layerListMinimizedClass);
+		    } else {
+		        // minimize it
+		        $minimizer.html('<i class="icon-layers"></i>');
+		        $minimizer.addClass(selectors.layerListMinimizedClass);
+		        $(selectors.leafletLayerList).hide();
+		    }
+		});
         }
 
         layerControl.addTo(map);
