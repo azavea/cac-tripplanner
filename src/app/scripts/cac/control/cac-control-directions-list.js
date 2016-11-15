@@ -105,13 +105,11 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
 
         $container.append($html);
 
-        // Share link to directions list page, which is relative to the current URL,
-        // has all of the current URL's parameters,
-        // does *not* have the map path (just directions, with a trailing slash),
-        // and has an added parameter for the selected itinerary.
+        // Share link to directions list page, which is relative to the current URL, has all of
+        // the current URL's parameters and has an added parameter for the selected itinerary.
         var href = window.location.href;
         var directionsUrl = ['/directions/',
-                             href.slice(href.indexOf('/map/directions') + '/map/directions'.length),
+                             href.slice(href.indexOf('?')),
                              '&',
                              $.param({itineraryIndex: itinerary.id})
                             ].join('');

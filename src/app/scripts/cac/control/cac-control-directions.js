@@ -146,8 +146,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             setDirectionsError('origin');
             setDirectionsError('input-directions-to');
 
-            // TODO: fix URL routing for redesign
-            //updateUrl();  // Still update the URL if they request one-sided directions
+            updateUrl();  // Still update the URL if they request one-sided directions
             return;
         }
 
@@ -206,9 +205,8 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         UserPreferences.setPreference('mode', mode);
         UserPreferences.setPreference('arriveBy', arriveBy);
 
-        // TODO: fix URL handling for redesign
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
-        //updateUrl();
+        updateUrl();
 
         var params = {
             fromText: UserPreferences.getPreference('originText'),
@@ -229,10 +227,11 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
-            if (!tabControl.isTabShowing('directions')) {
-                // if user has switched away from the directions tab, do not show trip
-                return;
-            }
+            // TODO: rework tab control
+            // if (!tabControl.isTabShowing('directions')) {
+            //     // if user has switched away from the directions tab, do not show trip
+            //     return;
+            // }
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();
@@ -406,22 +405,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
         event.preventDefault();  // do not submit form
 
-        var $input;
-        var prefKey;
-
-        // Make sure to keep the directionsFrom origin in sync with the explore origin
-        if (key === 'origin') {
-            prefKey = 'origin';
-            $input = $(options.selectors.directionsFrom);
-        } else if (key === 'destination') {
-            prefKey = 'destination';
-            $input = $(options.selectors.typeaheadTo);
-        } else {
-            console.error('unrecognized typeahead key ' + key);
-            return;
-        }
-
-
         if (!location) {
             UserPreferences.clearLocation(key);
             setDirections(key, null);
@@ -594,16 +577,20 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             typeaheadFrom.setValue(originText);
         }
 
-        if (tabControl.isTabShowing('directions')) {
-            if (origin && destination) {
-                planTrip();
-            } else if (origin || destination) {
-                mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
-                clearItineraries();
-            } else {
-                clearDirections();
-            }
+        // TODO: rework tab control
+        if (origin && destination) {
+            planTrip();
         }
+        // if (tabControl.isTabShowing('directions')) {
+        //     if (origin && destination) {
+        //         planTrip();
+        //     } else if (origin || destination) {
+        //         mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
+        //         clearItineraries();
+        //     } else {
+        //         clearDirections();
+        //     }
+        // }
     }
 
 })(_, jQuery, CAC.Control, CAC.Search.Geocoder,
