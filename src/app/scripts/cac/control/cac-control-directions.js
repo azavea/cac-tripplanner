@@ -222,10 +222,11 @@ CAC.Control.Directions = (function (_, $, Control, ModeOptions, Geocoder, Routin
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
-            if (!tabControl.isTabShowing('directions')) {
-                // if user has switched away from the directions tab, do not show trip
-                return;
-            }
+            // TODO: rework tab control
+            // if (!tabControl.isTabShowing('directions')) {
+            //     // if user has switched away from the directions tab, do not show trip
+            //     return;
+            // }
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();

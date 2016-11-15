@@ -1,8 +1,8 @@
 /**
  * A basic URL router and related utilities.
  *
- * The app is still based on local storage, but this enables some URL navigation and facilitates
- * the interaction between that and local storage.
+ * The app still uses a UserPreferences component to store and retrieve all parameters, but this
+ * enables some URL navigation and facilitates the interaction between that and UserPreferences.
  */
 
 CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
@@ -20,22 +20,14 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var router = null;
 
     function UrlRouter() {
-        router = new Navigo('');
-
-        // TODO: disabling explore since it's not re-implemented yet for redesign.
-        //       probably explore will also be on the root path and we'll need one URL parsing
-        //       function that handles both cases
-        // router.on(new RegExp('/places/?\?'), setExplorePrefsFromUrl);
-        router.on(new RegExp('/\\?'), setDirectionsPrefsFromUrl);
-
+        router = new Navigo();
+        router.on('/', setPrefsFromUrl);
         router.resolve();
     }
 
     UrlRouter.prototype.updateUrl = updateUrl;
     UrlRouter.prototype.clearUrl = clearUrl;
-    UrlRouter.prototype.setExplorePrefsFromUrl = setExplorePrefsFromUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
-    UrlRouter.prototype.setDirectionsPrefsFromUrl = setDirectionsPrefsFromUrl;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
 
     return UrlRouter;
@@ -51,18 +43,27 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         updateUrl('');
     }
 
-    function setExplorePrefsFromUrl() {
-        UserPreferences.setPreference('method', 'explore');
-        setPrefsFromUrl(EXPLORE_READ);
-    }
-
     function buildExploreUrlFromPrefs() {
-        return '/places?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
+        return '?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
     }
 
-    function setDirectionsPrefsFromUrl() {
-        UserPreferences.setPreference('method', 'directions');
-        setPrefsFromUrl(DIRECTIONS_READ);
+    /* Read URL parameters into user preferences
+     *
+     * Figures out whether to set 'directions' or 'explore' based on whether destination and
+     * origin are present, then calls setPrefs to read the appropriate parameters into
+     * UserPreferences.
+     *
+     * Does nothing if there's no origin or destination (i.e. the home view with no query params)
+     */
+    function setPrefsFromUrl() {
+        var params = Utils.getUrlParams();
+        if (params.destination) {
+            UserPreferences.setPreference('method', 'directions');
+            setPrefs(DIRECTIONS_READ, params);
+        } else if (params.origin) {
+            UserPreferences.setPreference('method', 'explore');
+            setPrefs(EXPLORE_READ, params);
+        }
     }
 
     function buildDirectionsUrlFromPrefs() {
@@ -70,7 +71,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
 
-    /* Parses the URL and saves parameter values into local storage
+    /* Saves the URL query parameter values to UserPreferences
      *
      * Field names in the URL must match those in UserPreferences
      * 'origin' and 'destination' get special handling to convert from coordinates to GeoJSON
@@ -79,12 +80,11 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * for origin and destination, which get set to undefined.
      *
      * Fields that are omitted will be ignored, not unset, so anything that uses those params will
-     * get what's already in local storage or else the default.
+     * get what's already in UserPreferences or else the default.
      *
      * @param {List[String]} fields : The field names to store values from
      */
-    function setPrefsFromUrl(fields) {
-        var params = Utils.getUrlParams();
+    function setPrefs(fields, params) {
         _.forEach(fields, function(field) {
             // Only set values actually given, don't clobber fields that weren't provided
             if (!_.isUndefined(params[field])) {
@@ -112,7 +112,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         });
     }
 
-    /* Reads values for the given fields from local storage and composes a URL query string
+    /* Reads values for the given fields from UserPreferences and composes a URL query string
      * from them.
      *
      * It won't set undefined fields to default values during lookup. Undefined preferences get
