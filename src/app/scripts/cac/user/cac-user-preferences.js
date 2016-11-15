@@ -18,29 +18,6 @@ CAC.User.Preferences = (function(Storages, _) {
         get: function (pref) { return options[pref]; }
     };
 
-    // store to use for default location
-    var cityHall = {
-        name: 'City Hall, Philadelphia, Pennsylvania, USA',
-        extent: {
-            xmax: -75.158978,
-            xmin: -75.168978,
-            ymax: 39.958449,
-            ymin: 39.948449
-        },
-        feature: {
-            attributes: {
-                City: 'Philadelphia',
-                Postal: '',
-                Region: 'Pennsylvania',
-                StAddr: '1450 John F Kennedy Blvd'
-            },
-            geometry: {
-                x: -75.16397666699964,
-                y: 39.95344911900048
-            }
-        }
-    };
-
     var defaults = {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
@@ -48,8 +25,8 @@ CAC.User.Preferences = (function(Storages, _) {
         maxWalk: 2,
         method: 'explore',
         mode: 'TRANSIT,WALK',
-        origin: cityHall,
-        originText: cityHall.name,
+        origin: undefined,
+        originText: '',
         destination: undefined,
         destinationText: '',
         waypoints: [],
