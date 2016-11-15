@@ -178,22 +178,21 @@ CAC.Utils = (function (_) {
 
     function modeStringHelper(modeString) {
         var modeIcons = {
-            // TODO: add appropriate mode icons
             BUS: {name: 'bus', font: 'icon'},
-            SUBWAY: {name: 'train', font: 'icon'}, // TODO
-            CAR: {name: 'train', font: 'icon'}, // TODO
+            SUBWAY: {name: 'subway', font: 'icon'},
+            CAR: {name: 'car', font: 'icon'},
             TRAIN: {name: 'train', font: 'icon'},
-            RAIL: {name: 'train', font: 'icon'}, // TODO
+            RAIL: {name: 'train', font: 'icon'},
             BICYCLE: {name: 'bike', font: 'icon'},
             WALK: {name: 'walk', font: 'icon'},
-            TRAM: {name: 'train', font: 'icon'}, // TODO
-            FERRY: {name: 'train', font: 'icon'} // TODO
+            TRAM: {name: 'tram', font: 'icon'},
+            FERRY: {name: 'ferry', font: 'icon'}
         };
 
         var mode = modeIcons[modeString];
 
         if (!mode) {
-            mode = {name: 'transit', font: 'icon'};
+            mode = {name: 'default', font: 'icon'};
             console.error('Unrecognized transit mode: ' + modeString + '. Using default icon.');
         }
 

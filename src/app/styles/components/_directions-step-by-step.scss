@@ -180,6 +180,12 @@
         }
     }
 
+    .directions-step-continue {
+        &::before {
+            content: '\e814';
+        }
+    }
+
     .directions-step-bike {
         &::before {
             content: '\e801';
@@ -193,6 +199,12 @@
         }
     }
 
+    .directions-step-car {
+        &::before {
+            content: '\f1b9';
+        }
+    }
+
     .directions-step-bus {
         &::before {
             content: '\e802';
@@ -202,6 +214,54 @@
     .directions-step-train {
         &::before {
             content: '\f238';
+        }
+    }
+
+    .directions-step-rail {
+        &::before {
+            content: '\f238';
+        }
+    }
+
+    .directions-step-subway {
+        &::before {
+            content: '\e811';
+        }
+    }
+
+    .directions-step-ferry {
+        &::before {
+            content: '\e816';
+        }
+    }
+
+    .directions-step-tram {
+        &::before {
+            content: '\e812';
+        }
+    }
+
+    .directions-step-elevator {
+        &::before {
+            content: '\e813';
+        }
+    }
+
+    .directions-step-continue {
+        &::before {
+            content: '\e814';
+        }
+    }
+
+    .directions-step-clockwise {
+        &::before {
+            content: '\e815';
+        }
+    }
+
+    .directions-step-counterclockwise {
+        &::before {
+            content: '\e817';
         }
     }
 }
