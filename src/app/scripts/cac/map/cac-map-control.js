@@ -56,7 +56,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         // only load map tiles if map visible
         if (!homepage || $(this.options.selector).is(':visible')) {
-            loadMap(this);
+            loadMap.apply(this, null);
         }
     }
 
@@ -75,7 +75,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      */
     function goToMapPage() {
         if (!loaded) {
-            loadMap(this); // load map tiles and layers if not loaded already
+            loadMap.apply(this, null); // load map tiles and layers if not loaded already
         }
 
         if (!homepage) {
@@ -100,18 +100,17 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     /**
      * Load base map tiles and set map on associated controls.
      *
-     * @param {Object} ctl Reference to this control (useful if calling from elsewhere)
      */
-    function loadMap(ctl) {
+    function loadMap() {
         if (loaded) {
             return; // already loaded; nothing to do
         }
 
-        map = new cartodb.L.map(ctl.options.id, { zoomControl: false })
-                           .setView(ctl.options.center, ctl.options.zoom);
+        map = new cartodb.L.map(this.options.id, { zoomControl: false })
+                           .setView(this.options.center, this.options.zoom);
 
-        tabControl = ctl.options.tabControl;
-        homepage = ctl.options.homepage;
+        tabControl = this.options.tabControl;
+        homepage = this.options.homepage;
 
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
@@ -126,8 +125,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             initializeLayerControl();
         }
 
-        ctl.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
-        ctl.itineraryControl.setMap(map);
+        this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
+        this.itineraryControl.setMap(map);
         loaded = true;
     }
 

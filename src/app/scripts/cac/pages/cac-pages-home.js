@@ -120,7 +120,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
             $(window).resize(function() {
                 if ($(options.selectors.map).is(':visible')) {
                     if (!mapControl.isLoaded()) {
-                        mapControl.loadMap(mapControl);
+                        mapControl.loadMap.apply(mapControl, null);
                     }
 
                     // done listening to resizes after map loads
