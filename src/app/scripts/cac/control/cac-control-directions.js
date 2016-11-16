@@ -212,8 +212,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
-        mapControl.goToMapPage();
-
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
@@ -567,20 +565,9 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             typeaheadFrom.setValue(originText);
         }
 
-        // TODO: rework tab control
         if (origin && destination) {
             planTrip();
         }
-        // if (tabControl.isTabShowing('directions')) {
-        //     if (origin && destination) {
-        //         planTrip();
-        //     } else if (origin || destination) {
-        //         mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
-        //         clearItineraries();
-        //     } else {
-        //         clearDirections();
-        //     }
-        // }
     }
 
 })(_, jQuery, CAC.Control, CAC.Search.Geocoder,

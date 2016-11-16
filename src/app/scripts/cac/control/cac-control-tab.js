@@ -15,7 +15,7 @@ CAC.Control.Tab = (function ($, UserPreferences) {
         EXPLORE: 'EXPLORE',
         LEARN: 'LEARN'
     };
-    var currentTab = TABS.DIRECTIONS;
+    var currentTab = TABS.HOME;
 
     var defaults = {
         classes: {
@@ -25,8 +25,9 @@ CAC.Control.Tab = (function ($, UserPreferences) {
             LEARN: 'body-learn'
         },
         selectors: {
-            appBody: '#body-div',
-        }
+            appBody: '#body-div'
+        },
+        router: null
     };
 
     var events = $({});
@@ -41,6 +42,7 @@ CAC.Control.Tab = (function ($, UserPreferences) {
         self.events = events;
         self.eventNames = eventNames;
         self.TABS = TABS;
+        self.router = self.options.router;
 
         self.$body = $(self.options.selectors.appBody);
     }
@@ -62,13 +64,20 @@ CAC.Control.Tab = (function ($, UserPreferences) {
     function setTab(tabId) {
         if (!TABS[tabId]) { return; }
 
+        var oldTab = currentTab;
         currentTab = tabId;
 
         var newBodyClass = this.options.classes[currentTab];
         this.$body.removeClass();
         this.$body.addClass(newBodyClass);
 
-        this.events.trigger(eventNames.tabShown, tabId);
+        if (currentTab === TABS.HOME && this.router) {
+            this.router.clearUrl();
+        }
+
+        if (oldTab !== currentTab) {
+            this.events.trigger(eventNames.tabShown, tabId);
+        }
     }
 
 })(jQuery, CAC.User.Preferences);

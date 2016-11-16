@@ -4,7 +4,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var defaults = {
         id: 'map',
         selector: '#map',
-        homepage: true,
         center: [39.95, -75.1667],
         zoom: 14,
     };
@@ -33,7 +32,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var tabControl = null;
     var zoomControl = null;
 
-    var homepage = true; // whether currently displaying home page view
     var loaded = false; // whether map tiles loaded yet (delay on mobile until in view)
 
     var esriSatelliteAttribution = [
@@ -47,17 +45,32 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     ].join('');
 
     function MapControl(options) {
+        var self = this;
+
         this.events = events;
         this.eventNames = eventNames;
         this.options = $.extend({}, defaults, options);
+        tabControl = this.options.tabControl;
         overlaysControl = new CAC.Map.OverlaysControl();
 
         this.itineraryControl = new CAC.Map.ItineraryControl({map: null});
 
         // only load map tiles if map visible
-        if (!homepage || $(this.options.selector).is(':visible')) {
+        if ($(this.options.selector).is(':visible')) {
             loadMap.apply(this, null);
         }
+
+        tabControl.events.on(tabControl.eventNames.tabShown, function (event, tab) {
+            if (tab === tabControl.TABS.DIRECTIONS || tab === tabControl.TABS.EXPLORE) {
+                self.loadMap();
+                self.loadMapComponents();
+            } else {
+                self.clearMapComponents();
+            }
+            if (map) {
+                map.invalidateSize();
+            }
+        });
     }
 
     MapControl.prototype.isLoaded = isLoaded;
@@ -66,27 +79,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
     MapControl.prototype.clearDirectionsMarker = clearDirectionsMarker;
     MapControl.prototype.displayPoint = displayPoint;
-    MapControl.prototype.goToMapPage = goToMapPage;
+    MapControl.prototype.clearMapComponents = clearMapComponents;
+    MapControl.prototype.loadMapComponents = loadMapComponents;
 
     return MapControl;
-
-    /**
-     * Display map components not shown on the homepage.
-     */
-    function goToMapPage() {
-        if (!loaded) {
-            loadMap.apply(this, null); // load map tiles and layers if not loaded already
-        }
-
-        if (!homepage) {
-            return; // already on map page; do nothing
-        }
-
-        homepage = false;
-        zoomControl.addTo(map);
-        initializeOverlays();
-        initializeLayerControl();
-    }
 
     /**
      * Helper to determine if Leaflet base map has already loaded tiles.
@@ -109,21 +105,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
                            .setView(this.options.center, this.options.zoom);
 
-        tabControl = this.options.tabControl;
-        homepage = this.options.homepage;
-
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
 
         initializeBasemaps();
-
-        if (!homepage) {
-            // hide zoom control on home page view
-            zoomControl.addTo(map);
-            // delay loading overlays and layer switcher
-            initializeOverlays();
-            initializeLayerControl();
-        }
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
         this.itineraryControl.setMap(map);
@@ -163,47 +148,39 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         overlays['Bike Share Locations'] = overlaysControl.bikeShareOverlay();
         overlays['Bike Routes'] = overlaysControl.bikeRoutesOverlay(map);
 
-        // TODO: handle hiding layers on home view more cleanly
-        // when user switches back to home view from map view
-        // Would be better to initialize but not add to map, to avoid flashing,
-        // although it probably won't be visible due to centering of home page text.
-        if (homepage) {
-            overlays['Bike Share Locations'].eachLayer(function(layer) { layer.hide(); });
-            overlays['Bike Routes'].eachLayer(function(layer) { layer.hide(); });
-        }
-
         // TODO: re-enable when Uwishunu feed returns
         //overlays['Nearby Events'] = overlaysControl.nearbyEventsOverlay();
         //overlays['Nearby Events'].addTo(map);
     }
 
     function initializeLayerControl() {
-        layerControl = cartodb.L.control.layers(basemaps, overlays, {
-            position: 'bottomright',
-            collapsed: false
-        });
+        if (!layerControl) {
+            layerControl = cartodb.L.control.layers(basemaps, overlays, {
+                position: 'bottomright',
+                collapsed: false
+            });
+            // add minimize button to layer control
+            var leafletMinimizer = '.leaflet-minimize';
+            var leafletLayerList = '.leaflet-control-layers-list';
+            var $layerContainer = $('.leaflet-control-layers');
+
+            $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
+            $(leafletMinimizer).click(function() {
+                if ($(leafletMinimizer).hasClass('minimized')) {
+                    // show again
+                    $(leafletLayerList).show();
+                    $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
+                    $(leafletMinimizer).removeClass('minimized');
+                } else {
+                    // minimize it
+                    $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
+                    $(leafletMinimizer).addClass('minimized');
+                    $(leafletLayerList).hide();
+                }
+            });
+        }
 
         layerControl.addTo(map);
-
-        // add minimize button to layer control
-        var leafletMinimizer = '.leaflet-minimize';
-        var leafletLayerList = '.leaflet-control-layers-list';
-        var $layerContainer = $('.leaflet-control-layers');
-
-        $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
-        $(leafletMinimizer).click(function() {
-            if ($(leafletMinimizer).hasClass('minimized')) {
-                // show again
-                $(leafletLayerList).show();
-                $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
-                $(leafletMinimizer).removeClass('minimized');
-            } else {
-                // minimize it
-                $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
-                $(leafletMinimizer).addClass('minimized');
-                $(leafletLayerList).hide();
-            }
-        });
     }
 
     function setGeocodeMarker(latLng) {
@@ -326,6 +303,34 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             map.removeLayer(directionsMarkers[type]);
         }
         directionsMarkers[type] = null;
+    }
+
+    function loadMapComponents() {
+        zoomControl.addTo(map);
+        initializeOverlays();
+        initializeLayerControl();
+    }
+
+    function clearMapComponents() {
+        if (!map) { return; }
+
+        if (zoomControl) {
+            zoomControl.removeFrom(map);
+        }
+        if (layerControl) {
+            layerControl.removeFrom(map);
+        }
+
+        map.removeLayer(overlays['Bike Share Locations']);
+        map.removeLayer(overlays['Bike Routes']);
+        overlays = {};
+
+        clearDirectionsMarker('origin');
+        clearDirectionsMarker('destination');
+
+        if (this.itineraryControl) {
+            this.itineraryControl.clearItineraries();
+        }
     }
 
     /**

@@ -27,6 +27,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
             toggleExploreButton: '#toggle-explore',
             typeaheadExplore: '#exploreOrigin',
 
+            homeLink: '.home-link',
             tabControl: '.tab-control',
             tabControlLink: '.nav-item'
         }
@@ -84,10 +85,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
     Home.prototype.initialize = function () {
         urlRouter = new UrlRouter();
 
-        tabControl = new TabControl({});
+        tabControl = new TabControl({
+            router: urlRouter
+        });
 
         mapControl = new MapControl({
-            homepage: true,
             tabControl: tabControl
         });
 
@@ -137,7 +139,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
                 tabControl.setTab(tabControl.TABS.EXPLORE);
             }
         });
+        $(options.selectors.homeLink).on('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
 
+            tabControl.setTab(tabControl.TABS.HOME);
+        });
+
+        // TODO: Adjust as necessary once user prefs strategy is decided
         $(document).ready(directionsControl.setFromUserPreferences());
     }
 
