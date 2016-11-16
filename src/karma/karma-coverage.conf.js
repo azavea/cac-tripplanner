@@ -48,7 +48,6 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-directions-list.js',
       'app/scripts/cac/home/cac-home-templates.js',
       'app/scripts/cac/pages/cac-pages-home.js',
-      'app/scripts/cac/pages/cac-pages-map.js',
       'app/scripts/cac/pages/cac-pages-directions.js',
 
       'test/spec/*.js',
