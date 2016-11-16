@@ -1,0 +1,74 @@
+/**
+ *  Controls the tab switching for the home page
+ *
+ *  Events:
+ *  @event cac:control:tab:shown
+ *  @property {string} tabId The tab id that was selected
+ */
+CAC.Control.Tab = (function ($, UserPreferences) {
+
+    'use strict';
+
+    var TABS = {
+        HOME: 'HOME',
+        DIRECTIONS: 'DIRECTIONS',
+        EXPLORE: 'EXPLORE',
+        LEARN: 'LEARN'
+    };
+    var currentTab = TABS.DIRECTIONS;
+
+    var defaults = {
+        classes: {
+            HOME: 'body-home',
+            DIRECTIONS: 'body-map body-has-sidebar-banner',
+            EXPLORE: 'body-explore',
+            LEARN: 'body-learn'
+        },
+        selectors: {
+            appBody: '#body-div',
+        }
+    };
+
+    var events = $({});
+    var eventNames = {
+        tabShown: 'cac:control:tab:shown'
+    };
+
+    function TabControl(options) {
+        var self = this;
+
+        self.options = $.extend({}, defaults, options);
+        self.events = events;
+        self.eventNames = eventNames;
+        self.TABS = TABS;
+
+        self.$body = $(self.options.selectors.appBody);
+    }
+
+    TabControl.prototype.currentTab = currentTab;
+    TabControl.prototype.isTabShowing = isTabShowing;
+    TabControl.prototype.setTab = setTab;
+
+    return TabControl;
+
+    function currentTab() {
+        return currentTab;
+    }
+
+    function isTabShowing(tabId) {
+        return tabId === currentTab;
+    }
+
+    function setTab(tabId) {
+        if (!TABS[tabId]) { return; }
+
+        currentTab = tabId;
+
+        var newBodyClass = this.options.classes[currentTab];
+        this.$body.removeClass();
+        this.$body.addClass(newBodyClass);
+
+        this.events.trigger(eventNames.tabShown, tabId);
+    }
+
+})(jQuery, CAC.User.Preferences);

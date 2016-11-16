@@ -29,10 +29,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             typeaheadFrom: '#input-directions-from',
             typeaheadTo: '#input-directions-to',
 
-            // top-level classes
-            homePageClass: 'body-home',
-            mapPageClasses: 'body-map body-has-sidebar-banner',
-
             itineraryBlock: '.route-summary',
 
             // TODO: update or remove below components (from before refactor)
@@ -214,13 +210,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         };
         $.extend(params, otpOptions);
 
-        // change to map view, if not there already
-        var $homepage = $('.' + options.selectors.homePageClass);
-        if ($homepage) {
-            $homepage.blur()
-                     .removeClass(options.selectors.homePageClass)
-                     .addClass(options.selectors.mapPageClasses);
-        }
+        tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
         mapControl.goToMapPage();
 

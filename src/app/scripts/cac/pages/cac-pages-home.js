@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserPreferences,
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Templates, UserPreferences,
                             UrlRouter) {
     'use strict';
 
@@ -26,6 +26,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
             toggleDirectionsButton: '#toggle-directions',
             toggleExploreButton: '#toggle-explore',
             typeaheadExplore: '#exploreOrigin',
+
+            tabControl: '.tab-control',
+            tabControlLink: '.nav-item'
         }
     };
 
@@ -35,11 +38,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
     var transitOptionsModal = null;
 
     var mapControl = null;
+    var tabControl = null;
     var urlRouter = null;
     var directionsControl = null;
-
-    // TODO: rework tab control
-    var sidebarTabControl = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -83,28 +84,26 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
     Home.prototype.initialize = function () {
         urlRouter = new UrlRouter();
 
-        // Map initialization logic and event binding
-        // TODO: rework tab control
-        sidebarTabControl = new CAC.Control.SidebarTab();
+        tabControl = new TabControl({});
 
         mapControl = new MapControl({
             homepage: true,
-            tabControl: sidebarTabControl
+            tabControl: tabControl
         });
 
         directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
             modeOptionsControl: modeOptionsControl,
-            tabControl: sidebarTabControl,
+            tabControl: tabControl,
             urlRouter: urlRouter
         });
 
-        this.destinations = null;
-        $(options.selectors.toggleButton).on('click', function() {
-            var id = $(this).attr('id');
-            setTab(id);
-        });
+        _setupEvents();
+    };
 
+    return Home;
+
+    function _setupEvents() {
         $(options.selectors.placeList).on('click',
                                           options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
@@ -129,14 +128,18 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
             });
         }
 
-        // TODO: re-enable loading settings from user preferences
-        // once routing figured out. Currently there is no way to go back
-        // to the home page, so if there is an origin and destination in
-        // preferences, the app will jump directly to the map page with no way back.
-        $(document).ready(directionsControl.setFromUserPreferences());
-    };
+        $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
+            var tabId = $(this).data('tab-id');
+            if (tabId === tabControl.TABS.EXPLORE) {
+                event.preventDefault();
+                event.stopPropagation();
 
-    return Home;
+                tabControl.setTab(tabControl.TABS.EXPLORE);
+            }
+        });
+
+        $(document).ready(directionsControl.setFromUserPreferences());
+    }
 
     /**
      * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
@@ -152,21 +155,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
         var block = $(event.target).closest(options.selectors.placeCard);
         var placeId = block.data('destination-id');
         UserPreferences.setPreference('placeId', placeId);
-        window.location = '/map';
-    }
 
-    function setTab(tab) {
-        if (tab.indexOf('directions') > -1) {
-            $(options.selectors.exploreForm).addClass('hidden');
-            $(options.selectors.directionsForm).removeClass('hidden');
-            $(options.selectors.toggleDirectionsButton).addClass('active');
-            $(options.selectors.toggleExploreButton).removeClass('active');
-        } else {
-            $(options.selectors.directionsForm).addClass('hidden');
-            $(options.selectors.exploreForm).removeClass('hidden');
-            $(options.selectors.toggleDirectionsButton).removeClass('active');
-            $(options.selectors.toggleExploreButton).addClass('active');
-        }
+        // TODO: Enable once explore view exists
+        // tabControl.setTab(tabControl.TABS.EXPLORE);
     }
 
     function onOptionsModalItemClicked(event) {
@@ -184,5 +175,5 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, Templates, UserP
         directionsControl.moveOriginDestination('destination', position);
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Home.Templates, CAC.User.Preferences,
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences,
     CAC.UrlRouting.UrlRouter);
