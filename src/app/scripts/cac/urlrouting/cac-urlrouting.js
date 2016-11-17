@@ -20,7 +20,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var router = null;
 
     function UrlRouter() {
-        router = new Navigo();
+        router = new Navigo('/');
         router.on('/', setPrefsFromUrl);
         router.resolve();
     }
@@ -35,7 +35,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     // Updates the displayed URL without triggering any routing callbacks
     function updateUrl(url) {
         router.pause(true);
-        router.navigate(url);
+        router.navigate(url, true);
         router.pause(false);
     }
 
@@ -44,7 +44,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
     function buildExploreUrlFromPrefs() {
-        return '?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
+        return '/?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
     }
 
     /* Read URL parameters into user preferences
@@ -67,7 +67,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
     function buildDirectionsUrlFromPrefs() {
-        return '?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
+        return '/?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
     }
 
 

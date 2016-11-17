@@ -62,7 +62,7 @@ def directions(request):
     :param request: Request object
     :returns: A rendered response
     """
-    return base_view(request, 'directions.html')
+    return base_view(request, 'directions.html', {})
 
 
 def place_detail(request, pk):
