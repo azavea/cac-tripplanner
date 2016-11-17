@@ -36,23 +36,22 @@ def base_view(request, page, context):
 
 
 def home(request):
+    # Load one random article
+    article = Article.objects.random()
+    # Show all destinations, in random order
+    destinations = Destination.objects.order_by('?').all()
+    context = {
+        'tab': 'home',
+        'article': article,
+        'destinations': destinations
+    }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
-        context = {'tab': 'map'}
+        context['tab'] = 'map'
     elif request.GET.get('origin') is not None:
         # If there's no destination but there is an origin, go to Explore
-        context = {'tab': 'explore'}
-    else:
-        # Otherwise show the home view
-        # Show one random article
-        article = Article.objects.random()
-        # Show all destinations, in random order
-        destinations = Destination.objects.order_by('?').all()
-        context = {
-            'tab': 'home',
-            'article': article,
-            'destinations': destinations
-        }
+        context['tab'] = 'explore'
+
     return base_view(request, 'home.html', context=context)
 
 

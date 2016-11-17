@@ -29,10 +29,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             typeaheadFrom: '#input-directions-from',
             typeaheadTo: '#input-directions-to',
 
-            // top-level classes
-            homePageClass: 'body-home',
-            mapPageClasses: 'body-map body-has-sidebar-banner',
-
             itineraryBlock: '.route-summary',
 
             // TODO: update or remove below components (from before refactor)
@@ -214,15 +210,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         };
         $.extend(params, otpOptions);
 
-        // change to map view, if not there already
-        var $homepage = $('.' + options.selectors.homePageClass);
-        if ($homepage) {
-            $homepage.blur()
-                     .removeClass(options.selectors.homePageClass)
-                     .addClass(options.selectors.mapPageClasses);
-        }
-
-        mapControl.goToMapPage();
+        tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
@@ -577,20 +565,9 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             typeaheadFrom.setValue(originText);
         }
 
-        // TODO: rework tab control
         if (origin && destination) {
             planTrip();
         }
-        // if (tabControl.isTabShowing('directions')) {
-        //     if (origin && destination) {
-        //         planTrip();
-        //     } else if (origin || destination) {
-        //         mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
-        //         clearItineraries();
-        //     } else {
-        //         clearDirections();
-        //     }
-        // }
     }
 
 })(_, jQuery, CAC.Control, CAC.Search.Geocoder,

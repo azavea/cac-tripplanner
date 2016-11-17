@@ -3,14 +3,14 @@
         <div class="slogan-start">
             Walk. Ride. Pedal. Discover.
         </div>
-        <div class="logo"><a href="#"></a></div>
+        <div class="logo"><a class="home-link" href="{% url 'home' %}"></a></div>
         <div class="slogan-end">
             Next time bring your bike onboard.
         </div>
     </div>
-    <nav class="primary-nav">
-        <a class="nav-item {% if not tab or tab == 'home'%} on {% endif %}" href="/">Directions</a>
-        <a class="nav-item {% if tab == 'explore'%} on {% endif %}" href="#">Explore</a>
-        <a class="nav-item {% if tab == 'info'%} on {% endif %}" href="{% url 'learn-list' %}">Learn</a>
+    <nav class="primary-nav tab-control">
+        <a class="nav-item {% if not tab or tab == 'home'%} on {% endif %}" href="/" data-tab-id="DIRECTIONS">Directions</a>
+        <a class="nav-item {% if tab == 'explore'%} on {% endif %}" href="#" data-tab-id="EXPLORE">Explore</a>
+        <a class="nav-item {% if tab == 'info'%} on {% endif %}" href="{% url 'learn-list' %}" data-tab-id="LEARN">Learn</a>
     </nav>
 </header>
