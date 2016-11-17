@@ -19,7 +19,7 @@ module.exports = function(config) {
       // load moment before other vendor scripts; is requirement for bootstrap datetime picker
       '/srv/cac/scripts/vendor/moment.js',
       '/srv/cac/scripts/vendor/moment-duration-format.js',
-      '/srv/cac/scripts/vendor/cartodb.js',
+      '/srv/cac/scripts/vendor/cartodb.uncompressed.js',
       '/srv/cac/scripts/vendor/Polyline.encoded.js',
       '/srv/cac/scripts/vendor/!(cartodb|Polyline|moment).js',
 
