@@ -72,7 +72,6 @@ CAC.Control.ModeOptions = (function ($) {
 
     function initialize() {
         // update classes on mode toggle buttons
-        // TODO: trigger event to notify that input changed
         $(options.selectors.modeToggle).on('click', options.selectors.modeOption, function(e) {
             e.preventDefault();
 

@@ -40,4 +40,39 @@
             border: 0;
         }
     }
+
+    .leaflet-control-layers {
+        margin-right: 30px;
+        margin-bottom: 30px;
+        position: relative;
+        padding: 15px 20px 18px;
+        border-radius: 0;
+        box-shadow: 0 0 12px rgba(0,0,0,0.35);
+
+        .leaflet-control-layers-separator {
+            margin: 15px -20px 15px -20px;
+        }
+        .leaflet-control-layers-selector {
+            margin-right: 8px;
+            top: 0;
+        }
+    }
+
+    .leaflet-minimize {
+        color: #707070;
+        cursor: pointer;
+        position: absolute;
+        border-radius: 3px;
+        line-height: 10px;
+        padding: 13px 15px;
+        bottom: 0;
+        z-index: 99999;
+        right: 0;
+
+        &.minimized {
+            height: 38px;
+            line-height: 0;
+            background: white;
+        }
+    }
 }

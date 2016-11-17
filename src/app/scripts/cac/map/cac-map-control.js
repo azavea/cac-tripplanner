@@ -3,7 +3,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var defaults = {
         id: 'map',
-        selector: '#map',
+        selectors: {
+            id: '#map',
+            leafletMinimizer: '.leaflet-minimize',
+            leafletLayerList: '.leaflet-control-layers-list',
+            leafletLayerControl: '.leaflet-control-layers',
+            layerListMinimizedClass: 'minimized'
+        },
         center: [39.95, -75.1667],
         zoom: 14,
     };
@@ -31,6 +37,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var layerControl = null;
     var tabControl = null;
     var zoomControl = null;
+
 
     var loaded = false; // whether map tiles loaded yet (delay on mobile until in view)
 
@@ -105,6 +112,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
                            .setView(this.options.center, this.options.zoom);
 
+        tabControl = this.options.tabControl;
+
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
 
@@ -159,28 +168,33 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 position: 'bottomright',
                 collapsed: false
             });
-            // add minimize button to layer control
-            var leafletMinimizer = '.leaflet-minimize';
-            var leafletLayerList = '.leaflet-control-layers-list';
-            var $layerContainer = $('.leaflet-control-layers');
-
-            $layerContainer.prepend('<div class="leaflet-minimize"><i class="fa fa-minus"></i></div>');
-            $(leafletMinimizer).click(function() {
-                if ($(leafletMinimizer).hasClass('minimized')) {
-                    // show again
-                    $(leafletLayerList).show();
-                    $(leafletMinimizer).html('<i class="fa fa-minus"></i>');
-                    $(leafletMinimizer).removeClass('minimized');
-                } else {
-                    // minimize it
-                    $(leafletMinimizer).html('<i class="fa fa-map-marker"></i>');
-                    $(leafletMinimizer).addClass('minimized');
-                    $(leafletLayerList).hide();
-                }
-            });
         }
 
         layerControl.addTo(map);
+
+        // Add minimize button to layer control.
+        // This needs to happen after the layer control has been added to the map,
+        // or else the selectors will not find it.
+        var $layerContainer = $(this.options.selectors.leafletLayerControl);
+        window.lc = $layerContainer;
+
+        $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
+
+        var $minimizer = $(this.options.selectors.leafletMinimizer);
+        var selectors = this.options.selectors;
+        $minimizer.click(function() {
+            if ($minimizer.hasClass(selectors.layerListMinimizedClass)) {
+                // show again
+                $(selectors.leafletLayerList).show();
+                $minimizer.html('<i class="icon-layers"></i>');
+                $minimizer.removeClass(selectors.layerListMinimizedClass);
+            } else {
+                // minimize it
+                $minimizer.html('<i class="icon-layers"></i>');
+                $minimizer.addClass(selectors.layerListMinimizedClass);
+                $(selectors.leafletLayerList).hide();
+            }
+        });
     }
 
     function setGeocodeMarker(latLng) {
@@ -308,7 +322,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     function loadMapComponents() {
         zoomControl.addTo(map);
         initializeOverlays();
-        initializeLayerControl();
+        initializeLayerControl.apply(this, null);
     }
 
     function clearMapComponents() {
