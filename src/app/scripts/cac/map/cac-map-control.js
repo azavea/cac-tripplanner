@@ -113,7 +113,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                            .setView(this.options.center, this.options.zoom);
 
         tabControl = this.options.tabControl;
-        homepage = this.options.homepage;
 
         // put zoom control on top right
         zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
@@ -169,29 +168,33 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 position: 'bottomright',
                 collapsed: false
             });
-            // add minimize button to layer control
-		var $layerContainer = $(this.options.selectors.leafletLayerControl);
-		$layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
-
-		var $minimizer = $(this.options.selectors.leafletMinimizer);
-		var selectors = this.options.selectors;
-		$minimizer.click(function() {
-		    if ($minimizer.hasClass(selectors.layerListMinimizedClass)) {
-		        // show again
-		        $(selectors.leafletLayerList).show();
-		        // TODO: use a separeate icon/styling for minimize button?
-		        $minimizer.html('<i class="icon-layers"></i>');
-		        $minimizer.removeClass(selectors.layerListMinimizedClass);
-		    } else {
-		        // minimize it
-		        $minimizer.html('<i class="icon-layers"></i>');
-		        $minimizer.addClass(selectors.layerListMinimizedClass);
-		        $(selectors.leafletLayerList).hide();
-		    }
-		});
         }
 
         layerControl.addTo(map);
+
+        // Add minimize button to layer control.
+        // This needs to happen after the layer control has been added to the map,
+        // or else the selectors will not find it.
+        var $layerContainer = $(this.options.selectors.leafletLayerControl);
+        window.lc = $layerContainer;
+
+        $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
+
+        var $minimizer = $(this.options.selectors.leafletMinimizer);
+        var selectors = this.options.selectors;
+        $minimizer.click(function() {
+            if ($minimizer.hasClass(selectors.layerListMinimizedClass)) {
+                // show again
+                $(selectors.leafletLayerList).show();
+                $minimizer.html('<i class="icon-layers"></i>');
+                $minimizer.removeClass(selectors.layerListMinimizedClass);
+            } else {
+                // minimize it
+                $minimizer.html('<i class="icon-layers"></i>');
+                $minimizer.addClass(selectors.layerListMinimizedClass);
+                $(selectors.leafletLayerList).hide();
+            }
+        });
     }
 
     function setGeocodeMarker(latLng) {
@@ -319,7 +322,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     function loadMapComponents() {
         zoomControl.addTo(map);
         initializeOverlays();
-        initializeLayerControl();
+        initializeLayerControl.apply(this, null);
     }
 
     function clearMapComponents() {
