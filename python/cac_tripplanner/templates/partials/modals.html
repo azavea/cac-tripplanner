@@ -15,18 +15,23 @@
 
     <div class="modal-panel modal-share">
         <header class="modal-header">
-            <i class="icon-share"></i>
-            Share
+            <span class="default"><i class="icon-share"></i>Share </span>
+            <span class="secondary share-link"><i class="icon-link"></i> Get a link </span>
         </header>
-        <ul class="modal-list modal-contents">
+        <ul class="modal-list modal-contents default">
             <li class="modal-list-link">Get a link</li>
             <li class="modal-list-twitter">Twitter</li>
             <li class="modal-list-facebook">Facebook</li>
             <li class="modal-list-google">Google+</li>
             <li class="modal-list-email">Email</li>
         </ul>
+        <div class="modal-contents secondary share-link">
+            <p>Here's a link to these directions:</p>
+            <p><a id="modalDirectionsLink" href=""></a></p>
+        </div>
         <footer class="modal-footer">
             <button name="close-modal" class="btn-close-modal">Close</button>
         </footer>
     </div>
+
 </div>

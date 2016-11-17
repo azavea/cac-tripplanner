@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
+CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
 
     'use strict';
 
@@ -39,13 +39,11 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
 
     var $container = null;
     var itinerary = {};
-    var socialSharing = null;
 
     function DirectionsListControl(params) {
         // recursively extend objects, so those not overridden will still exist
         options = $.extend(true, {}, defaults, params);
         $container = $(options.selectors.container);
-        socialSharing = new Social();
     }
 
     DirectionsListControl.prototype = {
@@ -103,42 +101,13 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
             $container.append($alert);
         }
 
-        $container.append($html);
-
-        // Share link to directions list page, which is relative to the current URL, has all of
-        // the current URL's parameters and has an added parameter for the selected itinerary.
-        var href = window.location.href;
-        var directionsUrl = ['/directions/',
-                             href.slice(href.indexOf('?')),
-                             '&',
-                             $.param({itineraryIndex: itinerary.id})
-                            ].join('');
-
-        // TODO: postpone shortening link until user chooses to share directions
-        socialSharing.shortenLink(directionsUrl).then(function(shortened) {
-            // set up click handlers for social sharing with shortened link
-            $(options.selectors.twitterShareButton).on('click',
-                                                       {url: shortened},
-                                                       socialSharing.shareOnTwitter);
-            $(options.selectors.facebookShareButton).on('click',
-                                                        {url: shortened},
-                                                        socialSharing.shareOnFacebook);
-            $(options.selectors.googlePlusShareButton).on('click',
-                                                          {url: shortened},
-                                                          socialSharing.shareOnGooglePlus);
-            $(options.selectors.emailShareButton).on('click',
-                                                     {url: shortened},
-                                                     socialSharing.shareViaEmail);
-            $(options.selectors.directLinkButton).on('click',
-                                                     {url: shortened},
-                                                     socialSharing.shareDirectLink);
-        });
-    }
+        $container.append($html);    }
 
     function getTemplate(itinerary) {
         var templateData = {
             showBackButton: options.showBackButton,
             showShareButton: options.showShareButton,
+            id: itinerary.id,
             start: {
                 text: itinerary.fromText,
                 time: itinerary.startTime
@@ -171,4 +140,4 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates, Social) {
         }
     }
 
-})(_, jQuery, CAC.Map.Templates, CAC.Share.Social);
+})(_, jQuery, CAC.Map.Templates);

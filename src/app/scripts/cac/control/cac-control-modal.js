@@ -45,12 +45,18 @@ CAC.Control.Modal = (function ($) {
         if (event && event.preventDefault) {
             event.preventDefault();
         }
+        if (this.options.onOpen) {
+            return this.options.onOpen(event);
+        }
     }
 
     function _close(event) {
         $(this.options.selectors.body).removeClass(_getBodyClass(this));
         if (event && event.preventDefault) {
             event.preventDefault();
+        }
+        if (this.options.onClose) {
+            return this.options.onClose(event);
         }
     }
 

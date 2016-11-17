@@ -245,7 +245,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '</button>',
                 '{{/if}}',
             '</header>',
-            '<div class="directions-list-of-steps">',
+            '<div class="directions-list-of-steps" data-itinerary-id="{{data.id}}">',
                 '<div class="directions-leg directions-leg-origin">',
                     '<div class="directions-step directions-step-origin">',
                     '<div class="directions-instruction">Depart {{data.start.text}}</div>',
