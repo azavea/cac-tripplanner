@@ -6,7 +6,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
         selectors: {
             // modal
             optionsButton: '.btn-options',
+            optionsModalClass: 'modal-options',
             shareModalClass: 'modal-share',
+            shareModalButton: '.share-directions',
 
             // destinations
             placeCard: '.place-card',
@@ -48,10 +50,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
         modeOptionsControl = new ModeOptions();
 
         shareModal = new Modal({modalClass: options.selectors.shareModalClass});
-        // TODO: Open share modal once view with button exists
+        $('body').on('click', options.selectors.shareModalButton, shareModal.open);
 
         transitOptionsModal = new Modal({
-            modalClass: options.selectors.shareModalClass,
+            modalClass: options.selectors.optionsModalClass,
             clickHandler: onOptionsModalItemClicked
         });
         $(options.selectors.optionsButton).on('click', transitOptionsModal.open);

@@ -14,49 +14,48 @@ CAC.Control.Modal = (function ($) {
         clickHandler: function (event) { }
     };
 
-    var options = {};
-
     function Modal(params) {
-        options = $.extend({}, defaults, params);
+        var options = $.extend({}, defaults, params);
         this.options = options;
         this.initialize();
     }
 
     Modal.prototype = {
         initialize: initialize,
-        open: open,
-        close: close
     };
 
     return Modal;
 
     function initialize() {
-        if (!options.modalClass) {
+        if (!this.options.modalClass) {
             throw 'CAC.Control.Modal options.modalClass required.';
         }
 
-        $(options.selectors.modal + ' .' + options.modalClass).on('click',
-            options.selectors.clickHandlerFilter, options.clickHandler);
-        $(options.selectors.modal + ' .' + options.modalClass).on('click',
-            options.selectors.buttonClose, close);
+        this.open = _open.bind(this);
+        this.close = _close.bind(this);
+
+        $(this.options.selectors.modal + ' .' + this.options.modalClass).on('click',
+            this.options.selectors.clickHandlerFilter, this.options.clickHandler);
+        $(this.options.selectors.modal + ' .' + this.options.modalClass).on('click',
+            this.options.selectors.buttonClose, this.close);
     }
 
-    function open(event) {
-        $(options.selectors.body).addClass(_getBodyClass());
+    function _open(event) {
+        $(this.options.selectors.body).addClass(_getBodyClass(this));
         if (event && event.preventDefault) {
             event.preventDefault();
         }
     }
 
-    function close(event) {
-        $(options.selectors.body).removeClass(_getBodyClass());
+    function _close(event) {
+        $(this.options.selectors.body).removeClass(_getBodyClass(this));
         if (event && event.preventDefault) {
             event.preventDefault();
         }
     }
 
-    function _getBodyClass() {
-        return 'body-modal body-' + options.modalClass;
+    function _getBodyClass(modal) {
+        return 'body-modal body-' + modal.options.modalClass;
     }
 
 })(jQuery);
