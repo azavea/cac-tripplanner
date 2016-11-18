@@ -1,12 +1,12 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Templates, UserPreferences,
-                            UrlRouter) {
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabControl, Templates,
+                            UserPreferences, UrlRouter) {
     'use strict';
 
     var defaults = {
         selectors: {
             // modal
             optionsButton: '.btn-options',
-            shareModalClass: 'modal-share',
+            optionsModalClass: 'modal-options',
 
             // destinations
             placeCard: '.place-card',
@@ -47,11 +47,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
         options = $.extend({}, defaults, params);
         modeOptionsControl = new ModeOptions();
 
-        shareModal = new Modal({modalClass: options.selectors.shareModalClass});
-        // TODO: Open share modal once view with button exists
+        shareModal = new ShareModal({});
 
         transitOptionsModal = new Modal({
-            modalClass: options.selectors.shareModalClass,
+            modalClass: options.selectors.optionsModalClass,
             clickHandler: onOptionsModalItemClicked
         });
         $(options.selectors.optionsButton).on('click', transitOptionsModal.open);
@@ -184,5 +183,5 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
         directionsControl.moveOriginDestination('destination', position);
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences,
-    CAC.UrlRouting.UrlRouter);
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Share.ShareModal,
+    CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);

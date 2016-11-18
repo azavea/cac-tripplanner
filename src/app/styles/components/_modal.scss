@@ -32,6 +32,9 @@
         display: flex;
     }
 
+    .secondary {
+        display: none;
+    }
 }
 
 .modal-header {
@@ -42,6 +45,13 @@
     justify-content: center;
     color: $white;
     text-transform: uppercase;
+
+    .modal-header-contents {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+    }
 
     .modal-sub-menu & {
         text-transform: none;
