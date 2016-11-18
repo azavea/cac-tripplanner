@@ -16,7 +16,7 @@ $(function() {
         }
     });
 
-    $('html').on('click', '.body-home .directions-to input', function(e) {
+    $('html').on('click', '.body-home .directions-destination input', function(e) {
         e.preventDefault();
         this.blur();
         $('body').removeClass('body-home').addClass('body-map body-has-sidebar-banner');
@@ -72,6 +72,16 @@ $(function() {
     $('body').on('click', '.btn-dismiss-sidebar-banner', function(e) {
         $('body').removeClass('body-has-sidebar-banner');
         e.preventDefault();
+    });
+
+    $('body').on('click', '.directions-input.directions-destination label', function(e) {
+        e.preventDefault();
+        $('#output-directions-within').val($('#input-directions-within').val());
+        $('.directions-form').toggleClass('directions-destination-mode-to directions-destination-mode-within');
+    });
+
+    $('body').on('input', '#input-directions-within', function(e) {
+        $('#output-directions-within').val(e.target.value);
     });
 
     // The "post card" on the home page is a link to that post,

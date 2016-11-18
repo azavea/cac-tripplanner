@@ -30,7 +30,7 @@
     </header>
 
     <form class="directions-form-element" action="" method="post">
-        <div class="directions-form">
+        <div class="directions-form directions-destination-mode-to">
             <div class="mode-picker">
                 <div class="mode-toggle">
                     <div class="walk mode-option on">
@@ -49,15 +49,20 @@
                     <i class="icon-sliders"></i>
                 </div>
             </div>
-            <div class="directions-from directions-text-input">
-                <label for="input-directions-from">from</label>
-                <input type="text" id="input-directions-from" name="input-directions-from" value="" placeholder="Enter a starting point">
+            <div class="directions-input directions-origin">
+                <label for="input-directions-origin">from</label>
+                <input type="text" id="input-directions-origin" name="input-directions-origin" value="" placeholder="Enter a starting point">
                 <button class="btn-geolocate" title="Detect current location" type="button" name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
-            <div class="directions-to directions-text-input">
+            <div class="directions-input directions-destination directions-destination-to">
                 <label for="input-directions-to">to</label>
                 <input type="text" id="input-directions-to" name="input-directions-to" value="" placeholder="Enter a destination — or choose one below">
                 <button class="btn-reverse" title="Swap starting point and destination" type="button" name="reverse"><i class="icon-reverse"></i></button>
+            </div>
+            <div class="directions-input directions-destination directions-destination-within">
+                <label for="input-directions-within">within</label>
+                <output id="output-directions-within" name="output-directions-within" for="input-directions-within" value="60"></output>
+                <input type="range" id="input-directions-within" name="input-directions-within" value="60" min="10" max="180" step="5">
             </div>
         </div>
     </form>
