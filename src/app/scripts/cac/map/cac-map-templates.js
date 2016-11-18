@@ -334,7 +334,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     function getModeClass(modeText) {
         switch (modeText) {
-            case 'BIKE':
+            case 'BICYCLE':
                 return 'directions-step-bike'; // TODO: bike share has separate icon
             default:
                 return 'directions-step-' + modeText.toLowerCase();
