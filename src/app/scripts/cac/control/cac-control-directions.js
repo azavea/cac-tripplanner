@@ -173,11 +173,13 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         }
 
         if (mode.indexOf('BICYCLE') > -1) {
-            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
-            var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-            UserPreferences.setPreference('bikeTriangle', bikeTriangle);
+            // TODO: re-enable bike optimization options when control re-implemented
+            //var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
+            //var bikeTriangle = bikeTriangleOpt.val();
+
+            //$.extend(otpOptions, {optimize: 'TRIANGLE'},
+            //         modeOptionsControl.options.bikeTriangle[bikeTriangle]);
+            //UserPreferences.setPreference('bikeTriangle', bikeTriangle);
 
             // allow longer bike riding when using public transit
             $.extend(otpOptions, { maxWalkDistance: MAXWALK_BIKE * METERS_PER_MILE });
