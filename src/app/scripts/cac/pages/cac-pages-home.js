@@ -116,8 +116,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, TabControl, Temp
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
 
-        // Listen to window resize on mobile view; if map becomes visible, load tiles.
-        if (!$(options.selectors.map).is(':visible')) {
+
+        if ($(options.selectors.map).is(':visible')) {
+            // Map is visible on load
+            mapControl.loadMap.apply(mapControl, null);
+        } else {
+            // Listen to window resize on mobile view; if map becomes visible, load tiles.
             $(window).resize(function() {
                 if ($(options.selectors.map).is(':visible')) {
                     if (!mapControl.isLoaded()) {
