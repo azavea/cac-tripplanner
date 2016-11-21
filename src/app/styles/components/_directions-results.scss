@@ -48,8 +48,8 @@
             background-color: $v-lt-gray;
 
             .route-summary-path {
-                stroke: #e23331;
-                stroke-dasharray: 0;
+                stroke: $route-summary-path-selected-color;
+                stroke-dasharray: $route-summary-selected-dasharray;
             }
         }
 
@@ -57,8 +57,8 @@
             flex: 0 0 4px;
             margin-right: 13px;
 
-            stroke: #5c99c6;
-            stroke-dasharray: 7, 7;
+            stroke: $route-summary-path-default-color;
+            stroke-dasharray: $route-summary-default-dasharray;
             stroke-width: 3;
         }
 
