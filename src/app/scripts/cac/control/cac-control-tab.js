@@ -5,7 +5,7 @@
  *  @event cac:control:tab:shown
  *  @property {string} tabId The tab id that was selected
  */
-CAC.Control.Tab = (function ($, UserPreferences) {
+CAC.Control.Tab = (function ($) {
 
     'use strict';
 
@@ -47,13 +47,13 @@ CAC.Control.Tab = (function ($, UserPreferences) {
         self.$body = $(self.options.selectors.appBody);
     }
 
-    TabControl.prototype.currentTab = currentTab;
+    TabControl.prototype.getCurrentTab = getCurrentTab;
     TabControl.prototype.isTabShowing = isTabShowing;
     TabControl.prototype.setTab = setTab;
 
     return TabControl;
 
-    function currentTab() {
+    function getCurrentTab() {
         return currentTab;
     }
 
@@ -80,4 +80,4 @@ CAC.Control.Tab = (function ($, UserPreferences) {
         }
     }
 
-})(jQuery, CAC.User.Preferences);
+})(jQuery);

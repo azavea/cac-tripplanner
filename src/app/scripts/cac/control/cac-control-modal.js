@@ -11,6 +11,7 @@ CAC.Control.Modal = (function ($) {
             modal: '.modal-overlay'
         },
         // Triggered directly by jQuery when a list item in the modal is clicked. NOOP by default.
+        /*jshint unused:false*/
         clickHandler: function (event) { }
     };
 
