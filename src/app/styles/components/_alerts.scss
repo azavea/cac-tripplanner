@@ -1,0 +1,23 @@
+.alert {
+    padding: 1rem;
+    text-align: center;
+
+    .alert-title {
+        position: relative;
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+}
+
+.alert-bicycle {
+    background-color: $alert-color-bicycle;
+}

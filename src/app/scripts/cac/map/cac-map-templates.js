@@ -79,15 +79,19 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
         // message is not templated, so we can embed links
         var source = [
-            '<div class="alert-container">',
-            '<div class="alert alert-{{type}} alert-dismissible" role="alert">',
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
-            '<span aria-hidden="true">&times;</span></button>',
+            '<div class="alert alert-bicycle">',
+            '<div class="alert-title">',
+            'Notice',
+            '<button title="Dismiss this message" name="close" class="close" aria-label="Close">',
+            '<i class="icon-cancel"></i></button>',
+            '</div>',
+            '<div class="alert-body">',
             msg,
-            '</div></div>'
+            '</div>',
+            '</div>'
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({type: 'warning'});
+        var html = template();
         return html;
     }
 

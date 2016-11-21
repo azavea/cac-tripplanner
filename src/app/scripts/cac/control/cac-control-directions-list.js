@@ -15,10 +15,12 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
+            alertCloseButton: '.close',
             container: '.directions-step-by-step',
             mapContainer: '.body-map',
             backButton: '.back-to-directions-results',
             directionItem: '.directions-leg .directions-step',
+            directionsHeader: '.step-by-step-header',
             directLinkButton: '.modal-list-link',
             emailShareButton: '.modal-list-email',
             facebookShareButton: '.modal-list-facebook',
@@ -94,14 +96,18 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
 
 
         $container.empty();
+        $container.append($html);
 
         // Show alert with link to transit agency bicycle policy for bike+transit itineraries
         if (_.includes(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
-            var $alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
-            $container.append($alert);
+            var alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
+            var $alert = $(alert);
+            $alert.one('click', options.selectors.alertCloseButton, function () {
+                $alert.remove();
+            });
+            $container.find(options.selectors.directionsHeader).after($alert);
         }
-
-        $container.append($html);    }
+    }
 
     function getTemplate(itinerary) {
         var templateData = {
