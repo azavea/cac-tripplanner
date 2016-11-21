@@ -43,9 +43,23 @@
             margin: 0;
         }
 
+        &.selected {
+
+            background-color: $v-lt-gray;
+
+            .route-summary-path {
+                stroke: #e23331;
+                stroke-dasharray: 0;
+            }
+        }
+
         .route-summary-path {
             flex: 0 0 4px;
             margin-right: 13px;
+
+            stroke: #5c99c6;
+            stroke-dasharray: 7, 7;
+            stroke-width: 3;
         }
 
         .route-summary-details {

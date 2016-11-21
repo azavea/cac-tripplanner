@@ -206,7 +206,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         '{{#each itineraries}}',
             '<div class="route-summary" data-itinerary="{{this.id}}">',
             '<svg class="route-summary-path" width="3" height="100%" xmlns="http://www.w3.org/2000/svg">',
-                '<line x1="50%" y1="6%" x2="50%" y2="94%" stroke-width="3" stroke="#e23331"></line>',
+                '<line x1="50%" y1="6%" x2="50%" y2="94%"></line>',
             '</svg>',
             '<div class="route-summary-details">',
                 '<div class="route-summary-primary-details">',
