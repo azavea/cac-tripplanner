@@ -31,6 +31,8 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
             itineraryBlock: '.route-summary',
 
+            selectedItineraryClass: 'selected',
+
             // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
             datepicker: '#datetimeDirections',
@@ -330,8 +332,9 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
      */
     function onItineraryHover(event, itinerary) {
         if (itinerary) {
-            findItineraryBlock(currentItinerary.id).css('background-color', 'white');
-            findItineraryBlock(itinerary.id).css('background-color', 'lightgray');
+            findItineraryBlock(currentItinerary.id)
+                .removeClass(options.selectors.selectedItineraryClass);
+            findItineraryBlock(itinerary.id).addClass(options.selectors.selectedItineraryClass);
             currentItinerary.highlight(false);
             itinerary.highlight(true);
             currentItinerary = itinerary;
