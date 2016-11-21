@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+
+{% block pagetitle %}
+<title>{% block title %}GoPhillyGo | {{ article.title }}{% endblock %}</title>
+
+<meta property="og:title" content="GoPhillyGo | {{ article.title }}" />
+<meta name="twitter:title" content="GoPhillyGo | {{ article.title }}" />
+{% endblock %}
+
 {% block content %}
     {% include "partials/header.html" %}
     <div class="main">

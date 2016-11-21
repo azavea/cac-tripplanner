@@ -5,13 +5,18 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+
+    {% block pagetitle %}
     <title>{% block title %}GoPhillyGo | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
+
+    <meta property="og:title" content="Trip Planner" />
+    <meta name="twitter:title" content="GoPhillyGo" />
+    {% endblock %}
 
     {% block extrametatags %}
     <meta property="fb:app_id" content="{{ fb_app_id }}" />
     <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
-    <meta property="og:title" content="Trip Planner" />
     <meta property="og:description"
         content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
     <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
@@ -21,7 +26,6 @@
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@go_philly_go" />
-    <meta name="twitter:title" content="GoPhillyGo" />
     <meta name="twitter:description" content="Helping you get around greater Philly" />
     <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     {% endblock %}
