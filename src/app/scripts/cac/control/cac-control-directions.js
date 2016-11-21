@@ -437,6 +437,10 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
+                // prevent typeahead dropdown from opening by removing focus
+                $(options.selectors.typeaheadFrom).blur();
+                $(options.selectors.typeaheadTo).blur();
+
                 var location = Utils.convertReverseGeocodeToFeature(data);
                 UserPreferences.setPreference(key, location);
                 /*jshint camelcase: false */

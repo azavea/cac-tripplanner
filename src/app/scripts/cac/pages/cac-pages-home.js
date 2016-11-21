@@ -183,7 +183,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
     }
 
     function moveDestination(event, position) {
-        event.preventDefault(); // necessary to prevent typeahead dropdown from opening
+        event.preventDefault();
         directionsControl.moveOriginDestination('destination', position);
     }
 
