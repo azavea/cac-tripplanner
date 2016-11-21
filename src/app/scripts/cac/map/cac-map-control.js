@@ -69,7 +69,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         tabControl.events.on(tabControl.eventNames.tabShown, function (event, tab) {
             if (tab === tabControl.TABS.DIRECTIONS || tab === tabControl.TABS.EXPLORE) {
-                self.loadMap();
+                loadMap.apply(self, null);
                 self.loadMapComponents();
             } else {
                 self.clearMapComponents();
