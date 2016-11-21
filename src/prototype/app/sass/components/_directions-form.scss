@@ -45,7 +45,7 @@
         max-width: $sidebar-width;
         height: $directions-form-sidebar-height;
         margin: 0;
-        padding: 0 10px 10px;
+        padding: 0 5px 10px;
 
         @include respond-to('xxs') {
             width: 100%;
@@ -197,13 +197,13 @@
         }
     }
 
-    .directions-text-input {
+    .directions-input {
         display: flex;
         position: relative;
         flex: 0 0 40px;
         flex-flow: row nowrap;
         align-items: stretch;
-        justify-content: flex-start;
+        justify-content: space-between;
         margin-bottom: 15px;
         background-color: $directions-form-text-input-background-color;
 
@@ -213,22 +213,23 @@
             border: 1px solid $white;
             background-color: $gophillygo-blue;
 
-            &.directions-from {
+            &.directions-origin {
                 border-bottom-width: 0;
             }
         }
 
         label {
-            flex: 0 0 4em;
-            padding-right: 1em;
+            flex: 0 0 3em;
+            padding-left: 7px;
+            margin-right: 1em;
             font-size: 1.4rem;
             font-weight: $font-weight-bold;
             line-height: 40px;
-            text-align: right;
+            text-align: left;
             cursor: text;
 
             .body-map & {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
                 font-weight: $font-weight-medium;
                 line-height: 30px;
                 color: rgba(255, 255, 255, .9);
@@ -273,7 +274,7 @@
             display: none;
             position: absolute;
             top: -16px;
-            right: -5px;
+            right: -3px;
             width: 30px;
             height: 30px;
             padding: 0;
@@ -290,5 +291,71 @@
             }
         }
 
+    }
+
+    .directions-destination {
+        &.directions-destination-within {
+            display: none;
+        }
+
+        &.directions-destination-to {
+            display: flex;
+        }
+    }
+
+    @include respond-to('xxs-up') {
+        .body-map & {
+
+            .directions-destination label {
+                position: relative;
+                background-color: $gophillygo-blue-dark;
+                cursor: pointer;
+                
+                // Caret if we go with menu instead of toggle
+                // &:after {
+                //     position: absolute;
+                //     right: 5px;
+                //     color: inherit;
+                //     font-size: 1.1rem;
+                //     content: '▾';
+                // }
+            }
+
+            &.directions-destination-mode-within {
+
+                .directions-destination.directions-destination-within {
+                    display: flex;
+                }
+
+                .directions-destination.directions-destination-to {
+                    display: none;
+                }
+
+                .directions-destination label {
+                    padding-right: 1em;
+                    margin-right: .2em;
+                }
+
+                #output-directions-within {
+                    position: relative;
+                    width: 6rem;
+                    margin-right: 1rem;
+                    color: $white;
+                    font-size: 1.4rem;
+                    font-weight: $font-weight-medium;
+                    line-height: 30px;
+                    text-align: right;
+
+                    &:after {
+                        content: ' min';
+                    }
+                }
+
+                #input-directions-within {
+                    @include inputrange();
+                    margin-right: 1rem;
+                }
+            }
+        }
     }
 }
