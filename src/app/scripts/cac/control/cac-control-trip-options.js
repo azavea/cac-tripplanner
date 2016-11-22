@@ -4,9 +4,13 @@ CAC.Control.TripOptions = (function ($, Modal) {
     var defaults = {
         currentMode: 'WALK',
         selectors: {
-            // mode related selectors
-            modeToggle: '.mode-toggle',
-
+            bodyModalClass: 'modal-options',
+            bikeOptionsModal: '.modal-options.bike-options',
+            bikeShareSelectionModal: '.modal-options.bike-share-select',
+            timingModal: '.modal-options.timing-modal',
+            bikeTriangleModal: '.modal-options.bike-triangle',
+            walkOptionsModal: '.modal-options.walk-options',
+            accessibilityModal: '.modal-options.accessibility-options',
         }
     };
     var events = $({});
@@ -14,6 +18,8 @@ CAC.Control.TripOptions = (function ($, Modal) {
         toggle: 'cac:control:tripoptions:toggle'
     };
     var options = {};
+    var modal = null;
+    var modalSelector = null;
 
     function TripOptionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -22,48 +28,37 @@ CAC.Control.TripOptions = (function ($, Modal) {
 
     TripOptionsControl.prototype = {
         initialize: initialize,
-        changeMode: changeMode,
         events: events,
         eventNames: eventNames,
-        getMode: getMode,
-        setMode: setMode
+        open: open
     };
 
     return TripOptionsControl;
 
     function initialize() {
-        if (options.currentMode === 'BICYCLE') {
+        modalSelector = options.currentMode.indexOf('BICYCLE') > -1 ?
+            options.selectors.bikeOptionsModal :
+            options.selectors.walkOptionsModal;
 
-        } else {
-            // walking
-        }
+        modal = new Modal({
+            modalSelector: modalSelector,
+            bodyModalClass: options.selectors.bodyModalClass,
+            clickHandler: onClick,
+            onClose: onClose
+        });
     }
 
-    /**
-     * Show/hide sidebar options based on the selected mode.
-     * Expects both tabs to have the same selector names for the toggleable divs.
-     */
-    function changeMode() {
-
+    function onClick() {
+        console.log('TODO: implement click');
     }
 
-    /**
-     * Helper to return the mode string based on the buttons within the given input selector.
-     *
-     * @returns {String} comma-separated list of OpenTripPlanner mode parameters
-     */
-    function getMode() {
-
+    function onClose() {
+        console.log('TODO: implement close');
     }
 
-    /**
-     * Helper to set the appropriate buttons within the given input selector
-     * so that they match the mode string.
-     *
-     * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
-     */
-    function setMode(mode) {
-
+    function open() {
+        $(modalSelector).show();
+        modal.open();
     }
 
 })(jQuery, CAC.Control.Modal);

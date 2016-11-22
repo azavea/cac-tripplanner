@@ -28,16 +28,16 @@ CAC.Control.Modal = (function ($) {
     return Modal;
 
     function initialize() {
-        if (!this.options.modalClass) {
-            throw 'CAC.Control.Modal options.modalClass required.';
+        if (!this.options.modalSelector || !this.options.bodyModalClass) {
+            throw 'CAC.Control.Modal options.modalSelector and options.bodyModalClass required.';
         }
 
         this.open = _open.bind(this);
         this.close = _close.bind(this);
 
-        $(this.options.selectors.modal + ' .' + this.options.modalClass).on('click',
+        $(this.options.selectors.modal + ' ' + this.options.modalSelector).on('click',
             this.options.selectors.clickHandlerFilter, this.options.clickHandler);
-        $(this.options.selectors.modal + ' .' + this.options.modalClass).on('click',
+        $(this.options.selectors.modal + ' ' + this.options.modalSelector).on('click',
             this.options.selectors.buttonClose, this.close);
     }
 
@@ -62,7 +62,7 @@ CAC.Control.Modal = (function ($) {
     }
 
     function _getBodyClass(modal) {
-        return 'body-modal body-' + modal.options.modalClass;
+        return 'body-modal body-' + modal.options.bodyModalClass;
     }
 
 })(jQuery);

@@ -41,7 +41,8 @@ CAC.Share.ShareModal = (function ($, Settings, Modal) {
 
     function initialize() {
         modal = new Modal({
-            modalClass: options.selectors.shareModalClass,
+            modalSelector: '.' + options.selectors.shareModalClass,
+            bodyModalClass: options.selectors.shareModalClass,
             clickHandler: onClick,
             onClose: onClose
         });
