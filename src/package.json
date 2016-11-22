@@ -4,6 +4,7 @@
     "node": ">=0.12.0"
   },
   "dependencies": {
+    "navigo": "~3.5.0",
     "@turf/nearest": "~3.5.2"
   },
   "devDependencies": {

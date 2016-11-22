@@ -39,7 +39,7 @@ var stat = {
     images: staticRoot + '/images'
 };
 
-var cartoDbRoot = 'bower_components/cartodb.js/cartodb.uncompressed.js';
+var cartoDbJs = 'bower_components/cartodb.js/cartodb.uncompressed.js';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -107,6 +107,8 @@ var copyVendorJS = function(filter, extraFiles) {
     var bowerStream = copyBowerFiles(filter, extraFiles);
     var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
     vendorStream.add(bowerStream);
+    vendorStream.add(gulp.src(['node_modules/navigo/**/navigo.js'])
+                     .pipe(rename({dirname: ''})));
     // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
     // running jQuery in noConflict mode for JotForms.
     // (Breaks loading Carto layers when it tries to reference $.ajax.)
@@ -200,7 +202,7 @@ gulp.task('copy:vendor-scripts', function() {
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/cartodb**'],
                         // load the uncompressed version of CartoDB in development,
                         // for easier debugging
-                        ['bower_components/cartodb.js/cartodb.uncompressed.js'])
+                        [cartoDbJs])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -241,7 +243,7 @@ gulp.task('test:copy-jquery', function() {
 
 // Since cartodb.js is loaded from a CDN, we need to pull it in manually here.
 gulp.task('test:copy-cartodb', function() {
-    return copyBowerFiles('cartodb.js', [cartoDbRoot + '**/cartodb.js'])
+    return copyBowerFiles('cartodb.js', [cartoDbJs])
         .pipe(gulp.dest(stat.scripts));
 });
 
