@@ -31,13 +31,16 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
             itineraryBlock: '.route-summary',
 
+            // TODO: bring back these selectors; used for error display
+            // origin: ??
+            //destination: ??
+
             selectedItineraryClass: 'selected',
 
             // TODO: update or remove below components (from before refactor)
             bikeTriangleDiv: '#directionsBikeTriangle',
             datepicker: '#datetimeDirections',
             departAtSelect: '#directionsDepartAt',
-            destination: 'section.directions input.destination',
             directions: '.directions',
             directionInput: '.direction-input',
             errorClass: 'error',
@@ -142,7 +145,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
     var planTrip = _.throttle(function() {  // jshint ignore:line
         if (!(directions.origin && directions.destination)) {
             setDirectionsError('origin');
-            setDirectionsError('input-directions-to');
+            setDirectionsError('destination');
 
             updateUrl();  // Still update the URL if they request one-sided directions
             return;
@@ -434,6 +437,10 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
+                // prevent typeahead dropdown from opening by removing focus
+                $(options.selectors.typeaheadFrom).blur();
+                $(options.selectors.typeaheadTo).blur();
+
                 var location = Utils.convertReverseGeocodeToFeature(data);
                 UserPreferences.setPreference(key, location);
                 /*jshint camelcase: false */
@@ -488,9 +495,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         typeaheadTo.setValue(destinationText);
         $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
-        // Save selections to user preferences
-        UserPreferences.setLocation('destination', destination, destinationText);
-
         // Get directions
         planTrip();
     }
@@ -506,6 +510,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
     }
 
     function setDirectionsError(key) {
+        // TODO: bring back error display for origin/destination fields
         var $input = null;
         if (key === 'origin') {
             $input = $(options.selectors.origin);

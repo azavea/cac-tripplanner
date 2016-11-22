@@ -27,8 +27,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var eventNames = {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
-        destinationMoved: 'cac:map:control:destinationmoved',
-        geocodeMarkerMoved: 'cac:map:control:geocodemoved',
+        destinationMoved: 'cac:map:control:destinationmoved'
     };
     var basemaps = {};
     var overlays = {};
@@ -205,8 +204,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
             marker.setLatLng(latlng, {draggable: true});
             map.panTo(latlng); // allow user to drag marker off map
-
-            events.trigger(eventNames.geocodeMarkerMoved, position);
         }
 
         if (latLng === null) {
