@@ -36,7 +36,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
     var options = {};
     var modeOptionsControl = null;
     var shareModal = null;
-    var transitOptionsModal = null;
+    var tripOptionsModal = null;
 
     var mapControl = null;
     var tabControl = null;
@@ -49,11 +49,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
 
         shareModal = new ShareModal({});
 
-        transitOptionsModal = new Modal({
+        tripOptionsModal = new Modal({
             modalClass: options.selectors.optionsModalClass,
             clickHandler: onOptionsModalItemClicked
         });
-        $(options.selectors.optionsButton).on('click', transitOptionsModal.open);
+        $(options.selectors.optionsButton).on('click', tripOptionsModal.open);
     }
 
     /* TODO: update for redesign or remove
