@@ -5,7 +5,7 @@ CAC.Control.Modal = (function ($) {
         // Class name to search the DOM for to attach the modal control to. Required.
         modalClass: null,
         selectors: {
-            body: 'body',
+            body: '#body-div',
             buttonClose: '.btn-close-modal',
             clickHandlerFilter: 'li',
             modal: '.modal-overlay'
