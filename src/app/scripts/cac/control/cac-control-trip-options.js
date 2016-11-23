@@ -80,7 +80,7 @@ CAC.Control.TripOptions = (function ($, Modal) {
                 modalSelector: childModalSelector,
                 bodyModalClass: options.selectors.bodyModalClass,
                 clickHandler: childModalClick,
-                onclose: onChildModalClose
+                onClose: onChildModalClose
             });
             modal.close();
             childModal.open();
@@ -92,7 +92,7 @@ CAC.Control.TripOptions = (function ($, Modal) {
 
     function onClose() {
         $(modalSelector).removeClass(options.selectors.visibleClass);
-        console.log('TODO: implement close');
+        console.log('TODO: implement close of parent modal');
     }
 
     /**
@@ -105,11 +105,15 @@ CAC.Control.TripOptions = (function ($, Modal) {
 
     function childModalClick() {
         console.log('TODO: implement click on child modal');
+        // just close it for now
+        childModal.close();
     }
 
     function onChildModalClose() {
         console.log('TODO: implement child modal close');
         $(childModalSelector).removeClass(options.selectors.visibleClass);
+        childModal = null;
+        childModalSelector = null;
         // TODO: re-open parent modal?
     }
 
