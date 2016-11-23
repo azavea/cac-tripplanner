@@ -35,7 +35,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
     var options = {};
     var modeOptionsControl = null;
     var shareModal = null;
-    var tripOptionsModal = null;
 
     var mapControl = null;
     var tabControl = null;
@@ -91,10 +90,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
             urlRouter: urlRouter
         });
 
-        tripOptionsModal = new TripOptions({
-            currentMode: modeOptionsControl.getMode()
-        });
-
         shareModal = new ShareModal({});
 
         _setupEvents();
@@ -103,7 +98,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
     return Home;
 
     function _setupEvents() {
-        $(options.selectors.optionsButton).on('click', tripOptionsModal.open);
+        $(options.selectors.optionsButton).on('click', function() {
+            // initialize trip options modal with current mode selection
+            new TripOptions({
+                currentMode: modeOptionsControl.getMode()
+            }).open();
+        });
 
         $(options.selectors.placeList).on('click',
                                           options.selectors.placeCardDirectionsLink,

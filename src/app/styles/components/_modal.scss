@@ -28,7 +28,7 @@
     box-shadow: $modal-panel-drop-shadow;
 
     .body-modal-share &.modal-share,
-    .body-modal-options &.modal-options {
+    .body-modal-options &.modal-options.visible {
         display: flex;
     }
 

@@ -5,6 +5,7 @@ CAC.Control.TripOptions = (function ($, Modal) {
         currentMode: 'WALK',
         selectors: {
             bodyModalClass: 'modal-options',
+            visibleClass: 'visible',
             bikeOptionsModal: '.modal-options.bike-options',
             bikeShareSelectionModal: '.modal-options.bike-share-select',
             timingModal: '.modal-options.timing-modal',
@@ -53,11 +54,12 @@ CAC.Control.TripOptions = (function ($, Modal) {
     }
 
     function onClose() {
+        $(modalSelector).removeClass(options.selectors.visibleClass);
         console.log('TODO: implement close');
     }
 
     function open() {
-        $(modalSelector).show();
+        $(modalSelector).addClass(options.selectors.visibleClass);
         modal.open();
     }
 
