@@ -107,8 +107,6 @@ var copyVendorJS = function(filter, extraFiles) {
     var bowerStream = copyBowerFiles(filter, extraFiles);
     var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
     vendorStream.add(bowerStream);
-    vendorStream.add(gulp.src(['node_modules/navigo/**/navigo.js'])
-                     .pipe(rename({dirname: ''})));
     // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
     // running jQuery in noConflict mode for JotForms.
     // (Breaks loading Carto layers when it tries to reference $.ajax.)
