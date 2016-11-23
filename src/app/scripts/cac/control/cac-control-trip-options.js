@@ -5,7 +5,9 @@ CAC.Control.TripOptions = (function ($, Modal) {
         currentMode: 'WALK',
         selectors: {
             bodyModalClass: 'modal-options',
+            selectedClass: 'selected', // used to mark selection from a list
             visibleClass: 'visible',
+            listOptions: 'li.modal-list-choice',
 
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
@@ -66,7 +68,6 @@ CAC.Control.TripOptions = (function ($, Modal) {
     }
 
     function onClick(e) {
-        console.log('TODO: implement click');
         var $el = $(e.target);
 
         var menuOptions = isBike ? options.selectors.bikeMenuOptions : options.selectors.walkMenuOptions;
@@ -93,6 +94,7 @@ CAC.Control.TripOptions = (function ($, Modal) {
     function onClose() {
         $(modalSelector).removeClass(options.selectors.visibleClass);
         console.log('TODO: implement close of parent modal');
+        // TODO: should trigger re-query (also check if anything actually changed first?)
     }
 
     /**
@@ -103,18 +105,24 @@ CAC.Control.TripOptions = (function ($, Modal) {
         modal.open();
     }
 
-    function childModalClick() {
+    function childModalClick(e) {
         console.log('TODO: implement click on child modal');
-        // just close it for now
+        var $el = $(e.target);
+
+        // toggle selected class to clicked item
+        // TODO: modify to only do this if a list item clicked
+        $(childModalSelector).find(options.selectors.listOptions)
+            .removeClass(options.selectors.selectedClass);
+
+        $el.addClass(options.selectors.selectedClass);
+
         childModal.close();
     }
 
     function onChildModalClose() {
-        console.log('TODO: implement child modal close');
         $(childModalSelector).removeClass(options.selectors.visibleClass);
         childModal = null;
         childModalSelector = null;
-        // TODO: re-open parent modal?
     }
 
 })(jQuery, CAC.Control.Modal);
