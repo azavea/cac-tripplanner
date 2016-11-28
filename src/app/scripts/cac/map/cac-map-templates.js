@@ -259,35 +259,40 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '{{#each data.legs}}',
                 '<div class="directions-leg" ',
                     'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
-                    // transit step directions
                     '{{#if this.transitLeg}}',
-                    '<div class="directions-step {{modeClass this.mode}}" ',
-                        'data-lat="{{ this.from.lat }}" data-lon="{{ this.from.lon }}">',
-                        '<div class="directions-instruction">Board {{this.agencyName}} {{this.route}} ',
-                        '{{this.headsign}}</div>',
-                        '<div class="directions-time">at {{datetime this.startTime}}</div>',
-                        '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
-                    '</div>',
-                    '<div class="directions-step directions-step-disembark" ',
-                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
-                        '<div class="directions-instruction">Disembark <strong>',
-                            '{{this.to.name}}</strong></div>',
-                    '</div>',
-                    '{{else}}',
-                    // non-tranist step directions
-                    '{{#each steps}}',
-                        '<div class="directions-step {{directionClass this.relativeDirection ../this.mode}}" ',
-                            'data-lat="{{ lat }}" data-lon="{{ lon }}">',
-                            '<div class="directions-instruction">{{directionText}}</div>',
+                        // transit step directions
+                        '<div class="directions-step {{modeClass this.mode}}" ',
+                            'data-lat="{{ this.from.lat }}" data-lon="{{ this.from.lon }}">',
+                            '<div class="directions-instruction">Board {{this.agencyName}} ',
+                            '{{this.route}} {{this.headsign}}</div>',
+                            '<div class="directions-time">at {{datetime this.startTime}}</div>',
                             '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
                         '</div>',
-                    '{{/each}}',
-                    '{{#unless this.lastLeg}}',
-                    '<div class="directions-step directions-step-arrive" ',
-                        'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
-                        '<div class="directions-instruction"><strong>Arrive {{this.to.name}}</strong></div>',
-                    '</div>',
-                    '{{/unless}}', // unless last step
+                        '<div class="directions-step directions-step-disembark" ',
+                            'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                            '<div class="directions-instruction">Disembark <strong>',
+                                '{{this.to.name}}</strong></div>',
+                        '</div>',
+                    '{{else}}',
+                        // non-transit step directions
+                        '{{#each steps}}',
+                            '<div class="directions-step ',
+                                '{{directionClass this.relativeDirection ../this.mode @index}}" ',
+                                'data-lat="{{ lat }}" data-lon="{{ lon }}">',
+                                '<div class="directions-instruction">{{directionText ../this @index}}</div>',
+                                '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
+                            '</div>',
+                        '{{/each}}',
+                        '{{#unless this.lastLeg}}',
+                            '<div class="directions-step ',
+                                '{{#if this.toBikeShareStation}}directions-step-indego"',
+                                '{{else}}directions-step-arrive"{{/if}}',
+                                'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                                '<div class="directions-instruction"><strong>Arrive ',
+                                '{{#if this.toBikeShareStation}}Indego station, {{/if}}',
+                                '{{this.to.name}}</strong></div>',
+                            '</div>',
+                        '{{/unless}}', // unless last step
                     '{{/if}}', // end if transit or not
                 '</div>',
             '{{/each}}',
@@ -299,20 +304,17 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '</div>'
         ].join('');
         var template = Handlebars.compile(source);
-        // set a flag on the last leg, so we can avoid diplaying arriving there right above
-        // also arriving at the final destination
-        templateData.legs[templateData.legs.length - 1].lastLeg = true;
         var html = template({data: templateData});
         return html;
     }
 
     function registerListItemHelpers() {
-        Handlebars.registerHelper('directionClass', function(direction, mode) {
-            return new Handlebars.SafeString(getTurnIconClass(direction, mode));
+        Handlebars.registerHelper('directionClass', function(direction, mode, index) {
+            return new Handlebars.SafeString(getTurnIconClass(direction, mode, index));
         });
 
-        Handlebars.registerHelper('directionText', function () {
-            var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
+        Handlebars.registerHelper('directionText', function (leg, index) {
+            var text = turnText(this, leg, index);
             return new Handlebars.SafeString('<span>' + text + '</span>');
         });
 
@@ -339,13 +341,17 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function getModeClass(modeText) {
         switch (modeText) {
             case 'BICYCLE':
-                return 'directions-step-bike'; // TODO: bike share has separate icon
+                return 'directions-step-bike';
             default:
                 return 'directions-step-' + modeText.toLowerCase();
         }
     }
 
-    function getTurnIconClass(turnType, modeText) {
+    // Get icon class for step. The first step in a leg gets the mode icon (and absolute direction)
+    function getTurnIconClass(turnType, modeText, index) {
+        if (index === 0) {
+            return getModeClass(modeText);
+        }
         switch (turnType) {
             case 'DEPART':
                 return getModeClass(modeText);
@@ -373,13 +379,28 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         }
     }
 
-    function turnText(turn, street, direction) {
+    function getModeText(leg) {
+        switch (leg.mode) {
+            case 'BICYCLE':
+                return 'Bike';
+            case 'WALK':
+                return 'Walk' + (leg.rentedBike ? ' the bike' : '');
+            default:
+                return 'Head';
+        }
+    }
+
+    // Get the text for a step. The first step in a leg gets absolute direction.
+    function turnText(step, leg, index) {
+        var turn = step.relativeDirection;
+        var street = step.streetName;
+        var direction = step.absoluteDirection;
         var turnTextString = '';
         var turnLower = turn.toLowerCase();
         var turnSplit = turnLower.replace('_', ' ');
         street = Utils.abbrevStreetName(street);
-        if (turn === 'DEPART') {
-            turnTextString = 'Head ' + direction.toLowerCase() + ' on ' + street;
+        if (turn === 'DEPART' || index === 0) {
+            turnTextString = getModeText(leg) + ' ' + direction.toLowerCase() + ' on ' + street;
         } else if (turn === 'CONTINUE') {
             turnTextString = 'Continue on to ' + street;
         } else if (turn === 'ELEVATOR') {
