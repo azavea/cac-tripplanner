@@ -11,7 +11,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             selectedClass: 'selected', // used to mark selection from a list
             visibleClass: 'visible',
             listOptions: 'li.modal-list-choice',
+            listOptionsClass: 'modal-list-choice',
             timingOptions: '.modal-options.timing-modal',
+            timeOptionsId: 'options-timing-time',
+            dayOptionsId: 'options-timing-day',
 
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
@@ -83,6 +86,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         // populate date/time picker options
         if (childModalSelector === options.selectors.timingOptions) {
             $(childModalSelector).find('.modal-options-timing-fields').html(timingModalOptions());
+
+            // listen to time/date selector changes
+            $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
+                console.log(e);
+                window.myTarget = $(e.target);
+                console.log('picked:');
+                console.log(Date($(e.target).val()));
+            });
         }
 
         if (childModalSelector) {
@@ -118,13 +129,21 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         console.log('TODO: implement click on child modal');
         var $el = $(e.target);
 
-        // toggle selected class to clicked item
-        // TODO: modify to only do this if a list item clicked
-        // TODO: un-toggles both 'depart at' and 'arrive by' if click elsewhere on timing modal
-        $(childModalSelector).find(options.selectors.listOptions)
-            .removeClass(options.selectors.selectedClass);
+        window.myEl = $el;
 
-        $el.addClass(options.selectors.selectedClass);
+        // toggle selected class to clicked item
+        if ($el.hasClass(options.selectors.listOptionsClass)) {
+            $(childModalSelector).find(options.selectors.listOptions)
+                .removeClass(options.selectors.selectedClass);
+
+            $el.addClass(options.selectors.selectedClass);
+        } else if ($el.is('#' + options.selectors.timeOptionsId)) {
+            console.log('picked a time');
+        } else if ($el.is('#' + options.selectors.dayOptionsId)) {
+            console.log('picked a date');
+        } else {
+            console.log('TODO: handle. clicked modal away from list option');
+        }
 
         // TODO: how to handle close out?
         //childModal.close();
@@ -144,13 +163,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
      */
     function timingModalOptions() {
         var source = [
-            '<li><select class="modal-options-timing-select" name="options-timing-day">',
+            '<li><select class="modal-options-timing-select" id="{{dayOptionsId}}">',
                 '<option value="{{today}}">Today</option>',
                 '{{#each days}}',
                     '<option value="{{this.value}}">{{this.label}}</option>',
                 '{{/each}}',
                 '</select></li>',
-                '<li><select class="modal-options-timing-select" name="options-timing-time">',
+                '<li><select class="modal-options-timing-select" id="{{timeOptionsId}}">',
                     '<option value="{{today}}">Now</option>',
                     '{{#each times}}',
                         '<option value="{{this.value}}">{{this.label}}</option>',
@@ -175,9 +194,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
 
         // round first listed time to 15 minutes
         var ROUND_MS_TO_15_MIN = 15 * 60 * 1000;
-        time = moment(Math.round((+time) / ROUND_MS_TO_15_MIN) * ROUND_MS_TO_15_MIN);
+        time = moment(Math.round((time - ROUND_MS_TO_15_MIN) / ROUND_MS_TO_15_MIN) * ROUND_MS_TO_15_MIN);
 
-        for (var j = 0; j < 40; j++) {
+        // generate list of options in 15 minute increments for next 24 hour window
+        for (var j = 0; j < 96; j++) {
             time = time.add(15, 'minutes');
             times.push({
                 value: time,
@@ -186,7 +206,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         }
 
         var template = Handlebars.compile(source);
-        var html = template({days: days, times: times, today: now});
+        var html = template({
+            dayOptionsId: options.selectors.dayOptionsId,
+            timeOptionsId: options.selectors.timeOptionsId,
+            days: days,
+            times: times,
+            today: now,
+        });
         return html;
     }
 
