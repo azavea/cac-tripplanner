@@ -235,15 +235,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     function itinerary(templateData) {
-        // set a flag on the last leg, so we can avoid diplaying arriving there right above
-        // also arriving at the final destination
-        templateData.legs[templateData.legs.length - 1].lastLeg = true;
-        // And set a flag on legs that end at bike share stations (whether on a bike or walking
-        // to a station), so we can show the icon
-        _.forEach(templateData.legs, function (leg) {
-            leg.toBikeShareStation = leg.to.vertexType === 'BIKESHARE';
-        });
-
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
             '<header class="step-by-step-header">',
@@ -267,7 +258,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '</div>',
             '{{#each data.legs}}',
                 '<div class="directions-leg" ',
-                'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
+                    'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
                     '{{#if this.transitLeg}}',
                         // transit step directions
                         '<div class="directions-step {{modeClass this.mode}}" ',
@@ -283,7 +274,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                                 '{{this.to.name}}</strong></div>',
                         '</div>',
                     '{{else}}',
-                        // non-tranist step directions
+                        // non-transit step directions
                         '{{#each steps}}',
                             '<div class="directions-step ',
                                 '{{directionClass this.relativeDirection ../this.mode @index}}" ',

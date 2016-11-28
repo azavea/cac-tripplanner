@@ -170,14 +170,15 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Check leg from/to place name; if it's an OSM node label, reverse geocode it and update label
-     * Also, if there are waypoints, call the function to merge legs across them.
+     * Does some post-processing for the legs, for cleanup and template convenience
      *
      * @params {Array} legs Itinerary legs returned by OTP
      * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
-     * @returns {Array} Itinerary legs, with prettified place labels
+     * @returns {Array} Itinerary legs, with prettified place labels and other improvements
      */
     function getLegs(legs, hasWaypoints) {
+        // Check leg from/to place name; if it's an OSM node label, reverse geocode it
+        // and update label
         var newLegs = _.map(legs, function(leg) {
             if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
@@ -191,10 +192,24 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             }
             return leg;
         });
+
+        // If there are waypoints, call the function to merge legs across them.
         if (hasWaypoints) {
             newLegs = mergeLegsAcrossWaypoints(newLegs);
         }
+
+        // Add some derived data to be used in the template:
+        // - Format duration
         _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
+        // - Set a flag on the last leg, so we can avoid diplaying arriving there right above
+        //   also arriving at the final destination
+        newLegs[newLegs.length - 1].lastLeg = true;
+        // - And set a flag on legs that end at bike share stations (whether on a bike or walking
+        //   to a station), so we can show the icon
+        _.forEach(newLegs, function (leg) {
+            leg.toBikeShareStation = leg.to.vertexType === 'BIKESHARE';
+        });
+
         return newLegs;
     }
 
