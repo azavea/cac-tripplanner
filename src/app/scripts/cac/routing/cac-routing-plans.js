@@ -13,8 +13,8 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
      *
      * @param {array} coordsFrom The coords in lat-lng which we would like to travel from
      * @param {array} coordsTo The coords in lat-lng which we would like to travel to
-     * @param {Object} moment.js date/time object for when the trip should be
-     * @param {String} Modes of travel to use for this trip
+     * @param {Object} when moment.js date/time object for when the trip should be
+     * @param {String} extraOptions Modes of travel to use for this trip, other options
      *
      * @return {promise} The promise object which - if successful - resolves to a
      *                   an object with itineraries

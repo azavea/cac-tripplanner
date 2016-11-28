@@ -1,4 +1,7 @@
-CAC.Control.TripOptions = (function ($, Modal) {
+/**
+ * Manage modals used to set and display trip planning options.
+ */
+CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
     'use strict';
 
     var defaults = {
@@ -8,6 +11,7 @@ CAC.Control.TripOptions = (function ($, Modal) {
             selectedClass: 'selected', // used to mark selection from a list
             visibleClass: 'visible',
             listOptions: 'li.modal-list-choice',
+            timingOptions: '.modal-options.timing-modal',
 
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
@@ -76,6 +80,11 @@ CAC.Control.TripOptions = (function ($, Modal) {
             return $el.hasClass(key);
         });
 
+        // populate date/time picker options
+        if (childModalSelector === options.selectors.timingOptions) {
+            $(childModalSelector).find('.modal-options-timing-fields').html(timingModalOptions());
+        }
+
         if (childModalSelector) {
             childModal = new Modal({
                 modalSelector: childModalSelector,
@@ -111,12 +120,14 @@ CAC.Control.TripOptions = (function ($, Modal) {
 
         // toggle selected class to clicked item
         // TODO: modify to only do this if a list item clicked
+        // TODO: un-toggles both 'depart at' and 'arrive by' if click elsewhere on timing modal
         $(childModalSelector).find(options.selectors.listOptions)
             .removeClass(options.selectors.selectedClass);
 
         $el.addClass(options.selectors.selectedClass);
 
-        childModal.close();
+        // TODO: how to handle close out?
+        //childModal.close();
     }
 
     function onChildModalClose() {
@@ -125,4 +136,58 @@ CAC.Control.TripOptions = (function ($, Modal) {
         childModalSelector = null;
     }
 
-})(jQuery, CAC.Control.Modal);
+    /**
+     * Helper to generate options lists for days and times available for planning trip.
+     *
+     * @returns {String} HTML snippet with list items to replace content inside
+                         modal-options-timing-fields
+     */
+    function timingModalOptions() {
+        var source = [
+            '<li><select class="modal-options-timing-select" name="options-timing-day">',
+                '<option value="{{today}}">Today</option>',
+                '{{#each days}}',
+                    '<option value="{{this.value}}">{{this.label}}</option>',
+                '{{/each}}',
+                '</select></li>',
+                '<li><select class="modal-options-timing-select" name="options-timing-time">',
+                    '<option value="{{today}}">Now</option>',
+                    '{{#each times}}',
+                        '<option value="{{this.value}}">{{this.label}}</option>',
+                    '{{/each}}',
+                '</select></li>'
+        ].join('');
+
+        var now = moment();
+        var day = now;
+        var time = now;
+
+        var days = [];
+        for (var i = 1; i < 8; i++) {
+            day = now.add(1, 'days');
+            days.push({
+                value: day,
+                label: day.format('ddd MM/DD')
+            });
+        }
+
+        var times = [];
+
+        // round first listed time to 15 minutes
+        var ROUND_MS_TO_15_MIN = 15 * 60 * 1000;
+        time = moment(Math.round((+time) / ROUND_MS_TO_15_MIN) * ROUND_MS_TO_15_MIN);
+
+        for (var j = 0; j < 40; j++) {
+            time = time.add(15, 'minutes');
+            times.push({
+                value: time,
+                label: time.format('h:mm a')
+            });
+        }
+
+        var template = Handlebars.compile(source);
+        var html = template({days: days, times: times, today: now});
+        return html;
+    }
+
+})(jQuery, Handlebars, moment, CAC.Control.Modal);
