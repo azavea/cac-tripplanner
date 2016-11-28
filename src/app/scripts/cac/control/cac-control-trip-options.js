@@ -193,8 +193,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         var times = [];
 
         // round first listed time to 15 minutes
-        var ROUND_MS_TO_15_MIN = 15 * 60 * 1000;
-        time = moment(Math.round((time - ROUND_MS_TO_15_MIN) / ROUND_MS_TO_15_MIN) * ROUND_MS_TO_15_MIN);
+        var MS_TO_15_MIN = 15 * 60 * 1000;
+        time = moment(Math.round((time - (MS_TO_15_MIN / 2)) / MS_TO_15_MIN) * MS_TO_15_MIN);
 
         // generate list of options in 15 minute increments for next 24 hour window
         for (var j = 0; j < 96; j++) {
