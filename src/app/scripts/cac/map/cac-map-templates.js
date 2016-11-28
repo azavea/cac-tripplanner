@@ -288,7 +288,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '<div class="directions-step ',
                                 '{{directionClass this.relativeDirection ../this.mode @index}}" ',
                                 'data-lat="{{ lat }}" data-lon="{{ lon }}">',
-                                '<div class="directions-instruction">{{directionText ../this.mode @index}}</div>',
+                                '<div class="directions-instruction">{{directionText ../this @index}}</div>',
                                 '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
                             '</div>',
                         '{{/each}}',
@@ -322,9 +322,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             return new Handlebars.SafeString(getTurnIconClass(direction, mode, index));
         });
 
-        Handlebars.registerHelper('directionText', function (mode, index) {
-            var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection,
-                                mode, index);
+        Handlebars.registerHelper('directionText', function (leg, index) {
+            var text = turnText(this, leg, index);
             return new Handlebars.SafeString('<span>' + text + '</span>');
         });
 
@@ -389,25 +388,28 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         }
     }
 
-    function getModeText(mode) {
-        switch (mode) {
+    function getModeText(leg) {
+        switch (leg.mode) {
             case 'BICYCLE':
                 return 'Bike';
             case 'WALK':
-                return 'Walk';
+                return 'Walk' + (leg.rentedBike ? ' the bike' : '');
             default:
                 return 'Head';
         }
     }
 
     // Get the text for a step. The first step in a leg gets absolute direction.
-    function turnText(turn, street, direction, mode, index) {
+    function turnText(step, leg, index) {
+        var turn = step.relativeDirection;
+        var street = step.streetName;
+        var direction = step.absoluteDirection;
         var turnTextString = '';
         var turnLower = turn.toLowerCase();
         var turnSplit = turnLower.replace('_', ' ');
         street = Utils.abbrevStreetName(street);
         if (turn === 'DEPART' || index === 0) {
-            turnTextString = getModeText(mode) + ' ' + direction.toLowerCase() + ' on ' + street;
+            turnTextString = getModeText(leg) + ' ' + direction.toLowerCase() + ' on ' + street;
         } else if (turn === 'CONTINUE') {
             turnTextString = 'Continue on to ' + street;
         } else if (turn === 'ELEVATOR') {
