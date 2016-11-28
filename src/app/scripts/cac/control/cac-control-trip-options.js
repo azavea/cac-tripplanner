@@ -13,6 +13,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             listOptions: 'li.modal-list-choice',
             listOptionsClass: 'modal-list-choice',
             timingOptions: '.modal-options.timing-modal',
+            timingFields: '.modal-options-timing-fields',
             timeOptionsId: 'options-timing-time',
             dayOptionsId: 'options-timing-day',
 
@@ -85,14 +86,31 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
 
         // populate date/time picker options
         if (childModalSelector === options.selectors.timingOptions) {
-            $(childModalSelector).find('.modal-options-timing-fields').html(timingModalOptions());
+            // first read out previously set value, if any
+            var selectedDay = $('#' + options.selectors.dayOptionsId).val();
+            var selectedTime = $('#' + options.selectors.timeOptionsId).val();
+
+            // set time and date selector options
+            $(childModalSelector).find(options.selectors.timingFields).html(timingModalOptions());
+
+            // set back previous selections for day and time
+            if (selectedDay) {
+                $(options.selectors.timingFields).find('#' + options.selectors.dayOptionsId)
+                    .val(selectedDay);
+            }
+
+            if (selectedTime) {
+                $(options.selectors.timingFields).find('#' + options.selectors.timeOptionsId)
+                    .val(selectedTime);
+            }
 
             // listen to time/date selector changes
             $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
-                console.log(e);
-                window.myTarget = $(e.target);
-                console.log('picked:');
-                console.log(Date($(e.target).val()));
+                var $target = $(e.target);
+                console.log(moment(parseInt($target.val())));
+                $target.find('option').removeClass('selected');
+
+                // TODO: set and read from storage
             });
         }
 
@@ -177,15 +195,15 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
                 '</select></li>'
         ].join('');
 
-        var now = moment();
-        var day = now;
-        var time = now;
+        var time = moment();
+        var today = moment().startOf('date'); // set to 12 AM to normalize
+        var day = today.clone();
 
         var days = [];
         for (var i = 1; i < 8; i++) {
-            day = now.add(1, 'days');
+            day = day.add(1, 'days');
             days.push({
-                value: day,
+                value: day.unix(),
                 label: day.format('ddd MM/DD')
             });
         }
@@ -200,7 +218,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         for (var j = 0; j < 96; j++) {
             time = time.add(15, 'minutes');
             times.push({
-                value: time,
+                value: time.unix(),
                 label: time.format('h:mm a')
             });
         }
@@ -211,8 +229,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             timeOptionsId: options.selectors.timeOptionsId,
             days: days,
             times: times,
-            today: now,
+            today: today,
         });
+
         return html;
     }
 
