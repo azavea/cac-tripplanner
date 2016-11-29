@@ -123,10 +123,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             // listen to time/date selector changes
             $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
                 var $target = $(e.target);
-                console.log(moment(parseInt($target.val())));
-                $target.find('option').removeClass('selected');
 
                 // TODO: set and read from storage
+                console.log(moment(parseInt($target.val())));
             });
         }
 
@@ -159,11 +158,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
 
             $el.addClass(options.selectors.selectedClass);
 
-            // close child modal and re-open parent, showing what got selected
+            // close child modal once option picked
             // should not happen with timing modal, which has its own close button
             if (childModalSelector !== options.selectors.timingOptions) {
                 childModal.close();
-                // TODO: re-open parent
             }
 
         } // else: user clicked somewhere on modal that is not an option; ignore
@@ -173,6 +171,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         $(childModalSelector).removeClass(options.selectors.visibleClass);
         childModal = null;
         childModalSelector = null;
+
+        // re-open parent modal on child modal close, to show selections
+        if (childModalSelector !== options.selectors.timingOptions) {
+            // rei-initialize first, to turn the click handlers back on
+            initialize();
+            open();
+        }
+
     }
 
     /**
