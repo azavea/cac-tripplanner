@@ -16,6 +16,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             timingFields: '.modal-options-timing-fields',
             timeOptionsId: 'options-timing-time',
             dayOptionsId: 'options-timing-day',
+            departAt: '#departAt',
 
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
@@ -244,7 +245,18 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
      * Event handler for user click on 'clear' button on timing modal
      */
     function onTimingModalClearClick() {
-        console.log('TODO: clear timing modal');
-    }
+        var $timing = $(options.selectors.timingFields);
+        var $day = $timing.find('#' + options.selectors.dayOptionsId);
+        var $time = $timing.find('#' + options.selectors.timeOptionsId);
+
+        // set date and time selectors to first option, for today/now
+        $day.val($day.find('option:first').val());
+        $time.val($time.find('option:first').val());
+
+        // reset to 'depart at'
+        $(childModalSelector).find(options.selectors.departAt).click();
+
+        // TODO: update user preferences as well
+}
 
 })(jQuery, Handlebars, moment, CAC.Control.Modal);
