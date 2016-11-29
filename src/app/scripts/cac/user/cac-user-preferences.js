@@ -22,8 +22,8 @@ CAC.User.Preferences = (function(Storages, _) {
         arriveBy: false, // depart at set time, by default
         bikeTriangle: 'neutral',
         exploreTime: 20,
-        maxWalk: 2,
-        method: 'explore',
+        maxWalk: 482802, // in meters; set large, since not user-controllable
+        method: 'directions',
         mode: 'TRANSIT,WALK',
         origin: undefined,
         originText: '',
