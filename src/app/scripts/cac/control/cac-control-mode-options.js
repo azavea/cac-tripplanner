@@ -4,22 +4,22 @@ CAC.Control.ModeOptions = (function ($) {
     var defaults = {
         // Note:  the three bike options must sum to 1, or OTP won't plan the trip
         bikeTriangle: {
-            neutral: {
+            any: {
                 triangleSafetyFactor: 0.34,
                 triangleSlopeFactor: 0.33,
                 triangleTimeFactor: 0.33
             },
-            flatter: {
+            flat: {
                 triangleSafetyFactor: 0.17,
                 triangleSlopeFactor: 0.66,
                 triangleTimeFactor: 0.17
             },
-            faster: {
+            fast: {
                 triangleSafetyFactor: 0.17,
                 triangleSlopeFactor: 0.17,
                 triangleTimeFactor: 0.66
             },
-            safer: {
+            safe: {
                 triangleSafetyFactor: 0.66,
                 triangleSlopeFactor: 0.17,
                 triangleTimeFactor: 0.17

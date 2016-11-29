@@ -49,7 +49,7 @@
 
         it('Should fall back on default value when not set by user', function(done) {
             // is in defaults but not in user settings
-            expect(UserPreferences.getPreference('bikeTriangle')).toEqual('neutral');
+            expect(UserPreferences.getPreference('bikeTriangle')).toEqual('Any');
 
             // is in defaults, but overridden by user setting
             UserPreferences.setPreference('bikeTriangle', 'warp7');

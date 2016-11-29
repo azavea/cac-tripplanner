@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
+CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Typeahead,
                                     UserPreferences, Utils) {
 
     'use strict';
@@ -129,9 +129,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
-        // FIXME: updated date/time control
-        // FIXME: moment not explicitly loaded here. use in UserPreferences?
-        var date = moment();
+        var date = UserPreferences.getPreference('dateTime') || moment();
 
         var mode = modeOptionsControl.getMode();
         var arriveBy = isArriveBy(); // depart at time by default
@@ -151,9 +149,15 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            $.extend(otpOptions, {optimize: 'TRIANGLE'},
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle').toLowerCase();
+
+            if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'},
                      modeOptionsControl.options.bikeTriangle[bikeTriangle]);
+            } else {
+                console.error('unrecognized bike triangle option ' + bikeTriangle);
+            }
+
         } else {
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
@@ -503,5 +507,5 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         }
     }
 
-})(_, jQuery, CAC.Control, CAC.Search.Geocoder,
+})(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
