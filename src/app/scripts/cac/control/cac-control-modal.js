@@ -80,8 +80,8 @@ CAC.Control.Modal = (function ($) {
     }
 
     function _clear(event) {
-        if (this.options.onClear) {
-            return this.options.onClear(event);
+        if (this.options.clearHandler) {
+            return this.options.clearHandler(event);
         }
     }
 

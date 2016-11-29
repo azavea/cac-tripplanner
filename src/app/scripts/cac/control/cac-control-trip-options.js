@@ -118,7 +118,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             }
 
             // set 'clear' button event handler for timing options modal
-            childModalOptions.onClear = onTimingModalClearClick;
+            childModalOptions.clearHandler = onTimingModalClearClick;
 
             // listen to time/date selector changes
             $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
@@ -138,7 +138,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
 
     function onClose() {
         $(modalSelector).removeClass(options.selectors.visibleClass);
-        console.log('TODO: implement close of parent modal');
         // TODO: should trigger re-query (also check if anything actually changed first?)
     }
 
@@ -151,7 +150,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
     }
 
     function childModalClick(e) {
-        console.log('TODO: implement click on child modal');
         var $el = $(e.target);
 
         // toggle selected class to clicked item
@@ -160,16 +158,15 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
                 .removeClass(options.selectors.selectedClass);
 
             $el.addClass(options.selectors.selectedClass);
-        } else if ($el.is('#' + options.selectors.timeOptionsId)) {
-            console.log('picked a time');
-        } else if ($el.is('#' + options.selectors.dayOptionsId)) {
-            console.log('picked a date');
-        } else {
-            console.log('TODO: handle. clicked modal away from list option');
-        }
 
-        // TODO: how to handle close out?
-        //childModal.close();
+            // close child modal and re-open parent, showing what got selected
+            // should not happen with timing modal, which has its own close button
+            if (childModalSelector !== options.selectors.timingOptions) {
+                childModal.close();
+                // TODO: re-open parent
+            }
+
+        } // else: user clicked somewhere on modal that is not an option; ignore
     }
 
     function onChildModalClose() {
