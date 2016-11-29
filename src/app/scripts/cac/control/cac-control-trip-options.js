@@ -84,6 +84,18 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             return $el.hasClass(key);
         });
 
+        if (!childModalSelector) {
+            console.error('could not find child menu for selected option');
+            return;
+        }
+
+        var childModalOptions = {
+            modalSelector: childModalSelector,
+            bodyModalClass: options.selectors.bodyModalClass,
+            clickHandler: childModalClick,
+            onClose: onChildModalClose
+        };
+
         // populate date/time picker options
         if (childModalSelector === options.selectors.timingOptions) {
             // first read out previously set value, if any
@@ -104,6 +116,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
                     .val(selectedTime);
             }
 
+            // set 'clear' button event handler for timing options modal
+            childModalOptions.onClear = onTimingModalClearClick;
+
             // listen to time/date selector changes
             $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
                 var $target = $(e.target);
@@ -114,19 +129,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             });
         }
 
-        if (childModalSelector) {
-            childModal = new Modal({
-                modalSelector: childModalSelector,
-                bodyModalClass: options.selectors.bodyModalClass,
-                clickHandler: childModalClick,
-                onClose: onChildModalClose
-            });
-            modal.close();
-            childModal.open();
-            $(childModalSelector).addClass(options.selectors.visibleClass);
-        } else {
-            console.error('could not find child menu for selected option');
-        }
+        childModal = new Modal(childModalOptions);
+        modal.close();
+        childModal.open();
+        $(childModalSelector).addClass(options.selectors.visibleClass);
     }
 
     function onClose() {
@@ -146,8 +152,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
     function childModalClick(e) {
         console.log('TODO: implement click on child modal');
         var $el = $(e.target);
-
-        window.myEl = $el;
 
         // toggle selected class to clicked item
         if ($el.hasClass(options.selectors.listOptionsClass)) {
@@ -215,7 +219,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         time = moment(Math.round((time - (MS_TO_15_MIN / 2)) / MS_TO_15_MIN) * MS_TO_15_MIN);
 
         // generate list of options in 15 minute increments for next 24 hour window
-        for (var j = 0; j < 96; j++) {
+        var QTR_HRS_IN_DAY = 96;
+        for (var j = 0; j < QTR_HRS_IN_DAY; j++) {
             time = time.add(15, 'minutes');
             times.push({
                 value: time.unix(),
@@ -233,6 +238,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         });
 
         return html;
+    }
+
+    /**
+     * Event handler for user click on 'clear' button on timing modal
+     */
+    function onTimingModalClearClick() {
+        console.log('TODO: clear timing modal');
     }
 
 })(jQuery, Handlebars, moment, CAC.Control.Modal);

@@ -7,6 +7,7 @@ CAC.Control.Modal = (function ($) {
         selectors: {
             body: '#body-div',
             buttonClose: '.btn-close-modal',
+            buttonClear: '.btn-reset-modal',
             clickHandlerFilter: 'li',
             modal: '.modal-overlay'
         },
@@ -34,13 +35,18 @@ CAC.Control.Modal = (function ($) {
 
         this.open = _open.bind(this);
         this.close = _close.bind(this);
+        this.clear = _clear.bind(this);
 
+        // bind events; these must also be unbound during _close
         $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
             this.options.selectors.clickHandlerFilter).on('click',
             this.options.clickHandler);
         $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
             this.options.selectors.buttonClose).on('click',
             this.close);
+        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
+            this.options.selectors.buttonClear).on('click',
+            this.clear);
     }
 
     function _open(event) {
@@ -65,9 +71,17 @@ CAC.Control.Modal = (function ($) {
             this.options.selectors.clickHandlerFilter).off('click');
         $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
             this.options.selectors.buttonClose).off('click');
+        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
+            this.options.selectors.buttonClear).off('clear');
 
         if (this.options.onClose) {
             return this.options.onClose(event);
+        }
+    }
+
+    function _clear(event) {
+        if (this.options.onClear) {
+            return this.options.onClear(event);
         }
     }
 
