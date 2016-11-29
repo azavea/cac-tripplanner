@@ -83,8 +83,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, planTrip);
         modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, planTrip);
 
-        $(options.selectors.modes).change($.proxy(changeMode, this));
-
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
         // TODO: updated time/date control
@@ -264,11 +262,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
     }, DIRECTION_THROTTLE_MILLIS);
 
     return DirectionsControl;
-
-    function changeMode() {
-        modeOptionsControl.changeMode();
-        planTrip();
-    }
 
     function clearDirections() {
         mapControl.setDirectionsMarkers(null, null);

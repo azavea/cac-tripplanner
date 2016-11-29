@@ -61,7 +61,6 @@ CAC.Control.ModeOptions = (function ($) {
 
     ModeOptionsControl.prototype = {
         initialize: initialize,
-        changeMode: changeMode,
         events: events,
         eventNames: eventNames,
         getMode: getMode,
@@ -93,23 +92,6 @@ CAC.Control.ModeOptions = (function ($) {
             var active = $(this).find('i').hasClass(options.selectors.transitIconOnClass);
             events.trigger(eventNames.transitChanged, active);
         });
-    }
-
-    /**
-     * Show/hide sidebar options based on the selected mode.
-     * Expects both tabs to have the same selector names for the toggleable divs.
-     */
-    function changeMode() {
-        var mode = getMode();
-        if (mode && mode.indexOf('BICYCLE') > -1) {
-            $(options.selectors.bikeTriangleDiv).removeClass('hidden');
-            $(options.selectors.maxWalkDiv).addClass('hidden');
-            $(options.selectors.wheelchairDiv).addClass('hidden');
-        } else {
-            $(options.selectors.bikeTriangleDiv).addClass('hidden');
-            $(options.selectors.maxWalkDiv).removeClass('hidden');
-            $(options.selectors.wheelchairDiv).removeClass('hidden');
-        }
     }
 
     /**
