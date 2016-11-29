@@ -221,6 +221,14 @@
             border: 1px solid $white;
             background-color: $gophillygo-blue;
 
+            &.error {
+                background-color: $gophillygo-red;
+
+                input {
+                    background-color: $gophillygo-red !important;
+                }
+            }
+
             &.directions-from {
                 border-bottom-width: 0;
             }
@@ -249,7 +257,7 @@
             font-size: 1.4rem;
 
             .body-map & {
-                background-color: $gophillygo-blue !important;
+                background-color: $gophillygo-blue;
                 color: $white !important;
                 font-weight: $font-weight-medium;
                 line-height: 30px;
