@@ -476,12 +476,12 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
 
     /**
-     * When first navigating to this page, check for user preferences to load.
+     * When first navigating to the page, check if origin and destination already set.
+     * Go directly to trip plan if so.
      */
     function setFromUserPreferences() {
-        // Look up origin with setDefault=false to allow it to be blank
-        var origin = UserPreferences.getPreference('origin', false);
-        var originText = UserPreferences.getPreference('originText', false);
+        var origin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
 

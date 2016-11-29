@@ -17,7 +17,7 @@
 
         it('Should fetch a default setting', function(done) {
             var val = UserPreferences.getPreference('method');
-            expect(val).toEqual('explore');
+            expect(val).toEqual('directions');
             done();
         });
 

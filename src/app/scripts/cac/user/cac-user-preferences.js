@@ -30,6 +30,7 @@ CAC.User.Preferences = (function(_) {
     };
 
     var module = {
+        isDefault: isDefault,
         getPreference: getPreference,
         setPreference: setPreference,
         setLocation: setLocation,
@@ -41,22 +42,16 @@ CAC.User.Preferences = (function(_) {
      * Fetch stored setting.
      *
      * @param {String} preference Name of setting to fetch
-     * @param {Boolean} [setDefault=true] If false, don't set the default value if no value is set
      * @return {Object} setting found in storage, or default if none found
      */
-    function getPreference(preference, setDefault) {
+    function getPreference(preference) {
         var val = storage.get(preference);
         if (val) {
             val = JSON.parse(val);
         }
 
-        // Default to true
-        setDefault = _.isUndefined(setDefault) || setDefault;
-
-        // If a typeahead is cleared, we want to grab the default
-        if (setDefault && !val || val === '') {
+        if (!val || val === '') {
             val = defaults[preference];
-            setPreference(preference, val);
         }
         return val;
     }
@@ -69,6 +64,16 @@ CAC.User.Preferences = (function(_) {
      */
     function setPreference(preference, val) {
         storage.set(preference, JSON.stringify(val));
+    }
+
+    /**
+     * Check if value has been set by user, or is a default.
+     *
+     * @param {String} preference Name of setting to check
+     * @return {Boolean} True if getPreference will return a default value
+     */
+    function isDefault(preference) {
+        return !storage.get(preference);
     }
 
     /**
