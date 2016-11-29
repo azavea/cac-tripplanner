@@ -393,8 +393,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         directions[key] = null;
         UserPreferences.clearLocation(key);
         mapControl.clearDirectionsMarker(key);
-        // hide reverse origin/destination button
-        $(options.selectors.reverseButton).css('visibility', 'hidden');
     }
 
     function onTypeaheadSelected(event, key, location) {
@@ -406,9 +404,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             setDirections(key, null);
             return;
         }
-
-        // show reverse origin/destination button
-        $(options.selectors.reverseButton).css('visibility', 'visible');
 
         // save text for address to preferences
         UserPreferences.setLocation(key, location);

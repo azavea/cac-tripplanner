@@ -22,7 +22,8 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     var defaults = {
         highlight: true,
         minLength: 1, // empty input is checked differently, 0 minLength no longer needed
-        autoselect: true
+        hint: false,
+        autoselect: false
     };
     var defaultTypeaheadKey = 'default';
     var eventNames = {
