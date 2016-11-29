@@ -3,15 +3,26 @@ CAC.User.Preferences = (function(_) {
 
 
     // Initialize preference storage object.
-    // It just uses an 'options' dictionary, so preferences lives only as long as
-    // the page for which this is initialized.
+    // All values in storages should be stringified first.
+    // Setting to a falsy value will remove the object from storages;
+    // if not in storages, defaults will be used as fallback.
+    // Stringified undefined will remove the value from storage.
+    // Preferences lives only as long as the page for which this is initialized.
     // With this setup we have the flexibility to store all or some of the parameters to local
     // storage if we decide that's valuable, and components that use these parameters don't need
     // to know the difference.
     var options = {};
     var storage = {
-        set: function (pref, val) { options[pref] = val; },
-        get: function (pref) { return options[pref]; }
+        set: function (pref, val) {
+            if(!!val) {
+                options[pref] = val;
+            } else {
+                delete options[pref];
+            }
+        },
+        get: function (pref) {
+            return _.has(options, pref) ? options[pref] : undefined;
+        }
     };
 
     var defaults = {
@@ -21,9 +32,7 @@ CAC.User.Preferences = (function(_) {
         maxWalk: 482802, // in meters; set large, since not user-controllable
         method: 'directions',
         mode: 'TRANSIT,WALK',
-        origin: undefined,
         originText: '',
-        destination: undefined,
         destinationText: '',
         waypoints: [],
         wheelchair: false
@@ -34,9 +43,18 @@ CAC.User.Preferences = (function(_) {
         getPreference: getPreference,
         setPreference: setPreference,
         setLocation: setLocation,
-        clearLocation: clearLocation
+        clearLocation: clearLocation,
+        clearSettings: clearSettings
     };
     return module;
+
+    /**
+     * Wipe out all user settings.
+     * Helpful to reset state without forcing a page refresh.
+     */
+    function clearSettings() {
+        options = {};
+    }
 
     /**
      * Fetch stored setting.
@@ -46,12 +64,10 @@ CAC.User.Preferences = (function(_) {
      */
     function getPreference(preference) {
         var val = storage.get(preference);
-        if (val) {
-            val = JSON.parse(val);
-        }
-
         if (!val || val === '') {
-            val = defaults[preference];
+            val = _.has(defaults, preference) ? defaults[preference] : undefined;
+        } else {
+            val = JSON.parse(val);
         }
         return val;
     }
@@ -73,7 +89,7 @@ CAC.User.Preferences = (function(_) {
      * @return {Boolean} True if getPreference will return a default value
      */
     function isDefault(preference) {
-        return !storage.get(preference);
+        return !_.has(options, preference) && _.has(defaults, preference);
     }
 
     /**
