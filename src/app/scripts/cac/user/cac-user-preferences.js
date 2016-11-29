@@ -1,13 +1,9 @@
-CAC.User.Preferences = (function(Storages, _) {
+CAC.User.Preferences = (function(_) {
     'use strict';
 
-    // TODO: figure out local storage strategy
-    // set up local storage
-    // var namespaceStorage = Storages.initNamespaceStorage('cac_otp');
-    // var storage = namespaceStorage.localStorage;
 
     // Initialize preference storage object.
-    // Currently it just uses an 'options' dictionary, so preferences lives only as long as
+    // It just uses an 'options' dictionary, so preferences lives only as long as
     // the page for which this is initialized.
     // With this setup we have the flexibility to store all or some of the parameters to local
     // storage if we decide that's valuable, and components that use these parameters don't need
@@ -96,4 +92,4 @@ CAC.User.Preferences = (function(Storages, _) {
         setPreference(key + 'Text', undefined);
     }
 
-})(Storages, _);
+})(_);
