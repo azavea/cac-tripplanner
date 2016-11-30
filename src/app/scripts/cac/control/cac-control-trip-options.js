@@ -120,12 +120,33 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 time.minutes(dt.minutes());
                 time.startOf('minute'); // drop seconds/milliseconds
 
-                // FIXME: handle if option does not exist in list
-                $(options.selectors.timingFields).find('#' + options.selectors.dayOptionsId)
-                    .val(day.unix().toString());
+                var $day = $(options.selectors.timingFields)
+                    .find('#' + options.selectors.dayOptionsId);
 
-                $(options.selectors.timingFields).find('#' + options.selectors.timeOptionsId)
-                    .val(time.unix().toString());
+                var $time = $(options.selectors.timingFields)
+                    .find('#' + options.selectors.timeOptionsId);
+
+                // check if value is an available option before selecting it;
+                // if not (more than a week passed?) will revert to default of 'now'
+                if ($day.find('option[value="' + day.unix().toString() + '"]').length > 0) {
+                    $day.val(day.unix().toString());
+                } else {
+                    UserPreferences.setPreference('dateTime', undefined);
+                }
+
+                if ($time.find('option[value="' + time.unix().toString() + '"]').length > 0) {
+                    $time.val(time.unix().toString());
+                } else {
+                    // add a day to find times wrapped past midnight
+                    time.add(1, 'day');
+                    if ($time.find('option[value="' + time.unix().toString() + '"]').length > 0) {
+                        $time.val(time.unix().toString());
+                    } else {
+                        UserPreferences.setPreference('dateTime', undefined);
+                        // unset day as well
+                        $day.val($day.find('option:first').val());
+                    }
+                }
             }
         }
 
