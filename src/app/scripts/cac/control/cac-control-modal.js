@@ -50,6 +50,7 @@ CAC.Control.Modal = (function ($) {
         }
 
         // bind events; these must also be unbound during _close
+
         $(this.options.selectors.modalOption).on('click', this.options.clickHandler);
         $(this.options.selectors.modalCloseButton).on('click', this.close);
         $(this.options.selectors.modalClearButton).on('click', this.clear);

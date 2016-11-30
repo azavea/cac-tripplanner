@@ -3,7 +3,7 @@
  *  View control for the sidebar directions list
  *
  */
-CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
+CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
 
     'use strict';
 
@@ -26,6 +26,7 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
             facebookShareButton: '.modal-list-facebook',
             twitterShareButton: '.modal-list-twitter',
             googlePlusShareButton: '.modal-list-google',
+            shareModalButton: '.share-directions',
             stepByStepClass: 'body-step-by-step',
             sidebarBannerClass: 'body-has-sidebar-banner'
         }
@@ -98,6 +99,12 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
         $container.empty();
         $container.append($html);
 
+        // listen to share button
+        // (unnecessary to un-bind, since html gets replaced with itinerary)
+        $container.find(options.selectors.shareModalButton).on('click', function() {
+            new ShareModal({}).open();
+        });
+
         // Show alert with link to transit agency bicycle policy for bike+transit itineraries
         if (_.includes(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
             var alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
@@ -146,4 +153,4 @@ CAC.Control.DirectionsList = (function (_, $, MapTemplates) {
         }
     }
 
-})(_, jQuery, CAC.Map.Templates);
+})(_, jQuery, CAC.Share.ShareModal, CAC.Map.Templates);

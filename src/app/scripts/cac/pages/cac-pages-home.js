@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal, TabControl, Templates,
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl, Templates,
                             UserPreferences, UrlRouter) {
     'use strict';
 
@@ -34,8 +34,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
 
     var options = {};
     var modeOptionsControl = null;
-    var shareModal = null;
-
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
@@ -89,8 +87,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
             tabControl: tabControl,
             urlRouter: urlRouter
         });
-
-        shareModal = new ShareModal({});
 
         _setupEvents();
     };
@@ -182,5 +178,5 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, ShareModal
         directionsControl.moveOriginDestination('destination', position);
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Share.ShareModal,
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions,
     CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
