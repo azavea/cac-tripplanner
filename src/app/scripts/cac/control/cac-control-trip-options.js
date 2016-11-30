@@ -1,7 +1,7 @@
 /**
  * Manage modals used to set and display trip planning options.
  */
-CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
+CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferences) {
     'use strict';
 
     var defaults = {
@@ -99,34 +99,39 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
 
         // populate date/time picker options
         if (childModalSelector === options.selectors.timingOptions) {
-            // first read out previously set value, if any
-            var selectedDay = $('#' + options.selectors.dayOptionsId).val();
-            var selectedTime = $('#' + options.selectors.timeOptionsId).val();
-
-            // set time and date selector options
-            $(childModalSelector).find(options.selectors.timingFields).html(timingModalOptions());
-
-            // set back previous selections for day and time
-            if (selectedDay) {
-                $(options.selectors.timingFields).find('#' + options.selectors.dayOptionsId)
-                    .val(selectedDay);
-            }
-
-            if (selectedTime) {
-                $(options.selectors.timingFields).find('#' + options.selectors.timeOptionsId)
-                    .val(selectedTime);
-            }
 
             // set 'clear' button event handler for timing options modal
             childModalOptions.clearHandler = onTimingModalClearClick;
 
-            // listen to time/date selector changes
-            $(childModalSelector).find('#' + options.selectors.dayOptionsId).change(function(e) {
-                var $target = $(e.target);
+            // set time and date selector options
+            $(childModalSelector).find(options.selectors.timingFields).html(timingModalOptions());
 
-                // TODO: set and read from storage
-                console.log(moment(parseInt($target.val())));
-            });
+            // TODO: also read/set arriveBy selection
+
+            // Attempt to set date/time selection back using what's stored in preferences.
+            // If either or both not found, will default to today/now.
+            var storedDateTime = UserPreferences.getPreference('dateTime');
+            console.log(storedDateTime);
+
+            if (storedDateTime) {
+                var dt = moment(storedDateTime);
+
+                console.log(dt.toString());
+                window.dt = dt;
+
+                // FIXME: I am so very broken. :-(
+                ////////////////////////////////////
+                var day = dt.clone().startOf('date');
+                var time = moment();
+                time.hours(dt.hours());
+                time.minutes(dt.minutes());
+
+                $(options.selectors.timingFields).find('#' + options.selectors.dayOptionsId)
+                    .val(day.unix().toString());
+
+                $(options.selectors.timingFields).find('#' + options.selectors.timeOptionsId)
+                    .val(time.unix().toString());
+            }
         }
 
         childModal = new Modal(childModalOptions);
@@ -168,17 +173,50 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
     }
 
     function onChildModalClose() {
+        // if closing the timing modal, read out the new date/time before exiting
+        if (childModalSelector === options.selectors.timingOptions) {
+            setDateTimeOnLocalStorage();
+        }
+
         $(childModalSelector).removeClass(options.selectors.visibleClass);
         childModal = null;
         childModalSelector = null;
 
         // re-open parent modal on child modal close, to show selections
-        if (childModalSelector !== options.selectors.timingOptions) {
-            // rei-initialize first, to turn the click handlers back on
-            initialize();
-            open();
+        // rei-initialize parent first, to turn the click handlers back on
+        initialize();
+        open();
+    }
+
+    function setDateTimeOnLocalStorage() {
+        var selectedDay = parseInt($('#' + options.selectors.dayOptionsId).val());
+        var selectedTime = parseInt($('#' + options.selectors.timeOptionsId).val());
+
+        var when;
+
+        if (!!selectedTime && !!selectedDay) {
+            selectedDay = moment(selectedDay);
+            selectedTime = moment(selectedTime);
+
+            // set the time portion on the selected day
+            when = selectedDay.clone();
+            when.hours(selectedTime.hours());
+            when.minutes(selectedTime.minutes());
+
+        } else if (!!selectedTime) {
+            when = moment(selectedTime);
+        } else if (!!selectedDay) {
+            when = moment(selectedDay);
+        } else {
+            when = undefined;
         }
 
+        if (when) {
+            when = when.unix();
+        }
+
+        // store date/time as unix timestamp
+        UserPreferences.setPreference('dateTime', when);
     }
 
     /**
@@ -190,13 +228,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
     function timingModalOptions() {
         var source = [
             '<li><select class="modal-options-timing-select" id="{{dayOptionsId}}">',
-                '<option value="{{today}}">Today</option>',
+                '<option value="">Today</option>',
                 '{{#each days}}',
                     '<option value="{{this.value}}">{{this.label}}</option>',
                 '{{/each}}',
                 '</select></li>',
                 '<li><select class="modal-options-timing-select" id="{{timeOptionsId}}">',
-                    '<option value="{{today}}">Now</option>',
+                    '<option value="">Now</option>',
                     '{{#each times}}',
                         '<option value="{{this.value}}">{{this.label}}</option>',
                     '{{/each}}',
@@ -204,8 +242,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         ].join('');
 
         var time = moment();
-        var today = moment().startOf('date'); // set to 12 AM to normalize
-        var day = today.clone();
+        var day = moment().startOf('date'); // set to 12 AM to normalize
 
         var days = [];
         for (var i = 1; i < 8; i++) {
@@ -237,8 +274,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
             dayOptionsId: options.selectors.dayOptionsId,
             timeOptionsId: options.selectors.timeOptionsId,
             days: days,
-            times: times,
-            today: today,
+            times: times
         });
 
         return html;
@@ -259,7 +295,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal) {
         // reset to 'depart at'
         $(childModalSelector).find(options.selectors.departAt).click();
 
-        // TODO: update user preferences as well
+        // un-set user preferences (will revert to defaults)
+        UserPreferences.setPreference('arriveBy', undefined);
+        UserPreferences.setPreference('dateTime', undefined);
 }
 
-})(jQuery, Handlebars, moment, CAC.Control.Modal);
+})(jQuery, Handlebars, moment, CAC.Control.Modal, CAC.User.Preferences);
