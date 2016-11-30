@@ -191,20 +191,33 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         } else {
             // user clicked somewhere on modal that is not a list item option
 
+            // listen to the day drop-down on the timing modal
             if ($el.prop('id') === options.selectors.dayOptionsId) {
+                var $time = $('#' + options.selectors.timeOptionsId);
+                var timeSelection = $time.val();
+
                 if (!$el.val()) {
-                    // set to current day
+                    // got set to current day
+
+                    // set time to 'now' if selection is before next 15 minute increment
+                    var nextQtrHr = $time.find('.' + options.selectors.nextQuarterHourClass).val();
+                    if (parseInt(timeSelection) < parseInt(nextQtrHr)) {
+                        $time.val($time.find('.' + options.selectors.currentTimeClass).val());
+                    }
 
                     // hide times before 'now'
                     $(options.selectors.timingFields).removeClass(options.selectors.notTodayClass);
-                    // TODO: set time to 'now' if selection is on or before next 15 minute increment
-
 
                 } else {
-                    // not today; hide 'now' option
-                    $(options.selectors.timingFields).addClass(options.selectors.notTodayClass);
-                    // TODO: set to next 15 minute increment if 'now' was selected
+                    // selection is not today
 
+                    // set selection to next 15 minute increment if 'now' was selected
+                    if (timeSelection === $time.find('.' + options.selectors.currentTimeClass).val()) {
+                        $time.val($time.find('.' + options.selectors.nextQuarterHourClass).val());
+                    }
+
+                    // hide 'now' option and show times before now
+                    $(options.selectors.timingFields).addClass(options.selectors.notTodayClass);
                 }
             }
         }
