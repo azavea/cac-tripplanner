@@ -111,21 +111,16 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             // Attempt to set date/time selection back using what's stored in preferences.
             // If either or both not found, will default to today/now.
             var storedDateTime = UserPreferences.getPreference('dateTime');
-            console.log(storedDateTime);
 
             if (storedDateTime) {
-                var dt = moment(storedDateTime);
-
-                console.log(dt.toString());
-                window.dt = dt;
-
-                // FIXME: I am so very broken. :-(
-                ////////////////////////////////////
+                var dt = moment.unix(storedDateTime);
                 var day = dt.clone().startOf('date');
                 var time = moment();
                 time.hours(dt.hours());
                 time.minutes(dt.minutes());
+                time.startOf('minute'); // drop seconds/milliseconds
 
+                // FIXME: handle if option does not exist in list
                 $(options.selectors.timingFields).find('#' + options.selectors.dayOptionsId)
                     .val(day.unix().toString());
 
@@ -193,8 +188,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         var when;
 
         if (!!selectedTime && !!selectedDay) {
-            selectedDay = moment(selectedDay);
-            selectedTime = moment(selectedTime);
+            selectedDay = moment.unix(selectedDay);
+            selectedTime = moment.unix(selectedTime);
 
             // set the time portion on the selected day
             when = selectedDay.clone();
@@ -202,9 +197,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             when.minutes(selectedTime.minutes());
 
         } else if (!!selectedTime) {
-            when = moment(selectedTime);
+            when = moment.unix(selectedTime);
         } else if (!!selectedDay) {
-            when = moment(selectedDay);
+            when = moment.unix(selectedDay);
         } else {
             when = undefined;
         }
@@ -213,7 +208,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             when = when.unix();
         }
 
-        // store date/time as unix timestamp
+        // store date/time as seconds since epoch
         UserPreferences.setPreference('dateTime', when);
     }
 
