@@ -3,7 +3,8 @@ CAC.Share.ShareModal = (function ($, Settings, Modal) {
 
     var defaults = {
         selectors: {
-            shareModalClass: 'modal-share',
+            shareModalSelector: '.modal-share',
+            shareModalBodyClass: 'body-modal body-modal-share',
             shareModalButton: '.share-directions',
             itinerary: '.directions-list-of-steps',
             defaultView: '.default',
@@ -41,8 +42,8 @@ CAC.Share.ShareModal = (function ($, Settings, Modal) {
 
     function initialize() {
         modal = new Modal({
-            modalSelector: '.' + options.selectors.shareModalClass,
-            bodyModalClass: options.selectors.shareModalClass,
+            modalSelector: options.selectors.shareModalSelector,
+            bodyModalClass: options.selectors.shareModalBodyClass,
             clickHandler: onClick,
             onClose: onClose
         });

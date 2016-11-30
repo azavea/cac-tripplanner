@@ -7,7 +7,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
     var defaults = {
         currentMode: 'WALK',
         selectors: {
-            bodyModalClass: 'modal-options',
+            bodyModalClass: 'body-modal body-modal-options',
             selectedClass: 'selected', // used to mark selection from a list
             visibleClass: 'visible',
             listOptions: 'li.modal-list-choice',
@@ -183,8 +183,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         childModalSelector = null;
 
         // re-open parent modal on child modal close, to show selections
-        // rei-initialize parent first, to turn the click handlers back on
-        initialize();
         open();
     }
 

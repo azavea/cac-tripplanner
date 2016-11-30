@@ -37,42 +37,39 @@ CAC.Control.Modal = (function ($) {
         this.close = _close.bind(this);
         this.clear = _clear.bind(this);
 
-        // bind events; these must also be unbound during _close
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.clickHandlerFilter).on('click',
-            this.options.clickHandler);
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.buttonClose).on('click',
-            this.close);
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.buttonClear).on('click',
-            this.clear);
+        // build selectors for children
+        this.options.selectors.modalOption = getChildSelector('clickHandlerFilter', this.options);
+        this.options.selectors.modalCloseButton = getChildSelector('buttonClose', this.options);
+        this.options.selectors.modalClearButton = getChildSelector('buttonClear', this.options);
     }
 
     function _open(event) {
-        $(this.options.selectors.body).addClass(_getBodyClass(this));
+        $(this.options.selectors.body).addClass(this.options.bodyModalClass);
         if (event && event.preventDefault) {
             event.preventDefault();
         }
+
+        // bind events; these must also be unbound during _close
+        $(this.options.selectors.modalOption).on('click', this.options.clickHandler);
+        $(this.options.selectors.modalCloseButton).on('click', this.close);
+        $(this.options.selectors.modalClearButton).on('click', this.clear);
+
         if (this.options.onOpen) {
             return this.options.onOpen(event);
         }
     }
 
     function _close(event) {
-        $(this.options.selectors.body).removeClass(_getBodyClass(this));
+        $(this.options.selectors.body).removeClass(this.options.bodyModalClass);
         if (event && event.preventDefault) {
             event.preventDefault();
         }
 
         // remove click handlers. otherwise will trigger click events repeatedly
         // on subsequent modal open
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.clickHandlerFilter).off('click');
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.buttonClose).off('click');
-        $(this.options.selectors.modal + ' ' + this.options.modalSelector + ' ' +
-            this.options.selectors.buttonClear).off('clear');
+        $(this.options.selectors.modalOption).off('click');
+        $(this.options.selectors.modalCloseButton).off('click');
+        $(this.options.selectors.modalClearButton).off('click');
 
         if (this.options.onClose) {
             return this.options.onClose(event);
@@ -85,8 +82,18 @@ CAC.Control.Modal = (function ($) {
         }
     }
 
-    function _getBodyClass(modal) {
-        return 'body-modal body-' + modal.options.bodyModalClass;
+    /**
+     * Helper to build a selector for elements within the modal.
+     *
+     * @param {String} selector Key to child selector; must exist in options.selectors
+     * @returns {String} jQuery selector specifying parent and child
+     */
+    function getChildSelector(selector, options) {
+        return [
+            options.selectors.modal,
+            options.modalSelector,
+            options.selectors[selector]
+        ].join(' ');
     }
 
 })(jQuery);

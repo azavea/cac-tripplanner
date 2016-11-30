@@ -84,6 +84,7 @@ CAC.User.Preferences = (function(_) {
 
     /**
      * Check if value has been set by user, or is a default.
+     * Will return false if given preference does not exist.
      *
      * @param {String} preference Name of setting to check
      * @return {Boolean} True if getPreference will return a default value
