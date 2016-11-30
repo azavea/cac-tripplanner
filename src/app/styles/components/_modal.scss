@@ -152,6 +152,23 @@
     select {
         width: 50%;
     }
+
+    .earlier-qtr-hour {
+        display: none;
+    }
+
+    .current-time {
+        display: flex;
+    }
+
+    &.not-today {
+        .earlier-qtr-hour {
+            display: flex;
+        }
+        .current-time {
+            display: none;
+        }
+    }
 }
 
 .modal-list {
