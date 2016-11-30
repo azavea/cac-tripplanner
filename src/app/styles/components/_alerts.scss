@@ -1,20 +1,33 @@
 .alert {
-    padding: 1rem;
+    padding: 1rem 1rem 1.2rem;
     text-align: center;
 
     .alert-title {
         position: relative;
         margin-top: 0;
-        margin-bottom: 1rem;
+        margin-bottom: .9rem;
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+        text-transform: uppercase;
     }
 
     .close {
         position: absolute;
         top: 0;
         right: 0;
+        padding: 0;
         background: none;
         border: none;
         cursor: pointer;
+    }
+
+    .alert-body {
+        font-size: 1.4rem;
+    }
+
+    .alert-link {
+        @include delinkify($gophillygo-blue);
+        font-weight: $font-weight-bold;
     }
 }
 

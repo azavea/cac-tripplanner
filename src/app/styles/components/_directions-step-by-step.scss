@@ -37,10 +37,6 @@
         .sidebar-banner {
             display: none;
         }
-
-        .directions-list-of-steps {
-            padding-top: 4rem;
-        }
     }
 
     .step-by-step-header {
@@ -50,7 +46,6 @@
         justify-content: space-between;
 
         @include respond-to('xxs') {
-            position: fixed;
             width: 100%;
             background-color: $gophillygo-blue;
             color: $white;

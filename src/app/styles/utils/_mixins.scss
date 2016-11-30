@@ -1,6 +1,6 @@
-@mixin delinkify {
+@mixin delinkify($color : inherit) {
     &:link, &:visited, &:focus, &:hover, &:active {
-        color: inherit;
+        color: $color;
         text-decoration: none;
     }
 }
