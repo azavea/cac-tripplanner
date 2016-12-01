@@ -97,7 +97,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
         $(options.selectors.optionsButton).on('click', function() {
             // initialize trip options modal with current mode selection
             new TripOptions({
-                currentMode: modeOptionsControl.getMode()
+                currentMode: modeOptionsControl.getMode(),
+                onClose: directionsControl.setOptions
             }).open();
         });
 
@@ -145,7 +146,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
             tabControl.setTab(tabControl.TABS.HOME);
         });
 
-        // TODO: Adjust as necessary once user prefs strategy is decided
+        // load directions if origin and destination set
         $(document).ready(directionsControl.setFromUserPreferences());
     }
 

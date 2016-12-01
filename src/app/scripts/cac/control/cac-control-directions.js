@@ -108,6 +108,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
         setDirections: setDirections,
+        setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
     };
 
@@ -129,10 +130,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
-        var date = UserPreferences.getPreference('dateTime') || moment();
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         var mode = modeOptionsControl.getMode();
-        var arriveBy = isArriveBy(); // depart at time by default
+        var arriveBy = UserPreferences.getPreference('arriveBy');
 
         // options to pass to OTP as-is
         var otpOptions = {
@@ -149,7 +151,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle').toLowerCase();
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
 
             if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
                 $.extend(otpOptions, {optimize: 'TRIANGLE'},
@@ -158,6 +160,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
                 console.error('unrecognized bike triangle option ' + bikeTriangle);
             }
 
+            // TODO: check user preference for bike share here, and update query mode if so
+            ///////////////////////////////////////////////////////////////////////////////
+
         } else {
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
@@ -165,7 +170,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
         UserPreferences.setPreference('mode', mode);
-        UserPreferences.setPreference('arriveBy', arriveBy);
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
@@ -197,7 +201,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !isArriveBy()) {
+            if (itineraries.length === 1 && !arriveBy) {
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
@@ -248,7 +252,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             itinerary.show(true);
             itinerary.highlight(true);
 
-            if (!isArriveBy()) {
+            // TODO: alert user that cannot use waypoints with arriveBy
+            if (!UserPreferences.getPreference('arriveBy')) {
                 itineraryControl.draggableItinerary(itinerary);
             }
 
@@ -261,19 +266,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     function findItineraryBlock(id) {
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
-    }
-
-    /**
-     * Helper to check if user has selected to route by arrive-by time
-     * rather than default depart-at time.
-     *
-     * @returns boolean True if user has selected arrive-by
-     */
-    function isArriveBy() {
-        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -306,6 +298,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
      */
     function queryWithWaypoints(event, points) {
         UserPreferences.setPreference('waypoints', points.waypoints);
+        planTrip();
+    }
+
+    // trigger re-query when trip options update
+    function setOptions() {
         planTrip();
     }
 

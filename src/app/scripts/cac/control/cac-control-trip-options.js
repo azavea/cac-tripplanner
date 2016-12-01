@@ -12,11 +12,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             visibleClass: 'visible',
             listOptions: 'li.modal-list-choice',
             listOptionsClass: 'modal-list-choice',
+
+            arriveBy: '#arriveBy',
             departAt: '#departAt',
 
             // date/time selectors
             timingOptions: '.modal-options.timing-modal',
             timingFields: '.modal-options-timing-fields',
+            arriveByDepartAt: '.modal-options-timing-tabs',
             timeOptionsId: 'options-timing-time',
             dayOptionsId: 'options-timing-day',
             nextQuarterHourClass: 'next-qtr-hour',
@@ -39,6 +42,18 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             walkMenuOptions: {
                 'modal-list-timing': '.modal-options.timing-modal',
                 'modal-list-accessibility': '.modal-options.accessibility-options'
+            },
+
+            // mapping of option IDs to what to set in user preferences if option picked
+            optionPreferences: {
+                'wheelchair': {name: 'wheelchair', value: true},
+                'noWheelchair': {name: 'wheelchair', value: false},
+                'noBikeShare': {name: 'bikeShare', value: false},
+                'useBikeShare': {name: 'bikeShare', value: true},
+                'bikeTriangleAny': {name: 'bikeTriangle', value: 'any'},
+                'bikeTriangleFast': {name: 'bikeTriangle', value: 'fast'},
+                'bikeTriangleFlat': {name: 'bikeTriangle', value: 'flat'},
+                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'}
             }
         }
     };
@@ -114,7 +129,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             // set time and date selector options
             $(childModalSelector).find(options.selectors.timingFields).html(timingModalOptions());
 
-            // TODO: also read/set arriveBy selection
+            // read arrive by user setting and toggle if needed
+            if (UserPreferences.getPreference('arriveBy')) {
+                $(childModalSelector).find(options.selectors.arriveBy).click();
+            }
 
             // Set date/time selection back using what's stored in preferences.
             var storedDateTime = UserPreferences.getPreference('dateTime');
@@ -161,7 +179,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
     function onClose() {
         $(modalSelector).removeClass(options.selectors.visibleClass);
-        // TODO: should trigger re-query (also check if anything actually changed first?)
+        // trigger plan re-query by calling onClose handler
+        // check if child modal exists to determine whether closing out of options altogether
+        // or just closing to go to another options modal
+        if (!childModal && options.onClose) {
+            options.onClose();
+        }
     }
 
     /**
@@ -182,9 +205,18 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
             $el.addClass(options.selectors.selectedClass);
 
-            // close child modal once option picked
-            // should not happen with timing modal, which has its own close button
+            // Set chosen value in preferences, then close child modal once option picked.
+            // Should not happen with timing modal, which has its own close button
+            // and its own preferences management.
             if (childModalSelector !== options.selectors.timingOptions) {
+                var selectedOptionId = $el.attr('id');
+                if (_.has(options.selectors.optionPreferences, selectedOptionId)) {
+                    var setting = options.selectors.optionPreferences[selectedOptionId];
+                    UserPreferences.setPreference(setting.name, setting.value);
+                } else {
+                    console.error('selected unrecognized option with ID: ' + selectedOptionId);
+                }
+
                 childModal.close();
             }
 
@@ -237,6 +269,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         open();
     }
 
+    /**
+     * Helper to read out date and time settings from modal and store them
+     * as user settings.
+     */
     function setDateTimeOnLocalStorage() {
         var selectedDay = parseInt($('#' + options.selectors.dayOptionsId).val());
         var selectedTime = parseInt($('#' + options.selectors.timeOptionsId).val());
@@ -254,10 +290,16 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             when = moment().startOf('date').add(selectedTime, 'minutes');
         } else {
             when = undefined;
+            // unset depart at/arrive by setting if defaulting to now
+            // (cannot arrive by now without time travel)
+            UserPreferences.setPreference('arriveBy', undefined);
         }
 
         if (when) {
             when = when.unix();
+            var arriveBy = $(options.selectors.arriveBy).hasClass(options.selectors.selectedClass);
+            // have date/time; also store selection for depart at or arrive by that time
+            UserPreferences.setPreference('arriveBy', arriveBy);
         }
 
         // store date/time as seconds since epoch
