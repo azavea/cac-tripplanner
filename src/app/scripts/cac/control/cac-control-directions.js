@@ -138,7 +138,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         // options to pass to OTP as-is
         var otpOptions = {
-            mode: mode,
             arriveBy: arriveBy,
             maxWalkDistance: UserPreferences.getPreference('maxWalk')
         };
@@ -160,12 +159,16 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
                 console.error('unrecognized bike triangle option ' + bikeTriangle);
             }
 
-            // TODO: check user preference for bike share here, and update query mode if so
-            ///////////////////////////////////////////////////////////////////////////////
+            // check user preference for bike share here, and update query mode if so
+            if (UserPreferences.getPreference('bikeShare')) {
+                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
+            }
 
         } else {
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
+
+        $.extend(otpOptions, {mode: mode});
 
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
