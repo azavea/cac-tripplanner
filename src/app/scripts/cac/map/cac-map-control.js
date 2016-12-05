@@ -217,9 +217,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             geocodeMarker.setLatLng(latLng);
         } else {
             var icon = L.AwesomeMarkers.icon({
-                icon: 'dot-circle-o',
-                prefix: 'fa',
-                markerColor: 'darkred'
+                icon: 'marker-origin',
+                prefix: 'icon',
+                markerColor: 'green'
             });
             geocodeMarker = new cartodb.L.marker(latLng, { icon: icon, draggable: true });
             geocodeMarker.addTo(map);
@@ -255,13 +255,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // for use on the static map page there. If you change them here, change them there as well
         // Remove comment if icon definitions are abstracted elsewhere
         var originIcon = L.AwesomeMarkers.icon({
-            icon: 'home',
+            icon: 'marker-origin',
             prefix: 'icon',
-            markerColor: 'purple'
+            markerColor: 'green'
         });
 
         var destIcon = L.AwesomeMarkers.icon({
-            icon: 'flag',
+            icon: 'marker-destination',
             prefix: 'icon',
             markerColor: 'red'
         });

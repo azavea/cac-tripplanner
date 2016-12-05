@@ -29,8 +29,10 @@
 .icon-email:before { content: '\f0e0'; } /* '' */
 .icon-default:before { content: '\f111'; } /* '' */
 .icon-geolocate:before { content: '\f124'; } /* '' */
+.icon-marker-origin:before { content: '\f144'; } /* '' */
 .icon-youtube:before { content: '\f16a'; } /* '' */
 .icon-instagram:before { content: '\f16d'; } /* '' */
+.icon-marker-poi:before { content: '\f192'; } /* '' */
 .icon-wheelchair:before { content: '\f193'; } /* '' */
 .icon-car:before { content: '\f1b9'; } /* '' */
 .icon-sliders:before { content: '\f1de'; } /* '' */
@@ -40,3 +42,4 @@
 .icon-train:before { content: '\f238'; } /* '' */
 .icon-flag:before { content: '\f239'; } /* '' */
 .icon-home:before { content: '\f240'; } /* '' */
+.icon-marker-destination:before { content: '\f28d'; } /* '' */
