@@ -164,7 +164,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     function initializeLayerControl() {
         if (!layerControl) {
             layerControl = cartodb.L.control.layers(basemaps, overlays, {
-                position: 'bottomright',
+                position: 'topright',
                 collapsed: false
             });
         }
@@ -177,7 +177,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         var $layerContainer = $(this.options.selectors.leafletLayerControl);
         window.lc = $layerContainer;
 
-        $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
+        $layerContainer.prepend('<div class="leaflet-minimize minimized"><i class="icon-layers"></i></div>');
 
         var $minimizer = $(this.options.selectors.leafletMinimizer);
         var selectors = this.options.selectors;
