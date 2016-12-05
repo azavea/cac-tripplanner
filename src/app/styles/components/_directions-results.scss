@@ -6,6 +6,10 @@
         display: none;
     }
 
+    .hidden {
+        display: none;
+    }
+
     @include respond-to('xxs') {
         flex: 0 0 $route-summary-height;
         order: 10;
