@@ -1,4 +1,4 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabControl, Templates,
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl, Templates,
                             UserPreferences, UrlRouter) {
     'use strict';
 
@@ -6,7 +6,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
         selectors: {
             // modal
             optionsButton: '.btn-options',
-            optionsModalClass: 'modal-options',
 
             // destinations
             placeCard: '.place-card',
@@ -35,9 +34,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
 
     var options = {};
     var modeOptionsControl = null;
-    var shareModal = null;
-    var transitOptionsModal = null;
-
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
@@ -45,15 +41,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
 
     function Home(params) {
         options = $.extend({}, defaults, params);
-        modeOptionsControl = new ModeOptions();
-
-        shareModal = new ShareModal({});
-
-        transitOptionsModal = new Modal({
-            modalClass: options.selectors.optionsModalClass,
-            clickHandler: onOptionsModalItemClicked
-        });
-        $(options.selectors.optionsButton).on('click', transitOptionsModal.open);
     }
 
     /* TODO: update for redesign or remove
@@ -92,6 +79,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
             tabControl: tabControl
         });
 
+        modeOptionsControl = new ModeOptions();
+
         directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
             modeOptionsControl: modeOptionsControl,
@@ -105,6 +94,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
     return Home;
 
     function _setupEvents() {
+        $(options.selectors.optionsButton).on('click', function() {
+            // initialize trip options modal with current mode selection
+            new TripOptions({
+                currentMode: modeOptionsControl.getMode(),
+                onClose: directionsControl.setOptions
+            }).open();
+        });
+
         $(options.selectors.placeList).on('click',
                                           options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
@@ -149,7 +146,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
             tabControl.setTab(tabControl.TABS.HOME);
         });
 
-        // TODO: Adjust as necessary once user prefs strategy is decided
+        // load directions if origin and destination set
         $(document).ready(directionsControl.setFromUserPreferences());
     }
 
@@ -172,11 +169,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
         // tabControl.setTab(tabControl.TABS.EXPLORE);
     }
 
-    function onOptionsModalItemClicked(event) {
-        // TODO: implement modals
-        console.log($(event.target).html());
-    }
-
     function moveOrigin(event, position) {
         event.preventDefault();
         directionsControl.moveOriginDestination('origin', position);
@@ -187,5 +179,5 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, Modal, ShareModal, TabC
         directionsControl.moveOriginDestination('destination', position);
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.Modal, CAC.Share.ShareModal,
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions,
     CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);

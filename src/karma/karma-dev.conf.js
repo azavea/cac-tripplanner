@@ -32,6 +32,7 @@ module.exports = function(config) {
       'app/scripts/cac/search/cac-typeahead.js',
       'app/scripts/cac/control/cac-control-modal.js',
       'app/scripts/cac/share/cac-share-modal.js',
+      'app/scripts/cac/control/cac-control-trip-options.js',
       'app/scripts/cac/routing/cac-routing-itinerary.js',
       'app/scripts/cac/routing/cac-routing-plans.js',
       'app/scripts/cac/urlrouting/cac-urlrouting.js',
@@ -48,7 +49,6 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-directions-list.js',
       'app/scripts/cac/home/cac-home-templates.js',
       'app/scripts/cac/pages/cac-pages-home.js',
-      'app/scripts/cac/pages/cac-pages-directions.js',
 
       'test/spec/*.js',
       'test/spec/**/*.js'

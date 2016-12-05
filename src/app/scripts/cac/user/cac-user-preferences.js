@@ -1,66 +1,74 @@
-CAC.User.Preferences = (function(Storages, _) {
+CAC.User.Preferences = (function(_) {
     'use strict';
 
-    // TODO: figure out local storage strategy
-    // set up local storage
-    // var namespaceStorage = Storages.initNamespaceStorage('cac_otp');
-    // var storage = namespaceStorage.localStorage;
 
     // Initialize preference storage object.
-    // Currently it just uses an 'options' dictionary, so preferences lives only as long as
-    // the page for which this is initialized.
+    // All values in storages should be stringified first.
+    // Setting to a falsy value will remove the object from storages;
+    // if not in storages, defaults will be used as fallback.
+    // Stringified undefined will remove the value from storage.
+    // Preferences lives only as long as the page for which this is initialized.
     // With this setup we have the flexibility to store all or some of the parameters to local
     // storage if we decide that's valuable, and components that use these parameters don't need
     // to know the difference.
     var options = {};
     var storage = {
-        set: function (pref, val) { options[pref] = val; },
-        get: function (pref) { return options[pref]; }
+        set: function (pref, val) {
+            if(!!val) {
+                options[pref] = val;
+            } else {
+                delete options[pref];
+            }
+        },
+        get: function (pref) {
+            return _.has(options, pref) ? options[pref] : undefined;
+        }
     };
 
     var defaults = {
         arriveBy: false, // depart at set time, by default
-        bikeTriangle: 'neutral',
+        bikeShare: false,
+        bikeTriangle: 'any',
         exploreTime: 20,
-        maxWalk: 2,
-        method: 'explore',
+        maxWalk: 482802, // in meters; set large, since not user-controllable
+        method: 'directions',
         mode: 'TRANSIT,WALK',
-        origin: undefined,
         originText: '',
-        destination: undefined,
         destinationText: '',
         waypoints: [],
         wheelchair: false
     };
 
     var module = {
+        isDefault: isDefault,
         getPreference: getPreference,
         setPreference: setPreference,
         setLocation: setLocation,
-        clearLocation: clearLocation
+        clearLocation: clearLocation,
+        clearSettings: clearSettings
     };
     return module;
+
+    /**
+     * Wipe out all user settings.
+     * Helpful to reset state without forcing a page refresh.
+     */
+    function clearSettings() {
+        options = {};
+    }
 
     /**
      * Fetch stored setting.
      *
      * @param {String} preference Name of setting to fetch
-     * @param {Boolean} [setDefault=true] If false, don't set the default value if no value is set
      * @return {Object} setting found in storage, or default if none found
      */
-    function getPreference(preference, setDefault) {
+    function getPreference(preference) {
         var val = storage.get(preference);
-        if (val) {
+        if (!val || val === '') {
+            val = _.has(defaults, preference) ? defaults[preference] : undefined;
+        } else {
             val = JSON.parse(val);
-        }
-
-        // Default to true
-        setDefault = _.isUndefined(setDefault) || setDefault;
-
-        // If a typeahead is cleared, we want to grab the default
-        if (setDefault && !val || val === '') {
-            val = defaults[preference];
-            setPreference(preference, val);
         }
         return val;
     }
@@ -73,6 +81,17 @@ CAC.User.Preferences = (function(Storages, _) {
      */
     function setPreference(preference, val) {
         storage.set(preference, JSON.stringify(val));
+    }
+
+    /**
+     * Check if value has been set by user, or is a default.
+     * Will return false if given preference does not exist.
+     *
+     * @param {String} preference Name of setting to check
+     * @return {Boolean} True if getPreference will return a default value
+     */
+    function isDefault(preference) {
+        return !_.has(options, preference) && _.has(defaults, preference);
     }
 
     /**
@@ -96,4 +115,4 @@ CAC.User.Preferences = (function(Storages, _) {
         setPreference(key + 'Text', undefined);
     }
 
-})(Storages, _);
+})(_);

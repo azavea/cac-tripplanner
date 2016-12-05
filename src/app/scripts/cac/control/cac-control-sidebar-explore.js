@@ -72,7 +72,7 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
         });
         datepicker.on('dp.change', clickedExplore);
 
-        $(options.selectors.modeSelectors).change($.proxy(changeMode, this));
+        $(options.selectors.modeSelectors).change($.proxy(clickedExplore, this));
 
         $(options.selectors.optionsViewMore).click(showOptions);
 
@@ -182,11 +182,6 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
     }, ISOCHRONE_DEBOUNCE_MILLIS);
 
     return SidebarExploreControl;
-
-    function changeMode() {
-        modeOptionsControl.changeMode(options.selectors);
-        clickedExplore();
-    }
 
     /**
      * Fetch travelshed from OpenTripPlanner, then populate side bar with featured locations

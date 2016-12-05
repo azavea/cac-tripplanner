@@ -21,7 +21,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     function UrlRouter() {
         router = new Navigo('/');
-        router.on('/', setPrefsFromUrl);
+        router.on('*', setPrefsFromUrl);
         router.resolve();
     }
 

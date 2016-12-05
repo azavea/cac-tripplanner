@@ -39,7 +39,7 @@ var stat = {
     images: staticRoot + '/images'
 };
 
-var cartoDbRoot = 'bower_components/cartodb.js/cartodb.uncompressed.js';
+var cartoDbJs = 'bower_components/cartodb.js/cartodb.uncompressed.js';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -200,7 +200,7 @@ gulp.task('copy:vendor-scripts', function() {
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/cartodb**'],
                         // load the uncompressed version of CartoDB in development,
                         // for easier debugging
-                        ['bower_components/cartodb.js/cartodb.uncompressed.js'])
+                        [cartoDbJs])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -241,7 +241,7 @@ gulp.task('test:copy-jquery', function() {
 
 // Since cartodb.js is loaded from a CDN, we need to pull it in manually here.
 gulp.task('test:copy-cartodb', function() {
-    return copyBowerFiles('cartodb.js', [cartoDbRoot + '**/cartodb.js'])
+    return copyBowerFiles('cartodb.js', [cartoDbJs])
         .pipe(gulp.dest(stat.scripts));
 });
 

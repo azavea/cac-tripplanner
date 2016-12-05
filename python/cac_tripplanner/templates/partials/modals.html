@@ -1,5 +1,5 @@
 <div class="modal-overlay">
-    <div class="modal-panel modal-options">
+    <div class="modal-panel modal-options bike-options">
         <header class="modal-header">
             Bike options
         </header>
@@ -11,6 +11,79 @@
         <footer class="modal-footer">
             <button name="close-modal" class="btn-close-modal">Close</button>
         </footer>
+    </div>
+
+    <div class="modal-panel modal-options modal-sub-menu bike-share-select">
+        <header class="modal-header">
+            <i class="icon-indego"></i>
+            Need a bike?
+        </header>
+        <ul class="modal-list modal-contents">
+            <li id="noBikeShare" class="modal-list-choice selected">I have a bike</li>
+            <li id="useBikeShare" class="modal-list-choice">Use Indego bike sharing</li>
+        </ul>
+    </div>
+
+    <div class="modal-panel modal-options modal-sub-menu timing-modal">
+        <header class="modal-header">
+            <i class="icon-clock"></i>
+            Timing
+        </header>
+        <div class="modal-contents">
+            <ul class="modal-options-timing-tabs">
+                <li id="departAt" class="modal-list-choice selected">Depart at</li>
+                <li id="arriveBy" class="modal-list-choice">Arrive by</li>
+            </ul>
+            <ul class="modal-options-timing-fields">
+                <li><select class="modal-options-timing-select" name="options-timing-day">
+                    <option value="" selected>Today</option>
+                </select></li>
+                <li><select class="modal-options-timing-select" name="options-timing-time">
+                    <option value="" selected>Now</option>
+                </select></li>
+            </ul>
+        </div>
+        <footer class="modal-footer modal-options-timing-footer">
+            <button name="reset" class="btn-reset-modal">Clear</button>
+            <button name="save" class="btn-close-modal">Done</button>
+        </footer>
+    </div>
+
+    <div class="modal-panel modal-options modal-sub-menu bike-triangle">
+        <header class="modal-header">
+            <i class="icon-road"></i>
+            What kind of ride?
+        </header>
+        <ul class="modal-list modal-contents modal-list-narrow">
+            <li id="bikeTriangleAny" class="modal-list-choice selected">Any</li>
+            <li id="bikeTriangleFast" class="modal-list-choice">Fast</li>
+            <li id="bikeTriangleFlat" class="modal-list-choice">Flat</li>
+            <li id="bikeTriangleSafe" class="modal-list-choice">Safe</li>
+        </ul>
+    </div>
+
+    <div class="modal-panel modal-options walk-options">
+        <header class="modal-header">
+            Walk options
+        </header>
+        <ul class="modal-list modal-contents">
+            <li class="modal-list-timing">Arrive/depart at…</li>
+            <li class="modal-list-accessibility">Accessibility</li>
+        </ul>
+        <footer class="modal-footer">
+            <button name="close-modal" class="btn-close-modal">Close</button>
+        </footer>
+    </div>
+
+    <div class="modal-panel modal-options modal-sub-menu accessibility-options">
+        <header class="modal-header">
+            <i class="icon-wheelchair"></i>
+            Accessibility
+        </header>
+        <ul class="modal-list modal-contents">
+            <li id="noWheelchair" class="modal-list-choice selected">No wheelchair</li>
+            <li id="wheelchair" class="modal-list-choice">I have a wheelchair</li>
+        </ul>
     </div>
 
     <div class="modal-panel modal-share">

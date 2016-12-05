@@ -2,18 +2,13 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
+CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Typeahead,
                                     UserPreferences, Utils) {
 
     'use strict';
 
-    var METERS_PER_MILE = 1609.34;
-
     // Number of millis to wait on input changes before sending directions request
     var DIRECTION_THROTTLE_MILLIS = 750;
-
-    // default maxWalk when biking (in miles)
-    var MAXWALK_BIKE = 300;
 
     var defaults = {
         selectors: {
@@ -31,29 +26,20 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
             itineraryBlock: '.route-summary',
 
-            // TODO: bring back these selectors; used for error display
-            // origin: ??
-            //destination: ??
+            // used for error display
+            origin: '.directions-from.directions-text-input',
+            destination: '.directions-to.directions-text-input',
 
             selectedItineraryClass: 'selected',
-
-            // TODO: update or remove below components (from before refactor)
-            bikeTriangleDiv: '#directionsBikeTriangle',
-            datepicker: '#datetimeDirections',
-            departAtSelect: '#directionsDepartAt',
-            directions: '.directions',
-            directionInput: '.direction-input',
             errorClass: 'error',
-            maxWalkDiv: '#directionsMaxWalk',
-            resultsClass: 'show-results',
-            spinner: 'section.directions div.sidebar-details > .sk-spinner',
-            wheelchairDiv: '#directionsWheelchair',
+
+            // TODO: add back spinner components (from before refactor)
+            spinner: '.directions-results > .sk-spinner',
         }
     };
     var options = {};
 
     var currentItinerary = null;
-    //var datepicker = null; // TODO: build new datepicker controls
 
     var directions = {
         origin: null,
@@ -77,20 +63,10 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
         modeOptionsControl = options.modeOptionsControl;
-        // TODO: We may need to manually remove these events if the DirectionsControl
-        //       is reinstantiated when the routing changes. That doesn't currently appear to be
-        //       the case though
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, planTrip);
         modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, planTrip);
 
-        $(options.selectors.modes).change($.proxy(changeMode, this));
-
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
-
-        // TODO: updated time/date control
-        // initiallize date/time picker
-        //datepicker = $(options.selectors.datepicker).datetimepicker({useCurrent: true});
-        //datepicker.on('dp.change', planTrip);
 
         directionsListControl = new Control.DirectionsList({
             showBackButton: true,
@@ -124,10 +100,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             directionsListControl.eventNames.directionHovered,
             function(e, lon, lat) {
                 mapControl.displayPoint(lon, lat);
-            });
-
-        // Respond to changes on all direction input fields
-        $(options.selectors.directionInput).on('input change', planTrip);
+        });
     }
 
     DirectionsControl.prototype = {
@@ -135,6 +108,7 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
         setDirections: setDirections,
+        setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
     };
 
@@ -156,19 +130,16 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
 
-        // TODO: updated date/time control
-        //var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        // use current date/time if none set
-        //var date = picker.date() || moment();
-        var date = moment();
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         var mode = modeOptionsControl.getMode();
-        var arriveBy = isArriveBy(); // depart at time by default
+        var arriveBy = UserPreferences.getPreference('arriveBy');
 
         // options to pass to OTP as-is
         var otpOptions = {
-            mode: mode,
-            arriveBy: arriveBy
+            arriveBy: arriveBy,
+            maxWalkDistance: UserPreferences.getPreference('maxWalk')
         };
 
         // add intermediatePlaces if user edited route
@@ -178,35 +149,30 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         }
 
         if (mode.indexOf('BICYCLE') > -1) {
-            // TODO: re-enable bike optimization options when control re-implemented
-            //var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
-            //var bikeTriangle = bikeTriangleOpt.val();
+            // set bike trip optimization option
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
 
-            //$.extend(otpOptions, {optimize: 'TRIANGLE'},
-            //         modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-            //UserPreferences.setPreference('bikeTriangle', bikeTriangle);
-
-            // allow longer bike riding when using public transit
-            $.extend(otpOptions, { maxWalkDistance: MAXWALK_BIKE * METERS_PER_MILE });
-        } else {
-            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
-            if (maxWalk) {
-                UserPreferences.setPreference('maxWalk', maxWalk);
-                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'},
+                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
             } else {
-                UserPreferences.setPreference('maxWalk', undefined);
+                console.error('unrecognized bike triangle option ' + bikeTriangle);
             }
 
-            // true if box checked
-            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
-            UserPreferences.setPreference('wheelchair', wheelchair);
-            $.extend(otpOptions, { wheelchair: wheelchair });
+            // check user preference for bike share here, and update query mode if so
+            if (UserPreferences.getPreference('bikeShare')) {
+                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
+            }
+
+        } else {
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
+
+        $.extend(otpOptions, {mode: mode});
 
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
         UserPreferences.setPreference('mode', mode);
-        UserPreferences.setPreference('arriveBy', arriveBy);
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
@@ -222,11 +188,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
-            // TODO: rework tab control
-            // if (!tabControl.isTabShowing('directions')) {
-            //     // if user has switched away from the directions tab, do not show trip
-            //     return;
-            // }
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();
@@ -243,14 +204,13 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !isArriveBy()) {
+            if (itineraries.length === 1 && !arriveBy) {
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
-            $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         }, function (error) {
             console.error('failed to plan trip');
@@ -258,17 +218,11 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             $(options.selectors.spinner).addClass('hidden');
             itineraryControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
-            $(options.selectors.directions).addClass(options.selectors.resultsClass);
             itineraryListControl.show();
         });
     }, DIRECTION_THROTTLE_MILLIS);
 
     return DirectionsControl;
-
-    function changeMode() {
-        modeOptionsControl.changeMode();
-        planTrip();
-    }
 
     function clearDirections() {
         mapControl.setDirectionsMarkers(null, null);
@@ -281,7 +235,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         itineraryControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
-        $(options.selectors.directions).removeClass(options.selectors.resultsClass);
     }
 
     function onDirectionsBackClicked() {
@@ -302,7 +255,8 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
             itinerary.show(true);
             itinerary.highlight(true);
 
-            if (!isArriveBy()) {
+            // TODO: alert user that cannot use waypoints with arriveBy
+            if (!UserPreferences.getPreference('arriveBy')) {
                 itineraryControl.draggableItinerary(itinerary);
             }
 
@@ -315,19 +269,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
     function findItineraryBlock(id) {
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
-    }
-
-    /**
-     * Helper to check if user has selected to route by arrive-by time
-     * rather than default depart-at time.
-     *
-     * @returns boolean True if user has selected arrive-by
-     */
-    function isArriveBy() {
-        if ($(options.selectors.departAtSelect).val() === 'arriveBy') {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -363,12 +304,23 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         planTrip();
     }
 
+    // trigger re-query when trip options update
+    function setOptions() {
+        planTrip();
+    }
+
     function reverseOriginDestination() {
         // read what they are now
         var origin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
+
+        if (!(directions.origin && directions.destination)) {
+            setDirectionsError('origin');
+            setDirectionsError('destination');
+            return;
+        }
 
         // update local storage
         UserPreferences.setPreference('origin', destination);
@@ -461,7 +413,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
                 itineraryListControl.setItinerariesError({
                     msg: 'Could not find street address for location.'
                 });
-                $(options.selectors.directions).addClass(options.selectors.resultsClass);
                 itineraryListControl.show();
             }
         });
@@ -490,10 +441,8 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         // set in UI
         var mode = UserPreferences.getPreference('mode');
         modeOptionsControl.setMode(mode);
-        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         typeaheadFrom.setValue(originText);
         typeaheadTo.setValue(destinationText);
-        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // Get directions
         planTrip();
@@ -510,7 +459,6 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
     }
 
     function setDirectionsError(key) {
-        // TODO: bring back error display for origin/destination fields
         var $input = null;
         if (key === 'origin') {
             $input = $(options.selectors.origin);
@@ -532,35 +480,14 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
 
 
     /**
-     * When first navigating to this page, check for user preferences to load.
+     * When first navigating to the page, check if origin and destination already set.
+     * Go directly to trip plan if so.
      */
     function setFromUserPreferences() {
-        // Look up origin with setDefault=false to allow it to be blank
-        var origin = UserPreferences.getPreference('origin', false);
-        var originText = UserPreferences.getPreference('originText', false);
+        var origin = UserPreferences.getPreference('origin');
+        var originText = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
-        var mode = UserPreferences.getPreference('mode');
-        var arriveBy = UserPreferences.getPreference('arriveBy');
-        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-        var maxWalk = UserPreferences.getPreference('maxWalk');
-        var wheelchair = UserPreferences.getPreference('wheelchair');
-
-        if (wheelchair) {
-            $('input', options.selectors.wheelchairDiv).click();
-        }
-
-        if (maxWalk) {
-            $('input', options.selectors.maxWalkDiv).val(maxWalk);
-        }
-
-        modeOptionsControl.setMode(mode);
-
-        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
-
-        if (arriveBy) {
-            $(options.selectors.departAtSelect).val('arriveBy');
-        }
 
         if (destination && destination.feature && destination.feature.geometry) {
             directions.destination = [
@@ -580,5 +507,5 @@ CAC.Control.Directions = (function (_, $, Control, Geocoder, Routing, Typeahead,
         }
     }
 
-})(_, jQuery, CAC.Control, CAC.Search.Geocoder,
+})(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
     CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
