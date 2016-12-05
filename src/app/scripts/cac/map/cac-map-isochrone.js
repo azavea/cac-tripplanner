@@ -76,8 +76,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 clickable: false,
                 style: {
                     clickable: false,
-                    color: '#5c2482',
-                    fillColor: '#5c2482',
+                    color: '#60a244',
+                    fillColor: '#60a244',
                     lineCap: 'round',
                     lineJoin: 'round',
                     opacity: 0.4,
