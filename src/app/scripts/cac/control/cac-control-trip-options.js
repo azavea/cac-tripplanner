@@ -322,7 +322,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 '</select></li>',
                 '<li><select class="modal-options-timing-select" id="{{timeOptionsId}}">',
                     '{{#each times}}',
-                        '<option class={{this.classes}} value="{{this.value}}">{{this.label}}</option>',
+                        '<option class="{{this.classes}}" value="{{this.value}}">{{this.label}}</option>',
                     '{{/each}}',
                 '</select></li>'
         ].join('');
