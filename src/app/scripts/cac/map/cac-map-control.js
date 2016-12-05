@@ -114,7 +114,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         tabControl = this.options.tabControl;
 
         // put zoom control on top right
-        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
+        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright', zoomInText: '<i class="icon-plus"></i>', zoomOutText: '<i class="icon-minus"></i>' });
 
         initializeBasemaps();
 

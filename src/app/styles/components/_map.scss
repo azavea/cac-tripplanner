@@ -41,6 +41,23 @@
         }
     }
 
+    .leaflet-bar {
+        border-radius: 0;
+
+        a {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 0;
+        }
+    }
+
+    .leaflet-control-zoom-in,
+    .leaflet-control-zoom-out {
+        font-size: 18px;
+        text-indent: inherit;
+    }
+
     .leaflet-control-layers {
         margin-right: 30px;
         margin-bottom: 30px;
