@@ -317,12 +317,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
 
-        if (!(directions.origin && directions.destination)) {
-            setDirectionsError('origin');
-            setDirectionsError('destination');
-            return;
-        }
-
         // update local storage
         UserPreferences.setPreference('origin', destination);
         UserPreferences.setPreference('originText', destinationText);
@@ -333,9 +327,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         typeaheadFrom.setValue(destinationText);
         typeaheadTo.setValue(originText);
 
-        // set on this object and validate
-        setDirections('origin', [destination.location.y, destination.location.x]);
-        setDirections('destination', [origin.location.y, origin.location.x]);
+        if (directions.origin) {
+            setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
+        }
+        if (directions.destination) {
+            setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
+        }
 
         // update the directions for the reverse trip
         planTrip();
