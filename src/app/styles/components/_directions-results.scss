@@ -70,13 +70,21 @@
             justify-content: flex-start;
         }
 
+        .route-name {
+            flex: 1 0 auto;
+            color: $gophillygo-blue;
+            font-size: 1.6rem;
+            font-weight: $font-weight-bold;
+        }
+
         .route-summary-primary-details {
             display: flex;
             flex: 1 0 auto;
             flex-flow: row nowrap;
             align-items: center;
             justify-content: flex-start;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
+            font-weight: $font-weight-medium;
         }
 
         .route-summary-secondary-details {
@@ -90,19 +98,11 @@
         }
 
         .route-duration {
-            margin-right: 1em;
-            color: $gophillygo-blue;
-            font-weight: $font-weight-bold;
+            margin-right: 2em;
         }
 
         .route-distance {
             margin-right: 1em;
-            color: $lt-gray;
-            font-weight: $font-weight-semibold;
-        }
-
-        .route-name {
-            font-weight: $font-weight-semibold;
         }
 
         .route-start-stop {
@@ -110,7 +110,7 @@
         }
 
         .route-modes {
-            font-size: 1.6rem;
+            font-size: 1.7rem;
         }
     }
 }

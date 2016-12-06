@@ -20,15 +20,14 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var destinationsLayer = null;
     var lastHighlightedMarker = null;
     var destinationIcon = L.AwesomeMarkers.icon({
-        icon: 'beenhere',
-        prefix: 'md',
-        markerColor: 'green'
+        icon: 'marker-poi',
+        prefix: 'icon',
+        markerColor: 'darkblue'
     });
     var highlightIcon = L.AwesomeMarkers.icon({
-        icon: 'beenhere',
-        prefix: 'md',
-        iconColor: 'black',
-        markerColor: 'lightgreen'
+        icon: 'marker-poi',
+        prefix: 'icon',
+        markerColor: 'blue'
     });
 
 
@@ -76,8 +75,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 clickable: false,
                 style: {
                     clickable: false,
-                    color: '#5c2482',
-                    fillColor: '#5c2482',
+                    color: '#60a244',
+                    fillColor: '#60a244',
                     lineCap: 'round',
                     lineJoin: 'round',
                     opacity: 0.4,

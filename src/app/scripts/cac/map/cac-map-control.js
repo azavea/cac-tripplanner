@@ -114,7 +114,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         tabControl = this.options.tabControl;
 
         // put zoom control on top right
-        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright' });
+        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright', zoomInText: '<i class="icon-plus"></i>', zoomOutText: '<i class="icon-minus"></i>' });
 
         initializeBasemaps();
 
@@ -164,7 +164,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     function initializeLayerControl() {
         if (!layerControl) {
             layerControl = cartodb.L.control.layers(basemaps, overlays, {
-                position: 'bottomright',
+                position: 'topright',
                 collapsed: false
             });
         }
@@ -177,7 +177,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         var $layerContainer = $(this.options.selectors.leafletLayerControl);
         window.lc = $layerContainer;
 
-        $layerContainer.prepend('<div class="leaflet-minimize"><i class="icon-layers"></i></div>');
+        $layerContainer.prepend('<div class="leaflet-minimize minimized"><i class="icon-layers"></i></div>');
 
         var $minimizer = $(this.options.selectors.leafletMinimizer);
         var selectors = this.options.selectors;
@@ -217,9 +217,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             geocodeMarker.setLatLng(latLng);
         } else {
             var icon = L.AwesomeMarkers.icon({
-                icon: 'dot-circle-o',
-                prefix: 'fa',
-                markerColor: 'darkred'
+                icon: 'marker-origin',
+                prefix: 'icon',
+                markerColor: 'green'
             });
             geocodeMarker = new cartodb.L.marker(latLng, { icon: icon, draggable: true });
             geocodeMarker.addTo(map);
@@ -255,13 +255,13 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // for use on the static map page there. If you change them here, change them there as well
         // Remove comment if icon definitions are abstracted elsewhere
         var originIcon = L.AwesomeMarkers.icon({
-            icon: 'home',
+            icon: 'marker-origin',
             prefix: 'icon',
-            markerColor: 'purple'
+            markerColor: 'green'
         });
 
         var destIcon = L.AwesomeMarkers.icon({
-            icon: 'flag',
+            icon: 'marker-destination',
             prefix: 'icon',
             markerColor: 'red'
         });

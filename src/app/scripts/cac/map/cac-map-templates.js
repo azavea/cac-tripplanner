@@ -103,7 +103,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             console.warn('Could not parse time string ' + timeString);
             return timeString;
         }
-        return time.format('hh:mm A');
+        return time.format('h:mma');
     }
 
     function bikeSharePopup(share) {
@@ -213,10 +213,10 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<line x1="50%" y1="6%" x2="50%" y2="94%"></line>',
             '</svg>',
             '<div class="route-summary-details">',
+                '<div class="route-name">via {{this.via}}</div>',
                 '<div class="route-summary-primary-details">',
-                    '<div class="route-duration units">{{this.formattedDuration}}</div>',
-                    '<div class="route-distance">{{this.distanceMiles}}  <span class="units">miles</span></div>',
-                    '<div class="route-name">via {{this.via}}</div>',
+                    '<div class="route-duration">{{this.formattedDuration}}</div>',
+                    '<div class="route-distance">{{this.distanceMiles}} miles</div>',
                 '</div>',
                 '<div class="route-summary-secondary-details">',
                     '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
@@ -330,7 +330,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             // round to the nearest minute
             var COEFF = 60000; // to round Unix timestamp to nearest minute
             var dt = moment(Math.round(dateTime / COEFF) * COEFF);
-            return new Handlebars.SafeString(dt.format('hh:mm A'));
+            return new Handlebars.SafeString(dt.format('h:mma'));
         });
 
         Handlebars.registerHelper('inMiles', function(meters) {

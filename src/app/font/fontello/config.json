@@ -349,6 +349,30 @@
       ]
     },
     {
+      "uid": "5717236f6134afe2d2a278a5c9b3927a",
+      "css": "marker-origin",
+      "code": 61764,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "3363990fa5a224d75ed1740e1ec50bb6",
+      "css": "marker-destination",
+      "code": 62093,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "81bb68665e8e595505272a746db07c7a",
+      "css": "marker-poi",
+      "code": 61842,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "861ab06e455e2de3232ebef67d60d708",
+      "css": "minus",
+      "code": 59417,
+      "src": "fontawesome"
+    },
+    {
       "uid": "ab0357a6c5c70238bf4293c0758af085",
       "css": "county",
       "code": 59400,
