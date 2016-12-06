@@ -39,7 +39,7 @@ def home(request):
     # Load one random article
     article = Article.objects.random()
     # Show all destinations, in random order
-    destinations = Destination.objects.order_by('?').all()
+    destinations = Destination.objects.order_by('?').filter(published=True)
     context = {
         'tab': 'home',
         'article': article,

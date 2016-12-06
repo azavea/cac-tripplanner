@@ -15,15 +15,18 @@ DEFAULT_CONTEXT = {
     'routing_url': settings.ROUTING_URL
 }
 
+
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
     context = dict(tab='about', page=page, **DEFAULT_CONTEXT)
     return render(request, 'about-faq.html', context=context)
 
+
 def learn_list(request):
     articles = Article.objects.published().order_by('-publish_date')
     context = dict(tab='info', articles=articles, **DEFAULT_CONTEXT)
     return render(request, 'learn-list.html', context=context)
+
 
 def learn_detail(request, slug):
     article = get_object_or_404(Article.objects.published(), slug=slug)
