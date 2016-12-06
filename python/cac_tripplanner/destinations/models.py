@@ -15,7 +15,7 @@ class DestinationManager(models.GeoManager):
     """Custom manager for Destinations allows filtering on published"""
 
     def published(self):
-        return self.get_queryset().filter(published=True)
+        return self.get_queryset().filter(published=True).order_by('priority')
 
     def get_queryset(self):
         return super(DestinationManager, self).get_queryset()
@@ -41,6 +41,7 @@ class Destination(models.Model):
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
                                    help_text='The half-height image. Will be displayed at 400x200.')
     published = models.BooleanField(default=False)
+    priority = models.IntegerField(default=9999, null=False)
 
     objects = DestinationManager()
 
