@@ -207,19 +207,19 @@
         margin-bottom: 15px;
         background-color: $directions-form-text-input-background-color;
 
-        .tt-input, .twitter-typeahead {
-            width: 100%;
-        }
-
-        .tt-dropdown-menu {
-            background-color: $directions-form-text-input-background-color;
-        }
-
         .body-map & {
             flex: 0 0 30px;
             margin-bottom: 0;
             border: 1px solid $white;
             background-color: $gophillygo-blue;
+
+            &.error {
+                background-color: $gophillygo-red;
+
+                input[type=text], input[type=search] {
+                    background-color: $gophillygo-red !important;
+                }
+            }
 
             &.directions-from {
                 border-bottom-width: 0;
@@ -243,13 +243,13 @@
             }
         }
 
-        input {
-            flex: 1;
+        input[type=text], input[type=search] {
+            flex: 1 0 auto;
             border: 0;
             font-size: 1.4rem;
 
             .body-map & {
-                background-color: $gophillygo-blue !important;
+                background-color: $gophillygo-blue;
                 color: $white !important;
                 font-weight: $font-weight-medium;
                 line-height: 30px;
@@ -262,6 +262,77 @@
             &:focus {
                 outline: none;
             }
+        }
+
+        .twitter-typeahead {
+            display: flex !important;
+            flex: 1;
+            flex-flow: row nowrap;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+
+        .tt-hint {
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            color: $lt-gray;
+
+            .body-map & {
+                height: 28px;
+                line-height: 30px;
+                color: rgba($white, .5) !important;
+            }
+        }
+
+        .tt-input {
+            flex: 1 0 auto;
+
+            .body-map & {
+                background-color: $gophillygo-blue;
+                color: $white !important;
+                font-weight: $font-weight-medium;
+                line-height: 30px;
+            }
+        }
+
+        .tt-dropdown-menu {
+            width: 100%;
+            margin-left: -10px;
+            background-color: $directions-form-text-input-background-color;
+            font-size: 1.4rem;
+            line-height: 1.25;
+
+            .body-map & {
+                width: $sidebar-width - 20px;
+                margin-left: -5rem;
+                font-size: 1.3rem;
+                line-height: 2;
+            }
+        }
+
+        .tt-suggestion {
+            padding: .5rem 1em;
+            color: $font-secondary-color;
+
+            p {
+                margin: 0;
+
+                .body-map & {
+                    text-overflow: ellipsis;
+                    white-space: nowrap !important;
+                    overflow: hidden;
+                }
+            }
+        }
+
+        .tt-highlight {
+            font-weight: $font-weight-bold;
+            color: $font-color;
+        }
+
+        .tt-cursor {
+            background-color: $v-lt-gray;
         }
 
         .btn-geolocate {

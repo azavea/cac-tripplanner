@@ -27,19 +27,19 @@
             </div>
             <div class="directions-from directions-text-input">
                 <label for="input-directions-from">from</label>
-                <input type="text" id="input-directions-from" name="input-directions-from"
+                <input type="search" id="input-directions-from" name="input-directions-from"
                     value="" placeholder="Enter a starting point"
-                    class="typeahead" type="search" data-typeahead-key="origin">
+                    tabindex="1" class="typeahead" data-typeahead-key="origin">
                 <button class="btn-geolocate" title="Detect current location" type="button"
-                    name="geolocate"><i class="icon-geolocate"></i></button>
+                    tabindex="3" name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
             <div class="directions-to directions-text-input">
                 <label for="input-directions-to">to</label>
-                <input type="text" id="input-directions-to" name="input-directions-to" value=""
+                <input type="search" id="input-directions-to" name="input-directions-to" value=""
                     placeholder="Enter a destination — or choose one below"
-                    class="typeahead" type="search" data-typeahead-key="destination">
+                    tabindex="2" class="typeahead" data-typeahead-key="destination">
                 <button class="btn-reverse" title="Swap starting point and destination"
-                    type="button" name="reverse"><i class="icon-reverse"></i></button>
+                    tabindex="4" type="button" name="reverse"><i class="icon-reverse"></i></button>
             </div>
         </div>
     </form>
