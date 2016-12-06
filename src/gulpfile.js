@@ -11,6 +11,7 @@ var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
 var fontello = require('gulp-fontello');
 var merge = require('merge-stream');
+var needle = require('needle');
 var pump = require('pump');
 var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
@@ -182,6 +183,7 @@ gulp.task('copy:marker-images', function() {
 });
 
 gulp.task('copy:fontello-fonts', function() {
+    needle.defaults({ open_timeout: 90000 }); // give fontello a long timeout (1.5 min)
     return gulp.src('app/font/fontello/config.json')
     .pipe(fontello())
     .pipe(gulp.dest(stat.fonts));
