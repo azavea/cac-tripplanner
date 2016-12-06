@@ -212,6 +212,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
             itineraryListControl.show();
+            // highlight first itinerary in sidebar as well as on map
+            findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
         }, function (error) {
             console.error('failed to plan trip');
             console.error(error);
