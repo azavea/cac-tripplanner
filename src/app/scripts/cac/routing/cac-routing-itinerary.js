@@ -20,7 +20,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.id = index.toString();
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
-        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
+        this.formattedDistance = getFormattedDistance(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
@@ -105,16 +105,24 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get total distance in miles for an itinerary
+     * Helper function to get total distance in yards or miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
-     * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
+     * @return {string} distance of itinerary in miles (rounded to 2nd decimal), or,
+     *                 if less than half a mile, in yards (rounded to nearest yard); includes unit.
      */
-    function getDistanceMiles(legs) {
+    function getFormattedDistance(legs) {
         var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
             return sum + n;
         });
-        return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
+
+        // 804.672m in 0.5mi; at 797m, rounds up to 0.5mi
+        if (distanceMeters < 797) {
+            return Math.round(distanceMeters * 1.09361).toString() + ' yards';
+        }
+
+        // return miles
+        return (Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100).toString() + ' miles';
     }
 
     /**
