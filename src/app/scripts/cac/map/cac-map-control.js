@@ -27,7 +27,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var eventNames = {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
-        destinationMoved: 'cac:map:control:destinationmoved'
+        destinationMoved: 'cac:map:control:destinationmoved',
+        mapMoved: 'cac:map:control:mapmoved'
     };
     var basemaps = {};
     var overlays = {};
@@ -110,6 +111,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         map = new cartodb.L.map(this.options.id, { zoomControl: false })
                            .setView(this.options.center, this.options.zoom);
+
+        map.on('moveend', function() {
+            events.trigger(eventNames.mapMoved, map.getCenter());
+        });
 
         tabControl = this.options.tabControl;
 

@@ -83,7 +83,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
                             if (data && data.address) {
-                                var location = Utils.convertReverseGeocodeToFeature(data);
+                                var location = Utils.convertReverseGeocodeToLocation(data);
                                 /*jshint camelcase: false */
                                 var fullAddress = data.address.Match_addr;
                                 /*jshint camelcase: true */
@@ -139,7 +139,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 });
         } else {
             // featured locations
-            this.lastSelectedValue = suggestion.name;
+            this.lastSelectedValue = suggestion.address;
             events.trigger(eventNames.selected, [typeaheadKey, suggestion]);
         }
     }
@@ -167,7 +167,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
 
         var params = {
-            searchExtent: SearchParams.searchBounds,
+            searchExtent: SearchParams.searchExtent,
             category: SearchParams.searchCategories,
             f: 'pjson'
         };
@@ -182,7 +182,16 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                     // do not behave well with the follow-up geocode.
                     // See: https://github.com/azavea/cac-tripplanner/issues/307
                     return _.filter(list.suggestions, { isCollection: false });
-                }
+                },
+                replace: function(url, query) {
+                    // overriding replace to modify bias location per request
+                    url = url.replace('%QUERY', encodeURIComponent(query));
+                    url += '&' + $.param({
+                        location: SearchParams.getLocation(),
+                        distance: SearchParams.distance
+                    });
+                    return url;
+                },
             }
         });
         adapter.initialize();

@@ -2,7 +2,7 @@ CAC.Utils = (function (_) {
     'use strict';
 
     var module = {
-        convertReverseGeocodeToFeature: convertReverseGeocodeToFeature,
+        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams,
@@ -65,15 +65,19 @@ CAC.Utils = (function (_) {
     return module;
 
     /**
-     * Convert ESRI reverse geocode response into feature formatted like typeahead results.
+     * Convert ESRI reverse geocode response into location formatted like typeahead results.
      *
      * @param {Object} response JSON response from ESRI reverse geocode service
-     * @returns {Object} Feature object structured like the typeahead results, for use on map page.
+     * @returns {Object} Location object structured like the typeahead results, for use on map page.
      */
-    function convertReverseGeocodeToFeature(response) {
-        var feature = {
+    function convertReverseGeocodeToLocation(response) {
+        var location = {
+            location: {
+                x: response.location.x,
+                y: response.location.y
+            },
             /*jshint camelcase: false */
-            name: response.address.Match_addr,
+            address: response.address.Match_addr,
             /*jshint camelcase: true */
             extent: {
                 xmax: response.location.x,
@@ -81,20 +85,14 @@ CAC.Utils = (function (_) {
                 ymax: response.location.y,
                 ymin: response.location.y
             },
-            feature: {
-                attributes: {
-                    City: response.address.City,
-                    Postal: response.address.Postal,
-                    Region: response.address.Region,
-                    StAddr: response.address.Address,
-                },
-                geometry: {
-                    x: response.location.x,
-                    y: response.location.y
-                }
-            }
+            attributes: {
+                City: response.address.City,
+                Postal: response.address.Postal,
+                Region: response.address.Region,
+                StAddr: response.address.Address,
+            },
         };
-        return feature;
+        return location;
     }
 
     // Source: https://github.com/azavea/nih-wayfinding/blob/develop/src/nih_wayfinding/app/scripts/routing/abbreviate-filter.js

@@ -334,8 +334,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         typeaheadTo.setValue(originText);
 
         // set on this object and validate
-        setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
-        setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
+        setDirections('origin', [destination.location.y, destination.location.x]);
+        setDirections('destination', [origin.location.y, origin.location.x]);
 
         // update the directions for the reverse trip
         planTrip();
@@ -348,19 +348,19 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         mapControl.clearDirectionsMarker(key);
     }
 
-    function onTypeaheadSelected(event, key, location) {
+    function onTypeaheadSelected(event, key, result) {
 
         event.preventDefault();  // do not submit form
 
-        if (!location) {
+        if (!result) {
             UserPreferences.clearLocation(key);
             setDirections(key, null);
             return;
         }
 
         // save text for address to preferences
-        UserPreferences.setLocation(key, location);
-        setDirections(key, [location.feature.geometry.y, location.feature.geometry.x]);
+        UserPreferences.setLocation(key, result);
+        setDirections(key, [result.location.y, result.location.x]);
 
         planTrip();
     }
@@ -389,7 +389,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
                 $(options.selectors.typeaheadFrom).blur();
                 $(options.selectors.typeaheadTo).blur();
 
-                var location = Utils.convertReverseGeocodeToFeature(data);
+                var location = Utils.convertReverseGeocodeToLocation(data);
                 UserPreferences.setPreference(key, location);
                 /*jshint camelcase: false */
                 var fullAddress = data.address.Match_addr;
@@ -419,7 +419,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         // Set origin
         var origin = UserPreferences.getPreference('origin');
         var originText = UserPreferences.getPreference('originText');
-        directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
+        directions.origin = [origin.location.y, origin.location.x];
 
         // Set destination
         var destinationCoords = destination.point.coordinates;
@@ -427,11 +427,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         directions.destination = [destinationCoords[1], destinationCoords[0]];
 
         // Save destination coordinates in expected format (to match typeahead results)
-        destination.feature = {
-            geometry: {
-                x: destinationCoords[0],
-                y: destinationCoords[1]
-            }
+        destination.location = {
+            x: destinationCoords[0],
+            y: destinationCoords[1]
         };
 
         // set in UI
@@ -485,16 +483,16 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
 
-        if (destination && destination.feature && destination.feature.geometry) {
+        if (destination && destination.location) {
             directions.destination = [
-                destination.feature.geometry.y,
-                destination.feature.geometry.x
+                destination.location.y,
+                destination.location.x
             ];
             typeaheadTo.setValue(destinationText);
         }
 
-        if (origin && origin.feature && origin.feature.geometry) {
-            directions.origin = [origin.feature.geometry.y, origin.feature.geometry.x];
+        if (origin && origin.location) {
+            directions.origin = [origin.location.y, origin.location.x];
             typeaheadFrom.setValue(originText);
         }
 
