@@ -175,7 +175,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         // This needs to happen after the layer control has been added to the map,
         // or else the selectors will not find it.
         var $layerContainer = $(this.options.selectors.leafletLayerControl);
-        window.lc = $layerContainer;
 
         $layerContainer.prepend('<div class="leaflet-minimize minimized"><i class="icon-layers"></i></div>');
 

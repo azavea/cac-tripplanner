@@ -33,8 +33,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             selectedItineraryClass: 'selected',
             errorClass: 'error',
 
-            // TODO: add back spinner components (from before refactor)
-            spinner: '.directions-results > .sk-spinner',
+            spinner: '.directions-results > .sk-spinner'
         }
     };
     var options = {};
