@@ -183,7 +183,7 @@ gulp.task('copy:marker-images', function() {
 });
 
 gulp.task('copy:fontello-fonts', function() {
-    needle.defaults({ open_timeout: 90000 }); // give fontello a long timeout (1.5 min)
+    needle.defaults({ open_timeout: 180000 }); // give fontello a long timeout (3 min)
     return gulp.src('app/font/fontello/config.json')
     .pipe(fontello())
     .pipe(gulp.dest(stat.fonts));
@@ -282,25 +282,21 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 );
 
 gulp.task('common:build', ['clean'], sequence([
+        'copy:fontello-fonts',
         'copy:vendor-css',
         'copy:vendor-images',
         'copy:marker-images',
-        'copy:fontello-fonts',
         'copy:app-images',
         'sass',
         'collectstatic'])
 );
 
 gulp.task('test', sequence([
-            'production',
             'test:copy-jquery',
             'test:copy-cartodb',
-            'minify:scripts',
-            'minify:vendor-scripts',
+            'production',
             'test:production',
             'development',
-            'copy:vendor-scripts',
-            'copy:scripts',
             'test:coverage'])
 );
 
