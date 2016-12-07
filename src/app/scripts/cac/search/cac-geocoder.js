@@ -5,7 +5,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
     var reverseUrl = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
 
     var defaults = {
-        searchExtent: SearchParams.searchBounds,
+        searchExtent: SearchParams.searchExtent,
         category: SearchParams.searchCategories,
         outFields: 'StAddr,City,Region,Postal',
         f: 'pjson',
