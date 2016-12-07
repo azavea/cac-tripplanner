@@ -69,8 +69,8 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             // check to see whether or not the value in the typeahead is something that has been
             // selected. If it has not been selected, trigger a change even with a null location
             // in order to warn listeners that the displayed value has not been geocoded.
-            $element.blur($.proxy(function() {
-                if ($element.typeahead('val') !== this.lastSelectedValue) {
+            $element.blur($.proxy(function(event) {
+                if (event.currentTarget && $element.typeahead('val') !== this.lastSelectedValue) {
                     var key = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
                     this.events.trigger(eventNames.selected, [key, null]);
                 }
