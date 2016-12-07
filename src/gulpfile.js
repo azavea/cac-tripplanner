@@ -183,7 +183,8 @@ gulp.task('copy:marker-images', function() {
 });
 
 gulp.task('copy:fontello-fonts', function() {
-    needle.defaults({ open_timeout: 180000 }); // give fontello a long timeout (3 min)
+    needle.defaults({ open_timeout: 0 }); // do not time out
+    needle.defaults({ read_timeout: 0 });
     return gulp.src('app/font/fontello/config.json')
     .pipe(fontello())
     .pipe(gulp.dest(stat.fonts));
