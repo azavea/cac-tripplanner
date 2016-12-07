@@ -146,6 +146,27 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
             tabControl.setTab(tabControl.TABS.HOME);
         });
 
+        // disable zoom on mobile safari
+        if (isMobileSafari()) {
+            $(document).bind('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault(); // pinch - prevent zoom
+                    e.stopPropagation();
+                    return;
+                }
+
+                var t2 = e.timeStamp;
+                var t1 = this.lastTouch || t2;
+                var dt = t2 - t1;
+                this.lastTouch = t2;
+
+                if (dt && dt < 500) {
+                    e.preventDefault(); // double tap - prevent zoom
+                    e.stopPropagation();
+                }
+            });
+        }
+
         // load directions if origin and destination set
         $(document).ready(directionsControl.setFromUserPreferences());
     }
@@ -177,6 +198,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
     function moveDestination(event, position) {
         event.preventDefault();
         directionsControl.moveOriginDestination('destination', position);
+    }
+
+    /**
+     * Helper to check user agent string to see if on Mobile Safari browser
+     *
+     @returns {boolean} True if visiting from Mobile Safari
+     */
+    function isMobileSafari() {
+        var ua = window.navigator.userAgent;
+        console.log(ua);
+        var iOS = /iP(ad|hone)/i.test(ua); // iPad / iPhone
+        var webkit = /WebKit/i.test(ua);
+        // Chrome and Opera also report WebKit
+        return iOS && webkit && !(/CriOS/i.test(ua)) && !(/OPiOS/i.test(ua));
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions,
