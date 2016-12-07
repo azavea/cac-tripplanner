@@ -38,8 +38,8 @@ def base_view(request, page, context):
 def home(request):
     # Load one random article
     article = Article.objects.random()
-    # Show all destinations, in random order
-    destinations = Destination.objects.order_by('?').all()
+    # Show all destinations
+    destinations = Destination.objects.published().all()
     context = {
         'tab': 'home',
         'article': article,
@@ -67,7 +67,7 @@ def directions(request):
 
 def place_detail(request, pk):
     destination = get_object_or_404(Destination.objects.published(), pk=pk)
-    more_destinations = Destination.objects.published().order_by('?').exclude(pk=destination.pk)[:3]
+    more_destinations = Destination.objects.published().exclude(pk=destination.pk)[:3]
     context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
                    **DEFAULT_CONTEXT)
     return base_view(request, 'place-detail.html', context=context)

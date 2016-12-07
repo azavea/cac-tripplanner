@@ -17,12 +17,12 @@ class DestinationManager(models.GeoManager):
     def published(self):
         return self.get_queryset().filter(published=True)
 
-    def get_queryset(self):
-        return super(DestinationManager, self).get_queryset()
-
 
 class Destination(models.Model):
     """Represents a destination"""
+
+    class Meta:
+        ordering = ['priority', '?']
 
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
@@ -41,6 +41,7 @@ class Destination(models.Model):
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
                                    help_text='The half-height image. Will be displayed at 400x200.')
     published = models.BooleanField(default=False)
+    priority = models.IntegerField(default=9999, null=False)
 
     objects = DestinationManager()
 
