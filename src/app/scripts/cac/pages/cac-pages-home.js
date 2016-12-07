@@ -155,9 +155,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
                     return;
                 }
 
-                const t2 = e.timeStamp;
-                const t1 = this.lastTouch || t2;
-                const dt = t2 - t1;
+                var t2 = e.timeStamp;
+                var t1 = this.lastTouch || t2;
+                var dt = t2 - t1;
                 this.lastTouch = t2;
 
                 if (dt && dt < 500) {
