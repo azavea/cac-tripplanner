@@ -6,6 +6,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
     var defaults = {
         currentMode: 'WALK',
+        // default text to display for top-level modal menu options
+        // when user has not set anything for it yet
+        defaultMenuText: {
+            bikeShare: 'Indego bike sharing',
+            timing: 'Arrive/depart at…',
+            bikeTriangle: 'Ride quality',
+            accessibility: 'Accessibility'
+        },
         selectors: {
             bodyModalClass: 'body-modal body-modal-options',
             selectedClass: 'selected', // used to mark selected list item
@@ -27,6 +35,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             currentTimeClass: 'current-time',
             notTodayClass: 'not-today',
             firstOption: 'option:first',
+            modalListContents: '.modal-list.modal-contents',
 
             // the two top-level modals
             bikeOptionsModal: '.modal-options.bike-options',
@@ -90,13 +99,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             modalSelector = options.selectors.walkOptionsModal;
             isBike = false;
         }
-
-        modal = new Modal({
-            modalSelector: modalSelector,
-            bodyModalClass: options.selectors.bodyModalClass,
-            clickHandler: onClick,
-            onClose: onClose
-        });
     }
 
     function onClick(e) {
@@ -185,12 +187,25 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         if (!childModal && options.onClose) {
             options.onClose();
         }
+
+        modal = null;
     }
 
     /**
      * Public function to pass through calls to open the top-level modal
      */
     function open() {
+        // set user selections in top-level dialogue
+        var ul = isBike ? bikeModalOptions() : walkModalOptions();
+        $(modalSelector).find(options.selectors.modalListContents).html(ul);
+
+        modal = new Modal({
+            modalSelector: modalSelector,
+            bodyModalClass: options.selectors.bodyModalClass,
+            clickHandler: onClick,
+            onClose: onClose
+        });
+
         $(modalSelector).addClass(options.selectors.visibleClass);
         modal.open();
     }
@@ -267,6 +282,108 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
         // re-open parent modal on child modal close, to show selections
         open();
+    }
+
+    /**
+     * Helper to generate options list for top-level menu to display when bike mode is on.
+     * Will display current selection instead of default text if user has explicitly set an option.
+     *
+     * @returns {String} HTML snippet with list items to replace content inside
+                         bike modal's unordered list
+     */
+    function bikeModalOptions() {
+
+        var source = [
+            '<li class="modal-list-indego">{{bikeShare}}</li>',
+            '<li class="modal-list-timing">{{timing}}</li>',
+            '<li class="modal-list-ride">{{bikeTriangle}}</li>'
+        ].join('');
+
+        var bikeShare = options.defaultMenuText.bikeShare;
+        if (!UserPreferences.isDefault('bikeShare')) {
+            var useBikeShare = UserPreferences.getPreference('bikeShare');
+            if (useBikeShare) {
+                bikeShare = 'Use Indego bike sharing';
+            } else {
+                bikeShare = 'Use my own bike';
+            }
+        }
+
+        var bikeTriangle = options.defaultMenuText.bikeTriangle;
+        if (!UserPreferences.isDefault('bikeTriangle')) {
+            var bikePreference = UserPreferences.getPreference('bikeTriangle');
+            bikeTriangle = [
+                bikePreference.charAt(0).toUpperCase(),
+                bikePreference.slice(1),
+                ' ride'
+            ].join('');
+        }
+
+        var timing = getTimingText();
+
+        var template = Handlebars.compile(source);
+        var html = template({
+            bikeShare: bikeShare,
+            timing: timing,
+            bikeTriangle: bikeTriangle
+        });
+
+        return html;
+    }
+
+        /**
+     * Helper to generate options list for top-level menu to display when bike mode is off.
+     * Will display current selection instead of default text if user has explicitly set an option.
+     *
+     * @returns {String} HTML snippet with list items to replace content inside
+                         walk modal's unordered list
+     */
+    function walkModalOptions() {
+
+        var source = [
+            '<li class="modal-list-timing">{{timing}}</li>',
+            '<li class="modal-list-accessibility">{{accessibility}}</li>'
+        ].join('');
+
+        var accessibility = options.defaultMenuText.accessibility;
+        if (!UserPreferences.isDefault('wheelchair')) {
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+            if (wheelchair) {
+                accessibility = 'I have a wheelchair';
+            } else {
+                accessibility = 'I am walking';
+            }
+        }
+
+        var timing = getTimingText();
+
+        var template = Handlebars.compile(source);
+        var html = template({
+            accessibility: accessibility,
+            timing: timing,
+        });
+
+        return html;
+    }
+
+    /**
+     * Helper to get the modal dialog text for arrival/departure time,
+     * shared by bike and walk modals.
+     *
+     * @returns {string} Text snippet to display
+     */
+    function getTimingText() {
+        var timing = options.defaultMenuText.timing;
+        if (!UserPreferences.isDefault('dateTime')) {
+            var dateTime = moment.unix(UserPreferences.getPreference('dateTime'));
+            var arriveBy = UserPreferences.getPreference('arriveBy');
+            timing = arriveBy ? 'Arrive ' : 'Depart ';
+            // format as relative time
+            // TODO: something more exact
+            timing += dateTime.fromNow();
+        }
+
+        return timing;
     }
 
     /**

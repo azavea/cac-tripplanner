@@ -29,6 +29,7 @@ CAC.User.Preferences = (function(_) {
         arriveBy: false, // depart at set time, by default
         bikeShare: false,
         bikeTriangle: 'any',
+        dateTime: undefined, // explicitly list here for isDefault check
         exploreTime: 20,
         maxWalk: 482802, // in meters; set large, since not user-controllable
         method: 'directions',
