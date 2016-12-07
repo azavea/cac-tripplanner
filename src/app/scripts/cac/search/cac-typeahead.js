@@ -22,8 +22,8 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     var defaults = {
         highlight: true,
         minLength: 1, // empty input is checked differently, 0 minLength no longer needed
-        hint: false,
-        autoselect: false
+        hint: true,
+        autoselect: true
     };
     var defaultTypeaheadKey = 'default';
     var eventNames = {
@@ -132,14 +132,13 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             this.lastSelectedValue = suggestion.text;
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
-                    // location will be null if no results found
                     events.trigger(eventNames.selected, [typeaheadKey, location]);
                 }, function (error) {
                     console.error(error);
                 });
         } else {
             // featured locations
-            this.lastSelectedValue = suggestion.address;
+            this.lastSelectedValue = suggestion.name;
             events.trigger(eventNames.selected, [typeaheadKey, suggestion]);
         }
     }

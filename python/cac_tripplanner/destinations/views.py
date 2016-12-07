@@ -193,6 +193,7 @@ class SearchDestinations(View):
 
         data = [model_to_dict(x) for x in results]
         for obj in data:
+            obj['address'] = obj['name']
             obj['point'] = json.loads(obj['point'].json)
             obj['image'] = image_to_url(obj, 'image')
             obj['wide_image'] = image_to_url(obj, 'wide_image')
@@ -204,18 +205,17 @@ class SearchDestinations(View):
                 'ymin': obj['point']['coordinates'][1]
             }
             obj['extent'] = extent
-            feature = {
-                'attributes': {
-                    'City': obj['city'],
-                    'Postal': obj['zip'],
-                    'Region': obj['state'],
-                    'StAddr': obj['address']
-                }, 'geometry': {
-                    'x': obj['point']['coordinates'][0],
-                    'y': obj['point']['coordinates'][1]
-                }
+            obj['attributes'] = {
+                'City': obj['city'],
+                'Postal': obj['zip'],
+                'Region': obj['state'],
+                'StAddr': obj['address']
             }
-            obj['feature'] = feature
+
+            obj['location'] = {
+                'x': obj['point']['coordinates'][0],
+                'y': obj['point']['coordinates'][1]
+            }
 
         response = {'destinations': data}
         return HttpResponse(json.dumps(response), 'application/json')
