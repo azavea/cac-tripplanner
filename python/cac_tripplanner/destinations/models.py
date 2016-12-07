@@ -15,14 +15,14 @@ class DestinationManager(models.GeoManager):
     """Custom manager for Destinations allows filtering on published"""
 
     def published(self):
-        return self.get_queryset().filter(published=True).order_by('priority')
-
-    def get_queryset(self):
-        return super(DestinationManager, self).get_queryset()
+        return self.get_queryset().filter(published=True)
 
 
 class Destination(models.Model):
     """Represents a destination"""
+
+    class Meta:
+        ordering = ['priority', '?']
 
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
