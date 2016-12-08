@@ -323,16 +323,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         UserPreferences.setPreference('destination', origin);
         UserPreferences.setPreference('destinationText', originText);
 
+        // swap the local values
+        var tmpDestination = directions.destination;
+        setDirections('destination', directions.origin);
+        setDirections('origin', tmpDestination);
+
         // update the text control
         typeaheadFrom.setValue(destinationText);
         typeaheadTo.setValue(originText);
-
-        if (directions.origin) {
-            setDirections('destination', [origin.feature.geometry.y, origin.feature.geometry.x]);
-        }
-        if (directions.destination) {
-            setDirections('origin', [destination.feature.geometry.y, destination.feature.geometry.x]);
-        }
 
         // update the directions for the reverse trip
         planTrip();
