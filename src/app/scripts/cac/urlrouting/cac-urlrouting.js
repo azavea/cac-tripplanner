@@ -94,8 +94,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                     if (isNaN(coords[0])) {
                         UserPreferences.setPreference(field, undefined);
                     } else {
-                        var feature = makeFeature(coords, params[field + 'Text']);
-                        UserPreferences.setPreference(field, feature);
+                        var location = makeLocation(coords, params[field + 'Text']);
+                        UserPreferences.setPreference(field, location);
                     }
                 } else if (field === 'waypoints') {
                     var waypoints = _.map(params[field].split(';'), function(waypoint) {
@@ -125,10 +125,10 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {
-                var location = UserPreferences.getPreference(field, false);
-                if (location && location.feature && location.feature.geometry) {
-                    opts[field] = [_.round(location.feature.geometry.y, COORDINATE_ROUND),
-                                   _.round(location.feature.geometry.x, COORDINATE_ROUND)
+                var place = UserPreferences.getPreference(field, false);
+                if (place && place.location) {
+                    opts[field] = [_.round(place.location.y, COORDINATE_ROUND),
+                                   _.round(place.location.x, COORDINATE_ROUND)
                                   ].join(',');
                 } else {
                     opts[field] = '';
@@ -153,14 +153,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         return Utils.encodeUrlParams(opts);
     }
 
-    function makeFeature(coords, name) {
+    function makeLocation(coords, name) {
         return {
-            name: name,
-            feature: {
-                geometry: {
-                    x: coords[1],
-                    y: coords[0]
-                }
+            address: name,
+            location: {
+                x: coords[1],
+                y: coords[0]
             }
         };
     }

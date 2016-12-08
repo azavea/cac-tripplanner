@@ -99,14 +99,14 @@ CAC.User.Preferences = (function(_) {
      * Convenience method to avoid having to manually set both preferences for 'origin' and
      * destination.
      *
-     * 'text' is optional and defaults to location.name if omitted
+     * 'text' is optional and defaults to location.address if omitted
      */
     function setLocation(key, location, text) {
         setPreference(key, location);
         if (!_.isUndefined(text)) {
             setPreference(key + 'Text', text);
         } else {
-            setPreference(key + 'Text', location.name);
+            setPreference(key + 'Text', location.address);
         }
     }
 

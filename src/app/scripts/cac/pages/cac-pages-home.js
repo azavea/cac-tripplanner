@@ -1,5 +1,5 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl, Templates,
-                            UserPreferences, UrlRouter) {
+CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
+                            Templates, UserPreferences, UrlRouter) {
     'use strict';
 
     var defaults = {
@@ -112,6 +112,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
 
+        mapControl.events.on(mapControl.eventNames.mapMoved, SearchParams.updateMapCenter);
+
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -214,5 +216,5 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, TabControl
         return iOS && webkit && !(/CriOS/i.test(ua)) && !(/OPiOS/i.test(ua));
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions,
+})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
     CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
