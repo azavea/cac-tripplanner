@@ -234,9 +234,13 @@
                 }
             }
 
-            &.directions-from {
-                border-bottom-width: 0;
+            &.directions-to {
+                border-top-width: 0;
             }
+        }
+
+        .body-map-explore &.directions-to {
+            display: none;
         }
 
         label {

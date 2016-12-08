@@ -13,12 +13,27 @@
         background-color: inherit;
     }
 
-    .body-map & {
+    .body-map-dir & {
         display: none;
     }
 
     .places-header {
         position: relative;
+    }
+
+    .body-map-explore & {
+        @include sidebar-main;
+
+        @include respond-to('xxs') {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+
+    // This is copied from the `sidebar-main` mixin but since that's included by
+    // `.body-map-explore &` the selector path comes out wrong.
+    .body-has-sidebar-banner & {
+        height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height} - #{$sidebar-banner-height});
     }
 
     h1 {
