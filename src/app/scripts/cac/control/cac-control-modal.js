@@ -49,6 +49,11 @@ CAC.Control.Modal = (function ($) {
             event.preventDefault();
         }
 
+        // unbind events before potentially re-binding them
+        $(this.options.selectors.modalOption).off('click');
+        $(this.options.selectors.modalCloseButton).off('click');
+        $(this.options.selectors.modalClearButton).off('click');
+
         // bind events; these must also be unbound during _close
         $(this.options.selectors.modalOption).on('click', this.options.clickHandler);
         $(this.options.selectors.modalCloseButton).on('click', this.close);
@@ -64,12 +69,6 @@ CAC.Control.Modal = (function ($) {
         if (event && event.preventDefault) {
             event.preventDefault();
         }
-
-        // remove click handlers. otherwise will trigger click events repeatedly
-        // on subsequent modal open
-        $(this.options.selectors.modalOption).off('click');
-        $(this.options.selectors.modalCloseButton).off('click');
-        $(this.options.selectors.modalClearButton).off('click');
 
         if (this.options.onClose) {
             return this.options.onClose(event);

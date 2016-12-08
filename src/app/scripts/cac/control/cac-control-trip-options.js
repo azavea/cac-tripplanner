@@ -174,10 +174,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        // close parent before declaring child modal
-        // FIXME: otherwise event bindings of parent are overwritten by child
-        modal.close();
         childModal = new Modal(childModalOptions);
+        modal.close();
         childModal.open();
         $(childModalSelector).addClass(options.selectors.visibleClass);
     }
