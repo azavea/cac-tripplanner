@@ -97,6 +97,7 @@ CAC.Control.ModeOptions = (function ($) {
 
     /**
      * Helper to return the mode string based on the buttons within the given input selector.
+     * Does not reflect whether in bike share mode or not, which is controlled separately.
      *
      * @returns {String} comma-separated list of OpenTripPlanner mode parameters
      */
@@ -114,7 +115,8 @@ CAC.Control.ModeOptions = (function ($) {
 
     /**
      * Helper to set the appropriate buttons within the given input selector
-     * so that they match the mode string.
+     * so that they match the mode string. Does not affect the bike share mode setting,
+     * which is managed separately by the trip options modal.
      *
      * @param mode {String} OpenTripPlanner mode string like 'WALK,TRANSIT'
      */
@@ -126,6 +128,10 @@ CAC.Control.ModeOptions = (function ($) {
         }
 
         _.each(options.modes, function(val, key) {
+            // for purposes of the bike toggle button, BICYCLE and BICYCLE_RENT are the same
+            if (key.indexOf('_RENT') >= 0) {
+                key = key.replace('_RENT', '');
+            }
             var $thisMode = $modes.find('.' + key);
 
             var addClass = options.selectors.offClass;

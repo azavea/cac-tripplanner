@@ -45,7 +45,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         destination: null
     };
 
-    var modeOptionsControl = null;
     var mapControl = null;
     var itineraryControl = null;
     var tabControl = null;
@@ -61,9 +60,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         tabControl = options.tabControl;
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
-        modeOptionsControl = options.modeOptionsControl;
-        modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, planTrip);
-        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, planTrip);
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
@@ -132,7 +128,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
 
-        var mode = modeOptionsControl.getMode();
+        var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
 
         // options to pass to OTP as-is
@@ -150,19 +146,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
             var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-
-            if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-            } else {
-                console.error('unrecognized bike triangle option ' + bikeTriangle);
+            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
+            if (bikeTriangle) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
             }
-
-            // check user preference for bike share here, and update query mode if so
-            if (UserPreferences.getPreference('bikeShare')) {
-                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
-            }
-
         } else {
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
@@ -431,8 +418,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         };
 
         // set in UI
-        var mode = UserPreferences.getPreference('mode');
-        modeOptionsControl.setMode(mode);
         typeaheadFrom.setValue(originText);
         typeaheadTo.setValue(destinationText);
 

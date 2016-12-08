@@ -92,7 +92,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
     return TripOptionsControl;
 
     function initialize() {
-        if (options.currentMode.indexOf('BICYCLE') > -1) {
+        var currentMode = UserPreferences.getPreference('mode');
+        if (currentMode.indexOf('BICYCLE') > -1) {
             modalSelector = options.selectors.bikeOptionsModal;
             isBike = true;
         } else {
@@ -173,8 +174,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        childModal = new Modal(childModalOptions);
+        // close parent before declaring child modal
+        // FIXME: otherwise event bindings of parent are overwritten by child
         modal.close();
+        childModal = new Modal(childModalOptions);
         childModal.open();
         $(childModalSelector).addClass(options.selectors.visibleClass);
     }
@@ -184,7 +187,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         // trigger plan re-query by calling onClose handler
         // check if child modal exists to determine whether closing out of options altogether
         // or just closing to go to another options modal
-        if (!childModal && options.onClose) {
+        if (!childModalSelector && options.onClose) {
             options.onClose();
         }
 
