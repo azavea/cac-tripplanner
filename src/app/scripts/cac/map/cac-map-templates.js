@@ -266,7 +266,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '<div class="directions-instruction">Board {{this.agencyName}} ',
                             '{{this.route}} {{this.headsign}}</div>',
                             '<div class="directions-time">at {{datetime this.startTime}}</div>',
-                            '<div class="directions-distance">{{inMilesYards this.distance}}</div>',
+                            '<div class="directions-distance">{{this.formattedDistance}}</div>',
                         '</div>',
                         '<div class="directions-step directions-step-disembark" ',
                             'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
@@ -280,7 +280,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                                 '{{directionClass this.relativeDirection ../this.mode @index}}" ',
                                 'data-lat="{{ lat }}" data-lon="{{ lon }}">',
                                 '<div class="directions-instruction">{{directionText ../this @index}}</div>',
-                                '<div class="directions-distance">{{inMilesYards this.distance}}</div>',
+                                '<div class="directions-distance">{{this.formattedDistance}}</div>',
                             '</div>',
                         '{{/each}}',
                         '{{#unless this.lastLeg}}',
@@ -331,16 +331,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             var COEFF = 60000; // to round Unix timestamp to nearest minute
             var dt = moment(Math.round(dateTime / COEFF) * COEFF);
             return new Handlebars.SafeString(dt.format('h:mma'));
-        });
-
-        Handlebars.registerHelper('inMilesYards', function(meters) {
-            if (meters < 797) {
-                var yards = Math.round(meters * 1.09361);
-                return new Handlebars.SafeString(yards.toString() + ' yards');
-            } else {
-                var miles = Math.round(((meters / 1000) * 0.621371) * 100) / 100;
-                return new Handlebars.SafeString(miles.toString() + ' mi');
-            }
         });
     }
 
