@@ -162,7 +162,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<div class="block-detail">',
                 '<div class="trip-numbers">{{#if d.formattedDuration}}<div class="trip-duration"> ',
                 '{{ d.formattedDuration }}</div>{{/if}}<div class="trip-distance">',
-                '{{ d.distanceMiles }}</div></div>',
+                '{{ d.formattedDistance }}</div></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}',
                     '{{^}}https://placehold.it/300x150{{/if}}" />',
@@ -216,7 +216,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<div class="route-name">via {{this.via}}</div>',
                 '<div class="route-summary-primary-details">',
                     '<div class="route-duration">{{this.formattedDuration}}</div>',
-                    '<div class="route-distance">{{this.distanceMiles}} miles</div>',
+                    '<div class="route-distance">{{this.formattedDistance}}</div>',
                 '</div>',
                 '<div class="route-summary-secondary-details">',
                     '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
@@ -266,7 +266,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '<div class="directions-instruction">Board {{this.agencyName}} ',
                             '{{this.route}} {{this.headsign}}</div>',
                             '<div class="directions-time">at {{datetime this.startTime}}</div>',
-                            '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
+                            '<div class="directions-distance">{{this.formattedDistance}}</div>',
                         '</div>',
                         '<div class="directions-step directions-step-disembark" ',
                             'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
@@ -280,7 +280,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                                 '{{directionClass this.relativeDirection ../this.mode @index}}" ',
                                 'data-lat="{{ lat }}" data-lon="{{ lon }}">',
                                 '<div class="directions-instruction">{{directionText ../this @index}}</div>',
-                                '<div class="directions-distance">{{inMiles this.distance}} mi</div>',
+                                '<div class="directions-distance">{{this.formattedDistance}}</div>',
                             '</div>',
                         '{{/each}}',
                         '{{#unless this.lastLeg}}',
@@ -331,10 +331,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             var COEFF = 60000; // to round Unix timestamp to nearest minute
             var dt = moment(Math.round(dateTime / COEFF) * COEFF);
             return new Handlebars.SafeString(dt.format('h:mma'));
-        });
-
-        Handlebars.registerHelper('inMiles', function(meters) {
-            return new Handlebars.SafeString(Math.round(((meters / 1000) * 0.621371) * 100) / 100);
         });
     }
 

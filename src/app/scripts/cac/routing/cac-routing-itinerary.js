@@ -20,7 +20,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.id = index.toString();
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
-        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
+        this.formattedDistance = getFormattedItineraryDistance(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
@@ -105,16 +105,33 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get total distance in miles for an itinerary
+     * Helper function to get total distance in feet or miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
-     * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
+     * @return {string} distance of itinerary in miles (rounded to 2nd decimal), or,
+     *                 if less than .2 mile, in feet (rounded to nearest foot); includes unit.
      */
-    function getDistanceMiles(legs) {
+    function getFormattedItineraryDistance(legs) {
         var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
             return sum + n;
         });
-        return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
+        return getFormattedDistance(distanceMeters);
+    }
+
+    /**
+     * Helper function to get formatted string in feet or miles for a given distance in meters
+     *
+     * @param {double} distanceMeters Distance to format
+     * @return {string} distance in miles or feet, rounded, with unit
+     */
+    function getFormattedDistance(distanceMeters) {
+        // less than ~0.2 miles
+        if (distanceMeters < 322) {
+            return Math.round(distanceMeters * 3.28084).toString() + ' ft';
+        }
+
+        // return miles
+        return (Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100).toString() + ' mi';
     }
 
     /**
@@ -179,6 +196,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     function getLegs(legs, hasWaypoints) {
         // Check leg from/to place name; if it's an OSM node label, reverse geocode it
         // and update label
+
         var newLegs = _.map(legs, function(leg) {
             if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
@@ -199,8 +217,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         }
 
         // Add some derived data to be used in the template:
-        // - Format duration
-        _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
+        // - Format duration on leg and distance on leg and its steps
+        _.forEach(newLegs, function (leg) {
+            leg.formattedDistance = getFormattedDistance(leg.distance);
+            leg.formattedDuration = getFormattedDuration(leg);
+            _.forEach(leg.steps, function(step) {
+                step.formattedDistance = getFormattedDistance(step.distance);
+            });
+        });
         // - Set a flag on the last leg, so we can avoid diplaying arriving there right above
         //   also arriving at the final destination
         newLegs[newLegs.length - 1].lastLeg = true;
