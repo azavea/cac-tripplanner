@@ -48,7 +48,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
     function clearUrl() {
-        updateUrl('');
+        updateUrl('/');
     }
 
     function buildExploreUrlFromPrefs() {
