@@ -90,7 +90,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         initialize: initialize,
         events: events,
         eventNames: eventNames,
-        open: open
+        open: open,
+        getTimingText: getTimingText
     };
 
     return TripOptionsControl;
@@ -347,7 +348,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             ].join('');
         }
 
-        var timing = getTimingText();
+        var timing = getTimingText() || options.defaultMenuText.timing;
 
         var template = Handlebars.compile(source);
         var html = template({
@@ -382,7 +383,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        var timing = getTimingText();
+        var timing = getTimingText() || options.defaultMenuText.timing;
         var template = Handlebars.compile(source);
         return template({
             accessibility: accessibility,
@@ -394,14 +395,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
      * Helper to get the modal dialog text for arrival/departure time,
      * shared by bike and walk modals.
      *
-     * @returns {string} Text snippet to display
+     * @returns {string} Text snippet to display, or null for default (now)
      */
     function getTimingText() {
-        var timing = options.defaultMenuText.timing;
         if (!UserPreferences.isDefault('dateTime')) {
             var dateTime = moment.unix(UserPreferences.getPreference('dateTime'));
             var arriveBy = UserPreferences.getPreference('arriveBy');
-            timing = arriveBy ? 'Arrive ' : 'Depart ';
+            var timing = arriveBy ? 'Arrive ' : 'Depart ';
             timing += dateTime.calendar(null, {
                 sameDay: '[Today] h:mma',
                 nextDay: '[Tomorrow] h:mma',
@@ -410,9 +410,11 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 lastWeek: '[Last] ddd h:mma',
                 sameElse: 'M/D h:mma'
             });
+            return timing;
         }
 
-        return timing;
+        // should use default text
+        return null;
     }
 
     /**

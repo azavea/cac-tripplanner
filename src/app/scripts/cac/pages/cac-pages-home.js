@@ -242,7 +242,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
-     *
+     * Sets the HTML in the trip options sidebar banner, based on user preferences.
      */
     function updateTripOptionsBanner() {
         var source = [
@@ -282,8 +282,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             modeText += ' + Transit';
         }
 
-        // TODO: populate
-        var timingText = 'arrive by yesterday';
+        var timingText = TripOptions.prototype.getTimingText() || 'Depart now';
 
         var template = Handlebars.compile(source);
         var html = template({
