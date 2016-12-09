@@ -247,9 +247,9 @@
             flex: 1 0 auto;
             border: 0;
             font-size: 1.4rem;
+            background-color: transparent;
 
             .body-map & {
-                background-color: $gophillygo-blue;
                 color: $white !important;
                 font-weight: $font-weight-medium;
                 line-height: 30px;
