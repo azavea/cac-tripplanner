@@ -20,6 +20,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
+            sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
             hiddenClass: 'hidden'
         }
     };
@@ -241,14 +242,45 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
+     *
+     */
+    function updateTripOptionsBanner() {
+        var source = [
+            '<div class="banner-message">',
+            '{{modeText}} &bull; {{rideTypeOrAccessibility}} &bull; {{timingText}}',
+            '</div>'
+        ].join('');
+
+        // TODO: populate
+        var modeText = 'transit';
+        var rideTypeOrAccessibility = 'flying saucer';
+        var timingText = 'arrive by yesterday';
+
+        var template = Handlebars.compile(source);
+        var html = template({
+            modeText: modeText,
+            rideTypeOrAccessibility: rideTypeOrAccessibility,
+            timingText: timingText
+        });
+
+        var $banner = $(options.selectors.sidebarTripOptionsBanner);
+        $banner.html(html);
+        $banner.removeClass(options.selectors.hiddenClass);
+    }
+
+    /**
      * The 'need wheels?' sidebar banner should only display when trip options have
      * never been seen and currently in bicycle mode. Check on initial load and mdoe toggle.
      */
     function showHideNeedWheelsBanner() {
         if (UserPreferences.showNeedWheelsPrompt()) {
             $(options.selectors.needWheelsBanner).removeClass(options.selectors.hiddenClass);
+            // hide trip options banner
+            $(options.selectors.sidebarTripOptionsBanner).addClass(options.selectors.hiddenClass);
         } else {
             $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+            // show trip options instead
+            updateTripOptionsBanner();
         }
     }
 

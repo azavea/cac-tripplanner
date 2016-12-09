@@ -41,8 +41,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
 
-            sidebarBanner: '.sidebar-banner',
-
             // mapping of menu option classes to the selector for the child modal to open
             bikeMenuOptions: {
                 'modal-list-indego': '.modal-options.bike-share-select',
@@ -361,7 +359,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         return html;
     }
 
-        /**
+    /**
      * Helper to generate options list for top-level menu to display when bike mode is off.
      * Will display current selection instead of default text if user has explicitly set an option.
      *
@@ -369,7 +367,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                          walk modal's unordered list
      */
     function walkModalOptions() {
-
         var source = [
             '<li class="modal-list-timing">{{timing}}</li>',
             '<li class="modal-list-accessibility">{{accessibility}}</li>'
@@ -386,14 +383,11 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         }
 
         var timing = getTimingText();
-
         var template = Handlebars.compile(source);
-        var html = template({
+        return template({
             accessibility: accessibility,
             timing: timing,
         });
-
-        return html;
     }
 
     /**
@@ -532,14 +526,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         }
 
         var template = Handlebars.compile(source);
-        var html = template({
+        return template({
             dayOptionsId: options.selectors.dayOptionsId,
             timeOptionsId: options.selectors.timeOptionsId,
             days: days,
             times: times
         });
-
-        return html;
     }
 
     /**

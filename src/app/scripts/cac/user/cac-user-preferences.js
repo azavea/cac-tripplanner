@@ -124,7 +124,8 @@ CAC.User.Preferences = (function(Storages, _) {
     }
 
     function showNeedWheelsPrompt() {
-        if (localStorage.get('sawTripOptions')) {
+        // local storage may be undefined if cleared by user after page load
+        if (localStorage && localStorage.get('sawTripOptions')) {
             return false; // user has already seen trip options
         }
 
