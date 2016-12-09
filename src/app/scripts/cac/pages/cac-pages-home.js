@@ -247,13 +247,42 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     function updateTripOptionsBanner() {
         var source = [
             '<div class="banner-message">',
-            '{{modeText}} &bull; {{rideTypeOrAccessibility}} &bull; {{timingText}}',
+            '{{modeText}} &bull; ',
+            '{{#if rideTypeOrAccessibility}}',
+                '{{rideTypeOrAccessibility}} &bull; ',
+            '{{/if}}',
+            '{{timingText}}',
             '</div>'
         ].join('');
 
+        var mode = UserPreferences.getPreference('mode');
+        var bikeMode = mode.indexOf('BICYCLE') >= 0;
+        var indego = bikeMode && mode.indexOf('BICYCLE_RENT') >= 0;
+        var transit = mode.indexOf('TRANSIT') >= 0;
+
+        var modeText = 'Walk';
+        var rideTypeOrAccessibility = '';
+        if (bikeMode) {
+            if (indego) {
+                modeText = 'Indego';
+            } else {
+                modeText = 'Bike';
+            }
+
+            var rideType = UserPreferences.getPreference('bikeTriangle');
+            rideTypeOrAccessibility = rideType.charAt(0).toUpperCase() + rideType.slice(1) + ' ride';
+        } else {
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+            if (wheelchair) {
+                rideTypeOrAccessibility = 'Wheelchair';
+            }
+        }
+
+        if (transit) {
+            modeText += ' + Transit';
+        }
+
         // TODO: populate
-        var modeText = 'transit';
-        var rideTypeOrAccessibility = 'flying saucer';
         var timingText = 'arrive by yesterday';
 
         var template = Handlebars.compile(source);
