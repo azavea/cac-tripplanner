@@ -36,6 +36,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     var tabControl = null;
     var urlRouter = null;
     var directionsControl = null;
+    var exploreControl = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -86,7 +87,15 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
+        exploreControl = new CAC.Control.Explore({
+            mapControl: mapControl,
+            modeOptionsControl: modeOptionsControl,
+            tabControl: tabControl,
+            urlRouter: urlRouter
+        });
+
         showHideNeedWheelsBanner();
+
         _setupEvents();
     };
 
@@ -151,11 +160,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
             var tabId = $(this).data('tab-id');
-            if (tabId === tabControl.TABS.EXPLORE) {
+            if (tabId) {
                 event.preventDefault();
                 event.stopPropagation();
 
-                tabControl.setTab(tabControl.TABS.EXPLORE);
+                tabControl.setTab(tabId);
             }
         });
 
@@ -201,7 +210,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
 
         // load directions if origin and destination set
-        $(document).ready(directionsControl.setFromUserPreferences());
+        $(document).ready(loadInitialMethod);
+    }
+
+    function loadInitialMethod() {
+        if (!UserPreferences.isDefault('method')) {
+            var method = UserPreferences.getPreference('method');
+            if (method === 'directions') {
+                tabControl.setTab(tabControl.TABS.DIRECTIONS);
+                directionsControl.setFromUserPreferences();
+            } else if (method === 'explore') {
+                tabControl.setTab(tabControl.TABS.EXPLORE);
+                exploreControl.setFromUserPreferences();
+            }
+        }
     }
 
     /**
@@ -223,8 +245,27 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
     function moveOrigin(event, position) {
         event.preventDefault();
-        directionsControl.moveOriginDestination('origin', position);
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            directionsControl.moveOriginDestination('origin', position);
+        } else if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            exploreControl.movedPoint(position);
+        }
     }
+
+    // function onTypeaheadSelected(event, key, location) {
+    //     if (tabControl.isTabShowing(tabControl.TABS.HOME)) {
+    //         var origin = UserPreferences.getPreference('origin');
+    //         var destination = UserPreferences.getPreference('destination');
+
+    //         if (destination) {
+    //             tabControl.setTab(tabControl.TABS.DIRECTIONS);
+    //             directionsControl.setFromUserPreferences();
+    //         } else if (origin) {
+    //             tabControl.setTab(tabControl.TABS.EXPLORE);
+    //             exploreControl.setFromUserPreferences();
+    //         }
+    //     }
+    // }
 
     function moveDestination(event, position) {
         event.preventDefault();

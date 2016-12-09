@@ -67,15 +67,15 @@ CAC.Control.Tab = (function ($) {
         var oldTab = currentTab;
         currentTab = tabId;
 
-        var newBodyClass = this.options.classes[currentTab];
-        this.$body.removeClass();
-        this.$body.addClass(newBodyClass);
-
-        if (currentTab === TABS.HOME && this.router) {
-            this.router.clearUrl();
-        }
-
         if (oldTab !== currentTab) {
+            var newBodyClass = this.options.classes[currentTab];
+            this.$body.removeClass();
+            this.$body.addClass(newBodyClass);
+
+            if (currentTab === TABS.HOME && this.router) {
+                this.router.clearUrl();
+            }
+
             this.events.trigger(eventNames.tabShown, tabId);
         }
     }

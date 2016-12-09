@@ -6,6 +6,14 @@
         max-width: 100%;
     }
 
+    .body-map-dir & {
+        display: none;
+    }
+
+    .body-map & .map-view-btn {
+        display: none;
+    }
+
     .body-home & {
         // Nesting the `sidebar-main` mixin inside a class makes the calculated height stop working,
         // so instead that's the default and we need to set some properties back to default values
@@ -33,8 +41,10 @@
         position: relative;
     }
 
-    .body-map-dir & {
-        display: none;
+    .places-content {
+        &.hidden {
+            display: none;
+        }
     }
 
     h1 {

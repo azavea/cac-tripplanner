@@ -154,7 +154,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 return;
             }
 
-            if (!tabControl.isTabShowing('explore')) {
+            if (!tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 // if user has switched away from the explore tab, do not show results
                 deferred.resolve();
                 return;

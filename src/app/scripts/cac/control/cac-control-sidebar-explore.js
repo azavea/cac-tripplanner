@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
+CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
                               Typeahead, UserPreferences, Utils) {
 
     'use strict';
@@ -14,80 +14,67 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
 
     var defaults = {
         selectors: {
-            bikeTriangleDiv: '#exploreBikeTriangle',
-            datepicker: '#datetimeExplore',
-            destinations: '.destinations',
-            distanceMinutesText: '.distance-minutes',
-            errorClass: 'error',
-            exploreTime: '#exploreTime',
-            isochroneInput: '.isochrone-input',
-            maxWalkDiv: '#exploreMaxWalk',
-            modeSelectors: '#exploreModes input',
-            optionsMore: '.sidebar-options .more-options',
-            optionsViewMore: '.sidebar-options .view-more',
-            sidebarContainer: '.explore .sidebar-clip',
-            spinner: '.explore div.sidebar-details > .sk-spinner',
-            submitExplore: 'section.explore button[type=submit]',
-            submitSearch: '.sidebar-search button[type="submit"]',
-            typeahead: 'section.explore input.typeahead',
-            wheelchairDiv: '#exploreWheelchair'
+            // bikeTriangleDiv: '#exploreBikeTriangle',
+            // datepicker: '#datetimeExplore',
+            // distanceMinutesText: '.distance-minutes',
+            // errorClass: 'error',
+            // exploreTime: '#exploreTime',
+            // isochroneInput: '.isochrone-input',
+            // maxWalkDiv: '#exploreMaxWalk',
+            // modeSelectors: '#exploreModes input',
+            // optionsMore: '.sidebar-options .more-options',
+            // optionsViewMore: '.sidebar-options .view-more',
+            // sidebarContainer: '.explore .sidebar-clip',
+            // submitExplore: 'section.explore button[type=submit]',
+            // submitSearch: '.sidebar-search button[type="submit"]',
+            // wheelchairDiv: '#exploreWheelchair',
+
+            typeahead: '#input-directions-from',
+            placesList: '.places-content',
+            spinner: '.places > .sk-spinner',
         }
     };
     var options = {};
 
     var events = $({});
     var eventNames = {
-        destinationDirections: 'cac:control:sidebarexplore:destinationdirections'
+        destinationDirections: 'cac:control:explore:destinationdirections'
     };
 
     var modeOptionsControl = null;
-    var datepicker = null;
+    // var datepicker = null;
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
     var typeahead = null;
     var exploreLatLng = null;
-    var selectedPlaceId = null;
-    var destinationsCache = [];
+    // var selectedPlaceId = null;
+    // var destinationsCache = [];
 
-    function SidebarExploreControl(params) {
+    function ExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
-        modeOptionsControl = new ModeOptions();
+        modeOptionsControl = options.modeOptionsControl;
 
-        // initiallize date/time picker
-        datepicker = $(options.selectors.datepicker).datetimepicker({
-            useCurrent: true,
-            format: 'h:mma on M/D/YY',
-            showTodayButton: true,
-            keyBinds: {
-                up: null,
-                down: null,
-                left: null,
-                right: null,
-                'delete': null
-            }
-        });
-        datepicker.on('dp.change', clickedExplore);
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, clickedExplore);
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, clickedExplore);
 
-        $(options.selectors.modeSelectors).change($.proxy(clickedExplore, this));
+        // $(options.selectors.optionsViewMore).click(showOptions);
 
-        $(options.selectors.optionsViewMore).click(showOptions);
+        // // Show isochrone in discovery tab
+        // $(options.selectors.submitExplore).click(clickedExplore);
 
-        // Show isochrone in discovery tab
-        $(options.selectors.submitExplore).click(clickedExplore);
-
-        $(options.selectors.submitSearch).on('click', function(){
-            $('.explore').addClass('show-results');
-        });
+        // $(options.selectors.submitSearch).on('click', function(){
+        //     $('.explore').addClass('show-results');
+        // });
 
         typeahead = new Typeahead(options.selectors.typeahead);
         typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
         typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
 
-        if (tabControl.isTabShowing('explore')) {
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
         }
 
@@ -95,18 +82,18 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
         $(options.selectors.isochroneInput).on('input change', clickedExplore);
     }
 
-    SidebarExploreControl.prototype = {
+    ExploreControl.prototype = {
         events: events,
         eventNames: eventNames,
         movedPoint: movedPoint,
         setAddress: setAddress,
-        setDestinationSidebar: setDestinationSidebar,
+        // setDestinationSidebar: setDestinationSidebar,
         setFromUserPreferences: setFromUserPreferences
     };
 
     function movedPoint(position) {
         // show spinner while loading
-        $(options.selectors.destinations).addClass('hidden');
+        $(options.selectors.placesList).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
 
         // update location
@@ -114,7 +101,7 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
 
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
-                var location = Utils.convertReverseGeocodeToFeature(data);
+                var location = Utils.convertReverseGeocodeToLocation(data);
                 /*jshint camelcase: false */
                 var fullAddress = data.address.Match_addr;
                 /*jshint camelcase: true */
@@ -126,7 +113,7 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
             } else {
                 addressHasError(null);
                 setError('Could not find street address for location.');
-                $(options.selectors.destinations).removeClass('hidden');
+                $(options.selectors.placesList).removeClass('hidden');
                 $(options.selectors.spinner).addClass('hidden');
             }
         });
@@ -141,47 +128,54 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
             return;
         }
 
-        var exploreMinutes = $(options.selectors.exploreTime).val();
+        // var exploreMinutes = $(options.selectors.exploreTime).val();
 
-        var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        var date = picker.date();
-        if (!date) {
-            // use current date/time if none set
-            date = moment();
-        }
+        // var picker = $(options.selectors.datepicker).data('DateTimePicker');
+        // var date = picker.date();
+        // if (!date) {
+        //     // use current date/time if none set
+        //     date = moment();
+        // }
 
-        var mode = modeOptionsControl.getMode(options.selectors.modeSelectors);
-        var otpOptions = { mode: mode };
+        // TODO: fix placeholders
+        var date = moment();
+        var exploreMinutes = 30;
+
+        var otpOptions = {};
+
+        var mode = modeOptionsControl.getMode();
 
         if (mode.indexOf('BICYCLE') > -1) {
-            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
-            var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'}, modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-            UserPreferences.setPreference('bikeTriangle', bikeTriangle);
-        } else {
-            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
-            if (maxWalk) {
-                UserPreferences.setPreference('maxWalk', maxWalk);
-                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+            // set bike trip optimization option
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+
+            if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'},
+                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
             } else {
-                UserPreferences.setPreference('maxWalk', undefined);
+                console.error('unrecognized bike triangle option ' + bikeTriangle);
             }
 
-            // true if box checked
-            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
-            UserPreferences.setPreference('wheelchair', wheelchair);
-            $.extend(otpOptions, { wheelchair: wheelchair });
+            // check user preference for bike share here, and update query mode if so
+            if (UserPreferences.getPreference('bikeShare')) {
+                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
+            }
+
+        } else {
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
+
+        $.extend(otpOptions, {mode: mode});
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('exploreTime', exploreMinutes);
+        // UserPreferences.setPreference('exploreTime', exploreMinutes);
         UserPreferences.setPreference('mode', mode);
 
         fetchIsochrone(date, exploreMinutes, otpOptions);
     }, ISOCHRONE_DEBOUNCE_MILLIS);
 
-    return SidebarExploreControl;
+    return ExploreControl;
 
     /**
      * Fetch travelshed from OpenTripPlanner, then populate side bar with featured locations
@@ -196,47 +190,52 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
         // (the 'detail' functions don't update the isochrone so they update the URL themselves)
         updateUrl();
 
-        $(options.selectors.destinations).addClass('hidden');
+        $(options.selectors.placesList).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
 
         // do not zoom to fit isochrone if going to highlight a selected destination
-        var zoomToFit = !selectedPlaceId;
+        // var zoomToFit = !selectedPlaceId;
 
-        mapControl.isochroneControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions, zoomToFit).then(
+        mapControl.isochroneControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions,
+                                                   true).then(
             function (destinations) {
                 $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.destinations).removeClass('hidden');
+                $(options.selectors.placesList).removeClass('hidden');
                 if (!destinations) {
                     setError('No destinations found.');
                 }
-                setDestinationSidebar(destinations);
+                // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
                 $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.destinations).removeClass('hidden');
+                $(options.selectors.placesList).removeClass('hidden');
                 setError('Could not find travelshed.');
             }
         );
     }
 
     function onTypeaheadCleared() {
-        UserPreferences.clearLocation('origin');
+        // UserPreferences.clearLocation('origin');
         exploreLatLng = null;
-        selectedPlaceId = null;
-        mapControl.isochroneControl.clearDiscoverPlaces();
+        // selectedPlaceId = null;
+        mapControl.isochroneControl.clearIsochrone();
     }
 
     function onTypeaheadSelected(event, key, location) {
+        event.preventDefault();  // do not submit form
+
         if (!location) {
-            UserPreferences.clearLocation('origin');
+            // UserPreferences.clearLocation('origin');
             setAddress(null);
             return;
         }
 
         UserPreferences.setLocation('origin', location);
         setAddress(location);
-        selectedPlaceId = null;
-        clickedExplore();
+        // selectedPlaceId = null;
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            clickedExplore();
+        }
     }
 
     /**
@@ -255,33 +254,32 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
             exploreLatLng = null;
             UserPreferences.clearLocation('origin');
             $input.addClass(options.selectors.errorClass);
-            mapControl.isochroneControl.clearDiscoverPlaces();
+            mapControl.isochroneControl.clearIsochrone();
             return true;
         }
     }
 
-    function showOptions(event) {
-        var parent = $(event.target).closest('section');
-        var moreOpt = $(options.selectors.optionsMore, parent);
+    // function showOptions(event) {
+    //     var parent = $(event.target).closest('section');
+    //     var moreOpt = $(options.selectors.optionsMore, parent);
 
-        $(moreOpt).toggleClass('active');
-        $(moreOpt).parent().find('a.view-more').text(function() {
-            if($(moreOpt).hasClass('active')){
-                return 'View fewer options';
-            } else {
-                return 'View more options';
-            }
-        });
-    }
+    //     $(moreOpt).toggleClass('active');
+    //     $(moreOpt).parent().find('a.view-more').text(function() {
+    //         if($(moreOpt).hasClass('active')){
+    //             return 'View fewer options';
+    //         } else {
+    //             return 'View more options';
+    //         }
+    //     });
+    // }
 
-    function setAddress(location) {
-        if (addressHasError(location)) {
+    function setAddress(address) {
+        if (addressHasError(address)) {
             return;
         }
-        var latLng = L.latLng(location.feature.geometry.y, location.feature.geometry.x);
-        exploreLatLng = [location.feature.geometry.y, location.feature.geometry.x];
-        mapControl.setGeocodeMarker(latLng);
-        $('div.address > h4').html(MapTemplates.addressText(location.feature.attributes));
+        exploreLatLng = [address.location.y, address.location.x];
+        mapControl.setDirectionsMarkers(exploreLatLng);
+        $('div.address > h4').html(MapTemplates.addressText(address.attributes));
     }
 
     /**
@@ -289,119 +287,120 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
      *
      * @param {Object} destination Destination put in the sidebar
      */
-    function setDestinationDistance(destination) {
+    // function setDestinationDistance(destination) {
 
-        // helper to set the text snippet
-        function setDestinationMinutesText(distanceMinutes) {
-            var $destination = $('#destination-' + destination.id);
-            $destination.find(options.selectors.distanceMinutesText)
-                .text(distanceMinutes + ' minutes away');
-        }
+    //     // helper to set the text snippet
+    //     function setDestinationMinutesText(distanceMinutes) {
+    //         var $destination = $('#destination-' + destination.id);
+    //         $destination.find(options.selectors.distanceMinutesText)
+    //             .text(distanceMinutes + ' minutes away');
+    //     }
 
-        // first check if we have distance cached
-        if (destination.formattedDuration) {
-            setDestinationMinutesText(destination.formattedDuration);
-            return;
-        }
+    //     // first check if we have distance cached
+    //     if (destination.formattedDuration) {
+    //         setDestinationMinutesText(destination.formattedDuration);
+    //         return;
+    //     }
 
-        // distance not cached; go query for it
-        var mode = UserPreferences.getPreference('mode');
-        var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        // use current date/time if none set
-        var date = picker.date() || moment();
-        // only request one itinerary (first returned is the shortest)
-        var otpOptions = { mode: mode, numItineraries: 1 };
-        if (mode.indexOf('BICYCLE') > -1) {
-            var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
-            var bikeTriangle = bikeTriangleOpt.val();
-            $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-        } else {
-            var maxWalk = $('input', options.selectors.maxWalkDiv).val();
-            if (maxWalk) {
-                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
-            }
-            // true if box checked
-            var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
-            $.extend(otpOptions, { wheelchair: wheelchair });
-        }
+    //     // distance not cached; go query for it
+    //     var mode = UserPreferences.getPreference('mode');
+    //     var picker = $(options.selectors.datepicker).data('DateTimePicker');
+    //     // use current date/time if none set
+    //     var date = picker.date() || moment();
+    //     // only request one itinerary (first returned is the shortest)
+    //     var otpOptions = { mode: mode, numItineraries: 1 };
+    //     if (mode.indexOf('BICYCLE') > -1) {
+    //         var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
+    //         var bikeTriangle = bikeTriangleOpt.val();
+    //         $.extend(otpOptions, {optimize: 'TRIANGLE'},
+    //                  modeOptionsControl.options.bikeTriangle[bikeTriangle]);
+    //     } else {
+    //         var maxWalk = $('input', options.selectors.maxWalkDiv).val();
+    //         if (maxWalk) {
+    //             $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+    //         }
+    //         // true if box checked
+    //         var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
+    //         $.extend(otpOptions, { wheelchair: wheelchair });
+    //     }
 
-        var dest = [destination.point.coordinates[1], destination.point.coordinates[0]];
+    //     var dest = [destination.point.coordinates[1], destination.point.coordinates[0]];
 
-        Routing.planTrip(exploreLatLng, dest, date, otpOptions).then(function (itineraries) {
-            if (itineraries.length) {
-                var distance = itineraries[0].formattedDuration;
-                destination.formattedDuration = distance;
-                setDestinationMinutesText(distance);
-            }
-        });
-    }
+    //     Routing.planTrip(exploreLatLng, dest, date, otpOptions).then(function (itineraries) {
+    //         if (itineraries.length) {
+    //             var distance = itineraries[0].formattedDuration;
+    //             destination.formattedDuration = distance;
+    //             setDestinationMinutesText(distance);
+    //         }
+    //     });
+    // }
 
-    function setDestinationSidebar(destinations) {
-        destinationsCache = destinations;
-        if (!destinations) {
-            return;
-        }
-        var $container = $('<div></div>').addClass('destinations');
-        $.each(destinations, function (i, destination) {
-            var $destination = $(MapTemplates.destinationBlock(destination));
-            $destination.click(function () {
-                setDestinationSidebarDetail(destination.id);
-                mapControl.isochroneControl.highlightDestination(destination.id, { panTo: true });
-            });
-            $destination.hover(function () {
-                mapControl.isochroneControl.highlightDestination(destination.id);
-            }, function () {
-                mapControl.isochroneControl.highlightDestination(null);
-            });
-            $container.append($destination);
-        });
-        $(options.selectors.destinations).html($container);
-        // go find distances once the sidebar templates have been added to DOM
-        $.each(destinations, function(i, destination) {
-            setDestinationDistance(destination);
-        });
-        $(options.selectors.sidebarContainer).height(400);
+    // function setDestinationSidebar(destinations) {
+    //     destinationsCache = destinations;
+    //     if (!destinations) {
+    //         return;
+    //     }
+    //     var $container = $('<div></div>').addClass('destinations');
+    //     $.each(destinations, function (i, destination) {
+    //         var $destination = $(MapTemplates.destinationBlock(destination));
+    //         $destination.click(function () {
+    //             setDestinationSidebarDetail(destination.id);
+    //             mapControl.isochroneControl.highlightDestination(destination.id, { panTo: true });
+    //         });
+    //         $destination.hover(function () {
+    //             mapControl.isochroneControl.highlightDestination(destination.id);
+    //         }, function () {
+    //             mapControl.isochroneControl.highlightDestination(null);
+    //         });
+    //         $container.append($destination);
+    //     });
+    //     $(options.selectors.destinations).html($container);
+    //     // go find distances once the sidebar templates have been added to DOM
+    //     $.each(destinations, function(i, destination) {
+    //         setDestinationDistance(destination);
+    //     });
+    //     $(options.selectors.sidebarContainer).height(400);
 
-        // show destination details if destination is selected
-        if (selectedPlaceId) {
-            setDestinationSidebarDetail(selectedPlaceId);
-            // also highlight it on the map and pan to it
-            mapControl.isochroneControl.highlightDestination(selectedPlaceId, { panTo: true });
-        }
-    }
+    //     // show destination details if destination is selected
+    //     if (selectedPlaceId) {
+    //         setDestinationSidebarDetail(selectedPlaceId);
+    //         // also highlight it on the map and pan to it
+    //         mapControl.isochroneControl.highlightDestination(selectedPlaceId, { panTo: true });
+    //     }
+    // }
 
     function setError(message) {
-        var $container = $('<div></div>').addClass('destinations');
-        var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
-        $container.append($errorTemplate);
-        $(options.selectors.destinations).html($container);
-        $(options.selectors.sidebarContainer).height(200);
+        console.log('TODO: display isochrone errors', message);
+        // var $container = $('<div></div>').addClass('destinations');
+        // var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
+        // $container.append($errorTemplate);
+        // $(options.selectors.destinations).html($container);
+        // $(options.selectors.sidebarContainer).height(200);
     }
 
-    function setDestinationSidebarDetail(selectedPlaceId) {
-        var selectedPlace = _.find(destinationsCache, {id: parseInt(selectedPlaceId)});
-        if (selectedPlace && selectedPlace.name) {
-            UserPreferences.setPreference('placeId', selectedPlaceId);
-            updateUrl();
-            var $detail = $(MapTemplates.destinationDetail(selectedPlace));
-            $detail.find('.back').on('click', onDestinationDetailBackClicked);
-            $detail.find('.getdirections').on('click', function() {
-                events.trigger(eventNames.destinationDirections, selectedPlace);
-            });
-            $(options.selectors.destinations).html($detail);
-        } else {
-            onDestinationDetailBackClicked();
-        }
-    }
+    // function setDestinationSidebarDetail(selectedPlaceId) {
+    //     var selectedPlace = _.find(destinationsCache, {id: parseInt(selectedPlaceId)});
+    //     if (selectedPlace && selectedPlace.name) {
+    //         UserPreferences.setPreference('placeId', selectedPlaceId);
+    //         updateUrl();
+    //         var $detail = $(MapTemplates.destinationDetail(selectedPlace));
+    //         $detail.find('.back').on('click', onDestinationDetailBackClicked);
+    //         $detail.find('.getdirections').on('click', function() {
+    //             events.trigger(eventNames.destinationDirections, selectedPlace);
+    //         });
+    //         $(options.selectors.destinations).html($detail);
+    //     } else {
+    //         onDestinationDetailBackClicked();
+    //     }
+    // }
 
-    function onDestinationDetailBackClicked() {
-        selectedPlaceId = null;
-        UserPreferences.setPreference('placeId', undefined);
-        updateUrl();
-        setDestinationSidebar(destinationsCache);
-        mapControl.isochroneControl.highlightDestination(null);
-    }
+    // function onDestinationDetailBackClicked() {
+    //     selectedPlaceId = null;
+    //     UserPreferences.setPreference('placeId', undefined);
+    //     updateUrl();
+    //     setDestinationSidebar(destinationsCache);
+    //     mapControl.isochroneControl.highlightDestination(null);
+    // }
 
     /* Update the URL based on current UserPreferences
      *
@@ -422,11 +421,10 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
 
-        selectedPlaceId = UserPreferences.getPreference('placeId');
+        // selectedPlaceId = UserPreferences.getPreference('placeId');
 
         if (exploreOrigin) {
-            exploreLatLng = [exploreOrigin.feature.geometry.y,
-                             exploreOrigin.feature.geometry.x];
+            exploreLatLng = [exploreOrigin.location.y, exploreOrigin.location.x];
 
             typeahead.setValue(originText);
             setAddress(exploreOrigin);
@@ -434,10 +432,10 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
             exploreLatLng = null;
         }
 
-        $(options.selectors.exploreTime).val(exploreTime);
+        // $(options.selectors.exploreTime).val(exploreTime);
 
-        modeOptionsControl.setMode(options.selectors.modeSelectors, mode);
-        $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
+        // modeOptionsControl.setMode(options.selectors.modeSelectors, mode);
+        // $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
 
         // use current date/time when loading from preferences
         var when = moment();
@@ -455,13 +453,13 @@ CAC.Control.SidebarExplore = (function (_, $, ModeOptions, Geocoder, MapTemplate
             $.extend(otpOptions, { wheelchair: wheelchair });
         }
 
-        if (wheelchair) {
-            $('input', options.selectors.wheelchairDiv).click();
-        }
+        // if (wheelchair) {
+        //     $('input', options.selectors.wheelchairDiv).click();
+        // }
 
-        if (maxWalk) {
-            $('input', options.selectors.maxWalkDiv).val(maxWalk);
-        }
+        // if (maxWalk) {
+        //     $('input', options.selectors.maxWalkDiv).val(maxWalk);
+        // }
 
         if (method === 'explore' && exploreLatLng) {
             fetchIsochrone(when, exploreTime, otpOptions);

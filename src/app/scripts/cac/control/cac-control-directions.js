@@ -359,7 +359,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         UserPreferences.setLocation(key, result);
         setDirections(key, [result.location.y, result.location.x]);
 
-        planTrip();
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            planTrip();
+        }
     }
 
     /**
