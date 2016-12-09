@@ -62,8 +62,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 'bikeTriangleAny': {name: 'bikeTriangle', value: 'any'},
                 'bikeTriangleFast': {name: 'bikeTriangle', value: 'fast'},
                 'bikeTriangleFlat': {name: 'bikeTriangle', value: 'flat'},
-                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'}
-            }
+                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'},
+                'arriveBy': {name: 'arriveBy', value: true},
+                'departAt': {name: 'arriveBy', value: false}
+            },
+            // distinct 'name' in optionPreferences above
+            preferences: ['wheelchair', 'bikeShare', 'bikeTriangle', 'arriveBy']
         }
     };
     var events = $({});
@@ -200,6 +204,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         var ul = isBike ? bikeModalOptions() : walkModalOptions();
         $(modalSelector).find(options.selectors.modalListContents).html(ul);
 
+        // set user selections in child modals
+        setSelections();
+
         modal = new Modal({
             modalSelector: modalSelector,
             bodyModalClass: options.selectors.bodyModalClass,
@@ -209,6 +216,23 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
         $(modalSelector).addClass(options.selectors.visibleClass);
         modal.open();
+    }
+
+    /**
+     * Set the selections in child modals based on user preferences.
+     * Does not manage date/time, which the timing modal controls directly.
+     */
+    function setSelections() {
+        _.forEach(options.selectors.preferences, function(option) {
+            var setting = UserPreferences.getPreference(option);
+            var toSelect = _.findKey(options.selectors.optionPreferences, function(pref) {
+                return option === pref.name && setting === pref.value;
+            });
+
+            var $toSelect = $('#' + toSelect);
+            $toSelect.siblings().removeClass(options.selectors.selectedClass);
+            $toSelect.addClass(options.selectors.selectedClass);
+        });
     }
 
     function childModalClick(e) {
