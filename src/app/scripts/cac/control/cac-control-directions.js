@@ -99,7 +99,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     }
 
     DirectionsControl.prototype = {
-        clearDirections: clearDirections,
+        clearUserSettings: clearUserSettings,
         moveOriginDestination: moveOriginDestination,
         setDestination: setDestination,
         setDirections: setDirections,
@@ -223,6 +223,18 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         itineraryControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
+    }
+
+    /**
+     * Wipe out user-set trip options and clear controls
+     */
+    function clearUserSettings() {
+        UserPreferences.clearSettings();
+        typeaheadFrom.setValue(null);
+        typeaheadTo.setValue(null);
+        setDirections('origin', null);
+        setDirections('destination', null);
+        clearDirections();
     }
 
     function onDirectionsBackClicked() {

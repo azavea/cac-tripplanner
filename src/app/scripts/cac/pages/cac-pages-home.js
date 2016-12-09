@@ -134,6 +134,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             event.preventDefault();
             event.stopPropagation();
 
+            // clear user set trip options on navigation back to home page
+            directionsControl.clearUserSettings();
+            // reset mode control
+            modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+
             tabControl.setTab(tabControl.TABS.HOME);
         });
 
