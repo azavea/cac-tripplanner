@@ -80,6 +80,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
+        showHideNeedWheelsBanner();
         _setupEvents();
     };
 
@@ -231,11 +232,24 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
         UserPreferences.setPreference('mode', mode);
         directionsControl.setOptions();
+        showHideNeedWheelsBanner();
     }
 
     function closedTripModal(event) {
         // update mode, then requery
         toggledMode(event, modeOptionsControl.getMode());
+    }
+
+    /**
+     * The 'need wheels?' sidebar banner should only display when trip options have
+     * never been seen and currently in bicycle mode. Check on initial load and mdoe toggle.
+     */
+    function showHideNeedWheelsBanner() {
+        if (UserPreferences.showNeedWheelsPrompt()) {
+            $(options.selectors.needWheelsBanner).removeClass(options.selectors.hiddenClass);
+        } else {
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        }
     }
 
     /**

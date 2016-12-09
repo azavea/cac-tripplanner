@@ -209,6 +209,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         // set user selections in child modals
         setSelections();
 
+        // note in local storage that trip options have been seen
+        UserPreferences.sawTripOptions();
+
         modal = new Modal({
             modalSelector: modalSelector,
             bodyModalClass: options.selectors.bodyModalClass,
