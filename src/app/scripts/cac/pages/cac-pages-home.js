@@ -16,7 +16,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             homeLink: '.home-link',
             tabControl: '.tab-control',
-            tabControlLink: '.nav-item'
+            tabControlLink: '.nav-item',
+
+            needWheelsBanner: '.sidebar-banner.indego-banner',
+            sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
+            hiddenClass: 'hidden'
         }
     };
 
@@ -120,6 +124,22 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 }
             });
         }
+
+        // listen to sidebar banner close button
+        $(options.selectors.sidebarBannerCloseButton).on('click', function() {
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        });
+
+        // listen to sidebar banner click
+        $(options.selectors.needWheelsBanner).on('click', function() {
+            // go to options modal
+            new TripOptions({
+                onClose: closedTripModal
+            }).open();
+
+            // dismiss banner
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        });
 
         $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
             var tabId = $(this).data('tab-id');

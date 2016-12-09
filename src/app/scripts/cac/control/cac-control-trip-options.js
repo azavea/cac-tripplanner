@@ -41,6 +41,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             bikeOptionsModal: '.modal-options.bike-options',
             walkOptionsModal: '.modal-options.walk-options',
 
+            sidebarBanner: '.sidebar-banner',
+
             // mapping of menu option classes to the selector for the child modal to open
             bikeMenuOptions: {
                 'modal-list-indego': '.modal-options.bike-share-select',
