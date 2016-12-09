@@ -90,6 +90,7 @@ CAC.Control.ModeOptions = (function ($) {
                 .find('i').toggleClass(options.selectors.transitIconOnOffClasses);
 
             var active = $(this).find('i').hasClass(options.selectors.transitIconOnClass);
+            $(this).attr('title', active ? 'Click to disable transit' : 'Click to enable transit');
             events.trigger(eventNames.transitChanged, active);
         });
     }

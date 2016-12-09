@@ -378,9 +378,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             var dateTime = moment.unix(UserPreferences.getPreference('dateTime'));
             var arriveBy = UserPreferences.getPreference('arriveBy');
             timing = arriveBy ? 'Arrive ' : 'Depart ';
-            // format as relative time
-            // TODO: something more exact
-            timing += dateTime.fromNow();
+            timing += dateTime.calendar(null, {
+                sameDay: '[Today] h:mma',
+                nextDay: '[Tomorrow] h:mma',
+                nextWeek: 'ddd h:mma',
+                lastDay: '[Yesterday] h:mma',
+                lastWeek: '[Last] ddd h:mma',
+                sameElse: 'M/D h:mma'
+            });
         }
 
         return timing;

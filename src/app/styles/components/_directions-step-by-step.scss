@@ -131,6 +131,7 @@
 
     .directions-time {
         margin-top: .5em;
+        color: $lt-gray;
         font-size: 1.5rem;
         font-weight: $font-weight-bold;
         line-height: 1.5;
@@ -189,6 +190,7 @@
 
     .directions-step-indego {
         &::before {
+            padding-top: 2px;
             color: $indego-purple;
             content: '\e80f';
         }

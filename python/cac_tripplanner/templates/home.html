@@ -9,15 +9,15 @@
         <div class="directions-form">
             <div class="mode-picker">
                 <div class="mode-toggle">
-                    <div class="walk mode-option on">
+                    <div class="walk mode-option on" title ="Walk there">
                         <i class="icon-walk"></i> <span class="mode-label">Walk</span>
                     </div>
-                    <div class="bike mode-option">
+                    <div class="bike mode-option" title ="Bike there">
                         <i class="icon-bike"></i> <span class="mode-label">Bike</span>
                     </div>
                     <input type="hidden" name="mode" value="walk">
                 </div>
-                <div class="transit mode-option on">
+                <div class="transit mode-option on" title ="Click to disable transit">
                     <i class="icon-transit-on"></i> <span class="mode-label">Transit</span>
                     <input type="hidden" name="transit" value="on">
                 </div>
@@ -70,7 +70,7 @@
                 </div>
                 <div class="place-card-actions">
                     <a class="place-card-action place-action-go"
-                        data-destination-id="{{ destination.id }}" href="#">Go here</a>
+                        data-destination-id="{{ destination.id }}" href="#">Directions</a>
                     <a class="place-card-action place-action-details"
                        href="{% url 'place-detail' pk=destination.pk %}">More info</a>
                 </div>

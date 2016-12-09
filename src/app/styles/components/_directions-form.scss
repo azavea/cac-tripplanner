@@ -213,8 +213,21 @@
             border: 1px solid $white;
             background-color: $gophillygo-blue;
 
+            &:after {
+                position: absolute;
+                width: 30px;
+                height: 28px;
+                background: linear-gradient(to right, rgba($gophillygo-blue,0) 0%,rgba($gophillygo-blue,1) 30%,rgba($gophillygo-blue,1) 100%);
+                content: '';
+                right: 0;
+            }
+
             &.error {
                 background-color: $gophillygo-red;
+
+                &:after {
+                    opacity: 0;
+                }
 
                 input[type=text], input[type=search] {
                     background-color: $gophillygo-red !important;
@@ -367,6 +380,7 @@
             font-size: 2rem;
             line-height: 20px;
             cursor: pointer;
+            z-index: 10;
 
             .body-map & {
                 display: block;
