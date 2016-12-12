@@ -308,6 +308,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                             opacity: 0.75};
         if (highlighted) {
             defaultStyle.dashArray = null;
+            defaultStyle.opacity = 1;
         } else {
             defaultStyle.color = '#2c7fb8';
             defaultStyle.dashArray = [5, 8];

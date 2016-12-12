@@ -198,6 +198,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
                     isFirst = false;
                 }
             });
+            currentItinerary.geojson.bringToFront();
 
             // If there is only one itinerary, make it draggable.
             // Only one itinerary is returned if there are waypoints, so this
@@ -262,6 +263,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             }
 
             currentItinerary = itinerary;
+            itinerary.geojson.bringToFront();
             directionsListControl.setItinerary(itinerary);
             itineraryListControl.hide();
             directionsListControl.show();
@@ -283,6 +285,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             currentItinerary.highlight(false);
             itinerary.highlight(true);
             currentItinerary = itinerary;
+            itinerary.geojson.bringToFront();
         }
     }
 
