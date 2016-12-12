@@ -487,11 +487,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
      * Helper to listen for change events on the day drop-down created by timingModalOptions
      */
     function addDayDropDownListener() {
-        $('#' + options.selectors.dayOptionsId).on('change', function(e) {
+        var $dayOptions = $('#' + options.selectors.dayOptionsId);
+        $dayOptions.on('change', function() {
             var $time = $('#' + options.selectors.timeOptionsId);
             var timeSelection = $time.val();
 
-            if (!$(e.currentTarget).val()) {
+            if (!$dayOptions.val()) {
                 // got set to current day
 
                 // set time to 'now' if selection is before next 15 minute increment
@@ -531,6 +532,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
         // reset to 'depart at'
         $(childModalSelector).find(options.selectors.departAt).click();
+
+        // trigger day drop-down change handler, to hide times before now
+        $('#' + options.selectors.dayOptionsId).trigger('change');
 
         // un-set user preferences (will revert to defaults)
         UserPreferences.setPreference('arriveBy', undefined);
