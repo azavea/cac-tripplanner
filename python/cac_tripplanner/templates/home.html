@@ -89,10 +89,10 @@
             <h1>Featured Locations <small>
                 <a id="viewAllDestinations" href="#">View all &raquo;</a>
             </small></h1>
-            <div id="#destinationsSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
-                <div class="sk-bounce1"></div>
-                <div class="sk-bounce2"></div>
-                <div class="sk-bounce3"></div>
+            <div id="#destinationsSpinner" class="sk-spinner sk-three-bounce hidden">
+                <div class="sk-child sk-bounce1"></div>
+                <div class="sk-child sk-bounce2"></div>
+                <div class="sk-child sk-bounce3"></div>
             </div>
             <div class="row destinations">
                 {% for destination in destinations|slice:":2" %}
@@ -133,10 +133,10 @@
                     <h3>GoPhillyGo Spotlight <small>
                         <a id="viewAllArticles" href="#">View all &raquo;</a>
                     </small></h3>
-                    <div id="articlesSpinner" class="sk-spinner sk-spinner-three-bounce hidden">
-                        <div class="sk-bounce1"></div>
-                        <div class="sk-bounce2"></div>
-                        <div class="sk-bounce3"></div>
+                    <div id="articlesSpinner" class="sk-spinner sk-three-bounce hidden">
+                        <div class="sk-child sk-bounce1"></div>
+                        <div class="sk-child sk-bounce2"></div>
+                        <div class="sk-child sk-bounce3"></div>
                     </div>
                     <div class="row articles">
                       {% if community_profile %}
