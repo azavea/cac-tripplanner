@@ -72,6 +72,7 @@
             flex-flow: column nowrap;
             align-items: stretch;
             justify-content: flex-start;
+            max-width: calc(100% - 17px);
         }
 
         .route-name {
@@ -79,6 +80,9 @@
             color: $gophillygo-blue;
             font-size: 1.6rem;
             font-weight: $font-weight-bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .route-summary-primary-details {
@@ -103,6 +107,7 @@
 
         .route-duration {
             margin-right: 2em;
+            font-weight: $font-weight-bold;
         }
 
         .route-distance {
