@@ -320,25 +320,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         var destination = UserPreferences.getPreference('destination');
         var destinationText = UserPreferences.getPreference('destinationText');
 
-        if (!(directions.origin && directions.destination)) {
-            setDirectionsError('origin');
-            setDirectionsError('destination');
-            return;
-        }
-
         // update local storage
         UserPreferences.setPreference('origin', destination);
         UserPreferences.setPreference('originText', destinationText);
         UserPreferences.setPreference('destination', origin);
         UserPreferences.setPreference('destinationText', originText);
 
+        // swap the local values
+        var tmpDestination = directions.destination;
+        setDirections('destination', directions.origin);
+        setDirections('origin', tmpDestination);
+
         // update the text control
         typeaheadFrom.setValue(destinationText);
         typeaheadTo.setValue(originText);
-
-        // set on this object and validate
-        setDirections('origin', [destination.location.y, destination.location.x]);
-        setDirections('destination', [origin.location.y, origin.location.x]);
 
         // update the directions for the reverse trip
         planTrip();
