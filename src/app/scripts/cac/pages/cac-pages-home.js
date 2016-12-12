@@ -128,7 +128,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
 
         // listen to sidebar banner close button
-        $(options.selectors.sidebarBannerCloseButton).on('click', function() {
+        $(options.selectors.sidebarBannerCloseButton).on('click', function(e) {
+            e.stopPropagation();
             $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
         });
 
