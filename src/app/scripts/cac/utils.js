@@ -2,6 +2,7 @@ CAC.Utils = (function (_) {
     'use strict';
 
     var module = {
+        getBikeTriangle: getBikeTriangle,
         convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
         getImageUrl: getImageUrl,
         abbrevStreetName: abbrevStreetName,
@@ -62,7 +63,47 @@ CAC.Utils = (function (_) {
         wy: 'Wy',
     };
 
-    return module;
+    // Note:  the three bike options must sum to 1, or OTP won't plan the trip
+    var bikeTriangle = {
+        any: {
+            triangleSafetyFactor: 0.34,
+            triangleSlopeFactor: 0.33,
+            triangleTimeFactor: 0.33
+        },
+        flat: {
+            triangleSafetyFactor: 0.17,
+            triangleSlopeFactor: 0.66,
+            triangleTimeFactor: 0.17
+        },
+        fast: {
+            triangleSafetyFactor: 0.17,
+            triangleSlopeFactor: 0.17,
+            triangleTimeFactor: 0.66
+        },
+        safe: {
+            triangleSafetyFactor: 0.66,
+            triangleSlopeFactor: 0.17,
+            triangleTimeFactor: 0.17
+        }
+    };
+
+    return Object.freeze(module);
+
+    /**
+     * Get OTP values for the bikeTriangle parameter, which weights based on
+     * relative preference for safety, speed, or flatness of route.
+     *
+     * @param {string} option Key for which option to prefer
+     * @returns {Object} Values that sum to 1 and weight for the preferred option
+     */
+    function getBikeTriangle(option) {
+        if (_.has(bikeTriangle, option)) {
+            return bikeTriangle[option];
+        }
+
+        console.error('bike triangle option ' + option + ' not found');
+        return bikeTriangle.any;
+    }
 
     /**
      * Convert ESRI reverse geocode response into location formatted like typeahead results.

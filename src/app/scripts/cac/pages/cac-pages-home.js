@@ -14,21 +14,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             map: '.the-map',
 
-            // TODO: update or remove old selectors below
-            errorClass: 'error',
-            exploreForm: '#explore',
-            exploreMode: '#exploreMode input',
-            exploreOrigin: '#exploreOrigin',
-            exploreTime: '#exploreTime',
-            submitErrorModal: '#submit-error-modal',
-            toggleButton: '.toggle-search button',
-            toggleDirectionsButton: '#toggle-directions',
-            toggleExploreButton: '#toggle-explore',
-            typeaheadExplore: '#exploreOrigin',
-
             homeLink: '.home-link',
             tabControl: '.tab-control',
-            tabControlLink: '.nav-item'
+            tabControlLink: '.nav-item',
+
+            needWheelsBanner: '.sidebar-banner.indego-banner',
+            sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
+            sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
+            hiddenClass: 'hidden'
         }
     };
 
@@ -80,14 +73,15 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         });
 
         modeOptionsControl = new ModeOptions();
+        modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
         directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
-            modeOptionsControl: modeOptionsControl,
             tabControl: tabControl,
             urlRouter: urlRouter
         });
 
+        showHideNeedWheelsBanner();
         _setupEvents();
     };
 
@@ -97,8 +91,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(options.selectors.optionsButton).on('click', function() {
             // initialize trip options modal with current mode selection
             new TripOptions({
-                currentMode: modeOptionsControl.getMode(),
-                onClose: directionsControl.setOptions
+                onClose: closedTripModal
             }).open();
         });
 
@@ -113,6 +106,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                              $.proxy(moveDestination, this));
 
         mapControl.events.on(mapControl.eventNames.mapMoved, SearchParams.updateMapCenter);
+
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
+        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged,
+                                     directionsControl.setOptions);
 
 
         if ($(options.selectors.map).is(':visible')) {
@@ -132,6 +129,23 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             });
         }
 
+        // listen to sidebar banner close button
+        $(options.selectors.sidebarBannerCloseButton).on('click', function(e) {
+            e.stopPropagation();
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        });
+
+        // listen to sidebar banner click
+        $(options.selectors.needWheelsBanner).on('click', function() {
+            // go to options modal
+            new TripOptions({
+                onClose: closedTripModal
+            }).open();
+
+            // dismiss banner
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        });
+
         $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
             var tabId = $(this).data('tab-id');
             if (tabId === tabControl.TABS.EXPLORE) {
@@ -144,6 +158,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(options.selectors.homeLink).on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
+
+            // clear user set trip options on navigation back to home page
+            directionsControl.clearUserSettings();
+            // reset mode control
+            modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
             tabControl.setTab(tabControl.TABS.HOME);
         });
@@ -178,11 +197,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
      */
     function clickedDestination(event) {
         event.preventDefault();
-        var mode = modeOptionsControl.getMode();
         var exploreTime = $(options.selectors.exploreTime).val();
         UserPreferences.setPreference('method', 'explore');
         UserPreferences.setPreference('exploreTime', exploreTime);
-        UserPreferences.setPreference('mode', mode);
 
         var block = $(event.target).closest(options.selectors.placeCard);
         var placeId = block.data('destination-id');
@@ -200,6 +217,102 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     function moveDestination(event, position) {
         event.preventDefault();
         directionsControl.moveOriginDestination('destination', position);
+    }
+
+    /**
+     * Updates mode user preference when mode button toggled and triggers trip re-query.
+     *
+     * Listen to toggles of the mode buttons for walk, bike, and transit;
+     * receives OTP mode string for those options. If in bike mode, check
+     * if bike rental option set, and update mode appropriately; this option
+     * is controlled separately from the mode toggle buttons.
+     */
+    function toggledMode(event, mode) {
+        if (mode.indexOf('BICYCLE') >= 0) {
+            var bikeShare = UserPreferences.getPreference('bikeShare');
+            if (bikeShare) {
+                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
+            }
+        }
+        UserPreferences.setPreference('mode', mode);
+        directionsControl.setOptions();
+        showHideNeedWheelsBanner();
+    }
+
+    function closedTripModal(event) {
+        // update mode, then requery
+        toggledMode(event, modeOptionsControl.getMode());
+    }
+
+    /**
+     * Sets the HTML in the trip options sidebar banner, based on user preferences.
+     */
+    function updateTripOptionsBanner() {
+        var source = [
+            '<div class="banner-message">',
+            '{{modeText}} &bull; ',
+            '{{#if rideTypeOrAccessibility}}',
+                '{{rideTypeOrAccessibility}} &bull; ',
+            '{{/if}}',
+            '{{timingText}}',
+            '</div>'
+        ].join('');
+
+        var mode = UserPreferences.getPreference('mode');
+        var bikeMode = mode.indexOf('BICYCLE') >= 0;
+        var indego = bikeMode && mode.indexOf('BICYCLE_RENT') >= 0;
+        var transit = mode.indexOf('TRANSIT') >= 0;
+
+        var modeText = 'Walk';
+        var rideTypeOrAccessibility = '';
+        if (bikeMode) {
+            if (indego) {
+                modeText = 'Indego';
+            } else {
+                modeText = 'Bike';
+            }
+
+            var rideType = UserPreferences.getPreference('bikeTriangle');
+            rideTypeOrAccessibility = rideType.charAt(0).toUpperCase() + rideType.slice(1) + ' ride';
+        } else {
+            var wheelchair = UserPreferences.getPreference('wheelchair');
+            if (wheelchair) {
+                rideTypeOrAccessibility = 'Wheelchair';
+            }
+        }
+
+        if (transit) {
+            modeText += ' + Transit';
+        }
+
+        var timingText = TripOptions.prototype.getTimingText() || 'Depart now';
+
+        var template = Handlebars.compile(source);
+        var html = template({
+            modeText: modeText,
+            rideTypeOrAccessibility: rideTypeOrAccessibility,
+            timingText: timingText
+        });
+
+        var $banner = $(options.selectors.sidebarTripOptionsBanner);
+        $banner.html(html);
+        $banner.removeClass(options.selectors.hiddenClass);
+    }
+
+    /**
+     * The 'need wheels?' sidebar banner should only display when trip options have
+     * never been seen and currently in bicycle mode. Check on initial load and mdoe toggle.
+     */
+    function showHideNeedWheelsBanner() {
+        if (UserPreferences.showNeedWheelsPrompt()) {
+            $(options.selectors.needWheelsBanner).removeClass(options.selectors.hiddenClass);
+            // hide trip options banner
+            $(options.selectors.sidebarTripOptionsBanner).addClass(options.selectors.hiddenClass);
+        } else {
+            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+            // show trip options instead
+            updateTripOptionsBanner();
+        }
     }
 
     /**

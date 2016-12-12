@@ -10,12 +10,20 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     'use strict';
 
     // User pref parameters for different views
-    var SHARED_ENCODE = ['origin', 'originText', 'mode'];
-    var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
+    var SHARED_ENCODE = ['origin',
+                         'originText',
+                         'mode',
+                         'maxWalk',
+                         'wheelchair',
+                         'bikeTriangle',
+                         'arriveBy',
+                         'dateTime'];
+
     var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
-    var EXPLORE_READ = EXPLORE_ENCODE.concat(SHARED_READ);
-    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText', 'waypoints']);
-    var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy']);
+
+    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
+                                                 'destinationText',
+                                                 'waypoints']);
 
     var router = null;
 
@@ -40,7 +48,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     }
 
     function clearUrl() {
-        updateUrl('');
+        updateUrl('/');
     }
 
     function buildExploreUrlFromPrefs() {
@@ -59,10 +67,16 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         var params = Utils.getUrlParams();
         if (params.destination) {
             UserPreferences.setPreference('method', 'directions');
-            setPrefs(DIRECTIONS_READ, params);
+            setPrefs(DIRECTIONS_ENCODE, params);
         } else if (params.origin) {
             UserPreferences.setPreference('method', 'explore');
-            setPrefs(EXPLORE_READ, params);
+            setPrefs(EXPLORE_ENCODE, params);
+        }
+
+        // set bike share preference separate from mode
+        if (params.mode) {
+            var bikeShare = params.mode.indexOf('_RENT') >= 0;
+            UserPreferences.setPreference('bikeShare', bikeShare);
         }
     }
 
@@ -105,6 +119,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                         }
                     });
                     UserPreferences.setPreference(field, waypoints);
+                } else if (field === 'dateTime') {
+                    if (!params[field]) {
+                        UserPreferences.setPreference(field, undefined);
+                    } else {
+                        UserPreferences.setPreference(field, parseInt(params[field]));
+                    }
                 } else {
                     UserPreferences.setPreference(field, params[field]);
                 }

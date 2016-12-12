@@ -1,11 +1,16 @@
-CAC.User.Preferences = (function(_) {
+CAC.User.Preferences = (function(Storages, _) {
     'use strict';
+
+    // set up local storage to track persistent notifications
+    var namespace = 'cac_otp';
+    var namespaceStorage = Storages.initNamespaceStorage(namespace);
+    var localStorage = namespaceStorage.localStorage;
 
 
     // Initialize preference storage object.
     // All values in storages should be stringified first.
-    // Setting to a falsy value will remove the object from storages;
-    // if not in storages, defaults will be used as fallback.
+    // Setting to a falsy value will remove the object from storage;
+    // if not in storage, defaults will be used as fallback.
     // Stringified undefined will remove the value from storage.
     // Preferences lives only as long as the page for which this is initialized.
     // With this setup we have the flexibility to store all or some of the parameters to local
@@ -46,7 +51,9 @@ CAC.User.Preferences = (function(_) {
         setPreference: setPreference,
         setLocation: setLocation,
         clearLocation: clearLocation,
-        clearSettings: clearSettings
+        clearSettings: clearSettings,
+        sawTripOptions: sawTripOptions,
+        showNeedWheelsPrompt: showNeedWheelsPrompt
     };
     return module;
 
@@ -116,4 +123,21 @@ CAC.User.Preferences = (function(_) {
         setPreference(key + 'Text', undefined);
     }
 
-})(_);
+    function showNeedWheelsPrompt() {
+        // local storage may be undefined if cleared by user after page load
+        if (localStorage && localStorage.get('sawTripOptions')) {
+            return false; // user has already seen trip options
+        }
+
+        if (getPreference('mode').indexOf('BICYCLE') >= 0) {
+            return true; // in bike mode and have not seen options yet
+        }
+
+        return false; // not in bike mode
+    }
+
+    function sawTripOptions() {
+        localStorage.set('sawTripOptions', true);
+    }
+
+})(Storages, _);

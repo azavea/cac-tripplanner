@@ -62,8 +62,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 'bikeTriangleAny': {name: 'bikeTriangle', value: 'any'},
                 'bikeTriangleFast': {name: 'bikeTriangle', value: 'fast'},
                 'bikeTriangleFlat': {name: 'bikeTriangle', value: 'flat'},
-                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'}
-            }
+                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'},
+                'arriveBy': {name: 'arriveBy', value: true},
+                'departAt': {name: 'arriveBy', value: false}
+            },
+            // distinct 'name' in optionPreferences above
+            preferences: ['wheelchair', 'bikeShare', 'bikeTriangle', 'arriveBy']
         }
     };
     var events = $({});
@@ -86,13 +90,15 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         initialize: initialize,
         events: events,
         eventNames: eventNames,
-        open: open
+        open: open,
+        getTimingText: getTimingText
     };
 
     return TripOptionsControl;
 
     function initialize() {
-        if (options.currentMode.indexOf('BICYCLE') > -1) {
+        var currentMode = UserPreferences.getPreference('mode');
+        if (currentMode.indexOf('BICYCLE') > -1) {
             modalSelector = options.selectors.bikeOptionsModal;
             isBike = true;
         } else {
@@ -184,7 +190,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         // trigger plan re-query by calling onClose handler
         // check if child modal exists to determine whether closing out of options altogether
         // or just closing to go to another options modal
-        if (!childModal && options.onClose) {
+        if (!childModalSelector && options.onClose) {
             options.onClose();
         }
 
@@ -199,6 +205,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         var ul = isBike ? bikeModalOptions() : walkModalOptions();
         $(modalSelector).find(options.selectors.modalListContents).html(ul);
 
+        // set user selections in child modals
+        setSelections();
+
+        // note in local storage that trip options have been seen
+        UserPreferences.sawTripOptions();
+
         modal = new Modal({
             modalSelector: modalSelector,
             bodyModalClass: options.selectors.bodyModalClass,
@@ -208,6 +220,23 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
         $(modalSelector).addClass(options.selectors.visibleClass);
         modal.open();
+    }
+
+    /**
+     * Set the selections in child modals based on user preferences.
+     * Does not manage date/time, which the timing modal controls directly.
+     */
+    function setSelections() {
+        _.forEach(options.selectors.preferences, function(option) {
+            var setting = UserPreferences.getPreference(option);
+            var toSelect = _.findKey(options.selectors.optionPreferences, function(pref) {
+                return option === pref.name && setting === pref.value;
+            });
+
+            var $toSelect = $('#' + toSelect);
+            $toSelect.siblings().removeClass(options.selectors.selectedClass);
+            $toSelect.addClass(options.selectors.selectedClass);
+        });
     }
 
     function childModalClick(e) {
@@ -319,7 +348,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             ].join('');
         }
 
-        var timing = getTimingText();
+        var timing = getTimingText() || options.defaultMenuText.timing;
 
         var template = Handlebars.compile(source);
         var html = template({
@@ -331,7 +360,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         return html;
     }
 
-        /**
+    /**
      * Helper to generate options list for top-level menu to display when bike mode is off.
      * Will display current selection instead of default text if user has explicitly set an option.
      *
@@ -339,7 +368,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                          walk modal's unordered list
      */
     function walkModalOptions() {
-
         var source = [
             '<li class="modal-list-timing">{{timing}}</li>',
             '<li class="modal-list-accessibility">{{accessibility}}</li>'
@@ -355,29 +383,25 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        var timing = getTimingText();
-
+        var timing = getTimingText() || options.defaultMenuText.timing;
         var template = Handlebars.compile(source);
-        var html = template({
+        return template({
             accessibility: accessibility,
             timing: timing,
         });
-
-        return html;
     }
 
     /**
      * Helper to get the modal dialog text for arrival/departure time,
      * shared by bike and walk modals.
      *
-     * @returns {string} Text snippet to display
+     * @returns {string} Text snippet to display, or null for default (now)
      */
     function getTimingText() {
-        var timing = options.defaultMenuText.timing;
         if (!UserPreferences.isDefault('dateTime')) {
             var dateTime = moment.unix(UserPreferences.getPreference('dateTime'));
             var arriveBy = UserPreferences.getPreference('arriveBy');
-            timing = arriveBy ? 'Arrive ' : 'Depart ';
+            var timing = arriveBy ? 'Arrive ' : 'Depart ';
             timing += dateTime.calendar(null, {
                 sameDay: '[Today] h:mma',
                 nextDay: '[Tomorrow] h:mma',
@@ -386,9 +410,11 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 lastWeek: '[Last] ddd h:mma',
                 sameElse: 'M/D h:mma'
             });
+            return timing;
         }
 
-        return timing;
+        // should use default text
+        return null;
     }
 
     /**
@@ -502,14 +528,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         }
 
         var template = Handlebars.compile(source);
-        var html = template({
+        return template({
             dayOptionsId: options.selectors.dayOptionsId,
             timeOptionsId: options.selectors.timeOptionsId,
             days: days,
             times: times
         });
-
-        return html;
     }
 
     /**
