@@ -3,7 +3,7 @@
  *
  */
 CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
-                              Typeahead, UserPreferences, Utils) {
+                              Typeahead, UserPreferences) {
 
     'use strict';
 
@@ -14,22 +14,10 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
 
     var defaults = {
         selectors: {
-            // bikeTriangleDiv: '#exploreBikeTriangle',
             // datepicker: '#datetimeExplore',
             // distanceMinutesText: '.distance-minutes',
             // errorClass: 'error',
-            // exploreTime: '#exploreTime',
-            // isochroneInput: '.isochrone-input',
-            // maxWalkDiv: '#exploreMaxWalk',
-            // modeSelectors: '#exploreModes input',
-            // optionsMore: '.sidebar-options .more-options',
-            // optionsViewMore: '.sidebar-options .view-more',
-            // sidebarContainer: '.explore .sidebar-clip',
-            // submitExplore: 'section.explore button[type=submit]',
-            // submitSearch: '.sidebar-search button[type="submit"]',
-            // wheelchairDiv: '#exploreWheelchair',
 
-            typeahead: '#input-directions-from',
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
         }
@@ -46,7 +34,7 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
-    var typeahead = null;
+    var directionsFormControl = null;
     var exploreLatLng = null;
     // var selectedPlaceId = null;
     // var destinationsCache = [];
@@ -56,67 +44,71 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         mapControl = options.mapControl;
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
+        directionsFormControl = options.directionsFormControl;
         modeOptionsControl = options.modeOptionsControl;
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, clickedExplore);
         modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, clickedExplore);
 
+        mapControl.events.on(mapControl.eventNames.originMoved, onMovePointStart);
+
+        tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
+
         // $(options.selectors.optionsViewMore).click(showOptions);
 
-        // // Show isochrone in discovery tab
-        // $(options.selectors.submitExplore).click(clickedExplore);
-
-        // $(options.selectors.submitSearch).on('click', function(){
-        //     $('.explore').addClass('show-results');
-        // });
-
-        typeahead = new Typeahead(options.selectors.typeahead);
-        typeahead.events.on(typeahead.eventNames.selected, onTypeaheadSelected);
-        typeahead.events.on(typeahead.eventNames.cleared, onTypeaheadCleared);
+        directionsFormControl.events.on(directionsFormControl.eventNames.selected,
+                                        onTypeaheadSelected);
+        directionsFormControl.events.on(directionsFormControl.eventNames.cleared,
+                                        onTypeaheadCleared);
+        directionsFormControl.events.on(directionsFormControl.eventNames.geocodeError,
+                                        onGeocodeError);
 
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
         }
 
-        // Respond to changes on all isochrone input fields
-        $(options.selectors.isochroneInput).on('input change', clickedExplore);
+        // TODO: respond to options changes
     }
 
     ExploreControl.prototype = {
         events: events,
         eventNames: eventNames,
-        movedPoint: movedPoint,
         setAddress: setAddress,
         // setDestinationSidebar: setDestinationSidebar,
         setFromUserPreferences: setFromUserPreferences
     };
 
-    function movedPoint(position) {
-        // show spinner while loading
-        $(options.selectors.placesList).addClass('hidden');
-        $(options.selectors.spinner).removeClass('hidden');
+    // When the explore tab is activated, do the thing. If some other tab is activated, clear the
+    // isochrone and destination markers.
+    function onTabShown(event, tabId) {
+        if (tabId === tabControl.TABS.EXPLORE) {
+            UserPreferences.setPreference('method', 'explore');
+            setFromUserPreferences();
+        } else {
+            mapControl.isochroneControl.clearIsochrone();
+            mapControl.isochroneControl.clearDestinations();
+        }
+    }
 
-        // update location
-        exploreLatLng = [position.lat, position.lng];
+    // If they move the marker, that invalidates the old isochrone and triggers the form to
+    // reverse geocode the new location, so show the spinner while that happens.
+    function onMovePointStart() {
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            $(options.selectors.placesList).addClass('hidden');
+            $(options.selectors.spinner).removeClass('hidden');
+        }
+    }
 
-        Geocoder.reverse(position.lat, position.lng).then(function (data) {
-            if (data && data.address) {
-                var location = Utils.convertReverseGeocodeToLocation(data);
-                /*jshint camelcase: false */
-                var fullAddress = data.address.Match_addr;
-                /*jshint camelcase: true */
-                UserPreferences.setPreference('originText', fullAddress);
-                UserPreferences.setPreference('origin', location);
-                $('div.address > h4').html(MapTemplates.addressText(fullAddress));
-                typeahead.setValue(fullAddress);
-                clickedExplore();
-            } else {
-                addressHasError(null);
-                setError('Could not find street address for location.');
+    // If they dragged the origin or destination and the location failed to geocode, show error
+    function onGeocodeError(event, key) {
+        if (key === 'origin') {
+            addressHasError(null);
+            setError('Could not find street address for location.');
+            $(options.selectors.spinner).addClass('hidden');
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 $(options.selectors.placesList).removeClass('hidden');
-                $(options.selectors.spinner).addClass('hidden');
             }
-        });
+        }
     }
 
     /**
@@ -214,23 +206,24 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         );
     }
 
-    function onTypeaheadCleared() {
-        // UserPreferences.clearLocation('origin');
-        exploreLatLng = null;
-        // selectedPlaceId = null;
-        mapControl.isochroneControl.clearIsochrone();
+    function setError(message) {
+        console.log('TODO: display isochrone errors', message);
+        // var $container = $('<div></div>').addClass('destinations');
+        // var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
+        // $container.append($errorTemplate);
+        // $(options.selectors.destinations).html($container);
+        // $(options.selectors.sidebarContainer).height(200);
+    }
+
+    function onTypeaheadCleared(event, key) {
+        if (key === 'origin') {
+            exploreLatLng = null;
+            // selectedPlaceId = null;
+            mapControl.isochroneControl.clearIsochrone();
+        }
     }
 
     function onTypeaheadSelected(event, key, location) {
-        event.preventDefault();  // do not submit form
-
-        if (!location) {
-            // UserPreferences.clearLocation('origin');
-            setAddress(null);
-            return;
-        }
-
-        UserPreferences.setLocation('origin', location);
         setAddress(location);
         // selectedPlaceId = null;
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
@@ -258,20 +251,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
             return true;
         }
     }
-
-    // function showOptions(event) {
-    //     var parent = $(event.target).closest('section');
-    //     var moreOpt = $(options.selectors.optionsMore, parent);
-
-    //     $(moreOpt).toggleClass('active');
-    //     $(moreOpt).parent().find('a.view-more').text(function() {
-    //         if($(moreOpt).hasClass('active')){
-    //             return 'View fewer options';
-    //         } else {
-    //             return 'View more options';
-    //         }
-    //     });
-    // }
 
     function setAddress(address) {
         if (addressHasError(address)) {
@@ -369,15 +348,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
     //     }
     // }
 
-    function setError(message) {
-        console.log('TODO: display isochrone errors', message);
-        // var $container = $('<div></div>').addClass('destinations');
-        // var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
-        // $container.append($errorTemplate);
-        // $(options.selectors.destinations).html($container);
-        // $(options.selectors.sidebarContainer).height(200);
-    }
-
     // function setDestinationSidebarDetail(selectedPlaceId) {
     //     var selectedPlace = _.find(destinationsCache, {id: parseInt(selectedPlaceId)});
     //     if (selectedPlace && selectedPlace.name) {
@@ -416,7 +386,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         var mode = UserPreferences.getPreference('mode');
         var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         var exploreOrigin = UserPreferences.getPreference('origin');
-        var originText = UserPreferences.getPreference('originText');
         var exploreTime = UserPreferences.getPreference('exploreTime');
         var maxWalk = UserPreferences.getPreference('maxWalk');
         var wheelchair = UserPreferences.getPreference('wheelchair');
@@ -424,9 +393,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         // selectedPlaceId = UserPreferences.getPreference('placeId');
 
         if (exploreOrigin) {
-            exploreLatLng = [exploreOrigin.location.y, exploreOrigin.location.x];
-
-            typeahead.setValue(originText);
             setAddress(exploreOrigin);
         } else {
             exploreLatLng = null;
@@ -448,18 +414,10 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
                      modeOptionsControl.options.bikeTriangle[bikeTriangle]);
         } else {
             if (maxWalk) {
-                $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
+                $.extend(otpOptions, { maxWalkDistance: maxWalk });
             }
             $.extend(otpOptions, { wheelchair: wheelchair });
         }
-
-        // if (wheelchair) {
-        //     $('input', options.selectors.wheelchairDiv).click();
-        // }
-
-        // if (maxWalk) {
-        //     $('input', options.selectors.maxWalkDiv).val(maxWalk);
-        // }
 
         if (method === 'explore' && exploreLatLng) {
             fetchIsochrone(when, exploreTime, otpOptions);
