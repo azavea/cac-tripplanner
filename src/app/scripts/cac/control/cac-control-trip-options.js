@@ -131,6 +131,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             // set time and date selector options
             $(childModalSelector).find(options.selectors.timingFields).html(timingModalOptions());
 
+            // listen to the day drop-down on the timing modal
+            addDayDropDownListener();
+
             // read arrive by user setting and toggle if needed
             if (UserPreferences.getPreference('arriveBy')) {
                 $(childModalSelector).find(options.selectors.arriveBy).click();
@@ -235,39 +238,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 childModal.close();
             }
 
-        } else {
-            // user clicked somewhere on modal that is not a list item option
-
-            // listen to the day drop-down on the timing modal
-            if ($el.prop('id') === options.selectors.dayOptionsId) {
-                var $time = $('#' + options.selectors.timeOptionsId);
-                var timeSelection = $time.val();
-
-                if (!$el.val()) {
-                    // got set to current day
-
-                    // set time to 'now' if selection is before next 15 minute increment
-                    var nextQtrHr = $time.find('.' + options.selectors.nextQuarterHourClass).val();
-                    if (parseInt(timeSelection) < parseInt(nextQtrHr)) {
-                        $time.val($time.find('.' + options.selectors.currentTimeClass).val());
-                    }
-
-                    // hide times before 'now'
-                    $(options.selectors.timingFields).removeClass(options.selectors.notTodayClass);
-
-                } else {
-                    // selection is not today
-
-                    // set selection to next 15 minute increment if 'now' was selected
-                    if (timeSelection === $time.find('.' + options.selectors.currentTimeClass).val()) {
-                        $time.val($time.find('.' + options.selectors.nextQuarterHourClass).val());
-                    }
-
-                    // hide 'now' option and show times before now
-                    $(options.selectors.timingFields).addClass(options.selectors.notTodayClass);
-                }
-            }
-        }
+        } // else user clicked somewhere on modal that is not a list item option
     }
 
     function onChildModalClose() {
@@ -510,6 +481,40 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         });
 
         return html;
+    }
+
+    /**
+     * Helper to listen for change events on the day drop-down created by timingModalOptions
+     */
+    function addDayDropDownListener() {
+        $('#' + options.selectors.dayOptionsId).on('change', function(e) {
+            var $time = $('#' + options.selectors.timeOptionsId);
+            var timeSelection = $time.val();
+
+            if (!$(e.currentTarget).val()) {
+                // got set to current day
+
+                // set time to 'now' if selection is before next 15 minute increment
+                var nextQtrHr = $time.find('.' + options.selectors.nextQuarterHourClass).val();
+                if (parseInt(timeSelection) < parseInt(nextQtrHr)) {
+                    $time.val($time.find('.' + options.selectors.currentTimeClass).val());
+                }
+
+                // hide times before 'now'
+                $(options.selectors.timingFields).removeClass(options.selectors.notTodayClass);
+
+            } else {
+                // selection is not today
+
+                // set selection to next 15 minute increment if 'now' was selected
+                if (timeSelection === $time.find('.' + options.selectors.currentTimeClass).val()) {
+                    $time.val($time.find('.' + options.selectors.nextQuarterHourClass).val());
+                }
+
+                // hide 'now' option and show times before now
+                $(options.selectors.timingFields).addClass(options.selectors.notTodayClass);
+            }
+        });
     }
 
     /**
