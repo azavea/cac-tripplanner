@@ -7,8 +7,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
 
     'use strict';
 
-    var METERS_PER_MILE = 1609.34;
-
     // Number of millis to wait on input changes before sending isochrone request
     var ISOCHRONE_DEBOUNCE_MILLIS = 750;
 
@@ -16,7 +14,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         selectors: {
             // datepicker: '#datetimeExplore',
             // distanceMinutesText: '.distance-minutes',
-            // errorClass: 'error',
 
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
@@ -99,13 +96,15 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         }
     }
 
-    // If they dragged the origin or destination and the location failed to geocode, show error
+    // If they dragged the origin or destination and the location failed to geocode, show error.
+    // Since the drag event activates the spinner, this needs to restore the sidebar list.
     function onGeocodeError(event, key) {
         if (key === 'origin') {
-            addressHasError(null);
+            setAddress(null);
             setError('Could not find street address for location.');
             $(options.selectors.spinner).addClass('hidden');
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                directionsFormControl.setError('origin');
                 $(options.selectors.placesList).removeClass('hidden');
             }
         }
@@ -116,7 +115,7 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
      * This function has been debounced to cut down on requests.
      */
     var clickedExplore = _.debounce(function() {  // jshint ignore:line
-        if (addressHasError(exploreLatLng)) {
+        if (!exploreLatLng) {
             return;
         }
 
@@ -232,33 +231,23 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
     }
 
     /**
-     * Returns true if given location is missing (address is not valid)
-     *
-     * @params {Object} location Geocoded location object (truthy if ok)
-     * @returns {Boolean} true if location is falsy
+     * Set or clear address.
+     * If setting, also draw the map marker (if the tab is shown).
+     * If clearing, also clear the isochrone.
      */
-    function addressHasError(location) {
-        var $input = $(options.selectors.typeahead);
-
-        if (location) {
-            $input.removeClass(options.selectors.errorClass);
-            return false;
+    function setAddress(address) {
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            directionsFormControl.setError('origin');
+        }
+        if (address) {
+            exploreLatLng = [address.location.y, address.location.x];
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                mapControl.setDirectionsMarkers(exploreLatLng);
+            }
         } else {
             exploreLatLng = null;
-            UserPreferences.clearLocation('origin');
-            $input.addClass(options.selectors.errorClass);
             mapControl.isochroneControl.clearIsochrone();
-            return true;
         }
-    }
-
-    function setAddress(address) {
-        if (addressHasError(address)) {
-            return;
-        }
-        exploreLatLng = [address.location.y, address.location.x];
-        mapControl.setDirectionsMarkers(exploreLatLng);
-        $('div.address > h4').html(MapTemplates.addressText(address.attributes));
     }
 
     /**

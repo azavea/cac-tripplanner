@@ -99,8 +99,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
         if (!(directions.origin && directions.destination)) {
-            setDirectionsError('origin');
-            setDirectionsError('destination');
+            directionsFormControl.setError('origin');
+            directionsFormControl.setError('destination');
 
             updateUrl();  // Still update the URL if they request one-sided directions
             return;
@@ -379,24 +379,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         clearItineraries();
         if (key === 'origin' || key === 'destination') {
             directions[key] = value;
-            setDirectionsError(key);
+            if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+                directionsFormControl.setError(key);
+            }
         } else {
             console.error('Directions key ' + key + 'unrecognized!');
-        }
-    }
-
-    function setDirectionsError(key) {
-        var $input = null;
-        if (key === 'origin') {
-            $input = $(options.selectors.origin);
-        } else {
-            $input = $(options.selectors.destination);
-        }
-
-        if (directions[key]) {
-            $input.removeClass(options.selectors.errorClass);
-        } else {
-            $input.addClass(options.selectors.errorClass);
         }
     }
 

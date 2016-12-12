@@ -46,7 +46,8 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         events: events,
         eventNames: eventNames,
         moveOriginDestination: moveOriginDestination,
-        clearAll: clearAll
+        clearAll: clearAll,
+        setError: setError
     };
 
     return DirectionsFormControl;
@@ -164,6 +165,17 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
     function clearAll() {
         typeaheadFrom.setValue(null);
         typeaheadTo.setValue(null);
+    }
+
+    // Add the error class to the given field if it's not set in UserPreferences, or remove
+    // the error class if it is.
+    function setError(key) {
+        var $input = $(options.selectors[key]);
+        if (UserPreferences.getPreference(key)) {
+            $input.removeClass(options.selectors.errorClass);
+        } else {
+            $input.addClass(options.selectors.errorClass);
+        }
     }
 
 })(jQuery, CAC.Search.Typeahead, CAC.Search.Geocoder, CAC.User.Preferences, CAC.Utils);
