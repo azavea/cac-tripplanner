@@ -108,8 +108,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         mapControl.events.on(mapControl.eventNames.mapMoved, SearchParams.updateMapCenter);
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
-        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged,
-                                     directionsControl.setOptions);
 
 
         if ($(options.selectors.map).is(':visible')) {

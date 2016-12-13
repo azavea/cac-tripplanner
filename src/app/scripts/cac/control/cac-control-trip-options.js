@@ -182,8 +182,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        childModal = new Modal(childModalOptions);
         modal.close();
+        childModal = new Modal(childModalOptions);
         childModal.open();
         $(childModalSelector).addClass(options.selectors.visibleClass);
     }

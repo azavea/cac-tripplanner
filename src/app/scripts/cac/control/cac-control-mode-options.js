@@ -2,29 +2,6 @@ CAC.Control.ModeOptions = (function ($) {
     'use strict';
 
     var defaults = {
-        // Note:  the three bike options must sum to 1, or OTP won't plan the trip
-        bikeTriangle: {
-            any: {
-                triangleSafetyFactor: 0.34,
-                triangleSlopeFactor: 0.33,
-                triangleTimeFactor: 0.33
-            },
-            flat: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.66,
-                triangleTimeFactor: 0.17
-            },
-            fast: {
-                triangleSafetyFactor: 0.17,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.66
-            },
-            safe: {
-                triangleSafetyFactor: 0.66,
-                triangleSlopeFactor: 0.17,
-                triangleTimeFactor: 0.17
-            }
-        },
         defaultMode: 'WALK,TRANSIT',
         // map button class names to OpenTripPlanner mode parameters
         modes: {
@@ -48,8 +25,7 @@ CAC.Control.ModeOptions = (function ($) {
     };
     var events = $({});
     var eventNames = {
-        toggle: 'cac:control:modeoptions:toggle',
-        transitChanged: 'cac:control:modeoptions:transitchanged'
+        toggle: 'cac:control:modeoptions:toggle'
     };
     var options = {};
 
@@ -91,7 +67,7 @@ CAC.Control.ModeOptions = (function ($) {
 
             var active = $(this).find('i').hasClass(options.selectors.transitIconOnClass);
             $(this).attr('title', active ? 'Click to disable transit' : 'Click to enable transit');
-            events.trigger(eventNames.transitChanged, active);
+            events.trigger(eventNames.toggle, getMode());
         });
     }
 
