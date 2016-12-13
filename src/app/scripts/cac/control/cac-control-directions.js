@@ -109,23 +109,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         // show spinner while loading
         showSpinner();
 
-        var date = UserPreferences.getPreference('dateTime');
-        date = date ? moment.unix(date) : moment(); // default to now
-
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
 
         // options to pass to OTP as-is
         var otpOptions = {
+            mode: mode,
             arriveBy: arriveBy,
             maxWalkDistance: UserPreferences.getPreference('maxWalk')
         };
-
-        // add intermediatePlaces if user edited route
-        var waypoints = UserPreferences.getPreference('waypoints');
-        if (waypoints && waypoints.length && !arriveBy) {
-            otpOptions.waypoints = waypoints;
-        }
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
@@ -138,7 +130,19 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
 
-        $.extend(otpOptions, {mode: mode});
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length && !arriveBy) {
+            otpOptions.waypoints = waypoints;
+        }
+
+        var params = $.extend({
+            fromText: UserPreferences.getPreference('originText'),
+            toText: UserPreferences.getPreference('destinationText')
+        }, otpOptions);
+
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
@@ -146,12 +150,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
-
-        var params = {
-            fromText: UserPreferences.getPreference('originText'),
-            toText: UserPreferences.getPreference('destinationText')
-        };
-        $.extend(params, otpOptions);
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 

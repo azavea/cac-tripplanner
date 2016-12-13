@@ -3,7 +3,7 @@
  *
  */
 CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
-                              Typeahead, UserPreferences) {
+                              Typeahead, UserPreferences, Utils) {
 
     'use strict';
 
@@ -119,44 +119,32 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
             return;
         }
 
-        // var exploreMinutes = $(options.selectors.exploreTime).val();
+        // TODO: replace placeholder with value from slider
+        var exploreMinutes = 20;
 
-        // var picker = $(options.selectors.datepicker).data('DateTimePicker');
-        // var date = picker.date();
-        // if (!date) {
-        //     // use current date/time if none set
-        //     date = moment();
-        // }
+        var mode = UserPreferences.getPreference('mode');
+        var arriveBy = UserPreferences.getPreference('arriveBy');
 
-        // TODO: fix placeholders
-        var date = moment();
-        var exploreMinutes = 30;
-
-        var otpOptions = {};
-
-        var mode = modeOptionsControl.getMode();
+        // options to pass to OTP as-is
+        var otpOptions = {
+            mode: mode,
+            arriveBy: arriveBy,
+            maxWalkDistance: UserPreferences.getPreference('maxWalk')
+        };
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
             var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-
-            if (_.has(modeOptionsControl.options.bikeTriangle, bikeTriangle)) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-            } else {
-                console.error('unrecognized bike triangle option ' + bikeTriangle);
+            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
+            if (bikeTriangle) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
             }
-
-            // check user preference for bike share here, and update query mode if so
-            if (UserPreferences.getPreference('bikeShare')) {
-                mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
-            }
-
         } else {
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
 
-        $.extend(otpOptions, {mode: mode});
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
@@ -372,14 +360,7 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
 
     function setFromUserPreferences() {
         var method = UserPreferences.getPreference('method');
-        var mode = UserPreferences.getPreference('mode');
-        var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
         var exploreOrigin = UserPreferences.getPreference('origin');
-        var exploreTime = UserPreferences.getPreference('exploreTime');
-        var maxWalk = UserPreferences.getPreference('maxWalk');
-        var wheelchair = UserPreferences.getPreference('wheelchair');
-
-        // selectedPlaceId = UserPreferences.getPreference('placeId');
 
         if (exploreOrigin) {
             setAddress(exploreOrigin);
@@ -387,29 +368,8 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
             exploreLatLng = null;
         }
 
-        // $(options.selectors.exploreTime).val(exploreTime);
-
-        // modeOptionsControl.setMode(options.selectors.modeSelectors, mode);
-        // $('select', options.selectors.bikeTriangleDiv).val(bikeTriangle);
-
-        // use current date/time when loading from preferences
-        var when = moment();
-
-        // build options for query
-        var otpOptions = { mode: mode };
-
-        if (mode.indexOf('BICYCLE') > -1) {
-            $.extend(otpOptions, {optimize: 'TRIANGLE'},
-                     modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-        } else {
-            if (maxWalk) {
-                $.extend(otpOptions, { maxWalkDistance: maxWalk });
-            }
-            $.extend(otpOptions, { wheelchair: wheelchair });
-        }
-
         if (method === 'explore' && exploreLatLng) {
-            fetchIsochrone(when, exploreTime, otpOptions);
+            clickedExplore();
         }
     }
 
