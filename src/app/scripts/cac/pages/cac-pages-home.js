@@ -21,7 +21,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
             sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
-            hiddenClass: 'hidden'
+            hiddenClass: 'hidden',
+
+            originInput: '#input-directions-from'
         }
     };
 
@@ -163,6 +165,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
             tabControl.setTab(tabControl.TABS.HOME);
+
+            $(options.selectors.originInput).focus();
         });
 
         // disable zoom on mobile safari
