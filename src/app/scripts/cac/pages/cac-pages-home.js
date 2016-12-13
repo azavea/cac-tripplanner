@@ -18,6 +18,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             tabControl: '.tab-control',
             tabControlLink: '.nav-item',
 
+            mapViewButton: '.map-view-btn',
+
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
             sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
@@ -155,6 +157,13 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 tabControl.setTab(tabControl.TABS.EXPLORE);
             }
         });
+
+        $(options.selectors.mapViewButton).on('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            tabControl.setTab(tabControl.TABS.EXPLORE);
+        });
+
         $(options.selectors.homeLink).on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
