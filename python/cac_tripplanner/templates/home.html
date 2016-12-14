@@ -61,7 +61,7 @@
             </header>
             <ul class="place-list">
                 {% for destination in destinations %}
-                <li class="place-card no-origin">
+                <li class="place-card no-origin" data-destination-id="{{ destination.id }}">
                     <img class="place-card-photo"
                         {% if destination.image %}
                             src="{{ destination.wide_image.url }}"
