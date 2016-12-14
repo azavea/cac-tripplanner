@@ -21,6 +21,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             mapViewButton: '.map-view-btn',
 
             needWheelsBanner: '.sidebar-banner.indego-banner',
+            sidebarBanner: '.sidebar-banner',
             sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
             sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
             hiddenClass: 'hidden',
@@ -138,13 +139,13 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         });
 
         // listen to sidebar banner click
-        $(options.selectors.needWheelsBanner).on('click', function() {
+        $(options.selectors.sidebarBanner).on('click', function() {
             // go to options modal
             new TripOptions({
                 onClose: closedTripModal
             }).open();
 
-            // dismiss banner
+            // dismiss 'need wheels?' banner
             $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
         });
 
