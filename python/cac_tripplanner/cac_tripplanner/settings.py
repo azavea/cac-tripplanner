@@ -211,7 +211,13 @@ CKEDITOR_CONFIGS = {
             ["Table", "HorizontalRule"],
             ["SpecialChar"],
             ["Source"]
-        ]
+        ],
+        'extraPlugins': ','.join(
+            ['autolink',
+             'autoembed',
+             'embed',
+             'embedsemantic',
+             'autogrow']),
     }
 }
 
