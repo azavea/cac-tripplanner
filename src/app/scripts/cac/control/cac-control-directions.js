@@ -115,48 +115,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
 
-        // options to pass to OTP as-is
-        var otpOptions = {
-            mode: mode,
-            arriveBy: arriveBy,
-            maxWalkDistance: UserPreferences.getPreference('maxWalk')
-        };
-
-        if (mode.indexOf('BICYCLE') > -1) {
-            // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
-            if (bikeTriangle) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
-            }
-        } else {
-            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
-        }
-
-        // add intermediatePlaces if user edited route
-        var waypoints = UserPreferences.getPreference('waypoints');
-        if (waypoints && waypoints.length && !arriveBy) {
-            otpOptions.waypoints = waypoints;
-        }
-
-        var params = $.extend({
-            fromText: UserPreferences.getPreference('originText'),
-            toText: UserPreferences.getPreference('destinationText')
-        }, otpOptions);
-
-        var date = UserPreferences.getPreference('dateTime');
-        date = date ? moment.unix(date) : moment(); // default to now
+        var otpOptions = getOtpOptions();
 
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
-        UserPreferences.setPreference('mode', mode);
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
-        Routing.planTrip(directions.origin, directions.destination, date, params)
+        Routing.planTrip(directions.origin, directions.destination, date, otpOptions)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
             // Add the itineraries to the map, highlighting the first one
@@ -172,24 +141,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             });
             currentItinerary.geojson.bringToFront();
 
+            // If there is only one itinerary, make it draggable.
+            // Only one itinerary is returned if there are waypoints, so this
+            // lets the user to continue to add or modify waypoints without
+            // having to select it in the list.
+            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
+                itineraryControl.draggableItinerary(currentItinerary);
+            }
+
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
             itineraryListControl.show();
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
-
-            // If there is only one itinerary, make it draggable.
-            // Only one itinerary is returned if there are waypoints, so this
-            // lets the user to continue to add or modify waypoints without
-            // having to select it in the list.
-            if (itineraries.length === 1 && !arriveBy) {
-                itineraryControl.draggableItinerary(currentItinerary);
-                // select the itinerary (go directly to detailed step view) if have waypoints
-                if (waypoints && waypoints.length) {
-                    onItineraryClicked(null, currentItinerary);
-                }
-            }
         }, function (error) {
             console.error('failed to plan trip');
             console.error(error);
@@ -227,6 +192,46 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         itineraryListControl.hide();
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
+    }
+
+    /**
+     * Get parameters to pass to OpenTripPlanner, based on current settings
+     *
+     * @returns {Object} extra parameter set to pass to Routing.planTrip
+     */
+    function getOtpOptions() {
+        var mode = UserPreferences.getPreference('mode');
+        var arriveBy = UserPreferences.getPreference('arriveBy');
+
+        var otpOptions = {
+            arriveBy: arriveBy,
+            maxWalkDistance: UserPreferences.getPreference('maxWalk')
+        };
+
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length && !arriveBy) {
+            otpOptions.waypoints = waypoints;
+        }
+
+        if (mode.indexOf('BICYCLE') > -1) {
+            // set bike trip optimization option
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
+            if (bikeTriangle) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
+            }
+        } else {
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
+        }
+
+        $.extend(otpOptions, {
+            mode: mode,
+            fromText: UserPreferences.getPreference('originText'),
+            toText: UserPreferences.getPreference('destinationText')
+        });
+
+        return otpOptions;
     }
 
     function onDirectionsBackClicked() {
