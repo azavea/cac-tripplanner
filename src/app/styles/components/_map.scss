@@ -113,4 +113,16 @@
             border: 0;
         }
     }
+
+    .leaflet-popup-tip-container {
+        display: none;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+    }
+
+    .leaflet-popup-content {
+        margin: 2px 4px;
+    }
 }

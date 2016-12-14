@@ -17,6 +17,10 @@
         display: none;
     }
 
+    .places-header {
+        position: relative;
+    }
+
     h1 {
         margin: 0;
         font-size: 2.5rem;
@@ -34,6 +38,34 @@
         .body-map & {
             font-size: 1.4rem;
             line-height: 4;
+        }
+    }
+
+    a.map-view-btn {
+        @include delinkify($gophillygo-blue);
+        display: block;
+        position: absolute;
+        top: 1.7rem;
+        right: 0;
+        height: 4rem;
+        padding-right: 2rem;
+        padding-left: 4rem;
+        border: 2px solid $gophillygo-blue;
+        line-height: 3.8rem;
+        text-align: center;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            display: none;
+        }
+
+        &:before {
+            content: '\f279';
+            position: absolute;
+            height: 100%;
+            left: 1rem;
+            color: $gophillygo-blue;
+            font-family: 'gpg';
         }
     }
 

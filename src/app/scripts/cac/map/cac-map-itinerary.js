@@ -15,16 +15,21 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var waypointsLayer = null;
 
     var waypointRadius = 6;
-    var waypointColor = '#444';
+    var waypointFillColor = 'white';
+    var waypointStrokeColor = '#d02d2d';
+    var waypointStrokeWidth = 4;
     var waypointCircle = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
-        'width="' + waypointRadius * 2 + '" height="' + waypointRadius * 2 + '">' +
-        '<circle cx="' + waypointRadius + '" cy="' + waypointRadius +
-        '" r="' + waypointRadius + '" fill="' + waypointColor + '"/></svg>';
+        'width="' + (waypointRadius + waypointStrokeWidth) * 2 +
+        '" height="' + (waypointRadius + waypointStrokeWidth) * 2 + '">' +
+        '<circle cx="' + (waypointRadius + waypointStrokeWidth) +
+        '" cy="' + (waypointRadius + waypointStrokeWidth) +
+        '" r="' + waypointRadius + '" fill="' + waypointFillColor +
+        '" stroke="' + waypointStrokeColor +
+        '" stroke-width="' + waypointStrokeWidth + '"/></svg>';
     var waypointIcon = L.icon( {
         iconUrl: 'data:image/svg+xml;base64,' + btoa(waypointCircle),
-        iconSize: [waypointRadius * 2, waypointRadius * 2],
-        iconAnchor: [waypointRadius, waypointRadius],
-        popupAnchor: [0, -2 - waypointRadius]
+        iconSize: [(waypointRadius + waypointStrokeWidth) * 2, (waypointRadius + waypointStrokeWidth) * 2],
+        popupAnchor: [60, 40]
     } );
 
     function ItineraryControl(options) {
@@ -116,7 +121,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: waypointIcon
-                    }).bindPopup('Drag marker to change route', {closeButton: false}
+                    }).bindPopup('Drag to change route', {closeButton: false}
                     ).on('dragstart', function(e) {
                         dragging = true;
                         var pt = e.target.getLatLng();
@@ -144,7 +149,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                             if (lastItineraryHoverMarker) {
                                 lastItineraryHoverMarker.closePopup();
                             }
-                         }, 50);
+                        }, 50);
 
                         // hide marker after awhile if not dragging
                         if (!dragging) {
@@ -155,7 +160,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                     dragging = false;
                                     newWaypointIndex = null;
                                 }
-                            }, 3000);
+                            }, 500);
                         }
                     });
 
@@ -172,7 +177,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
                 pointToLayer: function(geojson, latlng) {
                     var marker = new cartodb.L.marker(latlng, {icon: waypointIcon,
-                                                               draggable: true });
+                                                               draggable: true});
                     marker.on('dragstart', function() {
                         dragging = true;
                     }).on('dragend', function(e) {
@@ -188,10 +193,10 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                     }).on('click', function() {
                         removeWaypoint(itinerary, geojson.properties.index);
                     }).on('drag', function(event) {
-                            redrawWaypointDrag(event, geojson.properties.index, false);
+                        redrawWaypointDrag(event, geojson.properties.index, false);
                     });
 
-            marker.bindPopup('Drag to change or click to remove', {closeButton: false})
+            marker.bindPopup('Drag to change. Click to remove.', {closeButton: false})
                     .on('mouseover', function () {
                         clearTimeout(popupTimeout);
                         return dragging || this.openPopup();

@@ -54,4 +54,5 @@
 .icon-train { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf238;&nbsp;'); }
 .icon-flag { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf239;&nbsp;'); }
 .icon-home { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf240;&nbsp;'); }
+.icon-map { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf279;&nbsp;'); }
 .icon-marker-destination { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf28d;&nbsp;'); }
