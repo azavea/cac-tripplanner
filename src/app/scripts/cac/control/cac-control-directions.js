@@ -98,6 +98,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
+        if (!tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            return;
+        }
         if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');

@@ -93,7 +93,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         exploreControl = new CAC.Control.Explore({
             mapControl: mapControl,
-            modeOptionsControl: modeOptionsControl,
             directionsFormControl: directionsFormControl,
             tabControl: tabControl,
             urlRouter: urlRouter
@@ -286,6 +285,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
         UserPreferences.setPreference('mode', mode);
         directionsControl.setOptions();
+        exploreControl.setOptions();
         showHideNeedWheelsBanner();
     }
 

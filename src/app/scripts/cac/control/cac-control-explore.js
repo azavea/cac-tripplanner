@@ -2,8 +2,8 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Routing,
-                              Typeahead, UserPreferences, Utils) {
+CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahead,
+                                 UserPreferences, Utils) {
 
     'use strict';
 
@@ -12,29 +12,17 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
 
     var defaults = {
         selectors: {
-            // datepicker: '#datetimeExplore',
-            // distanceMinutesText: '.distance-minutes',
-
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
         }
     };
     var options = {};
 
-    var events = $({});
-    var eventNames = {
-        destinationDirections: 'cac:control:explore:destinationdirections'
-    };
-
-    var modeOptionsControl = null;
-    // var datepicker = null;
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
     var directionsFormControl = null;
     var exploreLatLng = null;
-    // var selectedPlaceId = null;
-    // var destinationsCache = [];
 
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -42,16 +30,10 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
         directionsFormControl = options.directionsFormControl;
-        modeOptionsControl = options.modeOptionsControl;
-
-        modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, clickedExplore);
-        modeOptionsControl.events.on(modeOptionsControl.eventNames.transitChanged, clickedExplore);
 
         mapControl.events.on(mapControl.eventNames.originMoved, onMovePointStart);
 
         tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
-
-        // $(options.selectors.optionsViewMore).click(showOptions);
 
         directionsFormControl.events.on(directionsFormControl.eventNames.selected,
                                         onTypeaheadSelected);
@@ -63,17 +45,17 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
         }
-
-        // TODO: respond to options changes
     }
 
+    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
+
     ExploreControl.prototype = {
-        events: events,
-        eventNames: eventNames,
         setAddress: setAddress,
-        // setDestinationSidebar: setDestinationSidebar,
+        setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
     };
+
+    return ExploreControl;
 
     // When the explore tab is activated, do the thing. If some other tab is activated, clear the
     // isochrone and destination markers.
@@ -85,6 +67,11 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
         }
+    }
+
+    // trigger re-query when trip options are changed
+    function setOptions() {
+        clickedExplore();
     }
 
     // If they move the marker, that invalidates the old isochrone and triggers the form to
@@ -111,14 +98,25 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
     }
 
     /**
-     * Set user preferences before fetching isochrone.
-     * This function has been debounced to cut down on requests.
+     * Show spinner and clear existing isochrone then fetch isochrone.
+     * The fetchIsochrone call is debounced to cut down on requests.
      */
-    var clickedExplore = _.debounce(function() {  // jshint ignore:line
-        if (!exploreLatLng) {
+    function clickedExplore() {
+        if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
+        $(options.selectors.placesList).addClass('hidden');
+        $(options.selectors.spinner).removeClass('hidden');
+        mapControl.isochroneControl.clearIsochrone();
 
+        debouncedFetchIsochrone();
+    }
+
+    /**
+     * Load options and compose OTP params, fetch travelshed from OpenTripPlanner,
+     * then populate side bar with featured locations found within the travelshed.
+     */
+    function fetchIsochrone() {
         // TODO: replace placeholder with value from slider
         var exploreMinutes = 20;
 
@@ -149,33 +147,15 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
         // UserPreferences.setPreference('exploreTime', exploreMinutes);
-        UserPreferences.setPreference('mode', mode);
 
-        fetchIsochrone(date, exploreMinutes, otpOptions);
-    }, ISOCHRONE_DEBOUNCE_MILLIS);
-
-    return ExploreControl;
-
-    /**
-     * Fetch travelshed from OpenTripPlanner, then populate side bar with featured locations
-     * found within the travelshed.
-     *
-     * @param {Object} when Moment.js time for the search (default to now)
-     * @param {String} mode String for travel mode to pass to OTP (walk, transit, etc.)
-     * @param {Number} exploreMinutes Number of minutes of travel for the isochrone limit
-     */
-    function fetchIsochrone(when, exploreMinutes, otpOptions) {
         // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
         // (the 'detail' functions don't update the isochrone so they update the URL themselves)
         updateUrl();
 
-        $(options.selectors.placesList).addClass('hidden');
-        $(options.selectors.spinner).removeClass('hidden');
-
         // do not zoom to fit isochrone if going to highlight a selected destination
         // var zoomToFit = !selectedPlaceId;
 
-        mapControl.isochroneControl.fetchIsochrone(exploreLatLng, when, exploreMinutes, otpOptions,
+        mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
             function (destinations) {
                 $(options.selectors.spinner).addClass('hidden');
@@ -183,6 +163,7 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
                 if (!destinations) {
                     setError('No destinations found.');
                 }
+                // TODO: reimplement interaction between isochrone and places sidebar, if needed
                 // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
@@ -238,117 +219,6 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         }
     }
 
-    /**
-     * Query OTP for travel time to a destination, then put it in the side panel.
-     *
-     * @param {Object} destination Destination put in the sidebar
-     */
-    // function setDestinationDistance(destination) {
-
-    //     // helper to set the text snippet
-    //     function setDestinationMinutesText(distanceMinutes) {
-    //         var $destination = $('#destination-' + destination.id);
-    //         $destination.find(options.selectors.distanceMinutesText)
-    //             .text(distanceMinutes + ' minutes away');
-    //     }
-
-    //     // first check if we have distance cached
-    //     if (destination.formattedDuration) {
-    //         setDestinationMinutesText(destination.formattedDuration);
-    //         return;
-    //     }
-
-    //     // distance not cached; go query for it
-    //     var mode = UserPreferences.getPreference('mode');
-    //     var picker = $(options.selectors.datepicker).data('DateTimePicker');
-    //     // use current date/time if none set
-    //     var date = picker.date() || moment();
-    //     // only request one itinerary (first returned is the shortest)
-    //     var otpOptions = { mode: mode, numItineraries: 1 };
-    //     if (mode.indexOf('BICYCLE') > -1) {
-    //         var bikeTriangleOpt = $('option:selected', options.selectors.bikeTriangleDiv);
-    //         var bikeTriangle = bikeTriangleOpt.val();
-    //         $.extend(otpOptions, {optimize: 'TRIANGLE'},
-    //                  modeOptionsControl.options.bikeTriangle[bikeTriangle]);
-    //     } else {
-    //         var maxWalk = $('input', options.selectors.maxWalkDiv).val();
-    //         if (maxWalk) {
-    //             $.extend(otpOptions, { maxWalkDistance: maxWalk * METERS_PER_MILE });
-    //         }
-    //         // true if box checked
-    //         var wheelchair = $('input', options.selectors.wheelchairDiv).prop('checked');
-    //         $.extend(otpOptions, { wheelchair: wheelchair });
-    //     }
-
-    //     var dest = [destination.point.coordinates[1], destination.point.coordinates[0]];
-
-    //     Routing.planTrip(exploreLatLng, dest, date, otpOptions).then(function (itineraries) {
-    //         if (itineraries.length) {
-    //             var distance = itineraries[0].formattedDuration;
-    //             destination.formattedDuration = distance;
-    //             setDestinationMinutesText(distance);
-    //         }
-    //     });
-    // }
-
-    // function setDestinationSidebar(destinations) {
-    //     destinationsCache = destinations;
-    //     if (!destinations) {
-    //         return;
-    //     }
-    //     var $container = $('<div></div>').addClass('destinations');
-    //     $.each(destinations, function (i, destination) {
-    //         var $destination = $(MapTemplates.destinationBlock(destination));
-    //         $destination.click(function () {
-    //             setDestinationSidebarDetail(destination.id);
-    //             mapControl.isochroneControl.highlightDestination(destination.id, { panTo: true });
-    //         });
-    //         $destination.hover(function () {
-    //             mapControl.isochroneControl.highlightDestination(destination.id);
-    //         }, function () {
-    //             mapControl.isochroneControl.highlightDestination(null);
-    //         });
-    //         $container.append($destination);
-    //     });
-    //     $(options.selectors.destinations).html($container);
-    //     // go find distances once the sidebar templates have been added to DOM
-    //     $.each(destinations, function(i, destination) {
-    //         setDestinationDistance(destination);
-    //     });
-    //     $(options.selectors.sidebarContainer).height(400);
-
-    //     // show destination details if destination is selected
-    //     if (selectedPlaceId) {
-    //         setDestinationSidebarDetail(selectedPlaceId);
-    //         // also highlight it on the map and pan to it
-    //         mapControl.isochroneControl.highlightDestination(selectedPlaceId, { panTo: true });
-    //     }
-    // }
-
-    // function setDestinationSidebarDetail(selectedPlaceId) {
-    //     var selectedPlace = _.find(destinationsCache, {id: parseInt(selectedPlaceId)});
-    //     if (selectedPlace && selectedPlace.name) {
-    //         UserPreferences.setPreference('placeId', selectedPlaceId);
-    //         updateUrl();
-    //         var $detail = $(MapTemplates.destinationDetail(selectedPlace));
-    //         $detail.find('.back').on('click', onDestinationDetailBackClicked);
-    //         $detail.find('.getdirections').on('click', function() {
-    //             events.trigger(eventNames.destinationDirections, selectedPlace);
-    //         });
-    //         $(options.selectors.destinations).html($detail);
-    //     } else {
-    //         onDestinationDetailBackClicked();
-    //     }
-    // }
-
-    // function onDestinationDetailBackClicked() {
-    //     selectedPlaceId = null;
-    //     UserPreferences.setPreference('placeId', undefined);
-    //     updateUrl();
-    //     setDestinationSidebar(destinationsCache);
-    //     mapControl.isochroneControl.highlightDestination(null);
-    // }
-
     /* Update the URL based on current UserPreferences
      *
      * The placeId preference is set when there's a selected location and not when there's not,
@@ -373,5 +243,5 @@ CAC.Control.Explore = (function (_, $, ModeOptions, Geocoder, MapTemplates, Rout
         }
     }
 
-})(_, jQuery, CAC.Control.ModeOptions, CAC.Search.Geocoder, CAC.Map.Templates,
-    CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead,
+   CAC.User.Preferences, CAC.Utils);
