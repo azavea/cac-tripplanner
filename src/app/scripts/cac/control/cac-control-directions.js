@@ -274,9 +274,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     function getTimesToPlaces() {
-        console.log('getTimesToPlaces');
-        // TODO: fire off ajax requests to get the travel times to each destination
-        ////////////////////////////////
+        // make ajax requests to get the travel times to each destination
         var otpOptions = getOtpOptions();
         // only using the first itinerary; let OTP know to not bother finding other options
         $.extend(otpOptions, {numItineraries: 1});
@@ -284,15 +282,28 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
 
-        /*
         var $placeCards = $('li.place-card');
-        $placeCards.each(function(index) {
+        $placeCards.each(function() {
             var $card = $(this);
+
+            // read out the location of the destination
+            var xCoord = $card.attr('data-destination-x');
+            var yCoord = $card.attr('data-destination-y');
+            var placeCoords = [yCoord, xCoord];
+
+            // get travel time to destination and update place card
             Routing.planTrip(directions.origin, placeCoords, date, otpOptions)
             .then(function (itineraries) {
+                if (itineraries && itineraries.length) {
+                    var itinerary = itineraries[0];
+                    $card.find('.place-card-travel-logistics-duration')
+                        .text(itinerary.formattedDuration);
+                    $card.find('.place-card-travel-logistics-origin')
+                        .text(itinerary.fromText);
+                    $card.removeClass('no-origin');
+                }
+            });
         });
-        */
-        ////////////////////////////////
     }
 
     function onDirectionsBackClicked() {

@@ -16,7 +16,9 @@ CAC.Home.Templates = (function (Handlebars) {
     function destinations(useDestinations) {
         var source = [
             '{{#each destinations}}',
-            '<li class="place-card no-origin">',
+            '<li class="place-card no-origin" data-destination-id="{{ this.id }}" ',
+                'data-destination-x="{{ this.location.x }}" ',
+                'data-destination-y="{{ this.location.y }}">',
                 '<img class="place-card-photo"',
                     '{{#if this.image}}',
                         'src="{{ this.wide_image }}"',
@@ -27,8 +29,8 @@ CAC.Home.Templates = (function (Handlebars) {
                     'alt="{{ this.name }}" />',
                 '<h2>{{ this.name }}</h2>',
                 '<div class="place-card-travel-logistics">',
-                    '<span class="place-card-travel-logistics-duration">N</span> ',
-                    'min from <span class="place-card-travel-logistics-origin">origin</span>',
+                    '<span class="place-card-travel-logistics-duration"></span> ',
+                    'from <span class="place-card-travel-logistics-origin">origin</span>',
                 '</div>',
                 '<div class="place-card-actions">',
                     '<a class="place-card-action place-action-go"',
