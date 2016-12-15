@@ -162,9 +162,18 @@
         justify-content: center;
     }
 
+    .body-map-explore & .explore-link {
+        display: none;
+    }
+
+    .body-map-dir & .directions-link {
+        display: none;
+    }
+
     a {
         @include delinkify;
         padding: 0 2em;
         text-transform: uppercase;
+        cursor: pointer;
     }
 }
