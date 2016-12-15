@@ -47,10 +47,10 @@ def home(request):
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
-        context['body_class'] = 'body-map body-map-dir body-has-sidebar-banner'
+        context['tab'] = 'map-dir'
     elif request.GET.get('origin') is not None:
         # If there's no destination but there is an origin, go to Explore
-        context['body_class'] = 'body-map body-map-explore body-has-sidebar-banner'
+        context['tab'] = 'map-explore'
 
     return base_view(request, 'home.html', context=context)
 

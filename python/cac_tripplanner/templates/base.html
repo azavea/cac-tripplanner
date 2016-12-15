@@ -69,7 +69,8 @@
     <!-- End Google Tag Manager -->
 
     {% block body %}
-    <div id="body-div" class="{{ body_class|default:'body-home' }}">
+    <div id="body-div" class="body-{{ tab|default:'home' }}
+        {% if 'map' in tab %}body-map{% endif %}">
         {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
     </div>
     {% endblock body %}
