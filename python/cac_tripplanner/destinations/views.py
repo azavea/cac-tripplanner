@@ -177,7 +177,7 @@ class SearchDestinations(View):
                 return HttpResponse(error, 'application/json')
             results = (Destination.objects.filter(published=True)
                        .distance(searchPoint)
-                       .order_by('distance'))
+                       .order_by('distance', 'priority'))
         elif text is not None:
             results = Destination.objects.filter(published=True, name__icontains=text)
         if limit:

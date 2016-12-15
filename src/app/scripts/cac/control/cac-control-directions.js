@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Typeahead,
+CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Templates, Typeahead,
                                     UserPreferences, Utils) {
 
     'use strict';
@@ -112,8 +112,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         // show spinner while loading
         showSpinner();
 
-        var mode = UserPreferences.getPreference('mode');
-        var arriveBy = UserPreferences.getPreference('arriveBy');
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         var otpOptions = getOtpOptions();
 
@@ -232,6 +232,67 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         });
 
         return otpOptions;
+    }
+
+    function getNearbyPlaces() {
+        console.log('getNearbyPlaces');
+        var $placeCards = $('li.place-card');
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass('no-origin');
+
+        // if origin is blank
+        if (!directions.origin) {
+            console.log('no origin; bail getNearbyPlaces');
+            return;
+        }
+
+        var searchUrl = '/api/destinations/search';
+
+        $.ajax({
+            url: searchUrl,
+            type: 'GET',
+            data: {
+                lat: directions.origin[0],
+                lon: directions.origin[1],
+                limit: 8, // TODO: keep limit? use different limit? add 'show more/all'?
+            },
+        }).then(function(data) {
+            console.log(data);
+            if (!data.destinations) {
+                console.error('no place search response');
+                console.error(data);
+                return;
+            }
+
+            var newPlaces = Templates.destinations(data.destinations);
+            $('ul.place-list').html(newPlaces);
+
+            // now places list has been updated, go fetch the travel time
+            // from the new origin to each place
+            getTimesToPlaces();
+        });
+    }
+
+    function getTimesToPlaces() {
+        console.log('getTimesToPlaces');
+        // TODO: fire off ajax requests to get the travel times to each destination
+        ////////////////////////////////
+        var otpOptions = getOtpOptions();
+        // only using the first itinerary; let OTP know to not bother finding other options
+        $.extend(otpOptions, {numItineraries: 1});
+
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
+
+        /*
+        var $placeCards = $('li.place-card');
+        $placeCards.each(function(index) {
+            var $card = $(this);
+            Routing.planTrip(directions.origin, placeCoords, date, otpOptions)
+            .then(function (itineraries) {
+        });
+        */
+        ////////////////////////////////
     }
 
     function onDirectionsBackClicked() {
@@ -423,4 +484,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     }
 
 })(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
-    CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+    CAC.Routing.Plans, CAC.Home.Templates, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);

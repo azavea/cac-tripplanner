@@ -1,5 +1,5 @@
 CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            Templates, UserPreferences, UrlRouter) {
+                            UserPreferences, UrlRouter) {
     'use strict';
 
     var defaults = {
@@ -415,4 +415,4 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
+    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
