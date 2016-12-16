@@ -9,8 +9,8 @@
         </div>
     </div>
     <nav class="primary-nav tab-control">
-        <a class="nav-item {% if not tab or tab == 'home'%} on {% endif %}" data-tab-id="DIRECTIONS">Home</a>
-        <a class="nav-item {% if tab == 'explore'%} on {% endif %}" href="#" data-tab-id="EXPLORE">Explore</a>
+        <a class="nav-item {% if not tab or tab == 'home'%} on {% endif %}" href="/" data-tab-id="HOME">Home</a>
+        <a class="nav-item {% if tab == 'explore'%} on {% endif %}" data-tab-id="EXPLORE">Explore</a>
         <a class="nav-item {% if tab == 'info'%} on {% endif %}" href="{% url 'learn-list' %}">Learn</a>
     </nav>
 </header>
