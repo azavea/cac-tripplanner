@@ -20,8 +20,8 @@ CAC.Control.Tab = (function ($) {
     var defaults = {
         classes: {
             HOME: 'body-home',
-            DIRECTIONS: 'body-map body-has-sidebar-banner',
-            EXPLORE: 'body-explore',
+            DIRECTIONS: 'body-map body-map-directions body-has-sidebar-banner',
+            EXPLORE: 'body-map body-map-explore body-has-sidebar-banner',
             LEARN: 'body-learn'
         },
         selectors: {
@@ -67,15 +67,15 @@ CAC.Control.Tab = (function ($) {
         var oldTab = currentTab;
         currentTab = tabId;
 
-        var newBodyClass = this.options.classes[currentTab];
-        this.$body.removeClass();
-        this.$body.addClass(newBodyClass);
-
-        if (currentTab === TABS.HOME && this.router) {
-            this.router.clearUrl();
-        }
-
         if (oldTab !== currentTab) {
+            var newBodyClass = this.options.classes[currentTab];
+            this.$body.removeClass();
+            this.$body.addClass(newBodyClass);
+
+            if (currentTab === TABS.HOME && this.router) {
+                this.router.clearUrl();
+            }
+
             this.events.trigger(eventNames.tabShown, tabId);
         }
     }

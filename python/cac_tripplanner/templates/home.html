@@ -54,34 +54,37 @@
     <div class="sidebar-banner trip-options-banner hidden"></div>
 
     <div class="places">
-        <header class="places-header">
-            <h1>Places we love</h1>
-            <a href="#" class="map-view-btn">Map View</a>
-        </header>
-        <ul class="place-list">
-            {% for destination in destinations %}
-            <li class="place-card no-origin">
-                <img class="place-card-photo"
-                    {% if destination.image %}
-                        src="{{ destination.wide_image.url }}"
-                    {% else %}
-                        src="https://placehold.it/400x400.jpg"
-                    {% endif %}
-                    width="400" height="200"
-                    alt="{{ destination.name }}" />
-                <h2>{{ destination.name }}</h2>
-                <div class="place-card-travel-logistics">
-                    <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
-                </div>
-                <div class="place-card-actions">
-                    <a class="place-card-action place-action-go"
-                        data-destination-id="{{ destination.id }}" href="#">Directions</a>
-                    <a class="place-card-action place-action-details"
-                       href="{% url 'place-detail' pk=destination.pk %}">More info</a>
-                </div>
-            </li>
-        {% endfor %}
-        </ul>
+        <div class="places-content">
+            <header class="places-header">
+                <h1>Places we love</h1>
+                <a href="#" class="map-view-btn">Map View</a>
+            </header>
+            <ul class="place-list">
+                {% for destination in destinations %}
+                <li class="place-card no-origin">
+                    <img class="place-card-photo"
+                        {% if destination.image %}
+                            src="{{ destination.wide_image.url }}"
+                        {% else %}
+                            src="https://placehold.it/400x400.jpg"
+                        {% endif %}
+                        width="400" height="200"
+                        alt="{{ destination.name }}" />
+                    <h2>{{ destination.name }}</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
+                    </div>
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go"
+                            data-destination-id="{{ destination.id }}" href="#">Directions</a>
+                        <a class="place-card-action place-action-details"
+                           href="{% url 'place-detail' pk=destination.pk %}">More info</a>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% include "partials/spinner.html" %}
     </div>
 
     {% if article %}
@@ -89,11 +92,7 @@
     {% endif %}
 
     <div class="directions-results">
-        <div class="sk-spinner sk-three-bounce hidden">
-            <div class="sk-child sk-bounce1"></div>
-            <div class="sk-child sk-bounce2"></div>
-            <div class="sk-child sk-bounce3"></div>
-        </div>
+        {% include "partials/spinner.html" %}
         <div class="directions-list"></div>
     </div>
 

@@ -12,26 +12,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     var defaults = {
         selectors: {
-            // origin/destination switcher
-            reverseButton: '.btn-reverse',
-
-            // directions form selectors
-            directionsForm: '.directions-form-element',
-            directionsFrom: '.directions-from',
-            directionsTo: '.directions-to',
-
-            // typeahead
-            typeaheadFrom: '#input-directions-from',
-            typeaheadTo: '#input-directions-to',
-
             itineraryBlock: '.route-summary',
 
-            // used for error display
-            origin: '.directions-from.directions-text-input',
-            destination: '.directions-to.directions-text-input',
-
             selectedItineraryClass: 'selected',
-            errorClass: 'error',
 
             spinner: '.directions-results > .sk-spinner'
         }
@@ -49,10 +32,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     var itineraryControl = null;
     var tabControl = null;
     var urlRouter = null;
+    var directionsFormControl = null;
     var directionsListControl = null;
     var itineraryListControl = null;
-    var typeaheadTo = null;
-    var typeaheadFrom = null;
 
     function DirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -60,8 +42,21 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         tabControl = options.tabControl;
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
+        directionsFormControl = options.directionsFormControl;
 
-        $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
+        mapControl.events.on(mapControl.eventNames.originMoved, originDestinationMoveStart);
+        mapControl.events.on(mapControl.eventNames.destinationMoved, originDestinationMoveStart);
+
+        directionsFormControl.events.on(directionsFormControl.eventNames.selected,
+                                        onTypeaheadSelected);
+        directionsFormControl.events.on(directionsFormControl.eventNames.cleared,
+                                        onTypeaheadCleared);
+        directionsFormControl.events.on(directionsFormControl.eventNames.reversed,
+                                        reverseOriginDestination);
+        directionsFormControl.events.on(directionsFormControl.eventNames.geocodeError,
+                                        onGeocodeError);
+
+        tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
 
         directionsListControl = new Control.DirectionsList({
             showBackButton: true,
@@ -82,14 +77,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
-        typeaheadTo = new Typeahead(options.selectors.typeaheadTo);
-        typeaheadTo.events.on(typeaheadTo.eventNames.selected, onTypeaheadSelected);
-        typeaheadTo.events.on(typeaheadTo.eventNames.cleared, onTypeaheadCleared);
-
-        typeaheadFrom = new Typeahead(options.selectors.typeaheadFrom);
-        typeaheadFrom.events.on(typeaheadFrom.eventNames.selected, onTypeaheadSelected);
-        typeaheadFrom.events.on(typeaheadFrom.eventNames.cleared, onTypeaheadCleared);
-
         // Listen to direction hovered events in order to show a point on the map
         directionsListControl.events.on(
             directionsListControl.eventNames.directionHovered,
@@ -99,9 +86,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     }
 
     DirectionsControl.prototype = {
-        clearUserSettings: clearUserSettings,
-        moveOriginDestination: moveOriginDestination,
-        setDestination: setDestination,
+        clearDirections: clearDirections,
+        // setDestination: setDestination,
         setDirections: setDirections,
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
@@ -112,36 +98,29 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
+        if (!tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            return;
+        }
         if (!(directions.origin && directions.destination)) {
-            setDirectionsError('origin');
-            setDirectionsError('destination');
+            directionsFormControl.setError('origin');
+            directionsFormControl.setError('destination');
 
             updateUrl();  // Still update the URL if they request one-sided directions
             return;
         }
 
         // show spinner while loading
-        itineraryListControl.hide();
-        directionsListControl.hide();
-        $(options.selectors.spinner).removeClass('hidden');
-
-        var date = UserPreferences.getPreference('dateTime');
-        date = date ? moment.unix(date) : moment(); // default to now
+        showSpinner();
 
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
 
         // options to pass to OTP as-is
         var otpOptions = {
+            mode: mode,
             arriveBy: arriveBy,
             maxWalkDistance: UserPreferences.getPreference('maxWalk')
         };
-
-        // add intermediatePlaces if user edited route
-        var waypoints = UserPreferences.getPreference('waypoints');
-        if (waypoints && waypoints.length && !arriveBy) {
-            otpOptions.waypoints = waypoints;
-        }
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
@@ -154,7 +133,19 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
         }
 
-        $.extend(otpOptions, {mode: mode});
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length && !arriveBy) {
+            otpOptions.waypoints = waypoints;
+        }
+
+        var params = $.extend({
+            fromText: UserPreferences.getPreference('originText'),
+            toText: UserPreferences.getPreference('destinationText')
+        }, otpOptions);
+
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
 
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
@@ -162,12 +153,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
-
-        var params = {
-            fromText: UserPreferences.getPreference('originText'),
-            toText: UserPreferences.getPreference('destinationText')
-        };
-        $.extend(params, otpOptions);
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
@@ -213,6 +198,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     return DirectionsControl;
 
+    function onTabShown(event, tabId) {
+        if (tabId === tabControl.TABS.DIRECTIONS) {
+            UserPreferences.setPreference('method', 'directions');
+            setFromUserPreferences();
+        } else {
+            clearDirections();
+        }
+    }
+
     function clearDirections() {
         mapControl.setDirectionsMarkers(null, null);
         urlRouter.clearUrl();
@@ -226,16 +220,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         directionsListControl.hide();
     }
 
-    /**
-     * Wipe out user-set trip options and clear controls
-     */
-    function clearUserSettings() {
-        UserPreferences.clearSettings();
-        typeaheadFrom.setValue(null);
-        typeaheadTo.setValue(null);
-        setDirections('origin', null);
-        setDirections('destination', null);
-        clearDirections();
+    function showSpinner() {
+        itineraryListControl.hide();
+        directionsListControl.hide();
+        $(options.selectors.spinner).removeClass('hidden');
     }
 
     function onDirectionsBackClicked() {
@@ -312,27 +300,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         planTrip();
     }
 
-    function reverseOriginDestination() {
-        // read what they are now
-        var origin = UserPreferences.getPreference('origin');
-        var originText = UserPreferences.getPreference('originText');
-        var destination = UserPreferences.getPreference('destination');
-        var destinationText = UserPreferences.getPreference('destinationText');
-
-        // update local storage
-        UserPreferences.setPreference('origin', destination);
-        UserPreferences.setPreference('originText', destinationText);
-        UserPreferences.setPreference('destination', origin);
-        UserPreferences.setPreference('destinationText', originText);
-
-        // swap the local values
-        var tmpDestination = directions.destination;
-        setDirections('destination', directions.origin);
-        setDirections('origin', tmpDestination);
-
-        // update the text control
-        typeaheadFrom.setValue(destinationText);
-        typeaheadTo.setValue(originText);
+    function reverseOriginDestination(event, newOrigin, newDestination) {
+        // set on this object and validate
+        setDirections('origin', [newOrigin.location.y, newOrigin.location.x]);
+        setDirections('destination', [newDestination.location.y, newDestination.location.x]);
 
         // update the directions for the reverse trip
         planTrip();
@@ -341,124 +312,79 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     function onTypeaheadCleared(event, key) {
         clearItineraries();
         directions[key] = null;
-        UserPreferences.clearLocation(key);
-        mapControl.clearDirectionsMarker(key);
+
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            mapControl.clearDirectionsMarker(key);
+        }
     }
 
     function onTypeaheadSelected(event, key, result) {
-
-        event.preventDefault();  // do not submit form
-
         if (!result) {
-            UserPreferences.clearLocation(key);
             setDirections(key, null);
             return;
         }
-
-        // save text for address to preferences
-        UserPreferences.setLocation(key, result);
         setDirections(key, [result.location.y, result.location.x]);
-
-        planTrip();
-    }
-
-    /**
-     * Change the origin or destination, then requery for directions.
-     *
-     * @param {String} key Either 'origin' or 'destination'
-     * @param {Object} position Has coordinates for new spot as 'lat' and 'lng' properties
-     */
-    function moveOriginDestination(key, position) {
-        if (key !== 'origin' && key !== 'destination') {
-            console.error('Unrecognized key in moveOriginDestination: ' + key);
-            return;
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            planTrip();
         }
-        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
+    }
 
-        // show spinner while loading
-        itineraryListControl.hide();
-        directionsListControl.hide();
-        $(options.selectors.spinner).removeClass('hidden');
+    // If they move a marker, that invalidates the old itineraries and triggers the form to
+    // reverse geocode the new location, so show the spinner while that happens.
+    function originDestinationMoveStart() {
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            showSpinner();
+        }
+    }
 
-        Geocoder.reverse(position.lat, position.lng).then(function (data) {
-            if (data && data.address) {
-                // prevent typeahead dropdown from opening by removing focus
-                $(options.selectors.typeaheadFrom).blur();
-                $(options.selectors.typeaheadTo).blur();
-
-                var location = Utils.convertReverseGeocodeToLocation(data);
-                UserPreferences.setPreference(key, location);
-                /*jshint camelcase: false */
-                var fullAddress = data.address.Match_addr;
-                /*jshint camelcase: true */
-                UserPreferences.setPreference(key + 'Text', fullAddress);
-                // The change event is triggered after setting the typeahead value
-                // in order to run the navigation icon hide/show logic
-                typeahead.setValue(fullAddress);
-                setDirections(key, [position.lat, position.lng]);
-                planTrip();
-            } else {
-                // unset location and show error
-                UserPreferences.clearLocation(key);
-                typeahead.setValue('');
-                setDirections(key, null);
-                $(options.selectors.spinner).addClass('hidden');
-                itineraryListControl.setItinerariesError({
-                    msg: 'Could not find street address for location.'
-                });
-                itineraryListControl.show();
-            }
+    // If they dragged the origin or destination and the location failed to geocode, show error
+    function onGeocodeError(event, key) {
+        setDirections(key, null);
+        $(options.selectors.spinner).addClass('hidden');
+        itineraryListControl.setItinerariesError({
+            msg: 'Could not find street address for location.'
         });
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            itineraryListControl.show();
+        }
     }
 
-    // called when going to show directions from 'explore' origin to a selected feature
-    function setDestination(destination) {
-        // Set origin
-        var origin = UserPreferences.getPreference('origin');
-        var originText = UserPreferences.getPreference('originText');
-        directions.origin = [origin.location.y, origin.location.x];
+    // TODO: restore/reimplement this functionality
+    /* Show directions to a destination when the user clicks a Places link */
+    // function setDestination(destination) {
+    //     // Set origin
+    //     var origin = UserPreferences.getPreference('origin');
+    //     var originText = UserPreferences.getPreference('originText');
+    //     directions.origin = [origin.location.y, origin.location.x];
 
-        // Set destination
-        var destinationCoords = destination.point.coordinates;
-        var destinationText = destination.address;
-        directions.destination = [destinationCoords[1], destinationCoords[0]];
+    //     // Set destination
+    //     var destinationCoords = destination.point.coordinates;
+    //     var destinationText = destination.address;
+    //     directions.destination = [destinationCoords[1], destinationCoords[0]];
 
-        // Save destination coordinates in expected format (to match typeahead results)
-        destination.location = {
-            x: destinationCoords[0],
-            y: destinationCoords[1]
-        };
+    //     // Save destination coordinates in expected format (to match typeahead results)
+    //     destination.location = {
+    //         x: destinationCoords[0],
+    //         y: destinationCoords[1]
+    //     };
 
-        // set in UI
-        typeaheadFrom.setValue(originText);
-        typeaheadTo.setValue(destinationText);
+    //     // set in UI
+    //     typeaheadFrom.setValue(originText);
+    //     typeaheadTo.setValue(destinationText);
 
-        // Get directions
-        planTrip();
-    }
+    //     // Get directions
+    //     planTrip();
+    // }
 
     function setDirections(key, value) {
         clearItineraries();
         if (key === 'origin' || key === 'destination') {
             directions[key] = value;
-            setDirectionsError(key);
+            if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+                directionsFormControl.setError(key);
+            }
         } else {
             console.error('Directions key ' + key + 'unrecognized!');
-        }
-    }
-
-    function setDirectionsError(key) {
-        var $input = null;
-        if (key === 'origin') {
-            $input = $(options.selectors.origin);
-        } else {
-            $input = $(options.selectors.destination);
-        }
-
-        if (directions[key]) {
-            $input.removeClass(options.selectors.errorClass);
-        } else {
-            $input.addClass(options.selectors.errorClass);
         }
     }
 
@@ -467,28 +393,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
     }
 
-
     /**
      * When first navigating to the page, check if origin and destination already set.
      * Go directly to trip plan if so.
      */
     function setFromUserPreferences() {
         var origin = UserPreferences.getPreference('origin');
-        var originText = UserPreferences.getPreference('originText');
         var destination = UserPreferences.getPreference('destination');
-        var destinationText = UserPreferences.getPreference('destinationText');
-
-        if (destination && destination.location) {
-            directions.destination = [
-                destination.location.y,
-                destination.location.x
-            ];
-            typeaheadTo.setValue(destinationText);
-        }
 
         if (origin && origin.location) {
             directions.origin = [origin.location.y, origin.location.x];
-            typeaheadFrom.setValue(originText);
+        }
+
+        if (destination && destination.location) {
+            directions.destination = [destination.location.y, destination.location.x ];
         }
 
         if (origin && destination) {

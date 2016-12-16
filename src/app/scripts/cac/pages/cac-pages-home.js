@@ -35,7 +35,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     var mapControl = null;
     var tabControl = null;
     var urlRouter = null;
+    var directionsFormControl = null;
     var directionsControl = null;
+    var exploreControl = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -80,13 +82,24 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         modeOptionsControl = new ModeOptions();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
+        directionsFormControl = new CAC.Control.DirectionsFormControl({});
+
         directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
+            directionsFormControl: directionsFormControl,
+            tabControl: tabControl,
+            urlRouter: urlRouter
+        });
+
+        exploreControl = new CAC.Control.Explore({
+            mapControl: mapControl,
+            directionsFormControl: directionsFormControl,
             tabControl: tabControl,
             urlRouter: urlRouter
         });
 
         showHideNeedWheelsBanner();
+
         _setupEvents();
     };
 
@@ -104,9 +117,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                                           options.selectors.placeCardDirectionsLink,
                                           $.proxy(clickedDestination, this));
 
+        // Listen for origin/destination dragging events to forward to the DirectionsFormControl
         mapControl.events.on(mapControl.eventNames.originMoved,
                              $.proxy(moveOrigin, this));
-
         mapControl.events.on(mapControl.eventNames.destinationMoved,
                              $.proxy(moveDestination, this));
 
@@ -114,6 +127,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
+        directionsFormControl.events.on(directionsFormControl.eventNames.selected,
+                                        $.proxy(onTypeaheadSelected, this));
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -151,11 +166,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
             var tabId = $(this).data('tab-id');
-            if (tabId === tabControl.TABS.EXPLORE) {
+            if (tabId) {
                 event.preventDefault();
                 event.stopPropagation();
 
-                tabControl.setTab(tabControl.TABS.EXPLORE);
+                tabControl.setTab(tabId);
             }
         });
 
@@ -170,9 +185,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             event.stopPropagation();
 
             // clear user set trip options on navigation back to home page
-            directionsControl.clearUserSettings();
-            // reset mode control
-            modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+            clearUserSettings();
 
             tabControl.setTab(tabControl.TABS.HOME);
 
@@ -201,7 +214,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
 
         // load directions if origin and destination set
-        $(document).ready(directionsControl.setFromUserPreferences());
+        $(document).ready(loadInitialMethod);
+    }
+
+    function loadInitialMethod() {
+        if (!UserPreferences.isDefault('method')) {
+            var method = UserPreferences.getPreference('method');
+            if (method === 'directions') {
+                tabControl.setTab(tabControl.TABS.DIRECTIONS);
+                directionsControl.setFromUserPreferences();
+            } else if (method === 'explore') {
+                tabControl.setTab(tabControl.TABS.EXPLORE);
+                exploreControl.setFromUserPreferences();
+            }
+        }
     }
 
     /**
@@ -221,14 +247,25 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         // tabControl.setTab(tabControl.TABS.EXPLORE);
     }
 
+    function onTypeaheadSelected() {
+        if (tabControl.isTabShowing(tabControl.TABS.HOME)) {
+            var origin = UserPreferences.getPreference('origin');
+            var destination = UserPreferences.getPreference('destination');
+
+            if (origin && destination) {
+                tabControl.setTab(tabControl.TABS.DIRECTIONS);
+            }
+        }
+    }
+
     function moveOrigin(event, position) {
         event.preventDefault();
-        directionsControl.moveOriginDestination('origin', position);
+        directionsFormControl.moveOriginDestination('origin', position);
     }
 
     function moveDestination(event, position) {
         event.preventDefault();
-        directionsControl.moveOriginDestination('destination', position);
+        directionsFormControl.moveOriginDestination('destination', position);
     }
 
     /**
@@ -248,12 +285,23 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
         UserPreferences.setPreference('mode', mode);
         directionsControl.setOptions();
+        exploreControl.setOptions();
         showHideNeedWheelsBanner();
     }
 
     function closedTripModal(event) {
         // update mode, then requery
         toggledMode(event, modeOptionsControl.getMode());
+    }
+
+    // Clear all parameters set by the user, restoring blank origin/destination and default options.
+    // This combined with selecting the Home tab will fully reset the Directions and Explore
+    // controllers.
+    function clearUserSettings() {
+        UserPreferences.clearSettings();
+        directionsFormControl.clearAll();
+        // reset mode control
+        modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
     }
 
     /**

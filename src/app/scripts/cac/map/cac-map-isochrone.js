@@ -61,6 +61,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     IsochroneControl.prototype.clearIsochrone = clearIsochrone;
     IsochroneControl.prototype.fetchIsochrone = fetchIsochrone;
     IsochroneControl.prototype.drawDestinations = drawDestinations;
+    IsochroneControl.prototype.clearDestinations = clearDestinations;
     IsochroneControl.prototype.highlightDestination = highlightDestination;
 
     return IsochroneControl;
@@ -154,7 +155,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 return;
             }
 
-            if (!tabControl.isTabShowing('explore')) {
+            if (!tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 // if user has switched away from the explore tab, do not show results
                 deferred.resolve();
                 return;

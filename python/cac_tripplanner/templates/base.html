@@ -69,7 +69,8 @@
     <!-- End Google Tag Manager -->
 
     {% block body %}
-    <div id="body-div" class="body-{{ tab|default:'home' }}">
+    <div id="body-div" class="body-{{ tab|default:'home' }}
+        {% if 'map' in tab %}body-map{% endif %}">
         {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
     </div>
     {% endblock body %}
@@ -128,7 +129,8 @@
     <script src="{% static 'scripts/main/cac/control/cac-control-tab.js' %}"></script>
     <script src="{% static 'scripts/main/cac/share/cac-share-modal.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-trip-options.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/control/cac-control-sidebar-explore.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-directions-form.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-explore.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-directions.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-itinerary-list.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-directions-list.js' %}"></script>

@@ -38,8 +38,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     var tabControl = null;
     var zoomControl = null;
 
-
-    var loaded = false; // whether map tiles loaded yet (delay on mobile until in view)
+    // track whether map tiles are loaded (on mobile, they're not loaded until they're in view)
+    var mapLoaded = false;
+    // track whether overlays and controls are loaded (separate from map because not shown on Home)
+    var componentsLoaded = false; // Whether the overlays and controls are loaded
 
     var esriSatelliteAttribution = [
         '&copy; <a href="http://www.esri.com/">Esri</a> ',
@@ -97,7 +99,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @returns {boolean} True if base map tiles have already been loaded
      */
     function isLoaded() {
-        return loaded;
+        return mapLoaded;
     }
 
     /**
@@ -105,7 +107,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      *
      */
     function loadMap() {
-        if (loaded) {
+        if (mapLoaded) {
             return; // already loaded; nothing to do
         }
 
@@ -125,7 +127,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
         this.itineraryControl.setMap(map);
-        loaded = true;
+        mapLoaded = true;
     }
 
     function initializeBasemaps() {
@@ -321,9 +323,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     }
 
     function loadMapComponents() {
-        zoomControl.addTo(map);
-        initializeOverlays();
-        initializeLayerControl.apply(this, null);
+        if (!componentsLoaded) {
+            zoomControl.addTo(map);
+            initializeOverlays();
+            initializeLayerControl.apply(this, null);
+            componentsLoaded = true;
+        }
     }
 
     function clearMapComponents() {
@@ -346,6 +351,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         if (this.itineraryControl) {
             this.itineraryControl.clearItineraries();
         }
+        componentsLoaded = false;
     }
 
     /**

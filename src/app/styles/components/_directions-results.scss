@@ -2,6 +2,7 @@
     @include sidebar-main;
 
     .body-home &,
+    .body-map-explore &,
     .body-map.body-step-by-step & {
         display: none;
     }
