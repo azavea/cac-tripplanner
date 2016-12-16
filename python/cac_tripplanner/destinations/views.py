@@ -47,7 +47,7 @@ def home(request):
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
-        context['tab'] = 'map-dir'
+        context['tab'] = 'map-directions'
     elif request.GET.get('origin') is not None:
         # If there's no destination but there is an origin, go to Explore
         context['tab'] = 'map-explore'
