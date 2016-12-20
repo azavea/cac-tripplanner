@@ -55,6 +55,8 @@
 
     #isochrone-slider {
         width: 75%;
+        @include inputrange();
+        margin-right: 1rem;
     }
 
     .isochrone-control {
