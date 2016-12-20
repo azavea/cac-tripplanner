@@ -302,6 +302,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         directionsControl.setOptions();
         exploreControl.setOptions();
         showHideNeedWheelsBanner();
+        directionsControl.getNearbyPlaces();
     }
 
     // Handler for changes to preferences due to URL change, i.e. browser back/forward
@@ -329,7 +330,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     function clearUserSettings() {
         UserPreferences.clearSettings();
         directionsFormControl.clearAll();
-        directionsControl.getNearbyPlaces();
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
     }
