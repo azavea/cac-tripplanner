@@ -87,6 +87,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
     DirectionsControl.prototype = {
         clearDirections: clearDirections,
+        getNearbyPlaces: getNearbyPlaces,
         // setDestination: setDestination,
         setDirections: setDirections,
         setOptions: setOptions,
@@ -242,7 +243,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
         // if origin is blank
         if (!directions.origin) {
-            console.log('no origin; bail getNearbyPlaces');
+            console.error('no origin; bail getNearbyPlaces');
             return;
         }
 
@@ -296,6 +297,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             .then(function (itineraries) {
                 if (itineraries && itineraries.length) {
                     var itinerary = itineraries[0];
+                    console.log(itinerary); //////////////////////////////
                     $card.find('.place-card-travel-logistics-duration')
                         .text(itinerary.formattedDuration);
                     $card.find('.place-card-travel-logistics-origin')

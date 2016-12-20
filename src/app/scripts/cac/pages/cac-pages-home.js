@@ -258,13 +258,17 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         // tabControl.setTab(tabControl.TABS.EXPLORE);
     }
 
-    function onTypeaheadSelected() {
+    function onTypeaheadSelected(event, key) {
         if (tabControl.isTabShowing(tabControl.TABS.HOME)) {
             var origin = UserPreferences.getPreference('origin');
             var destination = UserPreferences.getPreference('destination');
 
             if (origin && destination) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
+            }
+
+            if (key === 'origin') {
+                directionsControl.getNearbyPlaces();
             }
         }
     }
