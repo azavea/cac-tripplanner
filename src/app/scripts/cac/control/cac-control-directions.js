@@ -14,8 +14,16 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         selectors: {
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
-
             selectedItineraryClass: 'selected',
+            spinner: '.directions-results > .sk-spinner',
+
+            // places
+            placeCard: 'li.place-card',
+            noOriginClass: 'no-origin',
+            placeOriginText: '.place-card-travel-logistics-origin',
+            placeDistanceText: '.place-card-travel-logistics-duration',
+            placeAttrX: 'data-destination-x',
+            placeAttrY: 'data-destination-y',
 
             spinner: '.directions-results > .sk-spinner'
         }
@@ -234,9 +242,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     function getNearbyPlaces() {
-        var $placeCards = $('li.place-card');
+        console.log('getNearbyPlaces');
+        var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
-        $placeCards.addClass('no-origin');
+        $placeCards.addClass(options.selectors.noOriginClass);
 
         // if origin is blank
         if (!directions.origin) {
@@ -278,13 +287,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
 
-        var $placeCards = $('li.place-card');
+        var $placeCards = $(options.selectors.placeCard);
         $placeCards.each(function() {
             var $card = $(this);
 
             // read out the location of the destination
-            var xCoord = $card.attr('data-destination-x');
-            var yCoord = $card.attr('data-destination-y');
+            var xCoord = $card.attr(options.selectors.placeAttrX);
+            var yCoord = $card.attr(options.selectors.placeAttrY);
             var placeCoords = [yCoord, xCoord];
 
             // origin text has not been updated on URL, so fromText not set on itineraries
@@ -296,11 +305,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             .then(function (itineraries) {
                 if (itineraries && itineraries.length) {
                     var itinerary = itineraries[0];
-                    $card.find('.place-card-travel-logistics-duration')
+                    $card.find(options.selectors.placeDistanceText)
                         .text(itinerary.formattedDuration);
-                    $card.find('.place-card-travel-logistics-origin')
+                    $card.find(options.selectors.placeOriginText)
                         .text(originLabel);
-                    $card.removeClass('no-origin');
+                    $card.removeClass(options.selectors.noOriginClass);
                 }
             });
         });
