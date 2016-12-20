@@ -12,6 +12,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     var defaults = {
         selectors: {
+            hiddenClass: 'hidden',
             isochroneControl: '.isochrone-control',
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
@@ -45,9 +46,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
-            $(options.selectors.isochroneControl).removeClass('hidden');
+            $(options.selectors.isochroneControl).removeClass(options.selectors.hiddenClass);
         } else {
-            $(options.selectors.isochroneControl).addClass('hidden');
+            $(options.selectors.isochroneControl).addClass(options.selectors.hiddenClass);
         }
     }
 
@@ -67,11 +68,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (tabId === tabControl.TABS.EXPLORE) {
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
-            $(options.selectors.isochroneControl).removeClass('hidden');
+            $(options.selectors.isochroneControl).removeClass(options.selectors.hiddenClass);
         } else {
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
-            $(options.selectors.isochroneControl).addClass('hidden');
+            $(options.selectors.isochroneControl).addClass(options.selectors.hiddenClass);
         }
     }
 
@@ -84,8 +85,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     // reverse geocode the new location, so show the spinner while that happens.
     function onMovePointStart() {
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
-            $(options.selectors.placesList).addClass('hidden');
-            $(options.selectors.spinner).removeClass('hidden');
+            $(options.selectors.placesList).addClass(options.selectors.hiddenClass);
+            $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
         }
     }
 
@@ -95,10 +96,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (key === 'origin') {
             setAddress(null);
             setError('Could not find street address for location.');
-            $(options.selectors.spinner).addClass('hidden');
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 directionsFormControl.setError('origin');
-                $(options.selectors.placesList).removeClass('hidden');
+                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
             }
         }
     }
@@ -111,8 +112,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
-        $(options.selectors.placesList).addClass('hidden');
-        $(options.selectors.spinner).removeClass('hidden');
+        $(options.selectors.placesList).addClass(options.selectors.hiddenClass);
+        $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
         mapControl.isochroneControl.clearIsochrone();
 
         debouncedFetchIsochrone();
@@ -164,8 +165,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
             function (destinations) {
-                $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.placesList).removeClass('hidden');
+                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
                 if (!destinations) {
                     setError('No destinations found.');
                 }
@@ -173,8 +174,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
                 // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
-                $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.placesList).removeClass('hidden');
+                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
                 setError('Could not find travelshed.');
             }
         );
