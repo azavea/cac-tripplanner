@@ -12,6 +12,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     var defaults = {
         selectors: {
+            isochroneControl: '.isochrone-control',
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
         }
@@ -44,6 +45,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
+            $(options.selectors.isochroneControl).removeClass('hidden');
+        } else {
+            $(options.selectors.isochroneControl).addClass('hidden');
         }
     }
 
@@ -63,9 +67,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (tabId === tabControl.TABS.EXPLORE) {
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
+            $(options.selectors.isochroneControl).removeClass('hidden');
         } else {
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
+            $(options.selectors.isochroneControl).addClass('hidden');
         }
     }
 

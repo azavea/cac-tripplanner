@@ -53,6 +53,18 @@
         }
     }
 
+    #isochrone-slider {
+        width: 75%;
+    }
+
+    .isochrone-control {
+        display: flex;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
     .mode-picker {
         display: flex;
         flex: 0 0 60px;
