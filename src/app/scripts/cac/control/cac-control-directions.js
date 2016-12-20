@@ -100,9 +100,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
-        if (!tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            return;
-        }
         if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
@@ -243,7 +240,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
         // if origin is blank
         if (!directions.origin) {
-            console.error('no origin; bail getNearbyPlaces');
             return;
         }
 
@@ -409,6 +405,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
         }
+        getNearbyPlaces();
     }
 
     function onTypeaheadSelected(event, key, result) {
