@@ -13,7 +13,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     var defaults = {
         selectors: {
             hiddenClass: 'hidden',
-            isochroneControl: '.isochrone-control',
+            isochroneSliderContainer: '.isochrone-control',
+            isochroneSlider: '#isochrone-slider',
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
         }
@@ -25,6 +26,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     var urlRouter = null;
     var directionsFormControl = null;
     var exploreLatLng = null;
+
+    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -46,13 +49,14 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
-            $(options.selectors.isochroneControl).removeClass(options.selectors.hiddenClass);
+            $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
         } else {
-            $(options.selectors.isochroneControl).addClass(options.selectors.hiddenClass);
+            $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
         }
-    }
 
-    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
+        // update isochrone on slider move
+        $(options.selectors.isochroneSlider).change(debouncedFetchIsochrone);
+    }
 
     ExploreControl.prototype = {
         setAddress: setAddress,
@@ -68,11 +72,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (tabId === tabControl.TABS.EXPLORE) {
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
-            $(options.selectors.isochroneControl).removeClass(options.selectors.hiddenClass);
+            $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
         } else {
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
-            $(options.selectors.isochroneControl).addClass(options.selectors.hiddenClass);
+            $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
         }
     }
 
@@ -124,8 +128,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
      * then populate side bar with featured locations found within the travelshed.
      */
     function fetchIsochrone() {
-        // TODO: replace placeholder with value from slider
-        var exploreMinutes = 20;
+        // read slider
+        var exploreMinutes = $(options.selectors.isochroneSlider).val();
 
         var mode = UserPreferences.getPreference('mode');
         var arriveBy = UserPreferences.getPreference('arriveBy');
@@ -153,7 +157,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-        // UserPreferences.setPreference('exploreTime', exploreMinutes);
 
         // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
         // (the 'detail' functions don't update the isochrone so they update the URL themselves)
