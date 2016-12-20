@@ -61,6 +61,8 @@ CAC.Control.Tab = (function ($) {
         return tabId === currentTab;
     }
 
+    // Activates the given tab and broadcasts a 'tab shown' event, but does nothing if the
+    // requested tab is already active.
     function setTab(tabId) {
         if (!TABS[tabId]) { return; }
 

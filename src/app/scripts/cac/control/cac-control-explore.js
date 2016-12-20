@@ -229,7 +229,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     }
 
     function setFromUserPreferences() {
-        var method = UserPreferences.getPreference('method');
         var exploreOrigin = UserPreferences.getPreference('origin');
 
         if (exploreOrigin) {
@@ -238,7 +237,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             exploreLatLng = null;
         }
 
-        if (method === 'explore' && exploreLatLng) {
+        if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
         }
     }
