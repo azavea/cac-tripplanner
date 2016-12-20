@@ -55,7 +55,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         }
 
         // update isochrone on slider move
-        $(options.selectors.isochroneSlider).change(debouncedFetchIsochrone);
+        $(options.selectors.isochroneSlider).change(clickedExplore);
     }
 
     ExploreControl.prototype = {
