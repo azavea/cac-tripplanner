@@ -266,10 +266,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             if (origin && destination) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             }
+        }
 
-            if (key === 'origin') {
-                directionsControl.getNearbyPlaces();
-            }
+        if (key === 'origin') {
+            directionsControl.getNearbyPlaces();
         }
     }
 
