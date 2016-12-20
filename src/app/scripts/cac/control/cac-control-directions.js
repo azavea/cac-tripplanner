@@ -12,10 +12,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     var defaults = {
         selectors: {
+            hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
-
             selectedItineraryClass: 'selected',
-
             spinner: '.directions-results > .sk-spinner'
         }
     };
@@ -158,7 +157,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         Routing.planTrip(directions.origin, directions.destination, date, params)
         .then(function (itineraries) {
-            $(options.selectors.spinner).addClass('hidden');
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();
@@ -189,7 +188,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         }, function (error) {
             console.error('failed to plan trip');
             console.error(error);
-            $(options.selectors.spinner).addClass('hidden');
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             itineraryControl.clearItineraries();
             itineraryListControl.setItinerariesError(error);
             itineraryListControl.show();
@@ -223,7 +222,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     function showSpinner() {
         itineraryListControl.hide();
         directionsListControl.hide();
-        $(options.selectors.spinner).removeClass('hidden');
+        $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
     }
 
     function onDirectionsBackClicked() {
@@ -340,7 +339,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     // If they dragged the origin or destination and the location failed to geocode, show error
     function onGeocodeError(event, key) {
         setDirections(key, null);
-        $(options.selectors.spinner).addClass('hidden');
+        $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
         itineraryListControl.setItinerariesError({
             msg: 'Could not find street address for location.'
         });
