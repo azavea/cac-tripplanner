@@ -329,6 +329,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     function clearUserSettings() {
         UserPreferences.clearSettings();
         directionsFormControl.clearAll();
+        directionsControl.getNearbyPlaces();
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
     }
