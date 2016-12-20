@@ -249,8 +249,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             type: 'GET',
             data: {
                 lat: directions.origin[0],
-                lon: directions.origin[1],
-                limit: 8, // TODO: keep limit? use different limit? add 'show more/all'?
+                lon: directions.origin[1]
+                // limit: 8, // TODO: use limit? add 'show more/all'?
             },
         }).then(function(data) {
             if (!data.destinations) {
