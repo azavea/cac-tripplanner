@@ -125,10 +125,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         mapControl.events.on(mapControl.eventNames.mapMoved, SearchParams.updateMapCenter);
 
+        tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
+
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
         directionsFormControl.events.on(directionsFormControl.eventNames.selected,
                                         $.proxy(onTypeaheadSelected, this));
+
+        urlRouter.events.on(urlRouter.eventNames.changed, onUrlChanged);
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -184,9 +188,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             event.preventDefault();
             event.stopPropagation();
 
-            // clear user set trip options on navigation back to home page
-            clearUserSettings();
-
             tabControl.setTab(tabControl.TABS.HOME);
 
             $(options.selectors.originInput).focus();
@@ -213,20 +214,30 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             });
         }
 
-        // load directions if origin and destination set
-        $(document).ready(loadInitialMethod);
+        // Set active tab based on 'method'
+        $(document).ready(setActiveTab);
     }
 
-    function loadInitialMethod() {
+    // Sets the active tab based on the 'method' user preference. The controllers listen for the
+    // resulting "tab shown" event and do their thing if they're being activated (or hidden).
+    function setActiveTab() {
         if (!UserPreferences.isDefault('method')) {
             var method = UserPreferences.getPreference('method');
             if (method === 'directions') {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
-                directionsControl.setFromUserPreferences();
             } else if (method === 'explore') {
                 tabControl.setTab(tabControl.TABS.EXPLORE);
-                exploreControl.setFromUserPreferences();
             }
+        } else {
+            tabControl.setTab(tabControl.TABS.HOME);
+        }
+    }
+
+    // Returning to the Home tab resets everything as though it were loaded fresh
+    function onTabShown(event, tabId) {
+        if (tabId === tabControl.TABS.HOME) {
+            UserPreferences.setPreference('method', undefined);
+            clearUserSettings();
         }
     }
 
@@ -286,6 +297,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         UserPreferences.setPreference('mode', mode);
         directionsControl.setOptions();
         exploreControl.setOptions();
+        showHideNeedWheelsBanner();
+    }
+
+    // Handler for changes to preferences due to URL change, i.e. browser back/forward
+    // The URL router sends a signal and this triggers the appropriate update functions for
+    // all the affected components.
+    // Note that components are responsible for doing the right thing based on whether they're
+    // active or not.
+    function onUrlChanged() {
+        setActiveTab();
+        modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+        directionsControl.setFromUserPreferences();
+        exploreControl.setFromUserPreferences();
+        directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
     }
 

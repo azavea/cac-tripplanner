@@ -209,7 +209,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     function clearDirections() {
         mapControl.setDirectionsMarkers(null, null);
-        urlRouter.clearUrl();
         clearItineraries();
     }
 
@@ -409,7 +408,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             directions.destination = [destination.location.y, destination.location.x ];
         }
 
-        if (origin && destination) {
+        if (origin && destination && tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             planTrip();
         }
     }

@@ -25,11 +25,28 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                                                  'destinationText',
                                                  'waypoints']);
 
+    var events = $({});
+    var eventNames = {
+        changed: 'cac:control:urlrouting:changed'
+    };
+
     var router = null;
+    var updatingUrl = false;
 
     function UrlRouter() {
         router = new Navigo('/');
-        router.on('*', setPrefsFromUrl);
+        router.on('*', setPrefsFromUrl, {
+            before: function (done) {
+                if (updatingUrl) {
+                    // If we're updating the URL from the directions or explore controllers, we
+                    // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
+                    updatingUrl = false;
+                    done(false);
+                } else {
+                    done();
+                }
+            }
+        });
         router.resolve();
     }
 
@@ -37,14 +54,26 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     UrlRouter.prototype.clearUrl = clearUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
+    UrlRouter.prototype.events = events;
+    UrlRouter.prototype.eventNames = eventNames;
 
     return UrlRouter;
 
-    // Updates the displayed URL without triggering any routing callbacks
+    /* Updates the displayed URL without triggering any routing callbacks. It prevents unwanted
+     * routing callbacks by:
+     * 1. Checking whether it's being asked to update the URL to the current URL. This can happen
+     *    if e.g. a `Directions.planTrip` is triggered by browser navigation. The change in URL
+     *    will trigger the controllers to update, but they needn't/shouldn't re-update the URL,
+     *    since that will muddy up the history. It's hard to differentiate that case in a way that
+     *    can be checked inside the controllers, so handle it here.
+     * 2. Setting `updatingUrl`, which gets read by the routing handler as a signal to cancel.
+     */
     function updateUrl(url) {
-        router.pause(true);
+        if (decodeURI(location.search) === decodeURI(url.slice(1))) {
+            return;
+        }
+        updatingUrl = true;
         router.navigate(url, true);
-        router.pause(false);
     }
 
     function clearUrl() {
@@ -71,6 +100,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         } else if (params.origin) {
             UserPreferences.setPreference('method', 'explore');
             setPrefs(EXPLORE_ENCODE, params);
+        } else {
+            UserPreferences.setPreference('method', undefined);
         }
 
         // set bike share preference separate from mode
@@ -78,6 +109,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
             var bikeShare = params.mode.indexOf('_RENT') >= 0;
             UserPreferences.setPreference('bikeShare', bikeShare);
         }
+        events.trigger(eventNames.changed);
     }
 
     function buildDirectionsUrlFromPrefs() {
