@@ -237,7 +237,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     function getNearbyPlaces() {
-        console.log('getNearbyPlaces');
         var $placeCards = $('li.place-card');
         // hide existing times to places now showing (if any)
         $placeCards.addClass('no-origin');
@@ -259,7 +258,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
                 limit: 8, // TODO: keep limit? use different limit? add 'show more/all'?
             },
         }).then(function(data) {
-            console.log(data);
             if (!data.destinations) {
                 console.error('no place search response');
                 console.error(data);
@@ -293,16 +291,19 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             var yCoord = $card.attr('data-destination-y');
             var placeCoords = [yCoord, xCoord];
 
+            // origin text has not been updated on URL, so fromText not set on itineraries
+            // get it from user preferences instead
+            var originLabel = UserPreferences.getPreference('originText');
+
             // get travel time to destination and update place card
             Routing.planTrip(directions.origin, placeCoords, date, otpOptions)
             .then(function (itineraries) {
                 if (itineraries && itineraries.length) {
                     var itinerary = itineraries[0];
-                    console.log(itinerary); //////////////////////////////
                     $card.find('.place-card-travel-logistics-duration')
                         .text(itinerary.formattedDuration);
                     $card.find('.place-card-travel-logistics-origin')
-                        .text(itinerary.fromText);
+                        .text(originLabel);
                     $card.removeClass('no-origin');
                 }
             });
