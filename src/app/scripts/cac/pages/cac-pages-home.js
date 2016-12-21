@@ -227,6 +227,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             } else if (method === 'explore') {
                 tabControl.setTab(tabControl.TABS.EXPLORE);
+                directionsControl.setFromUserPreferences();
+                directionsControl.getNearbyPlaces();
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
@@ -316,12 +318,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
-        setActiveTab();
-        modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
-        directionsControl.setFromUserPreferences();
-        exploreControl.setFromUserPreferences();
         directionsFormControl.setFromUserPreferences();
+        directionsControl.setFromUserPreferences();
+        modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         showHideNeedWheelsBanner();
+        setActiveTab();
+        exploreControl.setFromUserPreferences();
     }
 
     function closedTripModal(event) {
@@ -417,7 +419,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
      */
     function isMobileSafari() {
         var ua = window.navigator.userAgent;
-        console.log(ua);
         var iOS = /iP(ad|hone)/i.test(ua); // iPad / iPhone
         var webkit = /WebKit/i.test(ua);
         // Chrome and Opera also report WebKit
