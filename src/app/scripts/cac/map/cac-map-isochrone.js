@@ -115,7 +115,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
             cache: false,
             url: isochroneUrl,
             contentType: 'application/json'
-        }).then(deferred.resolve);
+        }).done(deferred.resolve).fail(deferred.reject);
         return deferred.promise();
     }
 
@@ -168,6 +168,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
             activeIsochroneRequest = null;
             pendingIsochroneRequest = null;
             console.error(error);
+            deferred.reject(error);
         });
     }
 

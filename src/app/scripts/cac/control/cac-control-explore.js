@@ -175,12 +175,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     }
 
     function setError(message) {
-        console.log('TODO: display isochrone errors', message);
-        // var $container = $('<div></div>').addClass('destinations');
-        // var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
-        // $container.append($errorTemplate);
-        // $(options.selectors.destinations).html($container);
-        // $(options.selectors.sidebarContainer).height(200);
+        var $alert = MapTemplates.alert(message, 'danger');
+        var $container = $(options.selectors.placesList);
+        $container.html($alert);
+        $(options.selectors.spinner).addClass('hidden');
+        $container.removeClass('hidden');
     }
 
     function onTypeaheadCleared(event, key) {
