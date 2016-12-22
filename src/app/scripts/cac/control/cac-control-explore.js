@@ -12,6 +12,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     var defaults = {
         selectors: {
+            alert: '.alert',
             placesList: '.places-content',
             spinner: '.places > .sk-spinner',
         }
@@ -64,6 +65,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
         } else {
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
         }
@@ -87,10 +89,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     // Since the drag event activates the spinner, this needs to restore the sidebar list.
     function onGeocodeError(event, key) {
         if (key === 'origin') {
-            setAddress(null);
-            setError('Could not find street address for location.');
-            $(options.selectors.spinner).addClass('hidden');
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                setAddress(null);
+                setError('Could not find street address for location.');
+                $(options.selectors.spinner).addClass('hidden');
                 directionsFormControl.setError('origin');
                 $(options.selectors.placesList).removeClass('hidden');
             }
@@ -107,6 +109,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         }
         $(options.selectors.placesList).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
+        $(options.selectors.alert).remove();
         mapControl.isochroneControl.clearIsochrone();
 
         debouncedFetchIsochrone();
@@ -169,15 +172,19 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
                 console.error(error);
                 $(options.selectors.spinner).addClass('hidden');
                 $(options.selectors.placesList).removeClass('hidden');
-                setError('Could not find travelshed.');
+                setError('Could not find travelshed for given origin.');
             }
         );
     }
 
     function setError(message) {
-        var $alert = MapTemplates.alert(message, 'danger');
+        var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
         var $container = $(options.selectors.placesList);
         $container.html($alert);
+        // handle close button
+        $container.one('click', '.close', function () {
+            $alert.remove();
+        });
         $(options.selectors.spinner).addClass('hidden');
         $container.removeClass('hidden');
     }
@@ -186,6 +193,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (key === 'origin') {
             exploreLatLng = null;
             // selectedPlaceId = null;
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
         }
     }
@@ -214,6 +222,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             }
         } else {
             exploreLatLng = null;
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
         }
     }

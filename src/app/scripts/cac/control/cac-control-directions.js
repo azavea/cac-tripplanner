@@ -342,12 +342,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     // If they dragged the origin or destination and the location failed to geocode, show error
     function onGeocodeError(event, key) {
-        setDirections(key, null);
-        $(options.selectors.spinner).addClass('hidden');
-        itineraryListControl.setItinerariesError({
-            msg: 'Could not find street address for location.'
-        });
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            setDirections(key, null);
+            $(options.selectors.spinner).addClass('hidden');
+            itineraryListControl.setItinerariesError({
+                msg: 'Could not find street address for location.'
+            });
             itineraryListControl.show();
         }
     }

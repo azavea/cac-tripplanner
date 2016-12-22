@@ -31,22 +31,30 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
      * http://getbootstrap.com/components/#alerts
      *
      * @param {string} message Message to display
+     * @param {string} title Header for message
      * @param {string} type Alert type (success, warning, info, or danger)
      * @returns {String} Compiled Handlebars template for the Bootstrap alert
      */
-    function alert(message, type) {
+    function alert(message, title, type) {
         var info = {
             message: message,
+            title: title,
             type: type
         };
+
         var source = [
-            '<div class="alert-container">',
-            '<div class="alert alert-{{info.type}} alert-dismissible" role="alert">',
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
-            '<span aria-hidden="true">&times;</span></button>',
+            '<div class="alert alert-{{info.type}}">',
+            '<div class="alert-title">',
+            '{{info.title}}',
+            '<button title="Dismiss this message" name="close" class="close" aria-label="Close">',
+            '<i class="icon-cancel"></i></button>',
+            '</div>',
+            '<div class="alert-body">',
             '{{info.message}}',
-            '</div></div>'
+            '</div>',
+            '</div>'
         ].join('');
+
         var template = Handlebars.compile(source);
         var html = template({info: info});
         return html;
