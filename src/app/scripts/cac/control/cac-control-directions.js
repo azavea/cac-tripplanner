@@ -385,7 +385,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
     // trigger re-query when trip options update
     function setOptions() {
-        planTrip();
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            planTrip();
+        }
     }
 
     function reverseOriginDestination(event, newOrigin, newDestination) {
