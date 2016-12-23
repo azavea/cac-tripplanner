@@ -227,8 +227,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             } else if (method === 'explore') {
                 tabControl.setTab(tabControl.TABS.EXPLORE);
-                directionsControl.setFromUserPreferences();
-                directionsControl.getNearbyPlaces();
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
@@ -259,7 +257,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         // tabControl.setTab(tabControl.TABS.EXPLORE);
     }
 
-    function onTypeaheadSelected(event, key) {
+    function onTypeaheadSelected() {
         if (tabControl.isTabShowing(tabControl.TABS.HOME)) {
             var origin = UserPreferences.getPreference('origin');
             var destination = UserPreferences.getPreference('destination');
@@ -267,10 +265,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             if (origin && destination) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             }
-        }
-
-        if (key === 'origin') {
-            directionsControl.getNearbyPlaces();
         }
     }
 
@@ -309,7 +303,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         directionsControl.setOptions();
         exploreControl.setOptions();
         showHideNeedWheelsBanner();
-        directionsControl.getNearbyPlaces();
     }
 
     // Handler for changes to preferences due to URL change, i.e. browser back/forward
@@ -318,12 +311,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
-        directionsFormControl.setFromUserPreferences();
-        directionsControl.setFromUserPreferences();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+        directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
-        setActiveTab();
+        directionsControl.setFromUserPreferences();
         exploreControl.setFromUserPreferences();
+        setActiveTab();
     }
 
     function closedTripModal(event) {

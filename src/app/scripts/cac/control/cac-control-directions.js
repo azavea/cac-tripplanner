@@ -15,17 +15,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
             selectedItineraryClass: 'selected',
-            spinner: '.directions-results > .sk-spinner',
-
-            // places
-            placeCard: 'li.place-card',
-            placesList: 'ul.place-list',
-            noOriginClass: 'no-origin',
-            placeOriginText: '.place-card-travel-logistics-origin',
-            placeDistanceText: '.place-card-travel-logistics-duration',
-            placeAttrX: 'data-destination-x',
-            placeAttrY: 'data-destination-y',
-
             spinner: '.directions-results > .sk-spinner'
         }
     };
@@ -95,44 +84,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         });
     }
 
-    var getNearbyPlaces = _.throttle(function() {  // jshint ignore:line
-        var $placeCards = $(options.selectors.placeCard);
-        // hide existing times to places now showing (if any)
-        $placeCards.addClass(options.selectors.noOriginClass);
-
-        // if origin is blank, just hide travel times and bail
-        if (!directions.origin) {
-            return;
-        }
-
-        var searchUrl = '/api/destinations/search';
-
-        $.ajax({
-            url: searchUrl,
-            type: 'GET',
-            data: {
-                lat: directions.origin[0],
-                lon: directions.origin[1]
-            },
-        }).then(function(data) {
-            if (!data.destinations) {
-                console.error('no place search response');
-                console.error(data);
-                return;
-            }
-
-            var newPlaces = Templates.destinations(data.destinations);
-            $(options.selectors.placesList).html(newPlaces);
-
-            // now places list has been updated, go fetch the travel time
-            // from the new origin to each place
-            getTimesToPlaces();
-        });
-    }, DIRECTION_THROTTLE_MILLIS);
-
     DirectionsControl.prototype = {
         clearDirections: clearDirections,
-        getNearbyPlaces: getNearbyPlaces,
         // setDestination: setDestination,
         setDirections: setDirections,
         setOptions: setOptions,
@@ -277,43 +230,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         return otpOptions;
     }
 
-    function getTimesToPlaces() {
-        // make ajax requests to get the travel times to each destination
-        var otpOptions = getOtpOptions();
-        // only using the first itinerary; let OTP know to not bother finding other options
-        $.extend(otpOptions, {numItineraries: 1});
-
-        var date = UserPreferences.getPreference('dateTime');
-        date = date ? moment.unix(date) : moment(); // default to now
-
-        var $placeCards = $(options.selectors.placeCard);
-        $placeCards.each(function() {
-            var $card = $(this);
-
-            // read out the location of the destination
-            var xCoord = $card.attr(options.selectors.placeAttrX);
-            var yCoord = $card.attr(options.selectors.placeAttrY);
-            var placeCoords = [yCoord, xCoord];
-
-            // origin text has not been updated on URL, so fromText not set on itineraries
-            // get it from user preferences instead
-            var originLabel = UserPreferences.getPreference('originText');
-
-            // get travel time to destination and update place card
-            Routing.planTrip(directions.origin, placeCoords, date, otpOptions)
-            .then(function (itineraries) {
-                if (itineraries && itineraries.length) {
-                    var itinerary = itineraries[0];
-                    $card.find(options.selectors.placeDistanceText)
-                        .text(itinerary.formattedDuration);
-                    $card.find(options.selectors.placeOriginText)
-                        .text(originLabel);
-                    $card.removeClass(options.selectors.noOriginClass);
-                }
-            });
-        });
-    }
-
     function onDirectionsBackClicked() {
         // show the other itineraries again
         itineraryListControl.showItineraries(true);
@@ -406,9 +322,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
         // update the directions for the reverse trip
         planTrip();
-
-        // update the travel times to places for the new origin
-        getNearbyPlaces();
     }
 
     function onTypeaheadCleared(event, key) {
@@ -418,7 +331,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
         }
-        getNearbyPlaces();
     }
 
     function onTypeaheadSelected(event, key, result) {

@@ -2,7 +2,7 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahead,
+CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Routing, Typeahead,
                                  UserPreferences, Utils) {
 
     'use strict';
@@ -16,8 +16,15 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             hiddenClass: 'hidden',
             isochroneSliderContainer: '.isochrone-control',
             isochroneSlider: '#isochrone-slider',
-            placesList: '.places-content',
+            placesContent: '.places-content',
             spinner: '.places > .sk-spinner',
+            placeCard: 'li.place-card',
+            placesList: 'ul.place-list',
+            noOriginClass: 'no-origin',
+            placeOriginText: '.place-card-travel-logistics-origin',
+            placeDistanceText: '.place-card-travel-logistics-duration',
+            placeAttrX: 'data-destination-x',
+            placeAttrY: 'data-destination-y'
         }
     };
     var options = {};
@@ -59,10 +66,13 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
+    var getNearbyPlaces = _.throttle(_getNearbyPlaces, ISOCHRONE_DEBOUNCE_MILLIS);
+
     ExploreControl.prototype = {
         setAddress: setAddress,
         setOptions: setOptions,
-        setFromUserPreferences: setFromUserPreferences
+        setFromUserPreferences: setFromUserPreferences,
+        getNearbyPlaces: getNearbyPlaces
     };
 
     return ExploreControl;
@@ -85,17 +95,18 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     // trigger re-query when trip options are changed
     function setOptions() {
         clickedExplore();
+        getNearbyPlaces();
     }
 
     // Helper to hide loading spinner and show places list
-    function showPlacesList() {
+    function showPlacesContent() {
         $(options.selectors.spinner).addClass('hidden');
-        $(options.selectors.placesList).removeClass('hidden');
+        $(options.selectors.placesContent).removeClass('hidden');
     }
 
     // Helper to hide places list and show loading spinner in its place
     function showSpinner() {
-        $(options.selectors.placesList).addClass('hidden');
+        $(options.selectors.placesContent).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
     }
 
@@ -111,11 +122,14 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     // Since the drag event activates the spinner, this needs to restore the sidebar list.
     function onGeocodeError(event, key) {
         if (key === 'origin') {
+            setAddress(null);
+            setError('Could not find street address for location.');
+            $(options.selectors.spinner).addClass('hidden');
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 setAddress(null);
                 setError('Could not find street address for location.');
                 directionsFormControl.setError('origin');
-                showPlacesList();
+                showPlacesContent();
             }
         }
     }
@@ -162,7 +176,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
             function (destinations) {
-                showPlacesList();
+                showPlacesContent();
                 if (!destinations) {
                     setError('No destinations found.');
                 }
@@ -170,7 +184,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
                 // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
-                showPlacesList();
+                showPlacesContent();
                 setError('Could not find travelshed for given origin.');
             }
         );
@@ -207,13 +221,13 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     function setError(message) {
         var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
-        var $container = $(options.selectors.placesList);
+        var $container = $(options.selectors.placesContent);
         $container.html($alert);
         // handle close button
         $container.one('click', '.close', function () {
             $alert.remove();
         });
-        showPlacesList();
+        showPlacesContent();
     }
 
     function onTypeaheadCleared(event, key) {
@@ -222,14 +236,18 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             // selectedPlaceId = null;
             $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
+            getNearbyPlaces();
         }
     }
 
     function onTypeaheadSelected(event, key, location) {
-        setAddress(location);
-        // selectedPlaceId = null;
-        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
-            clickedExplore();
+        if (key === 'origin') {
+            setAddress(location);
+            // selectedPlaceId = null;
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                clickedExplore();
+            }
+            getNearbyPlaces();
         }
     }
 
@@ -278,7 +296,81 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
         }
+
+        getNearbyPlaces();
     }
 
-})(_, jQuery, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Routing.Plans, CAC.Search.Typeahead,
-   CAC.User.Preferences, CAC.Utils);
+    function _getNearbyPlaces() {
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+
+        // if origin is blank, just hide travel times and bail
+        if (!exploreLatLng) {
+            return;
+        }
+
+        var searchUrl = '/api/destinations/search';
+
+        $.ajax({
+            url: searchUrl,
+            type: 'GET',
+            data: {
+                lat: exploreLatLng[0],
+                lon: exploreLatLng[1]
+            },
+        }).then(function(data) {
+            if (!data.destinations) {
+                console.error('no place search response');
+                console.error(data);
+                return;
+            }
+
+            var newPlaces = HomeTemplates.destinations(data.destinations);
+            $(options.selectors.placesList).html(newPlaces);
+
+            // now places list has been updated, go fetch the travel time
+            // from the new origin to each place
+            getTimesToPlaces();
+        });
+    }
+
+    function getTimesToPlaces() {
+        // make ajax requests to get the travel times to each destination
+        var otpOptions = getOtpOptions();
+        // only using the first itinerary; let OTP know to not bother finding other options
+        $.extend(otpOptions, {numItineraries: 1});
+
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
+
+        var $placeCards = $(options.selectors.placeCard);
+        $placeCards.each(function() {
+            var $card = $(this);
+
+            // read out the location of the destination
+            var xCoord = $card.attr(options.selectors.placeAttrX);
+            var yCoord = $card.attr(options.selectors.placeAttrY);
+            var placeCoords = [yCoord, xCoord];
+
+            // origin text has not been updated on URL, so fromText not set on itineraries
+            // get it from user preferences instead
+            var originLabel = UserPreferences.getPreference('originText');
+
+            // get travel time to destination and update place card
+            Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions)
+            .then(function (itineraries) {
+                if (itineraries && itineraries.length) {
+                    var itinerary = itineraries[0];
+                    $card.find(options.selectors.placeDistanceText)
+                        .text(itinerary.formattedDuration);
+                    $card.find(options.selectors.placeOriginText)
+                        .text(originLabel);
+                    $card.removeClass(options.selectors.noOriginClass);
+                }
+            });
+        });
+    }
+
+})(_, jQuery, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans,
+    CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
