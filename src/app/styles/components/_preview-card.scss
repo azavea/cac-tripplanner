@@ -7,6 +7,8 @@ $goto-more-button-height: 4rem;
     flex-flow: column nowrap;
     align-items: stretch;
     justify-content: flex-start;
+    width: 100%;
+    max-width: $home-main-max-width;
     margin: 0 auto $home-section-margin;
 
     @include respond-to('xs') {

@@ -9,7 +9,8 @@
     box-shadow: $place-card-drop-shadow;
 
     .body-map & {
-        width: 100%;
+        margin-right: auto;
+        margin-left: auto;
     }
 
     h2 {

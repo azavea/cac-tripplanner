@@ -239,7 +239,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         var source = [
             '<header class="step-by-step-header">',
                 '{{#if data.showBackButton}}',
-                    '<button name="back-to-directions-results" class="back-to-directions-results">',
+                    '<button name="back-to-directions-results" class="back-to-directions-results" title="List all routes">',
                     '<i class="icon-left-big"></i></button>',
                 '{{/if}}',
                 '<h1>Directions</h1>',
