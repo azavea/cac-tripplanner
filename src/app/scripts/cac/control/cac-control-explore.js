@@ -169,6 +169,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
+        UserPreferences.setPreference('exploreMinutes', exploreMinutes);
+
         // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
         // (the 'detail' functions don't update the isochrone so they update the URL themselves)
         updateUrl();
@@ -259,6 +261,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         } else {
             exploreLatLng = null;
         }
+
+        // set explore time preference
+        $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
 
         if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
