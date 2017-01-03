@@ -19,7 +19,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             placesContent: '.places-content',
             spinner: '.places > .sk-spinner',
             placeCard: 'li.place-card',
-            placesList: 'ul.place-list',
             noOriginClass: 'no-origin',
             placeOriginText: '.place-card-travel-logistics-origin',
             placeDistanceText: '.place-card-travel-logistics-duration',
@@ -61,7 +60,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         }
 
         // update isochrone on slider move
-        $(options.selectors.isochroneSlider).change(clickedExplore);
+        $(options.selectors.isochroneSlider).change(setOptions);
     }
 
     var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
@@ -94,8 +93,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     // trigger re-query when trip options are changed
     function setOptions() {
-        clickedExplore();
-        getNearbyPlaces();
+        if (exploreLatLng) {
+            clickedExplore();
+            getNearbyPlaces();
+        }
     }
 
     // Helper to hide loading spinner and show places list
@@ -124,12 +125,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         if (key === 'origin') {
             setAddress(null);
             setError('Could not find street address for location.');
-            $(options.selectors.spinner).addClass('hidden');
+            showPlacesContent();
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 setAddress(null);
                 setError('Could not find street address for location.');
                 directionsFormControl.setError('origin');
-                showPlacesContent();
             }
         }
     }
@@ -226,6 +226,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // handle close button
         $container.one('click', '.close', function () {
             $alert.remove();
+            getNearbyPlaces();
         });
         showPlacesContent();
     }
@@ -236,7 +237,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             // selectedPlaceId = null;
             $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
-            getNearbyPlaces();
         }
     }
 
@@ -301,33 +301,40 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     }
 
     function _getNearbyPlaces() {
+        showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
 
-        // if origin is blank, just hide travel times and bail
-        if (!exploreLatLng) {
-            return;
-        }
-
         var searchUrl = '/api/destinations/search';
 
-        $.ajax({
+        var params = {
             url: searchUrl,
-            type: 'GET',
-            data: {
+            type: 'GET'
+        };
+
+        if (!exploreLatLng) {
+            // if origin is not set, re-fetch all by querying with a blank text search
+            params.data = {text: ''};
+        } else {
+            // use origin
+            params.data = {
                 lat: exploreLatLng[0],
                 lon: exploreLatLng[1]
-            },
-        }).then(function(data) {
+            };
+        }
+
+        $.ajax(params).then(function(data) {
             if (!data.destinations) {
-                console.error('no place search response');
+                console.error('no places found');
                 console.error(data);
+                showPlacesContent();
                 return;
             }
 
             var newPlaces = HomeTemplates.destinations(data.destinations);
-            $(options.selectors.placesList).html(newPlaces);
+            $(options.selectors.placesContent).html(newPlaces);
+            showPlacesContent();
 
             // now places list has been updated, go fetch the travel time
             // from the new origin to each place
@@ -336,6 +343,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     }
 
     function getTimesToPlaces() {
+        // bail if origin not set
+        if (!exploreLatLng) {
+            return;
+        }
         // make ajax requests to get the travel times to each destination
         var otpOptions = getOtpOptions();
         // only using the first itinerary; let OTP know to not bother finding other options

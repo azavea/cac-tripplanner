@@ -332,6 +332,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         directionsFormControl.clearAll();
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+        // requery for place list once origin field cleared
+        exploreControl.getNearbyPlaces();
     }
 
     /**

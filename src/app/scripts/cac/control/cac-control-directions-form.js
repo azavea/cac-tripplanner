@@ -18,6 +18,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             // used for error display
             origin: '.directions-from.directions-text-input',
             destination: '.directions-to.directions-text-input',
+            alert: '.alert',
 
             errorClass: 'error',
         }
@@ -162,10 +163,13 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         });
     }
 
-    // Clear both fields
+    // Clear both fields and any errors
     function clearAll() {
         typeaheadFrom.setValue(null);
         typeaheadTo.setValue(null);
+        $(options.selectors.origin).removeClass(options.selectors.errorClass);
+        $(options.selectors.destination).removeClass(options.selectors.errorClass);
+        $(options.selectors.alert).remove();
     }
 
     // Add the error class to the given field if it's not set in UserPreferences, or remove
