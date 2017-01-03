@@ -306,8 +306,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     function reverseOriginDestination(event, newOrigin, newDestination) {
         // set on this object and validate
-        setDirections('origin', [newOrigin.location.y, newOrigin.location.x]);
-        setDirections('destination', [newDestination.location.y, newDestination.location.x]);
+        if (newOrigin && newOrigin.location) {
+            setDirections('origin', [newOrigin.location.y, newOrigin.location.x]);
+        } else {
+            setDirections('origin', null);
+        }
+
+        if (newDestination && newDestination.location) {
+            setDirections('destination', [newDestination.location.y, newDestination.location.x]);
+        } else {
+            setDirections('destination', null);
+        }
 
         // update the directions for the reverse trip
         planTrip();
