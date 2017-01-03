@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Typeahead,
+CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Templates, Typeahead,
                                     UserPreferences, Utils) {
 
     'use strict';
@@ -12,11 +12,19 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     var defaults = {
         selectors: {
+
             itineraryBlock: '.route-summary',
-
             selectedItineraryClass: 'selected',
+            spinner: '.directions-results > .sk-spinner',
 
-            spinner: '.directions-results > .sk-spinner'
+            // places
+            placeCard: 'li.place-card',
+            placesList: 'ul.place-list',
+            noOriginClass: 'no-origin',
+            placeOriginText: '.place-card-travel-logistics-origin',
+            placeDistanceText: '.place-card-travel-logistics-duration',
+            placeAttrX: 'data-destination-x',
+            placeAttrY: 'data-destination-y'
         }
     };
     var options = {};
@@ -85,8 +93,44 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         });
     }
 
+    var getNearbyPlaces = _.throttle(function() {  // jshint ignore:line
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+
+        // if origin is blank, just hide travel times and bail
+        if (!directions.origin) {
+            return;
+        }
+
+        var searchUrl = '/api/destinations/search';
+
+        $.ajax({
+            url: searchUrl,
+            type: 'GET',
+            data: {
+                lat: directions.origin[0],
+                lon: directions.origin[1]
+            },
+        }).then(function(data) {
+            if (!data.destinations) {
+                console.error('no place search response');
+                console.error(data);
+                return;
+            }
+
+            var newPlaces = Templates.destinations(data.destinations);
+            $(options.selectors.placesList).html(newPlaces);
+
+            // now places list has been updated, go fetch the travel time
+            // from the new origin to each place
+            getTimesToPlaces();
+        });
+    }, DIRECTION_THROTTLE_MILLIS);
+
     DirectionsControl.prototype = {
         clearDirections: clearDirections,
+        getNearbyPlaces: getNearbyPlaces,
         // setDestination: setDestination,
         setDirections: setDirections,
         setOptions: setOptions,
@@ -98,9 +142,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
-        if (!tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            return;
-        }
         if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
@@ -112,51 +153,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         // show spinner while loading
         showSpinner();
 
-        var mode = UserPreferences.getPreference('mode');
-        var arriveBy = UserPreferences.getPreference('arriveBy');
-
-        // options to pass to OTP as-is
-        var otpOptions = {
-            mode: mode,
-            arriveBy: arriveBy,
-            maxWalkDistance: UserPreferences.getPreference('maxWalk')
-        };
-
-        if (mode.indexOf('BICYCLE') > -1) {
-            // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
-            if (bikeTriangle) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
-            }
-        } else {
-            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
-        }
-
-        // add intermediatePlaces if user edited route
-        var waypoints = UserPreferences.getPreference('waypoints');
-        if (waypoints && waypoints.length && !arriveBy) {
-            otpOptions.waypoints = waypoints;
-        }
-
-        var params = $.extend({
-            fromText: UserPreferences.getPreference('originText'),
-            toText: UserPreferences.getPreference('destinationText')
-        }, otpOptions);
-
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
 
+        var otpOptions = getOtpOptions();
+
         // set user preferences
         UserPreferences.setPreference('method', 'directions');
-        UserPreferences.setPreference('mode', mode);
 
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
-        Routing.planTrip(directions.origin, directions.destination, date, params)
+        Routing.planTrip(directions.origin, directions.destination, date, otpOptions)
         .then(function (itineraries) {
             $(options.selectors.spinner).addClass('hidden');
             // Add the itineraries to the map, highlighting the first one
@@ -172,24 +182,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             });
             currentItinerary.geojson.bringToFront();
 
+            // If there is only one itinerary, make it draggable.
+            // Only one itinerary is returned if there are waypoints, so this
+            // lets the user to continue to add or modify waypoints without
+            // having to select it in the list.
+            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
+                itineraryControl.draggableItinerary(currentItinerary);
+            }
+
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
             itineraryListControl.show();
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
-
-            // If there is only one itinerary, make it draggable.
-            // Only one itinerary is returned if there are waypoints, so this
-            // lets the user to continue to add or modify waypoints without
-            // having to select it in the list.
-            if (itineraries.length === 1 && !arriveBy) {
-                itineraryControl.draggableItinerary(currentItinerary);
-                // select the itinerary (go directly to detailed step view) if have waypoints
-                if (waypoints && waypoints.length) {
-                    onItineraryClicked(null, currentItinerary);
-                }
-            }
         }, function (error) {
             console.error('failed to plan trip');
             console.error(error);
@@ -227,6 +233,83 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         itineraryListControl.hide();
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass('hidden');
+    }
+
+    /**
+     * Get parameters to pass to OpenTripPlanner, based on current settings
+     *
+     * @returns {Object} extra parameter set to pass to Routing.planTrip
+     */
+    function getOtpOptions() {
+        var mode = UserPreferences.getPreference('mode');
+        var arriveBy = UserPreferences.getPreference('arriveBy');
+
+        var otpOptions = {
+            arriveBy: arriveBy,
+            maxWalkDistance: UserPreferences.getPreference('maxWalk')
+        };
+
+        // add intermediatePlaces if user edited route
+        var waypoints = UserPreferences.getPreference('waypoints');
+        if (waypoints && waypoints.length && !arriveBy) {
+            otpOptions.waypoints = waypoints;
+        }
+
+        if (mode.indexOf('BICYCLE') > -1) {
+            // set bike trip optimization option
+            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
+            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
+            if (bikeTriangle) {
+                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
+            }
+        } else {
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
+        }
+
+        $.extend(otpOptions, {
+            mode: mode,
+            fromText: UserPreferences.getPreference('originText'),
+            toText: UserPreferences.getPreference('destinationText')
+        });
+
+        return otpOptions;
+    }
+
+    function getTimesToPlaces() {
+        // make ajax requests to get the travel times to each destination
+        var otpOptions = getOtpOptions();
+        // only using the first itinerary; let OTP know to not bother finding other options
+        $.extend(otpOptions, {numItineraries: 1});
+
+        var date = UserPreferences.getPreference('dateTime');
+        date = date ? moment.unix(date) : moment(); // default to now
+
+        var $placeCards = $(options.selectors.placeCard);
+        $placeCards.each(function() {
+            var $card = $(this);
+
+            // read out the location of the destination
+            var xCoord = $card.attr(options.selectors.placeAttrX);
+            var yCoord = $card.attr(options.selectors.placeAttrY);
+            var placeCoords = [yCoord, xCoord];
+
+            // origin text has not been updated on URL, so fromText not set on itineraries
+            // get it from user preferences instead
+            var originLabel = UserPreferences.getPreference('originText');
+
+            // get travel time to destination and update place card
+            Routing.planTrip(directions.origin, placeCoords, date, otpOptions)
+            .then(function (itineraries) {
+                if (itineraries && itineraries.length) {
+                    var itinerary = itineraries[0];
+                    $card.find(options.selectors.placeDistanceText)
+                        .text(itinerary.formattedDuration);
+                    $card.find(options.selectors.placeOriginText)
+                        .text(originLabel);
+                    $card.removeClass(options.selectors.noOriginClass);
+                }
+            });
+        });
     }
 
     function onDirectionsBackClicked() {
@@ -310,6 +393,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
         // update the directions for the reverse trip
         planTrip();
+
+        // update the travel times to places for the new origin
+        getNearbyPlaces();
     }
 
     function onTypeaheadCleared(event, key) {
@@ -319,6 +405,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
         }
+        getNearbyPlaces();
     }
 
     function onTypeaheadSelected(event, key, result) {
@@ -418,4 +505,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
     }
 
 })(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
-    CAC.Routing.Plans, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+    CAC.Routing.Plans, CAC.Home.Templates, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
