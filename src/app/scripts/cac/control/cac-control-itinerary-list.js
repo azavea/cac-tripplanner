@@ -16,6 +16,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         selectors: {
             alert: '.alert',
             container: '.directions-list',
+            hiddenClass: 'hidden',
             itineraryItem: '.route-summary'
         }
     };
@@ -99,7 +100,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     }
 
     function show() {
-        $container.removeClass('hidden');
+        $container.removeClass(options.selectors.hiddenClass);
     }
 
     /**
@@ -114,11 +115,11 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     }
 
     function hide() {
-        $container.addClass('hidden');
+        $container.addClass(options.selectors.hiddenClass);
     }
 
     function toggle() {
-        if ($container.hasClass('hidden')) {
+        if ($container.hasClass(options.selectors.hiddenClass)) {
             show();
         } else {
             hide();

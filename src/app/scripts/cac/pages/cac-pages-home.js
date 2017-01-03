@@ -245,10 +245,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
      * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
      */
     function clickedDestination(event) {
+        console.error('TODO: implement clickedDestination');
         event.preventDefault();
-        var exploreTime = $(options.selectors.exploreTime).val();
         UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('exploreTime', exploreTime);
 
         var block = $(event.target).closest(options.selectors.placeCard);
         var placeId = block.data('destination-id');

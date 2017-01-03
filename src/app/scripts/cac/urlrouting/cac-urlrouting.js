@@ -19,7 +19,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                          'arriveBy',
                          'dateTime'];
 
-    var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
+    var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreMinutes']);
 
     var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
                                                  'destinationText',
