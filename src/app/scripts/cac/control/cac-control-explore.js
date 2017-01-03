@@ -76,12 +76,23 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         clickedExplore();
     }
 
+    // Helper to hide loading spinner and show places list
+    function showPlacesList() {
+        $(options.selectors.spinner).addClass('hidden');
+        $(options.selectors.placesList).removeClass('hidden');
+    }
+
+    // Helper to hide places list and show loading spinner in its place
+    function showSpinner() {
+        $(options.selectors.placesList).addClass('hidden');
+        $(options.selectors.spinner).removeClass('hidden');
+    }
+
     // If they move the marker, that invalidates the old isochrone and triggers the form to
     // reverse geocode the new location, so show the spinner while that happens.
     function onMovePointStart() {
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
-            $(options.selectors.placesList).addClass('hidden');
-            $(options.selectors.spinner).removeClass('hidden');
+            showSpinner();
         }
     }
 
@@ -92,9 +103,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 setAddress(null);
                 setError('Could not find street address for location.');
-                $(options.selectors.spinner).addClass('hidden');
                 directionsFormControl.setError('origin');
-                $(options.selectors.placesList).removeClass('hidden');
+                showPlacesList();
             }
         }
     }
@@ -107,8 +117,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
-        $(options.selectors.placesList).addClass('hidden');
-        $(options.selectors.spinner).removeClass('hidden');
+        showSpinner();
         $(options.selectors.alert).remove();
         mapControl.isochroneControl.clearIsochrone();
 
@@ -161,8 +170,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
             function (destinations) {
-                $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.placesList).removeClass('hidden');
+                showPlacesList();
                 if (!destinations) {
                     setError('No destinations found.');
                 }
@@ -170,8 +178,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
                 // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
-                $(options.selectors.spinner).addClass('hidden');
-                $(options.selectors.placesList).removeClass('hidden');
+                showPlacesList();
                 setError('Could not find travelshed for given origin.');
             }
         );
@@ -185,8 +192,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         $container.one('click', '.close', function () {
             $alert.remove();
         });
-        $(options.selectors.spinner).addClass('hidden');
-        $container.removeClass('hidden');
+        showPlacesList();
     }
 
     function onTypeaheadCleared(event, key) {
