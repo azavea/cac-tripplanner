@@ -220,6 +220,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         itinerary.geojson.bringToFront();
     }
 
+    // Figure out where in the sequence of waypoints the click to create a new one falls.
+    // Returns the index in the waypoint array at which to insert the new waypoint.
     function getNewWaypointIndex(itinerary, startDragPoint) {
         var waypoints = itinerary.waypoints;
 
@@ -227,37 +229,23 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
             return 0;
         }
 
-        var originPoint = turf.point([itinerary.from.lon, itinerary.from.lat], {index: -1});
-        var destPoint = turf.point([itinerary.to.lon, itinerary.to.lat], {index: waypoints.length});
+        // Combine the whole itinerary into a single linestring
+        var combinedRoute = turf.lineString(_.flatMap(itinerary.geojson.toGeoJSON().features,
+                                                      'geometry.coordinates'));
+        // Figure out how far the new point is along that linestring. Index is fine since we
+        // just need to do comparisons.
+        var newPointDist = turf.pointOnLine(combinedRoute, startDragPoint).properties.index;
 
-        var allFeatures = _.concat([originPoint], waypoints, [destPoint]);
-
-        var turfPoint = turf.point(startDragPoint);
-        var nearest = turf.nearest(turfPoint, turf.featureCollection(allFeatures));
-
-        var nearestIndex = nearest.properties.index;
-
-        // drop the nearest point to repeat search, in order to find next nearest
-        var remainingFeatures = _.concat(_.slice(allFeatures, 0, nearestIndex),
-                                       _.slice(allFeatures, nearestIndex + 1));
-
-        var nextNearest = turf.nearest(turfPoint, turf.featureCollection(remainingFeatures));
-
-        var nextNearestIndex = nextNearest.properties.index;
-
-        // determine the sequence ordering of the two nearest points, so the new point can
-        // be added between them
-        var smallerIndex = Math.min(nearestIndex, nextNearestIndex);
-        var largerIndex = Math.max(nearestIndex, nextNearestIndex);
-        var newIndex = smallerIndex + 1;
-
-        // If the nearest two points aren't in sequence and the larger indexed one is closer,
-        // put the new point right before that one instead of right after the 2nd nearest
-        if (largerIndex - smallerIndex !== 1 && smallerIndex !== nearestIndex) {
-            newIndex = largerIndex - 1;
+        // Find the first waypoint that's after the new point
+        var insertBefore = _.find(waypoints, function (pt) {
+            return turf.pointOnLine(combinedRoute, pt).properties.index > newPointDist;
+        });
+        // And return its index or, if no later waypoint was found, add the new one to the end
+        if (insertBefore) {
+            return insertBefore.properties.index;
+        } else {
+            return waypoints.length;
         }
-
-        return newIndex;
     }
 
     /**

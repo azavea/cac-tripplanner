@@ -4,7 +4,7 @@
     "node": ">=0.12.0"
   },
   "dependencies": {
-    "@turf/nearest": "~3.5.2"
+    "@turf/point-on-line": "~3.5.3"
   },
   "devDependencies": {
     "aliasify": "^2.0.0",
