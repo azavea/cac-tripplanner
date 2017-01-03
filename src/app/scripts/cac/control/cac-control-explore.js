@@ -12,6 +12,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
     var defaults = {
         selectors: {
+            alert: '.alert',
             hiddenClass: 'hidden',
             isochroneSliderContainer: '.isochrone-control',
             isochroneSlider: '#isochrone-slider',
@@ -26,8 +27,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     var urlRouter = null;
     var directionsFormControl = null;
     var exploreLatLng = null;
-
-    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -58,6 +57,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         $(options.selectors.isochroneSlider).change(clickedExplore);
     }
 
+    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
+
     ExploreControl.prototype = {
         setAddress: setAddress,
         setOptions: setOptions,
@@ -74,6 +75,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             setFromUserPreferences();
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
         } else {
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
             $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
@@ -85,12 +87,23 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         clickedExplore();
     }
 
+    // Helper to hide loading spinner and show places list
+    function showPlacesList() {
+        $(options.selectors.spinner).addClass('hidden');
+        $(options.selectors.placesList).removeClass('hidden');
+    }
+
+    // Helper to hide places list and show loading spinner in its place
+    function showSpinner() {
+        $(options.selectors.placesList).addClass('hidden');
+        $(options.selectors.spinner).removeClass('hidden');
+    }
+
     // If they move the marker, that invalidates the old isochrone and triggers the form to
     // reverse geocode the new location, so show the spinner while that happens.
     function onMovePointStart() {
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
-            $(options.selectors.placesList).addClass(options.selectors.hiddenClass);
-            $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
+            showSpinner();
         }
     }
 
@@ -98,12 +111,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     // Since the drag event activates the spinner, this needs to restore the sidebar list.
     function onGeocodeError(event, key) {
         if (key === 'origin') {
-            setAddress(null);
-            setError('Could not find street address for location.');
-            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                setAddress(null);
+                setError('Could not find street address for location.');
                 directionsFormControl.setError('origin');
-                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
+                showPlacesList();
             }
         }
     }
@@ -116,8 +128,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
-        $(options.selectors.placesList).addClass(options.selectors.hiddenClass);
-        $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
+        showSpinner();
+        $(options.selectors.alert).remove();
         mapControl.isochroneControl.clearIsochrone();
 
         debouncedFetchIsochrone();
@@ -157,7 +169,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
 
         // store search inputs to preferences
         UserPreferences.setPreference('method', 'explore');
-
         // Most interactions trigger this function, so updating the URL here keeps it mostly in sync
         // (the 'detail' functions don't update the isochrone so they update the URL themselves)
         updateUrl();
@@ -168,8 +179,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
             function (destinations) {
-                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
-                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
+                showPlacesList();
                 if (!destinations) {
                     setError('No destinations found.');
                 }
@@ -177,26 +187,28 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
                 // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
-                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
-                $(options.selectors.placesList).removeClass(options.selectors.hiddenClass);
-                setError('Could not find travelshed.');
+                showPlacesList();
+                setError('Could not find travelshed for given origin.');
             }
         );
     }
 
     function setError(message) {
-        console.log('TODO: display isochrone errors', message);
-        // var $container = $('<div></div>').addClass('destinations');
-        // var $errorTemplate = $(MapTemplates.destinationError({'message': message}));
-        // $container.append($errorTemplate);
-        // $(options.selectors.destinations).html($container);
-        // $(options.selectors.sidebarContainer).height(200);
+        var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
+        var $container = $(options.selectors.placesList);
+        $container.html($alert);
+        // handle close button
+        $container.one('click', '.close', function () {
+            $alert.remove();
+        });
+        showPlacesList();
     }
 
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
             exploreLatLng = null;
             // selectedPlaceId = null;
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
         }
     }
@@ -225,6 +237,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             }
         } else {
             exploreLatLng = null;
+            $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
         }
     }
@@ -239,7 +252,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
     }
 
     function setFromUserPreferences() {
-        var method = UserPreferences.getPreference('method');
         var exploreOrigin = UserPreferences.getPreference('origin');
 
         if (exploreOrigin) {
@@ -248,7 +260,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, Routing, Typeahea
             exploreLatLng = null;
         }
 
-        if (method === 'explore' && exploreLatLng) {
+        if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
         }
     }

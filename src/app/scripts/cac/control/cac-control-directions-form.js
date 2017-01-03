@@ -47,7 +47,8 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         eventNames: eventNames,
         moveOriginDestination: moveOriginDestination,
         clearAll: clearAll,
-        setError: setError
+        setError: setError,
+        setFromUserPreferences: setFromUserPreferences
     };
 
     return DirectionsFormControl;

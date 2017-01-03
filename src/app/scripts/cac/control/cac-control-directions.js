@@ -14,7 +14,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
         selectors: {
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
+
             selectedItineraryClass: 'selected',
+
             spinner: '.directions-results > .sk-spinner'
         }
     };
@@ -171,20 +173,24 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             });
             currentItinerary.geojson.bringToFront();
 
-            // If there is only one itinerary, make it draggable.
-            // Only one itinerary is returned if there are waypoints, so this
-            // lets the user to continue to add or modify waypoints without
-            // having to select it in the list.
-            if (itineraries.length === 1 && !arriveBy) {
-                itineraryControl.draggableItinerary(currentItinerary);
-            }
-
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
             itineraryListControl.show();
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
+
+            // If there is only one itinerary, make it draggable.
+            // Only one itinerary is returned if there are waypoints, so this
+            // lets the user to continue to add or modify waypoints without
+            // having to select it in the list.
+            if (itineraries.length === 1 && !arriveBy) {
+                itineraryControl.draggableItinerary(currentItinerary);
+                // select the itinerary (go directly to detailed step view) if have waypoints
+                if (waypoints && waypoints.length) {
+                    onItineraryClicked(null, currentItinerary);
+                }
+            }
         }, function (error) {
             console.error('failed to plan trip');
             console.error(error);
@@ -208,7 +214,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     function clearDirections() {
         mapControl.setDirectionsMarkers(null, null);
-        urlRouter.clearUrl();
         clearItineraries();
     }
 
@@ -338,12 +343,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
 
     // If they dragged the origin or destination and the location failed to geocode, show error
     function onGeocodeError(event, key) {
-        setDirections(key, null);
-        $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
-        itineraryListControl.setItinerariesError({
-            msg: 'Could not find street address for location.'
-        });
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            setDirections(key, null);
+            $(options.selectors.spinner).addClass('hidden');
+            itineraryListControl.setItinerariesError({
+                msg: 'Could not find street address for location.'
+            });
             itineraryListControl.show();
         }
     }
@@ -408,7 +413,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Ty
             directions.destination = [destination.location.y, destination.location.x ];
         }
 
-        if (origin && destination) {
+        if (origin && destination && tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             planTrip();
         }
     }

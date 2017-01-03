@@ -14,6 +14,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
+            alert: '.alert',
             container: '.directions-list',
             hiddenClass: 'hidden',
             itineraryItem: '.route-summary'
@@ -67,8 +68,13 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {Object} Error object returned from OTP
      */
     function setItinerariesError(error) {
-        var $alert = MapTemplates.alert('Could not plan trip: ' + error.msg, 'danger');
-        $container.html($alert);
+        var alert = MapTemplates.alert(error.msg, 'Could not plan trip', 'danger');
+        $container.html(alert);
+
+        // handle alert close button click
+        $container.one('click', options.selectors.alert, function() {
+            $(options.selectors.alert).remove();
+        });
     }
 
     function getItineraryById(id) {
