@@ -11,6 +11,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             placeCard: '.place-card',
             placeCardDirectionsLink: '.place-card .place-action-go',
             placeList: '.place-list',
+            places: '.places',
 
             map: '.the-map',
 
@@ -178,7 +179,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }
         });
 
-        $(options.selectors.mapViewButton).on('click', function (event) {
+        $(options.selectors.places).on('click', options.selectors.mapViewButton, function (event) {
             event.preventDefault();
             event.stopPropagation();
             tabControl.setTab(tabControl.TABS.EXPLORE);
