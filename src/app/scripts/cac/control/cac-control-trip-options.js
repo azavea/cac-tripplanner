@@ -15,6 +15,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             accessibility: 'Accessibility'
         },
         selectors: {
+            hiddenClass: 'hidden',
+
             bodyModalClass: 'body-modal body-modal-options',
             selectedClass: 'selected', // used to mark selected list item
             visibleClass: 'visible',
@@ -36,6 +38,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             notTodayClass: 'not-today',
             firstOption: 'option:first',
             modalListContents: '.modal-list.modal-contents',
+            timingMenuOption: 'li.modal-list-timing',
 
             // the two top-level modals
             bikeOptionsModal: '.modal-options.bike-options',
@@ -130,6 +133,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
         // populate date/time picker options
         if (childModalSelector === options.selectors.timingOptions) {
+            if (isBike && UserPreferences.getPreference('bikeShare')) {
+                // in bike share mode; always depart now
+                childModalSelector = null;
+                UserPreferences.setPreference('dateTime', undefined);
+                UserPreferences.setPreference('arriveBy', false);
+                return;
+            }
 
             // set 'clear' button event handler for timing options modal
             childModalOptions.clearHandler = onTimingModalClearClick;
@@ -180,6 +190,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 $day.val($day.find(options.selectors.firstOption).val());
                 $time.val($time.find('.' + options.selectors.currentTimeClass).val());
             }
+
+            if (isBike && UserPreferences.getPreference('bikeShare')) {
+                return;
+            }
         }
 
         modal.close();
@@ -222,6 +236,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         });
 
         $(modalSelector).addClass(options.selectors.visibleClass);
+
+        // hide timing option in bike share mode (always depart now)
+        if (isBike && UserPreferences.getPreference('bikeShare')) {
+            $(options.selectors.timingMenuOption).addClass(options.selectors.hiddenClass);
+        } else {
+            $(options.selectors.timingMenuOption).removeClass(options.selectors.hiddenClass);
+        }
+
         modal.open();
     }
 
@@ -260,6 +282,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 if (_.has(options.selectors.optionPreferences, selectedOptionId)) {
                     var setting = options.selectors.optionPreferences[selectedOptionId];
                     UserPreferences.setPreference(setting.name, setting.value);
+
+                    // on switch to bike share mode, reset time to depart now
+                    if (selectedOptionId === 'useBikeShare') {
+                        UserPreferences.setPreference('arriveBy', false);
+                        UserPreferences.setPreference('dateTime', undefined);
+                    }
                 } else {
                     console.error('selected unrecognized option with ID: ' + selectedOptionId);
                 }

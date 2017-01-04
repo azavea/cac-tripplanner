@@ -291,6 +291,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             var bikeShare = UserPreferences.getPreference('bikeShare');
             if (bikeShare) {
                 mode = mode.replace('BICYCLE', 'BICYCLE_RENT');
+
+                if (mode.indexOf('BICYCLE' > -1)) {
+                    // always depart now in bike share mode
+                    UserPreferences.setPreference('arriveBy', false);
+                    UserPreferences.setPreference('dateTime', undefined);
+                }
             }
         }
         UserPreferences.setPreference('mode', mode);
