@@ -82,7 +82,7 @@
 
         @include respond-to('xxs') {
             justify-content: flex-end;
-            margin-right: 10px;
+            margin-right: 5px;
         }
 
         .body-map & {
@@ -147,8 +147,12 @@
             margin-right: 60px;
         }
 
+        @include respond-to('xxs') {
+            margin-right: 30px;
+        }
+
         .body-map & {
-            margin-right: 50px;
+            margin-right: 40px;
 
             @include respond-to('xxs') {
                 margin-right: 70px;
@@ -160,7 +164,7 @@
         }
 
         .walk {
-            margin-right: 30px;
+            margin-right: 20px;
         }
 
         .bike {
@@ -172,13 +176,14 @@
         border-top: 2px solid transparent;
         border-bottom: 2px solid transparent;
         cursor: pointer;
+        opacity: .5;
 
         .body-map & {
             padding-right: 0;
         }
 
-        &.transit.off {
-            opacity: .5;
+        &.on {
+            opacity: 1;
         }
     }
 
@@ -189,7 +194,7 @@
         width: 50px;
         height: 100%;
         margin-top: -5px;
-        margin-left: 30px;
+        margin-left: 24px;
         padding-top: 3px;
         background-color: $gophillygo-blue-dark;
         cursor: pointer;

@@ -93,6 +93,15 @@
             color: $gophillygo-blue;
             font-family: 'gpg';
         }
+
+        &:hover {
+            background-color: $gophillygo-blue;
+            color: $white;
+
+            &:before {
+                color: $white;
+            }
+        }
     }
 
     .place-list {

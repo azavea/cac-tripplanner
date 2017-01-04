@@ -20,14 +20,14 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var destinationsLayer = null;
     var lastHighlightedMarker = null;
     var destinationIcon = L.AwesomeMarkers.icon({
-        icon: 'marker-poi',
+        icon: 'default',
         prefix: 'icon',
-        markerColor: 'darkblue'
+        markerColor: 'orange'
     });
     var highlightIcon = L.AwesomeMarkers.icon({
-        icon: 'marker-poi',
+        icon: 'default',
         prefix: 'icon',
-        markerColor: 'blue'
+        markerColor: 'orange'
     });
 
 
