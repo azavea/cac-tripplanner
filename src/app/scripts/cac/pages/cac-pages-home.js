@@ -19,7 +19,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             tabControl: '.tab-control',
             tabControlLink: '.nav-item',
 
-            mapViewButton: '.map-view-btn',
+            mapViewButton: 'a.map-view-btn',
 
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarBanner: '.sidebar-banner',
@@ -182,7 +182,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(options.selectors.places).on('click', options.selectors.mapViewButton, function (event) {
             event.preventDefault();
             event.stopPropagation();
-            tabControl.setTab(tabControl.TABS.EXPLORE);
+            $.proxy(tabControl.setTab(tabControl.TABS.EXPLORE), this);
         });
 
         $(options.selectors.homeLink).on('click', function (event) {
@@ -225,8 +225,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         if (!UserPreferences.isDefault('method')) {
             var method = UserPreferences.getPreference('method');
             if (method === 'directions') {
+                directionsControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             } else if (method === 'explore') {
+                exploreControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.EXPLORE);
             }
         } else {
@@ -315,8 +317,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
-        directionsControl.setFromUserPreferences();
-        exploreControl.setFromUserPreferences();
         setActiveTab();
     }
 

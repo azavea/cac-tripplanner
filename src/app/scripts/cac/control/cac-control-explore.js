@@ -13,6 +13,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     var defaults = {
         selectors: {
             alert: '.alert',
+            closeButton: '.close',
             hiddenClass: 'hidden',
             isochroneSliderContainer: '.isochrone-control',
             isochroneSlider: '#isochrone-slider',
@@ -220,15 +221,17 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     }
 
     function setError(message) {
-        var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
-        var $container = $(options.selectors.placesContent);
-        $container.html($alert);
-        // handle close button
-        $container.one('click', '.close', function () {
-            $alert.remove();
-            getNearbyPlaces();
-        });
-        showPlacesContent();
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
+            var $container = $(options.selectors.placesContent);
+            $container.html($alert);
+            // handle close button
+            $container.one('click', options.selectors.closeButton, function () {
+                $alert.remove();
+                getNearbyPlaces();
+            });
+            showPlacesContent();
+        }
     }
 
     function onTypeaheadCleared(event, key) {
@@ -296,8 +299,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
         }
-
-        getNearbyPlaces();
     }
 
     function _getNearbyPlaces() {
@@ -334,6 +335,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
             var newPlaces = HomeTemplates.destinations(data.destinations);
             $(options.selectors.placesContent).html(newPlaces);
+
             showPlacesContent();
 
             // now places list has been updated, go fetch the travel time
