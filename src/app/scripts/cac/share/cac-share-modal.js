@@ -66,11 +66,11 @@ CAC.Share.ShareModal = (function ($, Settings, Modal) {
     }
 
     function getShortLink() {
-        // Share link to directions list page, which is relative to the current URL, has all of
+        // Share link to directions on map, which is relative to the current URL, has all of
         // the current URL's parameters and has an added parameter for the selected itinerary.
         var href = window.location.href;
         var itineraryId = $(options.selectors.itinerary).data('itineraryId');
-        var url = ['/directions/', href.slice(href.indexOf('?')), '&',
+        var url = ['/', href.slice(href.indexOf('?')), '&',
                    $.param({itineraryIndex: itineraryId}) ].join('');
         return shortenLink(url);
     }
