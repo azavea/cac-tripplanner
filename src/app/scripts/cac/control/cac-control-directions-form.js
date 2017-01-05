@@ -96,8 +96,10 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
     }
 
     // For setting origin or destination from code, e.g. directions links
-    function setLocation(key, location, text) {
-        UserPreferences.setLocation(key, location, text);
+    function setLocation(key, location) {
+        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
+        typeahead.setValue(location.address);
+        UserPreferences.setLocation(key, location);
         events.trigger(eventNames.selected, [key, location]);
     }
 
