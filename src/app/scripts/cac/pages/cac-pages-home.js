@@ -1,5 +1,5 @@
 CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            Templates, UserPreferences, UrlRouter) {
+                            UserPreferences, UrlRouter) {
     'use strict';
 
     var defaults = {
@@ -11,6 +11,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             placeCard: '.place-card',
             placeCardDirectionsLink: '.place-card .place-action-go',
             placeList: '.place-list',
+            places: '.places',
 
             map: '.the-map',
 
@@ -18,7 +19,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             tabControl: '.tab-control',
             tabControlLink: '.nav-item',
 
-            mapViewButton: '.map-view-btn',
+            mapViewButton: 'a.map-view-btn',
 
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarBanner: '.sidebar-banner',
@@ -178,10 +179,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }
         });
 
-        $(options.selectors.mapViewButton).on('click', function (event) {
+        $(options.selectors.places).on('click', options.selectors.mapViewButton, function (event) {
             event.preventDefault();
             event.stopPropagation();
-            tabControl.setTab(tabControl.TABS.EXPLORE);
+            $.proxy(tabControl.setTab(tabControl.TABS.EXPLORE), this);
         });
 
         $(options.selectors.homeLink).on('click', function (event) {
@@ -224,9 +225,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         if (!UserPreferences.isDefault('method')) {
             var method = UserPreferences.getPreference('method');
             if (method === 'directions') {
+                directionsControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             } else if (method === 'explore') {
+                exploreControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.EXPLORE);
+                exploreControl.getNearbyPlaces();
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
@@ -311,12 +315,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
-        setActiveTab();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
-        directionsControl.setFromUserPreferences();
-        exploreControl.setFromUserPreferences();
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
+        setActiveTab();
     }
 
     function closedTripModal(event) {
@@ -332,6 +334,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         directionsFormControl.clearAll();
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
+        // requery for place list once origin field cleared
+        exploreControl.getNearbyPlaces();
     }
 
     /**
@@ -412,7 +416,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
      */
     function isMobileSafari() {
         var ua = window.navigator.userAgent;
-        console.log(ua);
         var iOS = /iP(ad|hone)/i.test(ua); // iPad / iPhone
         var webkit = /WebKit/i.test(ua);
         // Chrome and Opera also report WebKit
@@ -420,4 +423,4 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.Home.Templates, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
+    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);

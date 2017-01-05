@@ -45,7 +45,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         this.eventNames = eventNames;
 
         // For keeping track of the last selected value
-        this.lastSelectedValue = null;
+        this.lastSelectedValue = '';
         this.$element = null;
 
         var createTypeahead = _.bind(function() {
@@ -67,12 +67,13 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
 
             // Whenever the typeahead is switched away from (be it from a tab, click-away, etc.),
             // check to see whether or not the value in the typeahead is something that has been
-            // selected. If it has not been selected, trigger a change even with a null location
+            // selected. If it has not been selected, trigger a change even with a blank location
             // in order to warn listeners that the displayed value has not been geocoded.
             $element.blur($.proxy(function(event) {
                 if (event.currentTarget && $element.typeahead('val') !== this.lastSelectedValue) {
                     var key = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
-                    this.events.trigger(eventNames.selected, [key, null]);
+
+                    this.events.trigger(eventNames.selected, [key, '']);
                 }
             }, this));
 
