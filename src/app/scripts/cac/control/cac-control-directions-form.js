@@ -48,6 +48,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         eventNames: eventNames,
         moveOriginDestination: moveOriginDestination,
         clearAll: clearAll,
+        setLocation: setLocation,
         setError: setError,
         setFromUserPreferences: setFromUserPreferences
     };
@@ -85,13 +86,18 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
     // Handle the form-related parts of a typeahead select, then fire an event with the new
     // location for the directions and explore controllers to use
     function onTypeaheadSelected(event, key, location) {
-
         if (!location) {
             UserPreferences.clearLocation(key);
         } else {
             UserPreferences.setLocation(key, location);
         }
 
+        events.trigger(eventNames.selected, [key, location]);
+    }
+
+    // For setting origin or destination from code, e.g. directions links
+    function setLocation(key, location, text) {
+        UserPreferences.setLocation(key, location, text);
         events.trigger(eventNames.selected, [key, location]);
     }
 

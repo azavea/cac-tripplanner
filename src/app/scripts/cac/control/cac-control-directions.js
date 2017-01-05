@@ -86,7 +86,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
     DirectionsControl.prototype = {
         clearDirections: clearDirections,
-        // setDestination: setDestination,
         setDirections: setDirections,
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
@@ -363,33 +362,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             itineraryListControl.show();
         }
     }
-
-    // TODO: restore/reimplement this functionality
-    /* Show directions to a destination when the user clicks a Places link */
-    // function setDestination(destination) {
-    //     // Set origin
-    //     var origin = UserPreferences.getPreference('origin');
-    //     var originText = UserPreferences.getPreference('originText');
-    //     directions.origin = [origin.location.y, origin.location.x];
-
-    //     // Set destination
-    //     var destinationCoords = destination.point.coordinates;
-    //     var destinationText = destination.address;
-    //     directions.destination = [destinationCoords[1], destinationCoords[0]];
-
-    //     // Save destination coordinates in expected format (to match typeahead results)
-    //     destination.location = {
-    //         x: destinationCoords[0],
-    //         y: destinationCoords[1]
-    //     };
-
-    //     // set in UI
-    //     typeaheadFrom.setValue(originText);
-    //     typeaheadTo.setValue(destinationText);
-
-    //     // Get directions
-    //     planTrip();
-    // }
 
     function setDirections(key, value) {
         clearItineraries();
