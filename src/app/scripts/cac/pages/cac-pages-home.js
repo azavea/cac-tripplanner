@@ -261,6 +261,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         };
         directionsFormControl.setLocation('destination', destination);
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
+        if (!UserPreferences.getPreference('origin')) {
+            directionsFormControl.setError('origin');
+            $(options.selectors.originInput).focus();
+        }
     }
 
     function onTypeaheadSelected() {
