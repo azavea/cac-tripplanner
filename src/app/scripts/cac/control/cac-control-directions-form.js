@@ -34,6 +34,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
 
     var typeaheadTo = null;
     var typeaheadFrom = null;
+    var typeaheads = {};
 
 
     function DirectionsFormControl(params) {
@@ -63,6 +64,13 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         typeaheadFrom = new Typeahead(options.selectors.typeaheadFrom);
         typeaheadFrom.events.on(typeaheadFrom.eventNames.selected, onTypeaheadSelected);
         typeaheadFrom.events.on(typeaheadFrom.eventNames.cleared, onTypeaheadCleared);
+
+        // Also put the typeheads in an object to avoid having to make ternaries to get the right
+        // one in functions that take a 'key' argument
+        typeaheads = {
+            origin: typeaheadFrom,
+            destination: typeaheadTo
+        };
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
@@ -97,8 +105,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
 
     // For setting origin or destination from code, e.g. directions links
     function setLocation(key, location) {
-        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
-        typeahead.setValue(location.address);
+        typeaheads[key].setValue(location.address);
         UserPreferences.setLocation(key, location);
         events.trigger(eventNames.selected, [key, location]);
     }
@@ -143,7 +150,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
-        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
+        var typeahead = typeaheads[key];
 
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
