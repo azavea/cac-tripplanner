@@ -230,6 +230,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             } else if (method === 'explore') {
                 exploreControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.EXPLORE);
+                exploreControl.getNearbyPlaces();
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
