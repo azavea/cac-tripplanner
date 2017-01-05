@@ -32,10 +32,12 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: this.getFeatures(otpItinerary.legs)});
-        this.geojson.setStyle(getStyle(true, false));
 
-        // expose functions
-        this.getStyle = getStyle;
+        // expose method to change linestring styling
+        this.setLineColors = setLineColors;
+
+        // default to visible, backgrounded linestring styling
+        this.setLineColors(true, false);
 
         // set by CAC.Routing.Plans with the arguments sent to planTrip:
         // coordsFrom, coordsTo, when, extraOptions
@@ -44,11 +46,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     Itinerary.prototype.highlight = function(isHighlighted) {
-        this.geojson.setStyle(getStyle(true, isHighlighted));
+        this.setLineColors(true, isHighlighted);
     };
 
     Itinerary.prototype.show = function(isShown) {
-        this.geojson.setStyle(getStyle(isShown, false));
+        this.setLineColors(isShown, false);
     };
 
     /**
@@ -290,30 +292,41 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to construct style object for an itinerary
+     * Helper function to set style for an itinerary
      *
      * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
      * @param {Boolean} highlighted Should this itinerary be highlighted on the map
-     * @return {Object} Leaflet style object to apply to geojson
      */
-    function getStyle(shown, highlighted) {
+    function setLineColors(shown, highlighted) {
+
         if (!shown) {
-            return {opacity: 0};
+            this.geojson.setStyle({opacity: 0});
+            return;
         }
+
         var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
-                            color: '#d02d2d',
-                            dashArray: null,
-                            lineCap: 'round',
-                            lineJoin: 'round',
-                            opacity: 0.75};
+                        color: '#d02d2d',
+                        dashArray: null,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                        opacity: 0.75};
+
         if (highlighted) {
             defaultStyle.dashArray = null;
             defaultStyle.opacity = 1;
+            this.geojson.setStyle(defaultStyle);
+
+            // set color for each leg based on mode
+            this.geojson.eachLayer(function(layer) {
+                var modeColor = Utils.getModeColor(layer.feature.properties.mode);
+                layer.setStyle({color: modeColor});
+            });
         } else {
+            // in background
             defaultStyle.color = '#2c7fb8';
             defaultStyle.dashArray = [5, 8];
+            this.geojson.setStyle(defaultStyle);
         }
-        return defaultStyle;
     }
 
 })(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder, CAC.Utils);

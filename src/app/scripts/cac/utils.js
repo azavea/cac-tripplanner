@@ -8,6 +8,7 @@ CAC.Utils = (function (_) {
         abbrevStreetName: abbrevStreetName,
         getUrlParams: getUrlParams,
         encodeUrlParams: encodeUrlParams,
+        getModeColor: getModeColor,
         modeStringHelper: modeStringHelper
     };
 
@@ -85,6 +86,20 @@ CAC.Utils = (function (_) {
             triangleSlopeFactor: 0.17,
             triangleTimeFactor: 0.17
         }
+    };
+
+    // linestring colors for each mode
+    var defaultModeColor = '#d02d2d';
+    var modeColors = {
+        BUS: 'lime',
+        SUBWAY: 'purple',
+        CAR: 'maroon',
+        TRAIN: 'yellow',
+        RAIL: 'orange',
+        BICYCLE: 'aqua',
+        WALK: 'black',
+        TRAM: 'olive',
+        FERRY: 'lime'
     };
 
     return Object.freeze(module);
@@ -213,6 +228,10 @@ CAC.Utils = (function (_) {
         return _.map(params, function(val, key) {
             return encodeURIComponent(key) + '=' + encodeURIComponent(val);
         }).join('&');
+    }
+
+    function getModeColor(modeString) {
+        return modeColors[modeString] || defaultModeColor;
     }
 
     function modeStringHelper(modeString) {
