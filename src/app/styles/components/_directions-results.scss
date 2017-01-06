@@ -39,10 +39,11 @@
         justify-content: flex-start;
         height: $route-summary-height;
         margin-bottom: 20px;
-        padding: 6px 10px 4px 9px;
+        padding: 6px 10px 4px 14px;
         background-color: $white;
         box-shadow: $place-card-drop-shadow;
         cursor: pointer;
+        opacity: .5;
 
         @include respond-to('xxs') {
             margin: 0;
@@ -50,21 +51,32 @@
 
         &.selected {
 
-            background-color: $v-lt-blue;
+            opacity: 1;
 
-            .route-summary-path {
-                stroke: $route-summary-path-selected-color;
-                stroke-dasharray: $route-summary-selected-dasharray;
+            .route-modes {
+                .icon-walk,
+                .icon-ferry {
+                    color: $gophillygo-blue;
+                }
+
+                .icon-bike {
+                    color: $gophillygo-purple;
+                }
+
+                .icon-bus {
+                    color: $gophillygo-yellow;
+                }
+
+                .icon-subway,
+                .icon-train,
+                .icon-tram {
+                    color: $gophillygo-orange;
+                }
+
+                .icon-car {
+                    color: #111;
+                }
             }
-        }
-
-        .route-summary-path {
-            flex: 0 0 4px;
-            margin-right: 13px;
-
-            stroke: $route-summary-path-default-color;
-            stroke-dasharray: $route-summary-default-dasharray;
-            stroke-width: 3;
         }
 
         .route-summary-details {
@@ -121,6 +133,11 @@
 
         .route-modes {
             font-size: 1.7rem;
+
+            .icon-walk {
+                position: relative;
+                right: -3px;
+            }
         }
     }
 }
