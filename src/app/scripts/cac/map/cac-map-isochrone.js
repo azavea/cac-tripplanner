@@ -27,7 +27,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var highlightIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'orange'
+        markerColor: 'blue',
     });
 
 
@@ -250,7 +250,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
             panTo: false
         };
         var options = $.extend({}, defaults, opts);
-        if (!destinationId) {
+        if (!destinationId || !destinationMarkers[destinationId]) {
             // revert to original marker if set
             if (lastHighlightedMarker) {
                 lastHighlightedMarker.setIcon(destinationIcon);

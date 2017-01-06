@@ -182,6 +182,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             $.proxy(tabControl.setTab(tabControl.TABS.EXPLORE), this);
         });
 
+        $(options.selectors.places).on({
+            click: onPlaceClicked,
+            mouseenter: onPlaceHovered,
+            mouseleave: onPlaceBlurred
+        }, options.selectors.placeCard);
+
         $(options.selectors.places).on('click', options.selectors.placeCardDirectionsLink,
                                        $.proxy(clickedDestinationDirections, this));
 
@@ -242,28 +248,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         if (tabId === tabControl.TABS.HOME) {
             UserPreferences.setPreference('method', undefined);
             clearUserSettings();
-        }
-    }
-
-    /**
-     * When user clicks the Directions link on a destination, send them to the directions tab
-     * with that destination (whether or not there's an origin set)
-     */
-    function clickedDestinationDirections(event) {
-        event.preventDefault();
-
-        var placeCard = $(event.target).closest(options.selectors.placeCard);
-        var placeId = placeCard.data('destination-id');
-        UserPreferences.setPreference('placeId', placeId);
-        var destination = {
-            address: placeCard.find(options.selectors.placeCardName).text(),
-            location: { x: placeCard.data('destination-x'), y: placeCard.data('destination-y') }
-        };
-        directionsFormControl.setLocation('destination', destination);
-        tabControl.setTab(tabControl.TABS.DIRECTIONS);
-        if (!UserPreferences.getPreference('origin')) {
-            directionsFormControl.setError('origin');
-            $(options.selectors.originInput).focus();
         }
     }
 
@@ -342,6 +326,42 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         // requery for place list once origin field cleared
         exploreControl.getNearbyPlaces();
+    }
+
+    function onPlaceClicked(event) {
+        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
+        mapControl.isochroneControl.highlightDestination(placeId, { panTo: true });
+    }
+
+    function onPlaceHovered(event) {
+        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
+        mapControl.isochroneControl.highlightDestination(placeId);
+    }
+
+    function onPlaceBlurred() {
+        mapControl.isochroneControl.highlightDestination(null);
+    }
+
+    /**
+     * When user clicks the Directions link on a destination, send them to the directions tab
+     * with that destination (whether or not there's an origin set)
+     */
+    function clickedDestinationDirections(event) {
+        event.preventDefault();
+
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeId = placeCard.data('destination-id');
+        UserPreferences.setPreference('placeId', placeId);
+        var destination = {
+            address: placeCard.find(options.selectors.placeCardName).text(),
+            location: { x: placeCard.data('destination-x'), y: placeCard.data('destination-y') }
+        };
+        directionsFormControl.setLocation('destination', destination);
+        tabControl.setTab(tabControl.TABS.DIRECTIONS);
+        if (!UserPreferences.getPreference('origin')) {
+            directionsFormControl.setError('origin');
+            $(options.selectors.originInput).focus();
+        }
     }
 
     /**

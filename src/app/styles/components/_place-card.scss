@@ -11,6 +11,18 @@
     .body-map & {
         margin-right: auto;
         margin-left: auto;
+
+        .place-card-photo-container {
+            background-color: white;
+        }
+
+        &:hover {
+            background-color: $v-lt-blue;
+
+            .place-card-photo {
+                opacity: 0.95;
+            }
+        }
     }
 
     h2 {

@@ -69,14 +69,16 @@
                 <li class="place-card no-origin" data-destination-id="{{ destination.id }}"
                     data-destination-x="{{ destination.point.x }}"
                     data-destination-y="{{ destination.point.y }}">
-                    <img class="place-card-photo"
-                        {% if destination.image %}
-                            src="{{ destination.wide_image.url }}"
-                        {% else %}
-                            src="https://placehold.it/400x400.jpg"
-                        {% endif %}
-                        width="400" height="200"
-                        alt="{{ destination.name }}" />
+                    <div class="place-card-photo-container">
+                        <img class="place-card-photo"
+                            {% if destination.image %}
+                                src="{{ destination.wide_image.url }}"
+                            {% else %}
+                                src="https://placehold.it/400x400.jpg"
+                            {% endif %}
+                            width="400" height="200"
+                            alt="{{ destination.name }}" />
+                    </div>
                     <h2 class="place-card-name">{{ destination.name }}</h2>
                     <div class="place-card-travel-logistics">
                         <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
