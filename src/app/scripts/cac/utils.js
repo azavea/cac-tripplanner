@@ -1,16 +1,6 @@
 CAC.Utils = (function (_) {
     'use strict';
 
-    var module = {
-        getBikeTriangle: getBikeTriangle,
-        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
-        getImageUrl: getImageUrl,
-        abbrevStreetName: abbrevStreetName,
-        getUrlParams: getUrlParams,
-        encodeUrlParams: encodeUrlParams,
-        modeStringHelper: modeStringHelper
-    };
-
     var directions = {
         north: 'N',
         northeast: 'NE',
@@ -85,6 +75,34 @@ CAC.Utils = (function (_) {
             triangleSlopeFactor: 0.17,
             triangleTimeFactor: 0.17
         }
+    };
+
+    // linestring colors for each mode
+    var defaultModeColor = '#d02d2d';
+    var defaultBackgroundLineColor = '#2c7fb8';
+    var modeColors = {
+        BUS: 'lime',
+        SUBWAY: 'purple',
+        CAR: 'maroon',
+        TRAIN: 'yellow',
+        RAIL: 'orange',
+        BICYCLE: 'aqua',
+        WALK: 'black',
+        TRAM: 'olive',
+        FERRY: 'lime'
+    };
+
+    var module = {
+        getBikeTriangle: getBikeTriangle,
+        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
+        defaultBackgroundLineColor: defaultBackgroundLineColor,
+        defaultModeColor: defaultModeColor,
+        getImageUrl: getImageUrl,
+        abbrevStreetName: abbrevStreetName,
+        getUrlParams: getUrlParams,
+        encodeUrlParams: encodeUrlParams,
+        getModeColor: getModeColor,
+        modeStringHelper: modeStringHelper
     };
 
     return Object.freeze(module);
@@ -213,6 +231,10 @@ CAC.Utils = (function (_) {
         return _.map(params, function(val, key) {
             return encodeURIComponent(key) + '=' + encodeURIComponent(val);
         }).join('&');
+    }
+
+    function getModeColor(modeString) {
+        return modeColors[modeString] || defaultModeColor;
     }
 
     function modeStringHelper(modeString) {
