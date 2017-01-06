@@ -1,17 +1,6 @@
 CAC.Utils = (function (_) {
     'use strict';
 
-    var module = {
-        getBikeTriangle: getBikeTriangle,
-        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
-        getImageUrl: getImageUrl,
-        abbrevStreetName: abbrevStreetName,
-        getUrlParams: getUrlParams,
-        encodeUrlParams: encodeUrlParams,
-        getModeColor: getModeColor,
-        modeStringHelper: modeStringHelper
-    };
-
     var directions = {
         north: 'N',
         northeast: 'NE',
@@ -90,6 +79,7 @@ CAC.Utils = (function (_) {
 
     // linestring colors for each mode
     var defaultModeColor = '#d02d2d';
+    var defaultBackgroundLineColor = '#2c7fb8';
     var modeColors = {
         BUS: 'lime',
         SUBWAY: 'purple',
@@ -100,6 +90,19 @@ CAC.Utils = (function (_) {
         WALK: 'black',
         TRAM: 'olive',
         FERRY: 'lime'
+    };
+
+    var module = {
+        getBikeTriangle: getBikeTriangle,
+        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
+        defaultBackgroundLineColor: defaultBackgroundLineColor,
+        defaultModeColor: defaultModeColor,
+        getImageUrl: getImageUrl,
+        abbrevStreetName: abbrevStreetName,
+        getUrlParams: getUrlParams,
+        encodeUrlParams: encodeUrlParams,
+        getModeColor: getModeColor,
+        modeStringHelper: modeStringHelper
     };
 
     return Object.freeze(module);

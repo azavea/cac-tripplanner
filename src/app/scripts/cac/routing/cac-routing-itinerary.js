@@ -305,7 +305,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         }
 
         var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
-                        color: '#d02d2d',
+                        color: Utils.defaultModeColor,
                         dashArray: null,
                         lineCap: 'round',
                         lineJoin: 'round',
@@ -323,7 +323,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             });
         } else {
             // in background
-            defaultStyle.color = '#2c7fb8';
+            defaultStyle.color = Utils.defaultBackgroundLineColor;
             defaultStyle.dashArray = [5, 8];
             this.geojson.setStyle(defaultStyle);
         }
