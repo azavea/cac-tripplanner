@@ -41,6 +41,7 @@ module.exports = function(config) {
       'app/scripts/cac/map/cac-map-itinerary.js',
       'app/scripts/cac/map/cac-map-overlays.js',
       'app/scripts/cac/map/cac-map-templates.js',
+      'app/scripts/cac/home/cac-home-templates.js',
       'app/scripts/cac/control/cac-control-mode-options.js',
       'app/scripts/cac/control/cac-control-tab.js',
       'app/scripts/cac/control/cac-control-directions-form.js',
@@ -48,7 +49,6 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-directions.js',
       'app/scripts/cac/control/cac-control-itinerary-list.js',
       'app/scripts/cac/control/cac-control-directions-list.js',
-      'app/scripts/cac/home/cac-home-templates.js',
       'app/scripts/cac/pages/cac-pages-home.js',
       'app/scripts/cac/pages/cac-pages-directions.js',
 
