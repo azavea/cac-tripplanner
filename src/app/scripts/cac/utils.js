@@ -78,18 +78,26 @@ CAC.Utils = (function (_) {
     };
 
     // linestring colors for each mode
-    var defaultModeColor = '#d02d2d';
-    var defaultBackgroundLineColor = '#2c7fb8';
+    var brandColors = {
+        BLUE: '#2e68a3',
+        GREEN: '#60a244',
+        YELLOW: '#efa722',
+        PURPLE: '#6a4388',
+        ORANGE: '#f05223',
+        RED: '#e23331'
+    };
+    var defaultModeColor = brandColors.RED;
+    var defaultBackgroundLineColor = '#8B9cae';
     var modeColors = {
-        BUS: 'lime',
-        SUBWAY: 'purple',
-        CAR: 'maroon',
-        TRAIN: 'yellow',
-        RAIL: 'orange',
-        BICYCLE: 'aqua',
-        WALK: 'black',
-        TRAM: 'olive',
-        FERRY: 'lime'
+        WALK: brandColors.BLUE,
+        BICYCLE: brandColors.PURPLE,
+        BUS: brandColors.YELLOW,
+        TRAM: brandColors.ORANGE,
+        SUBWAY: brandColors.ORANGE,
+        TRAIN: brandColors.ORANGE,
+        RAIL: brandColors.ORANGE,
+        CAR: '#111111',
+        FERRY: brandColors.BLUE
     };
 
     var module = {
