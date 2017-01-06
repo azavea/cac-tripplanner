@@ -333,8 +333,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             };
         }
 
-        $.ajax(params).then(function(data) {
-            if (!data.destinations) {
+        $.ajax(params).done(function(data) {
+            if (!data || !data.destinations) {
                 console.error('no places found');
                 console.error(data);
                 showPlacesContent();
@@ -349,6 +349,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             // now places list has been updated, go fetch the travel time
             // from the new origin to each place
             getTimesToPlaces();
+        }).fail(function(error) {
+            console.error('error fetching destinations:');
+            console.error(error);
+
+            showPlacesContent();
         });
     }
 
