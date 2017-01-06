@@ -50,6 +50,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
                                         onTypeaheadSelected);
         directionsFormControl.events.on(directionsFormControl.eventNames.cleared,
                                         onTypeaheadCleared);
+        directionsFormControl.events.on(directionsFormControl.eventNames.reversed,
+                                        reverseOriginDestination);
         directionsFormControl.events.on(directionsFormControl.eventNames.geocodeError,
                                         onGeocodeError);
 
@@ -252,6 +254,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             }
             getNearbyPlaces();
         }
+    }
+
+    // The reverse button doesn't trigger typeahead-selected events, but for our purposes it's the
+    // same as selecting a new origin.
+    function reverseOriginDestination(event, newOrigin) {
+        onTypeaheadSelected(event, 'origin', newOrigin);
     }
 
     /**
