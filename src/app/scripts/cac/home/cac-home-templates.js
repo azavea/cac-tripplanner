@@ -32,7 +32,7 @@ CAC.Home.Templates = (function (Handlebars) {
                         '{{/if}}',
                         'width="400" height="200"',
                         'alt="{{ this.name }}" />',
-                    '<h2>{{ this.name }}</h2>',
+                    '<h2 class="place-card-name">{{ this.name }}</h2>',
                     '<div class="place-card-travel-logistics">',
                         '<span class="place-card-travel-logistics-duration"></span> ',
                         'from <span class="place-card-travel-logistics-origin">origin</span>',

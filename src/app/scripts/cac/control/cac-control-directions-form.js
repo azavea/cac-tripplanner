@@ -32,8 +32,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
     };
     var options = {};
 
-    var typeaheadTo = null;
-    var typeaheadFrom = null;
+    var typeaheads = {};
 
 
     function DirectionsFormControl(params) {
@@ -48,6 +47,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         eventNames: eventNames,
         moveOriginDestination: moveOriginDestination,
         clearAll: clearAll,
+        setLocation: setLocation,
         setError: setError,
         setFromUserPreferences: setFromUserPreferences
     };
@@ -55,13 +55,15 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
     return DirectionsFormControl;
 
     function initialize() {
-        typeaheadTo = new Typeahead(options.selectors.typeaheadTo);
-        typeaheadTo.events.on(typeaheadTo.eventNames.selected, onTypeaheadSelected);
-        typeaheadTo.events.on(typeaheadTo.eventNames.cleared, onTypeaheadCleared);
+        typeaheads.destination = new Typeahead(options.selectors.typeaheadTo);
+        typeaheads.destination.events.on(typeaheads.destination.eventNames.selected,
+                                         onTypeaheadSelected);
+        typeaheads.destination.events.on(typeaheads.destination.eventNames.cleared,
+                                         onTypeaheadCleared);
 
-        typeaheadFrom = new Typeahead(options.selectors.typeaheadFrom);
-        typeaheadFrom.events.on(typeaheadFrom.eventNames.selected, onTypeaheadSelected);
-        typeaheadFrom.events.on(typeaheadFrom.eventNames.cleared, onTypeaheadCleared);
+        typeaheads.origin = new Typeahead(options.selectors.typeaheadFrom);
+        typeaheads.origin.events.on(typeaheads.origin.eventNames.selected, onTypeaheadSelected);
+        typeaheads.origin.events.on(typeaheads.origin.eventNames.cleared, onTypeaheadCleared);
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
 
@@ -74,24 +76,30 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         var destination = UserPreferences.getPreference('destination');
 
         if (origin && origin.location) {
-            typeaheadFrom.setValue(UserPreferences.getPreference('originText'));
+            typeaheads.origin.setValue(UserPreferences.getPreference('originText'));
         }
 
         if (destination && destination.location) {
-            typeaheadTo.setValue(UserPreferences.getPreference('destinationText'));
+            typeaheads.destination.setValue(UserPreferences.getPreference('destinationText'));
         }
     }
 
     // Handle the form-related parts of a typeahead select, then fire an event with the new
     // location for the directions and explore controllers to use
     function onTypeaheadSelected(event, key, location) {
-
         if (!location) {
             UserPreferences.clearLocation(key);
         } else {
             UserPreferences.setLocation(key, location);
         }
 
+        events.trigger(eventNames.selected, [key, location]);
+    }
+
+    // For setting origin or destination from code, e.g. directions links
+    function setLocation(key, location) {
+        typeaheads[key].setValue(location.address);
+        UserPreferences.setLocation(key, location);
         events.trigger(eventNames.selected, [key, location]);
     }
 
@@ -116,8 +124,8 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         UserPreferences.setPreference('destinationText', originText);
 
         // update the text control
-        typeaheadFrom.setValue(destinationText);
-        typeaheadTo.setValue(originText);
+        typeaheads.origin.setValue(destinationText);
+        typeaheads.destination.setValue(originText);
 
         // Trigger reversed event, with new origin and destination, for directions controller to use
         events.trigger(eventNames.reversed, [destination, origin]);
@@ -135,7 +143,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             console.error('Unrecognized key in moveOriginDestination: ' + key);
             return;
         }
-        var typeahead = (key === 'origin') ? typeaheadFrom : typeaheadTo;
+        var typeahead = typeaheads[key];
 
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
@@ -164,8 +172,8 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
 
     // Clear both fields and any errors
     function clearAll() {
-        typeaheadFrom.setValue('');
-        typeaheadTo.setValue('');
+        typeaheads.origin.setValue('');
+        typeaheads.destination.setValue('');
         $(options.selectors.origin).removeClass(options.selectors.errorClass);
         $(options.selectors.destination).removeClass(options.selectors.errorClass);
         $(options.selectors.alert).remove();

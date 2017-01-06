@@ -10,6 +10,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             // destinations
             placeCard: '.place-card',
             placeCardDirectionsLink: '.place-card .place-action-go',
+            placeCardName: '.place-card-name',
             placeList: '.place-list',
             places: '.places',
 
@@ -114,10 +115,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }).open();
         });
 
-        $(options.selectors.placeList).on('click',
-                                          options.selectors.placeCardDirectionsLink,
-                                          $.proxy(clickedDestination, this));
-
         // Listen for origin/destination dragging events to forward to the DirectionsFormControl
         mapControl.events.on(mapControl.eventNames.originMoved,
                              $.proxy(moveOrigin, this));
@@ -185,6 +182,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             $.proxy(tabControl.setTab(tabControl.TABS.EXPLORE), this);
         });
 
+        $(options.selectors.places).on('click', options.selectors.placeCardDirectionsLink,
+                                       $.proxy(clickedDestinationDirections, this));
+
         $(options.selectors.homeLink).on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -246,19 +246,25 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
-     * When user clicks a destination, look it up, then redirect to its details in 'explore' tab.
+     * When user clicks the Directions link on a destination, send them to the directions tab
+     * with that destination (whether or not there's an origin set)
      */
-    function clickedDestination(event) {
-        console.error('TODO: implement clickedDestination');
+    function clickedDestinationDirections(event) {
         event.preventDefault();
-        UserPreferences.setPreference('method', 'explore');
 
-        var block = $(event.target).closest(options.selectors.placeCard);
-        var placeId = block.data('destination-id');
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeId = placeCard.data('destination-id');
         UserPreferences.setPreference('placeId', placeId);
-
-        // TODO: Enable once explore view exists
-        // tabControl.setTab(tabControl.TABS.EXPLORE);
+        var destination = {
+            address: placeCard.find(options.selectors.placeCardName).text(),
+            location: { x: placeCard.data('destination-x'), y: placeCard.data('destination-y') }
+        };
+        directionsFormControl.setLocation('destination', destination);
+        tabControl.setTab(tabControl.TABS.DIRECTIONS);
+        if (!UserPreferences.getPreference('origin')) {
+            directionsFormControl.setError('origin');
+            $(options.selectors.originInput).focus();
+        }
     }
 
     function onTypeaheadSelected() {
