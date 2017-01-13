@@ -142,14 +142,18 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
      * The fetchIsochrone call is debounced to cut down on requests.
      */
     function clickedExplore() {
-        if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+        if (!tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
         showSpinner();
         $(options.selectors.alert).remove();
         mapControl.isochroneControl.clearIsochrone();
 
-        debouncedFetchIsochrone();
+        if (!exploreLatLng) {
+            getNearbyPlaces();
+        } else {
+            debouncedFetchIsochrone();
+        }
     }
 
     /**
@@ -183,8 +187,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
                 if (!destinations) {
                     setError('No destinations found.');
                 }
-                // TODO: reimplement interaction between isochrone and places sidebar, if needed
-                // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
                 showPlacesContent();
@@ -304,7 +306,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // set explore time preference
         $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
 
-        if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             clickedExplore();
         }
     }
@@ -349,6 +351,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             // now places list has been updated, go fetch the travel time
             // from the new origin to each place
             getTimesToPlaces();
+
+            // also draw on explore map
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+                mapControl.isochroneControl.drawDestinations(data.destinations);
+            }
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);

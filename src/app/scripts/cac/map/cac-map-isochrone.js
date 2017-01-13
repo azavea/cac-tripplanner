@@ -228,7 +228,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                      '</div>',
                                      '<a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
-                                     '<a class="destination-directions-link pull-right" ',
+                                     '<a class="destination-directions-link" ',
                                      'id="{{geojson.properties.id}}">Get Directions</a>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
