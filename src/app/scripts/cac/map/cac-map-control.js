@@ -28,6 +28,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         currentLocationClick: 'cac:map:control:currentlocation',
         originMoved: 'cac:map:control:originmoved',
         destinationMoved: 'cac:map:control:destinationmoved',
+        destinationPopupClick: 'cac:map:control:destinationpopup',
         mapMoved: 'cac:map:control:mapmoved'
     };
     var basemaps = {};
@@ -127,6 +128,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         this.isochroneControl = new CAC.Map.IsochroneControl({map: map, tabControl: tabControl});
         this.itineraryControl.setMap(map);
+
+        // bubble up destination directions click events
+        this.isochroneControl.events.on(this.isochroneControl.eventNames.destinationPopupClick,
+                                        function(event, place) {
+                                            events.trigger(eventNames.destinationPopupClick, place);
+                                        });
         mapLoaded = true;
     }
 
