@@ -234,9 +234,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 directionsControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
             } else if (method === 'explore') {
+                exploreControl.showSpinner();
                 exploreControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.EXPLORE);
-                exploreControl.getNearbyPlaces();
+                exploreControl.clickedExplore();
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
