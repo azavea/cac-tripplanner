@@ -17,6 +17,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             hiddenClass: 'hidden',
             isochroneSliderContainer: '.isochrone-control',
             isochroneSlider: '#isochrone-slider',
+            isochroneOutput: '#output-directions-within',
             placesContent: '.places-content',
             spinner: '.places > .sk-spinner',
             placeCard: 'li.place-card',
@@ -103,6 +104,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     // trigger re-query when trip options are changed
     function setOptions() {
+        // set text output to match slider
+        $(options.selectors.isochroneOutput).val($(options.selectors.isochroneSlider).val());
         if (exploreLatLng) {
             clickedExplore();
         }
