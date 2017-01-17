@@ -156,9 +156,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         });
 
         // toggle from home or directions to explore, or explore to directions, using 'to' label
-        $(options.selectors.tabToToggleLink).on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
+        $(options.selectors.tabToToggleLink).on('click', function () {
+
+            if (!$(options.selectors.map).is(':visible')) {
+                return; // only allow explore mode on desktop
+            }
 
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
