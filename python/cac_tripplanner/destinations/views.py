@@ -17,13 +17,14 @@ from cms.models import Article
 DEFAULT_CONTEXT = {
     'debug': settings.DEBUG,
     'fb_app_id': settings.FB_APP_ID,
+    'isochrone_url': settings.ISOCHRONE_URL,
     'routing_url': settings.ROUTING_URL
 }
 
 
 def base_view(request, page, context):
     """
-    Base view that sets the OTP routing_url variable and Facebook app ID
+    Base view that sets some variables for JS settings
 
     :param request: Request object
     :param page: String representation of the HTML template

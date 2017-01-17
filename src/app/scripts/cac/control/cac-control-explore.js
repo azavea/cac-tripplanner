@@ -34,6 +34,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     var urlRouter = null;
     var directionsFormControl = null;
     var exploreLatLng = null;
+    var fetchingIsochrone = false;
 
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
@@ -57,6 +58,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
+            clickedExplore();
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
         } else {
             $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
@@ -64,17 +66,20 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         // update isochrone on slider move
         $(options.selectors.isochroneSlider).change(setOptions);
+        showPlacesContent();
     }
 
     var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
-    var getNearbyPlaces = _.throttle(_getNearbyPlaces, ISOCHRONE_DEBOUNCE_MILLIS);
+    var getNearbyPlaces = _.debounce(_getNearbyPlaces, ISOCHRONE_DEBOUNCE_MILLIS);
 
     ExploreControl.prototype = {
+        clickedExplore: clickedExplore,
         setAddress: setAddress,
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences,
-        getNearbyPlaces: getNearbyPlaces
+        getNearbyPlaces: getNearbyPlaces,
+        showSpinner: showSpinner
     };
 
     return ExploreControl;
@@ -83,9 +88,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     // isochrone and destination markers.
     function onTabShown(event, tabId) {
         if (tabId === tabControl.TABS.EXPLORE) {
+            showSpinner();
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
+            clickedExplore();
         } else {
             $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
@@ -98,14 +105,15 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     function setOptions() {
         if (exploreLatLng) {
             clickedExplore();
-            getNearbyPlaces();
         }
     }
 
     // Helper to hide loading spinner and show places list
     function showPlacesContent() {
-        $(options.selectors.spinner).addClass('hidden');
-        $(options.selectors.placesContent).removeClass('hidden');
+        if (!fetchingIsochrone) {
+            $(options.selectors.spinner).addClass('hidden');
+            $(options.selectors.placesContent).removeClass('hidden');
+        }
     }
 
     // Helper to hide places list and show loading spinner in its place
@@ -142,14 +150,18 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
      * The fetchIsochrone call is debounced to cut down on requests.
      */
     function clickedExplore() {
-        if (!exploreLatLng || !tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+        if (!tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             return;
         }
         showSpinner();
         $(options.selectors.alert).remove();
         mapControl.isochroneControl.clearIsochrone();
 
-        debouncedFetchIsochrone();
+        if (exploreLatLng) {
+            debouncedFetchIsochrone();
+        }
+
+        getNearbyPlaces();
     }
 
     /**
@@ -157,6 +169,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
      * then populate side bar with featured locations found within the travelshed.
      */
     function fetchIsochrone() {
+        showSpinner();
+
+        // do not hide spinner until isochrone fetch resolves
+        // (in case of destinations being fetched simultaneously)
+        fetchingIsochrone = true;
+
         // read slider
         var exploreMinutes = $(options.selectors.isochroneSlider).val();
 
@@ -178,15 +196,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
-            function (destinations) {
+            function () {
+                fetchingIsochrone = false;
                 showPlacesContent();
-                if (!destinations) {
-                    setError('No destinations found.');
-                }
-                // TODO: reimplement interaction between isochrone and places sidebar, if needed
-                // setDestinationSidebar(destinations);
             }, function (error) {
                 console.error(error);
+                fetchingIsochrone = false;
                 showPlacesContent();
                 setError('Could not find travelshed for given origin.');
             }
@@ -248,11 +263,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     function onTypeaheadSelected(event, key, location) {
         if (key === 'origin') {
             setAddress(location);
-            // selectedPlaceId = null;
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
+            } else {
+                getNearbyPlaces();
             }
-            getNearbyPlaces();
         }
     }
 
@@ -293,19 +308,15 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     }
 
     function setFromUserPreferences() {
+        // set explore time preference
+        $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
+
         var exploreOrigin = UserPreferences.getPreference('origin');
 
         if (exploreOrigin) {
             setAddress(exploreOrigin);
         } else {
             exploreLatLng = null;
-        }
-
-        // set explore time preference
-        $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
-
-        if (exploreLatLng && tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
-            clickedExplore();
         }
     }
 
@@ -344,11 +355,17 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             var newPlaces = HomeTemplates.destinations(data.destinations);
             $(options.selectors.placesContent).html(newPlaces);
 
+            // also draw on explore map
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+                mapControl.isochroneControl.drawDestinations(data.destinations);
+            }
+
             showPlacesContent();
 
             // now places list has been updated, go fetch the travel time
             // from the new origin to each place
             getTimesToPlaces();
+
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);

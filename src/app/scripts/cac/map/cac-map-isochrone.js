@@ -1,4 +1,4 @@
-CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
+CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settings) {
     'use strict';
 
     var defaults = {
@@ -101,13 +101,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     }
 
     /**
-     * Fetch all the reachable destinations within our destination database,
-     * and their enclosing isochrone (travelshed).
+     * Fetch an isochrone (travelshed).
      *
-     * @return {Object} Promise resolving to JSON with 'matched' and 'isochrone' properties
+     * @return {Object} Promise resolving to JSON with isochrone
      */
-    function fetchReachable(payload) {
-        var isochroneUrl = '/map/reachable';
+    function _fetchIsochrone(payload) {
+        var isochroneUrl = Settings.isochroneUrl;
         var deferred = $.Deferred();
         $.ajax({
             type: 'GET',
@@ -142,7 +141,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         // Set the active isochrone request and make query
         activeIsochroneRequest = { deferred: deferred, params: params, zoomToFit: zoomToFit };
-        fetchReachable(params).then(function(data) {
+        _fetchIsochrone(params).then(function(data) {
             activeIsochroneRequest = null;
             if (pendingIsochroneRequest) {
                 // These results are already out of date. Don't display them, and instead
@@ -160,10 +159,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 deferred.resolve();
                 return;
             }
-            drawIsochrone(data.isochrone, zoomToFit);
-            // also draw 'matched' list of locations
-            drawDestinations(data.matched);
-            deferred.resolve(data.matched);
+            drawIsochrone(data, zoomToFit);
+            deferred.resolve();
         }, function(error) {
             activeIsochroneRequest = null;
             pendingIsochroneRequest = null;
@@ -178,7 +175,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     function fetchIsochrone(coordsOrigin, when, exploreMinutes, otpParams, zoomToFit) {
         var deferred = $.Deferred();
         // clear results of last search
-        clearDiscoverPlaces();
+        clearIsochrone();
 
         var formattedTime = when.format('hh:mma');
         var formattedDate = when.format('YYYY/MM/DD');
@@ -186,7 +183,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         var params = {
             time: formattedTime,
             date: formattedDate,
-            cutoffSec: exploreMinutes * 60 // API expects seconds
+            cutoffSec: exploreMinutes * 60, // API expects seconds
+            routerId: 'default',
+            algorithm: 'accSampling'
         };
 
         // Default precision of 200m; 100m seems good for improving response times on non-transit
@@ -228,7 +227,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                      '</div>',
                                      '<a href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">{{geojson.properties.website_url}}</a>',
-                                     '<a class="destination-directions-link pull-right" ',
+                                     '<a class="destination-directions-link" ',
                                      'id="{{geojson.properties.id}}">Get Directions</a>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
@@ -266,14 +265,6 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         lastHighlightedMarker = marker;
     }
 
-    /**
-     * Remove layers for isochrone and destinations within it.
-     */
-    function clearDiscoverPlaces() {
-        clearDestinations();
-        clearIsochrone();
-    }
-
     function clearDestinations() {
         if (destinationsLayer) {
             map.removeLayer(destinationsLayer);
@@ -286,4 +277,4 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Settings);
