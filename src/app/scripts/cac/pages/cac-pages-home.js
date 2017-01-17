@@ -328,15 +328,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         event.preventDefault();
 
         var placeCard = $(event.target).closest(options.selectors.placeCard);
-        var placeId = placeCard.data('destination-id');
 
         var destination = {
-            id: placeId,
+            id: placeCard.data('destination-id'),
             address: placeCard.find(options.selectors.placeCardName).text(),
             location: { x: placeCard.data('destination-x'), y: placeCard.data('destination-y') }
         };
 
-        goToDestinationDirections(placeId, destination);
+        goToDestinationDirections(destination);
     }
 
     /**
