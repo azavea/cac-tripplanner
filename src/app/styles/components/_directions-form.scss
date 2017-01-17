@@ -419,17 +419,13 @@
      #isochrone-slider {
         @include inputrange();
         margin-right: 1rem;
-        width: 70%;
+        width: 80%;
     }
 
-    &.directions-destination-mode-within {
-
-        .directions-destination.isochrone-control {
-            display: flex;
-        }
-
-        .directions-destination.directions-text-input {
-            display: none;
+    .directions-tab-button.isochrone-control {
+            &:after {
+                background: $gophillygo-blue;
+            }
         }
 
         .directions-to label {
@@ -451,9 +447,8 @@
                 content: ' min';
             }
         }
-    }
 
-    @include respond-to('sm-up') {
+    @include respond-to('md-up') {
         .directions-tab-button label {
             position: relative;
             background-color: $gophillygo-blue-dark;
