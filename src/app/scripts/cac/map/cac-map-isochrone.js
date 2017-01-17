@@ -12,13 +12,14 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
 
     var events = $({});
     var eventNames = {
-        destinationPopupClick: 'cac:map:control:destinationpopup',
+        destinationPopupClick: 'cac:isochrone:control:destinationpopup',
     };
 
     var isochroneLayer = null;
     var destinationMarkers = {};
     var destinationsLayer = null;
     var lastHighlightedMarker = null;
+    var options = null;
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
@@ -43,19 +44,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
     var activeIsochroneRequest = null;
     var pendingIsochroneRequest = null;
 
-    function IsochroneControl(options) {
+    function IsochroneControl(opts) {
         this.events = events;
         this.eventNames = eventNames;
-
-        this.options = $.extend({}, defaults, options);
-        map = options.map;
-        tabControl = options.tabControl;
-
-        // set listener for click event on destination popup
-        $('#' + this.options.id).on('click', this.options.selectors.destinationPopup, function(event) {
-            events.trigger(eventNames.destinationPopupClick,
-                           destinationMarkers[event.currentTarget.id].destination);
-        });
+        options = $.extend({}, defaults, opts);
+        map = opts.map;
+        tabControl = opts.tabControl;
     }
 
     IsochroneControl.prototype.clearIsochrone = clearIsochrone;
@@ -239,6 +233,16 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
                     marker: marker,
                     destination: destinations[geojson.properties.id]
                 };
+
+                // wait to bind popup click handlers until popup is in the DOM
+                marker.on('click', function() {
+                    // listen for clicks to get directions to place
+                    $(options.selectors.destinationPopup).click(function(event) {
+                        event.preventDefault();
+                        events.trigger(eventNames.destinationPopupClick,
+                                       destinationMarkers[event.currentTarget.id].destination);
+                    });
+                });
                 return marker;
             }
         }).addTo(map);
@@ -248,7 +252,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         var defaults = {
             panTo: false
         };
-        var options = $.extend({}, defaults, opts);
+        var highlightOpts = $.extend({}, defaults, opts);
         if (!destinationId || !destinationMarkers[destinationId]) {
             // revert to original marker if set
             if (lastHighlightedMarker) {
@@ -259,7 +263,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         // Update icon for passed destination
         var marker = destinationMarkers[destinationId].marker;
         marker.setIcon(highlightIcon);
-        if (options.panTo) {
+        if (highlightOpts.panTo) {
             map.panTo(marker.getLatLng());
         }
         lastHighlightedMarker = marker;

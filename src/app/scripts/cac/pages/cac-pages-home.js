@@ -45,31 +45,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         options = $.extend({}, defaults, params);
     }
 
-    /* TODO: update for redesign or remove
-    var submitExplore = function(event) {
-        event.preventDefault();
-        var exploreTime = $(options.selectors.exploreTime).val();
-        var mode = modeOptionsControl.getMode();
-        var origin = UserPreferences.getPreference('originText');
-
-        if (!origin) {
-            $(options.selectors.exploreOrigin).addClass(options.selectors.errorClass);
-        }
-
-        // check if the input is in error status
-        if ($(options.selectors.exploreOrigin).hasClass(options.selectors.errorClass)) {
-            $(options.selectors.submitErrorModal).modal();
-            return;
-        }
-
-        UserPreferences.setPreference('method', 'explore');
-        UserPreferences.setPreference('exploreTime', exploreTime);
-        UserPreferences.setPreference('mode', mode);
-
-        window.location = '/map';
-    };
-    */
-
     Home.prototype.initialize = function () {
         urlRouter = new UrlRouter();
 
@@ -122,6 +97,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                              $.proxy(moveDestination, this));
 
         mapControl.events.on(mapControl.eventNames.mapMoved, SearchParams.updateMapCenter);
+
+        mapControl.events.on(mapControl.eventNames.destinationPopupClick,
+                             $.proxy(clickedDestinationDirectionsPopup, this));
 
         tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
 
@@ -344,19 +322,40 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
-     * When user clicks the Directions link on a destination, send them to the directions tab
-     * with that destination (whether or not there's an origin set)
+     * When user clicks the Directions link on a place card
      */
     function clickedDestinationDirections(event) {
         event.preventDefault();
 
         var placeCard = $(event.target).closest(options.selectors.placeCard);
-        var placeId = placeCard.data('destination-id');
-        UserPreferences.setPreference('placeId', placeId);
+
         var destination = {
+            id: placeCard.data('destination-id'),
             address: placeCard.find(options.selectors.placeCardName).text(),
             location: { x: placeCard.data('destination-x'), y: placeCard.data('destination-y') }
         };
+
+        goToDestinationDirections(destination);
+    }
+
+    /**
+     * When user clicks 'Get Directions' in a destination marker popup
+     */
+    function clickedDestinationDirectionsPopup(event, place) {
+        // match the format expected
+        place.location = {
+            x: place.point.coordinates[0],
+            y: place.point.coordinates[1]
+        };
+        goToDestinationDirections(place);
+    }
+
+    /**
+     * Send user to the directions tab with place destination (whether or not there's an origin set)
+     * @param {Object} destination Selected destination
+     */
+    function goToDestinationDirections(destination) {
+        UserPreferences.setPreference('placeId', destination.id);
         directionsFormControl.setLocation('destination', destination);
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
         if (!UserPreferences.getPreference('origin')) {
