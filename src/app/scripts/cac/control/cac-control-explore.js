@@ -68,9 +68,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // update isochrone on slider move
         $(options.selectors.isochroneSlider).change(setOptions);
 
-        // initialize slider text value
-        $(options.selectors.isochroneOutput).val($(options.selectors.isochroneSlider).val());
-
         showPlacesContent();
     }
 
@@ -316,7 +313,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     function setFromUserPreferences() {
         // set explore time preference
-        $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
+        var exploreMinutes = UserPreferences.getPreference('exploreMinutes');
+        $(options.selectors.isochroneSlider).val(exploreMinutes);
+        $(options.selectors.isochroneOutput).val(exploreMinutes);
+
 
         var exploreOrigin = UserPreferences.getPreference('origin');
 
