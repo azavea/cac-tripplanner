@@ -53,12 +53,6 @@
         }
     }
 
-    #isochrone-slider {
-        @include inputrange();
-        margin-right: 1rem;
-        width: 75%;
-    }
-
     .isochrone-control {
         display: flex;
 
@@ -411,4 +405,55 @@
         }
 
     }
+
+    .directions-to {
+         &.isochrone-control {
+             display: none;
+         }
+
+         &.directions-text-input {
+             display: flex;
+         }
+     }
+
+     #isochrone-slider {
+        @include inputrange();
+        margin-right: 1rem;
+        width: 80%;
+    }
+
+    .directions-tab-button.isochrone-control {
+            &:after {
+                background: $gophillygo-blue;
+            }
+        }
+
+        .directions-to label {
+            padding-right: 1em;
+            margin-right: .2em;
+        }
+
+        #output-directions-within {
+            position: relative;
+            width: 6rem;
+            margin-right: 1rem;
+            color: $white;
+            font-size: 1.4rem;
+            font-weight: $font-weight-medium;
+            line-height: 30px;
+            text-align: right;
+
+            &:after {
+                content: ' min';
+            }
+        }
+
+    @include respond-to('md-up') {
+        .directions-tab-button label {
+            position: relative;
+            background-color: $gophillygo-blue-dark;
+            cursor: pointer;
+        }
+    }
 }
+

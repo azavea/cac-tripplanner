@@ -33,7 +33,7 @@
                 <button class="btn-geolocate" title="Detect current location" type="button"
                     tabindex="3" name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
-            <div class="directions-to directions-text-input">
+            <div class="directions-to directions-tab-button directions-text-input">
                 <label for="input-directions-to">to</label>
                 <input type="search" id="input-directions-to" name="input-directions-to" value=""
                     placeholder="Enter a destination — or choose one below"
@@ -41,8 +41,10 @@
                 <button class="btn-reverse" title="Swap starting point and destination"
                     tabindex="4" type="button" name="reverse"><i class="icon-reverse"></i></button>
             </div>
-            <div class="isochrone-control directions-text-input hidden">
-                <label for="isochrone-slider">time</label>
+            <div class="isochrone-control directions-tab-button directions-text-input hidden">
+                <label for="isochrone-slider">within</label>
+                <output id="output-directions-within" name="output-directions-within"
+                    for="isochrone-slider" value="15"></output>
                 <input type="range" id="isochrone-slider" name="isochrone-slider" value="15"
                     tabindex="5" min="15" max="60" step="15">
             </div>

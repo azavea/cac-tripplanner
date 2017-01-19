@@ -129,6 +129,12 @@
         display: none;
     }
 
+    #explore-header-link {
+        @include respond-to('xs') {
+            display: none;
+        }
+    }
+
     .nav-item {
         @include delinkify;
         margin-right: 25px;

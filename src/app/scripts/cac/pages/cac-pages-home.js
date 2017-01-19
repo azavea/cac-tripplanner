@@ -19,6 +19,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             homeLink: '.home-link',
             tabControl: '.tab-control',
             tabControlLink: '.nav-item',
+            tabToToggleLink: '.directions-tab-button label',
 
             mapViewButton: 'a.map-view-btn',
 
@@ -151,6 +152,20 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                 event.stopPropagation();
 
                 tabControl.setTab(tabId);
+            }
+        });
+
+        // toggle from home or directions to explore, or explore to directions, using 'to' label
+        $(options.selectors.tabToToggleLink).on('click', function () {
+
+            if (!$(options.selectors.map).is(':visible')) {
+                return; // only allow explore mode on desktop
+            }
+
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                tabControl.setTab(tabControl.TABS.DIRECTIONS);
+            } else {
+                tabControl.setTab(tabControl.TABS.EXPLORE);
             }
         });
 

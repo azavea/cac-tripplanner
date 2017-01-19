@@ -17,6 +17,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             hiddenClass: 'hidden',
             isochroneSliderContainer: '.isochrone-control',
             isochroneSlider: '#isochrone-slider',
+            isochroneOutput: '#output-directions-within',
             placesContent: '.places-content',
             spinner: '.places > .sk-spinner',
             placeCard: 'li.place-card',
@@ -66,6 +67,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         // update isochrone on slider move
         $(options.selectors.isochroneSlider).change(setOptions);
+
         showPlacesContent();
     }
 
@@ -103,6 +105,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     // trigger re-query when trip options are changed
     function setOptions() {
+        // set text output to match slider
+        $(options.selectors.isochroneOutput).val($(options.selectors.isochroneSlider).val());
         if (exploreLatLng) {
             clickedExplore();
         }
@@ -309,7 +313,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     function setFromUserPreferences() {
         // set explore time preference
-        $(options.selectors.isochroneSlider).val(UserPreferences.getPreference('exploreMinutes'));
+        var exploreMinutes = UserPreferences.getPreference('exploreMinutes');
+        $(options.selectors.isochroneSlider).val(exploreMinutes);
+        $(options.selectors.isochroneOutput).val(exploreMinutes);
+
 
         var exploreOrigin = UserPreferences.getPreference('origin');
 
