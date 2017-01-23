@@ -33,10 +33,10 @@
     h1 {
         margin: 5rem auto;
         font-size: 2.5rem;
-        font-style: italic;
         font-weight: $font-weight-bold;
         line-height: 1.5;
         text-align: center;
+        text-transform: uppercase;
 
         @include respond-to('xs') {
             margin: 4rem auto;
@@ -57,7 +57,8 @@
 
     .info-article {
         background-color: $white;
-        line-height: 2;
+        font-size: 1.6rem;
+        line-height: 1.7;
         margin-bottom: 140px;
         padding-bottom: 40px;
         box-shadow: $place-card-drop-shadow;
@@ -179,13 +180,21 @@
         }
 
         .more-link {
+            line-height: 4;
             text-align: center;
 
             a {
-                @include delinkify;
+                @include delinkify($white);
+                background-color: $gophillygo-purple;
+                padding: 1em 4em;
                 font-style: italic;
+                font-size: 1.5rem;
                 font-weight: $font-weight-bold;
+                line-height: 2.75;
+                text-align: center;
                 text-transform: uppercase;
+                cursor: pointer;
+
             }
         }
 
