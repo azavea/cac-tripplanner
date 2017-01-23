@@ -21,6 +21,12 @@
         max-width: 100%;
     }
 
+    &.trip-options-banner {
+        font-size: 1.2rem;
+        color: rgba($white, .9);
+        text-transform: uppercase;
+    }
+
     &.indego-banner {
         justify-content: space-between;
         padding-right: 10px;

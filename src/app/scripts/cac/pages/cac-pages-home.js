@@ -385,9 +385,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     function updateTripOptionsBanner() {
         var source = [
             '<div class="banner-message">',
-            '{{modeText}} &bull; ',
+            '{{modeText}}&ensp;&middot;&ensp;',
             '{{#if rideTypeOrAccessibility}}',
-                '{{rideTypeOrAccessibility}} &bull; ',
+                '{{rideTypeOrAccessibility}}&ensp;&middot;&ensp;',
             '{{/if}}',
             '{{timingText}}',
             '</div>'
