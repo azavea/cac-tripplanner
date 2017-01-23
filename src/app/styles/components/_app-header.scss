@@ -118,8 +118,8 @@
     background-color: $primary-nav-bg-color;
 
     @include respond-to('xxs') {
-        justify-content: space-around;
-        margin-left: 70px;
+        justify-content: center;
+        margin-left: 30px;
         padding-top: 5px;
         padding-right: 5px;
         background-color: inherit;
@@ -150,8 +150,6 @@
         cursor: pointer;
 
         @include respond-to('xxs') {
-            margin-right: 0;
-            margin-left: 0;
             border-width: 2px 0;
             font-size: 1.4rem;
         }
