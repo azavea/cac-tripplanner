@@ -377,6 +377,11 @@
             color: $lt-gray;
             cursor: pointer;
 
+            &.spin i {
+                display: inline-block;
+                animation: full-rotation 2s infinite linear;
+            }
+
             .body-map & {
                 display: none;
             }
@@ -457,3 +462,7 @@
     }
 }
 
+@keyframes full-rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(359deg); }
+}
