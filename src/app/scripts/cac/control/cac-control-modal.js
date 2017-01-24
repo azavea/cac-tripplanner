@@ -72,18 +72,18 @@ CAC.Control.Modal = (function ($) {
         event.stopPropagation();
         // listen only to background and not modal within it
         if ($(event.target).has(this.options.selectors.modal).length) {
-            this.close();
+            this.close(event, true);
         }
     }
 
-    function _close(event) {
+    function _close(event, immediately) {
         $(this.options.selectors.body).removeClass(this.options.bodyModalClass);
         if (event && event.preventDefault) {
             event.preventDefault();
         }
 
         if (this.options.onClose) {
-            return this.options.onClose(event);
+            return this.options.onClose(event, immediately);
         }
     }
 

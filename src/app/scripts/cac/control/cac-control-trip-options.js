@@ -298,7 +298,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         } // else user clicked somewhere on modal that is not a list item option
     }
 
-    function onChildModalClose() {
+    function onChildModalClose(immediate) {
         // if closing the timing modal, read out the new date/time before exiting
         if (childModalSelector === options.selectors.timingOptions) {
             setDateTimeOnLocalStorage();
@@ -308,8 +308,13 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         childModal = null;
         childModalSelector = null;
 
-        // re-open parent modal on child modal close, to show selections
-        open();
+        if (!immediate) {
+            // re-open parent modal on child modal close, to show selections
+            open();
+        } else {
+            // close parent modal, too, if user clicked away from modal
+            onClose();
+        }
     }
 
     /**
