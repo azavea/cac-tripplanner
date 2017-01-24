@@ -87,7 +87,11 @@ CAC.User.Preferences = (function(Storages, _) {
      * @param {String} preference Name of setting to store
      * @param {Object} val Setting value to store
      */
-    function setPreference(preference, val) {
+    function setPreference(preference, val, ignoreDefault) {
+        if (ignoreDefault && _.has(defaults, preference) && defaults[preference] === val) {
+            delete options[preference];
+            return;
+        }
         storage.set(preference, JSON.stringify(val));
     }
 
