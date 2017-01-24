@@ -20,8 +20,8 @@ CAC.Control.Tab = (function ($) {
     var defaults = {
         classes: {
             HOME: 'body-home',
-            DIRECTIONS: 'body-map body-map-directions body-has-sidebar-banner',
-            EXPLORE: 'body-map body-map-explore body-has-sidebar-banner',
+            DIRECTIONS: 'body-map body-map-directions',
+            EXPLORE: 'body-map body-map-explore',
             LEARN: 'body-learn'
         },
         selectors: {

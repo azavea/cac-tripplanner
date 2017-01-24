@@ -23,10 +23,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             mapViewButton: 'a.map-view-btn',
 
-            needWheelsBanner: '.sidebar-banner.indego-banner',
+            mapContainer: '.body-map',
             sidebarBanner: '.sidebar-banner',
             sidebarBannerCloseButton: 'button.btn-dismiss-sidebar-banner',
+            needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
+            sidebarBannerClass: 'body-has-sidebar-banner',
             hiddenClass: 'hidden',
 
             originInput: '#input-directions-from'
@@ -393,6 +395,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             '</div>'
         ].join('');
 
+        var isDefault = true;
+
         var mode = UserPreferences.getPreference('mode');
         var bikeMode = mode.indexOf('BICYCLE') >= 0;
         var indego = bikeMode && mode.indexOf('BICYCLE_RENT') >= 0;
@@ -406,11 +410,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             } else {
                 modeText = 'Bike';
             }
+            isDefault = UserPreferences.isDefault('bikeShare') && isDefault;
 
             var rideType = UserPreferences.getPreference('bikeTriangle');
+            isDefault = UserPreferences.isDefault('bikeTriangle') && isDefault;
             rideTypeOrAccessibility = rideType.charAt(0).toUpperCase() + rideType.slice(1) + ' ride';
         } else {
             var wheelchair = UserPreferences.getPreference('wheelchair');
+            isDefault = UserPreferences.isDefault('wheelchair') && isDefault;
             if (wheelchair) {
                 rideTypeOrAccessibility = 'Wheelchair';
             }
@@ -421,6 +428,15 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         }
 
         var timingText = TripOptions.prototype.getTimingText() || 'Depart now';
+        isDefault = TripOptions.prototype.getTimingText() === null && isDefault;
+
+        var $banner = $(options.selectors.sidebarTripOptionsBanner);
+
+        if (isDefault) {
+            $banner.addClass(options.selectors.hiddenClass);
+            $(options.selectors.mapContainer).removeClass(options.selectors.sidebarBannerClass);
+            return;
+        }
 
         var template = Handlebars.compile(source);
         var html = template({
@@ -429,8 +445,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             timingText: timingText
         });
 
-        var $banner = $(options.selectors.sidebarTripOptionsBanner);
         $banner.html(html);
+        $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
         $banner.removeClass(options.selectors.hiddenClass);
     }
 
@@ -443,6 +459,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             $(options.selectors.needWheelsBanner).removeClass(options.selectors.hiddenClass);
             // hide trip options banner
             $(options.selectors.sidebarTripOptionsBanner).addClass(options.selectors.hiddenClass);
+            $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
         } else {
             $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
             // show trip options instead
