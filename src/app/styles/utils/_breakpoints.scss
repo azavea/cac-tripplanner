@@ -8,6 +8,7 @@ $breakpoints: (
     'sm-down': (max-width: 991px),
 
     'md': "(min-width: 992px) and (max-width: 1200px)",
+    // NB: if md-up breakpoint changes, must also update cac-pages-home.js MD_UP_BREAKPOINT
     'md-up': (min-width: 992px),
     'md-down': (max-width: 1200px),
 

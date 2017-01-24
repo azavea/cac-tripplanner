@@ -2,6 +2,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                             UserPreferences, UrlRouter) {
     'use strict';
 
+    // this needs to match the value in styles/utils/_breakpoints.scss
+    var MD_UP_BREAKPOINT = 992;
+
     var defaults = {
         selectors: {
             // modal
@@ -160,7 +163,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             // only allow explore mode on desktop and only respond to label in map view
             if (tabControl.isTabShowing(tabControl.TABS.HOME) ||
-                !$(options.selectors.map).is(':visible')) {
+                $(window).width() < MD_UP_BREAKPOINT) {
 
                 return;
             }
