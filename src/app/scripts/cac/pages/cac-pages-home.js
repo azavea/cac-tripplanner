@@ -133,7 +133,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         // listen to sidebar banner close button
         $(options.selectors.sidebarBannerCloseButton).on('click', function(e) {
             e.stopPropagation();
-            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+            hideNeedWheelsBanner();
         });
 
         // listen to sidebar banner click
@@ -144,7 +144,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }).open();
 
             // dismiss 'need wheels?' banner
-            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+            hideNeedWheelsBanner();
         });
 
         $(options.selectors.tabControl).on('click', options.selectors.tabControlLink, function (event) {
@@ -452,7 +452,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
     /**
      * The 'need wheels?' sidebar banner should only display when trip options have
-     * never been seen and currently in bicycle mode. Check on initial load and mdoe toggle.
+     * never been seen and currently in bicycle mode. Check on initial load and mode toggle.
      */
     function showHideNeedWheelsBanner() {
         if (UserPreferences.showNeedWheelsPrompt()) {
@@ -461,10 +461,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             $(options.selectors.sidebarTripOptionsBanner).addClass(options.selectors.hiddenClass);
             $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
         } else {
-            $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
-            // show trip options instead
-            updateTripOptionsBanner();
+            hideNeedWheelsBanner();
         }
+    }
+
+    function hideNeedWheelsBanner() {
+        $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
+        // show trip options instead, if applicable
+        updateTripOptionsBanner();
     }
 
     /**
