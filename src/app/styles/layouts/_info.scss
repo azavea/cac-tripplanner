@@ -181,6 +181,25 @@
         }
     }
 
+    .info-article-p-actions {
+        margin: 2rem 0 0;
+        line-height: 4;
+        text-align: center;
+
+        .place-action-go {
+            @include delinkify($white);
+            background-color: $gophillygo-purple;
+            padding: 1em 4em;
+            font-style: italic;
+            font-size: 1.5rem;
+            font-weight: $font-weight-bold;
+            line-height: 2.75;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+    }
+
     .summaries-list {
         h3 {
             margin: 40px auto;
