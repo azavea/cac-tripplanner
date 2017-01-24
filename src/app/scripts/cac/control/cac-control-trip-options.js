@@ -298,7 +298,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         } // else user clicked somewhere on modal that is not a list item option
     }
 
-    function onChildModalClose(immediate) {
+    function onChildModalClose(immediately) {
         // if closing the timing modal, read out the new date/time before exiting
         if (childModalSelector === options.selectors.timingOptions) {
             setDateTimeOnLocalStorage();
@@ -308,7 +308,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         childModal = null;
         childModalSelector = null;
 
-        if (!immediate) {
+        if (!immediately) {
             // re-open parent modal on child modal close, to show selections
             open();
         } else {
@@ -327,13 +327,14 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
     function bikeModalOptions() {
 
         var source = [
-            '<li class="modal-list-indego">{{bikeShare}}</li>',
-            '<li class="modal-list-timing">{{timing}}</li>',
-            '<li class="modal-list-ride">{{bikeTriangle}}</li>'
+            '<li class="modal-list-indego {{#if setBikeShare}} selected{{/if}}">{{bikeShare}}</li>',
+            '<li class="modal-list-timing {{#if setTiming}} selected{{/if}}">{{timing}}</li>',
+            '<li class="modal-list-ride {{#if setTriangle}} selected{{/if}}">{{bikeTriangle}}</li>'
         ].join('');
 
         var bikeShare = options.defaultMenuText.bikeShare;
-        if (!UserPreferences.isDefault('bikeShare')) {
+        var setBikeShare = !UserPreferences.isDefault('bikeShare');
+        if (setBikeShare) {
             var useBikeShare = UserPreferences.getPreference('bikeShare');
             if (useBikeShare) {
                 bikeShare = 'Use Indego bike sharing';
@@ -343,7 +344,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         }
 
         var bikeTriangle = options.defaultMenuText.bikeTriangle;
+        var setTriangle = false;
         if (!UserPreferences.isDefault('bikeTriangle')) {
+            setTriangle = true;
             var bikePreference = UserPreferences.getPreference('bikeTriangle');
             bikeTriangle = [
                 bikePreference.charAt(0).toUpperCase(),
@@ -352,13 +355,20 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             ].join('');
         }
 
-        var timing = getTimingText() || options.defaultMenuText.timing;
+        var timing = getTimingText();
+        var setTiming = !!timing;
+        if (!timing) {
+            timing = options.defaultMenuText.timing;
+        }
 
         var template = Handlebars.compile(source);
         var html = template({
             bikeShare: bikeShare,
+            setBikeShare: setBikeShare,
             timing: timing,
-            bikeTriangle: bikeTriangle
+            setTiming: setTiming,
+            bikeTriangle: bikeTriangle,
+            setTriangle: setTriangle
         });
 
         return html;
@@ -373,12 +383,16 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
      */
     function walkModalOptions() {
         var source = [
-            '<li class="modal-list-timing">{{timing}}</li>',
-            '<li class="modal-list-accessibility">{{accessibility}}</li>'
+            '<li class="modal-list-timing{{#if setTiming}} selected{{/if}}">{{timing}}</li>',
+            '<li class="modal-list-accessibility',
+                '{{#if setAccessibility}} selected{{/if}}">{{accessibility}}',
+            '</li>'
         ].join('');
 
         var accessibility = options.defaultMenuText.accessibility;
-        if (!UserPreferences.isDefault('wheelchair')) {
+        var setAccessibility = !UserPreferences.isDefault('wheelchair');
+
+        if (setAccessibility) {
             var wheelchair = UserPreferences.getPreference('wheelchair');
             if (wheelchair) {
                 accessibility = 'I have a wheelchair';
@@ -387,11 +401,18 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        var timing = getTimingText() || options.defaultMenuText.timing;
+        var timing = getTimingText();
+        var setTiming = !!timing;
+        if (!timing) {
+            timing = options.defaultMenuText.timing;
+        }
+
         var template = Handlebars.compile(source);
         return template({
             accessibility: accessibility,
+            setAccessibility: setAccessibility,
             timing: timing,
+            setTiming: setTiming
         });
     }
 

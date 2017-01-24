@@ -83,7 +83,7 @@ CAC.Control.Modal = (function ($) {
         }
 
         if (this.options.onClose) {
-            return this.options.onClose(event, immediately);
+            return this.options.onClose(immediately);
         }
     }
 
