@@ -28,7 +28,8 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
             googlePlusShareButton: '.modal-list-google',
             shareModalButton: '.share-directions',
             stepByStepClass: 'body-step-by-step',
-            sidebarBannerClass: 'body-has-sidebar-banner'
+            sidebarBannerClass: 'body-has-sidebar-banner',
+            activeSidebarBanner: '.sidebar-banner:not(.hidden)'
         }
     };
     var options = {};
@@ -55,7 +56,6 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
         setItinerary: setItinerary,
         show: show,
         hide: hide,
-        toggle: toggle
     };
 
     return DirectionsListControl;
@@ -142,14 +142,11 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
 
     function hide() {
         $(options.selectors.mapContainer).removeClass(options.selectors.stepByStepClass);
-        $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
-    }
-
-    function toggle() {
-        if ($(options.selectors.mapContainer).hasClass(options.selectors.sidebarBannerClass)) {
-            show();
-        } else {
-            hide();
+        // The spacing of the sidebar depends on the body div having a class indicating the
+        // presence of a banner in the sidebar. Most of the pieces are a few layers up in Home,
+        // so this uses a selector to figure out if there is an active sidebar and set the class.
+        if ($(options.selectors.mapContainer).find(options.selectors.activeSidebarBanner).length > 0) {
+            $(options.selectors.mapContainer).addClass(options.selectors.sidebarBannerClass);
         }
     }
 
