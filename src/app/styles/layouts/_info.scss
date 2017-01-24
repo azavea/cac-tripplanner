@@ -11,7 +11,8 @@
     width: 100%;
     height: 100%;
     background-color: $body-color;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 
     .main {
@@ -64,12 +65,11 @@
         box-shadow: $place-card-drop-shadow;
 
         @include respond-to('xxs') {
-            background-color: inherit;
             box-shadow: none;
         }
 
         @include respond-to('xxs') {
-            margin-bottom: 80px;
+            margin-bottom: 50px;
         }
     }
 
@@ -115,20 +115,31 @@
     }
 
     .info-article-aside {
-        width: 200px;
-        margin: 0 60px 20px 20px;
-        padding-left: 20px;
+        width: 240px;
+        margin: 0 0 20px 20px;
+        padding: 0 4rem 0 2rem;
         float: right;
         border-left: 2px solid $gophillygo-green;
-        color: #000;
+        color: #555;
         font-size: 1.3rem;
         font-style: italic;
-        line-height: 2.2;
+        line-height: 1.8;
 
-        @include respond-to('xxs') {
-            width: 36%;
-            margin-right: 2rem;
+        p {
+            margin: 0 0 1em;
         }
+
+        a {
+            color: $gophillygo-orange;
+        }
+
+        @include respond-to('xs') {
+            display: none;
+        }
+
+        // @include respond-to('xxs') {
+        //     width: 36%;
+        // }
     }
 
     .info-article-section {
@@ -139,12 +150,11 @@
         }
 
         p {
-            margin-bottom: 2em;
+            margin: 0 0 1em;
         }
 
         a {
-            @include delinkify;
-            color: $gophillygo-blue !important;
+            color: $gophillygo-orange;
         }
 
         strong {
