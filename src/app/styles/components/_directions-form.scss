@@ -51,6 +51,14 @@
             width: 100%;
             max-width: 100%;
         }
+
+        @include respond-to('md-up') {
+            .directions-tab-button label {
+                position: relative;
+                background-color: $gophillygo-blue-dark;
+                cursor: pointer;
+            }
+        }
     }
 
     .isochrone-control {
@@ -452,14 +460,6 @@
                 content: ' min';
             }
         }
-
-    @include respond-to('md-up') {
-        .directions-tab-button label {
-            position: relative;
-            background-color: $gophillygo-blue-dark;
-            cursor: pointer;
-        }
-    }
 }
 
 @keyframes full-rotation {
