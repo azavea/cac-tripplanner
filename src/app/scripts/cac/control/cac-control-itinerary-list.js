@@ -17,7 +17,23 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             alert: '.alert',
             container: '.directions-list',
             hiddenClass: 'hidden',
+            itineraryList: '.routes-list',
             itineraryItem: '.route-summary'
+        },
+        // Settings for 'slick' carousel for swiping itineraries on mobile
+        slick: {
+            arrows: false,
+            dots: true,
+            infinite: false,
+            mobileFirst: true,
+            variableWidth: true,
+            responsive : [
+                {
+                    // Breakpoint must match 'xxs' in _breakpoints.scss
+                    breakpoint: 480,
+                    settings: 'unslick'
+                }
+            ]
         }
     };
     var options = {};
@@ -59,6 +75,9 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Show the directions div and populate with itineraries
         var html = MapTemplates.itineraryList(itineraries);
         $container.html(html);
+
+        enableCarousel(itineraries);
+
         $(options.selectors.itineraryItem).on('click', onItineraryClicked);
         $(options.selectors.itineraryItem).hover(onItineraryHover);
     }
@@ -75,6 +94,22 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         $container.one('click', options.selectors.alert, function() {
             $(options.selectors.alert).remove();
         });
+    }
+
+    /**
+     * Enable 'slick' carousel for swiping itineraries on mobile
+     * @param {[object]} itineraries An open trip planner itinerary object, as returned from the plan endpoint
+     */
+    function enableCarousel(itineraries) {
+        if (itineraries.length < 2) {
+            return;
+        }
+
+        $(options.selectors.itineraryList)
+            .slick(options.slick)
+            .on('afterChange', function(event, slick, currentSlide) {
+                $(options.selectors.itineraryItem).eq(currentSlide).triggerHandler('mouseenter');
+            });
     }
 
     function getItineraryById(id) {

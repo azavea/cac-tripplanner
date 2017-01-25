@@ -1,4 +1,5 @@
 $breakpoints: (
+    // 'xxs' must match defaults.slick.responsive.breakpoint in cac-control-itinerary-list.js
     'xxs': (max-width: 480px),
 
     'xs': (max-width: 767px),

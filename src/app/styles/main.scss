@@ -1,6 +1,7 @@
 // Vendors
 @import
-'vendors/inputrange';
+'vendors/inputrange',
+'vendors/slick-theme';
 
 // Utils
 @import
@@ -34,7 +35,8 @@
 'components/directions-step-by-step',
 'components/sidebar-banner',
 'components/modal',
-'components/spinner';
+'components/spinner',
+'components/slick-dots';
 
 
 // Layouts
