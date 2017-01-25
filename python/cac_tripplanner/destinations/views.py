@@ -55,6 +55,15 @@ def home(request):
 
     return base_view(request, 'home.html', context=context)
 
+def explore(request):
+    """
+    Enables loading the explore view via URL.
+    Explore is still a javascript-defined sub-view of Home, but this enables us to send the message
+    to the javascript that it should start on that view even though there's no origin.
+    """
+    context = {'tab': 'map-explore'}
+    return base_view(request, 'home.html', context=context)
+
 
 def directions(request):
     """

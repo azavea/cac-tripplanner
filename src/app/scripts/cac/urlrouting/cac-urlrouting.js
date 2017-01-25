@@ -35,6 +35,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     function UrlRouter() {
         router = new Navigo('/');
+        router.on('explore', loadExplore);
         router.on('*', setPrefsFromUrl, {
             before: function (done) {
                 if (updatingUrl) {
@@ -82,6 +83,19 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
 
     function buildExploreUrlFromPrefs() {
         return '/?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
+    }
+
+    /* Enables direct linking to the blank Explore view (i.e. from the Learn tab)
+     *
+     * Sets the 'mode' preference, which causes the javascript to initialize with the Explore view
+     * active, but clears the URL because the URL-manipulation done by Directions and Explore
+     * assume/require that they be at /
+     */
+    function loadExplore() {
+        UserPreferences.setPreference('method', 'explore');
+        router.pause();
+        router.navigate('/', true);
+        router.resume();
     }
 
     /* Read URL parameters into user preferences

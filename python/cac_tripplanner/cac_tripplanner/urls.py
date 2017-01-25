@@ -12,6 +12,7 @@ import settings
 urlpatterns = [
     # Home view, which is also the directions and explore views
     url(r'^$', dest_views.home, name='home'),
+    url(r'^explore$', dest_views.explore, name='explore'),
 
     # Map
     url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
