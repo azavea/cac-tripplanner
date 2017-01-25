@@ -107,7 +107,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         // set bike share preference separate from mode
         if (params.mode) {
             var bikeShare = params.mode.indexOf('_RENT') >= 0;
-            UserPreferences.setPreference('bikeShare', bikeShare);
+            UserPreferences.setPreference('bikeShare', bikeShare, true);
         }
         events.trigger(eventNames.changed);
     }
@@ -138,10 +138,10 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                 if (field === 'origin' || field === 'destination') {
                     var coords = _.map(params[field].split(','), parseFloat);
                     if (isNaN(coords[0])) {
-                        UserPreferences.setPreference(field, undefined);
+                        UserPreferences.setPreference(field, undefined, true);
                     } else {
                         var location = makeLocation(coords, params[field + 'Text']);
-                        UserPreferences.setPreference(field, location);
+                        UserPreferences.setPreference(field, location, true);
                     }
                 } else if (field === 'waypoints') {
                     var waypoints = _.map(params[field].split(';'), function(waypoint) {
@@ -150,15 +150,15 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                             return coords;
                         }
                     });
-                    UserPreferences.setPreference(field, waypoints);
+                    UserPreferences.setPreference(field, waypoints, true);
                 } else if (field === 'dateTime') {
                     if (!params[field]) {
-                        UserPreferences.setPreference(field, undefined);
+                        UserPreferences.setPreference(field, undefined, true);
                     } else {
-                        UserPreferences.setPreference(field, parseInt(params[field]));
+                        UserPreferences.setPreference(field, parseInt(params[field]), true);
                     }
                 } else {
-                    UserPreferences.setPreference(field, params[field]);
+                    UserPreferences.setPreference(field, params[field], true);
                 }
             }
         });
