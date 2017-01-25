@@ -27,11 +27,11 @@
 
     h2 {
         width: 100%;
-        margin: 0;
+        margin: .5em 0 0;
         padding: 0 1em;
         font-size: 1.5rem;
         font-weight: $font-weight-bold;
-        line-height: 3;
+        line-height: 2.5;
         text-align: center;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -51,6 +51,7 @@
 }
 
 .place-card-travel-logistics {
+    margin: 0 0 1em;
     padding: 0 1em;
     color: $font-secondary-color;
     font-size: 1.3rem;

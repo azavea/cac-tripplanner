@@ -219,10 +219,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
                                     // HTML-formatted description
                                      geojson.properties.description,
                                      '</div>',
-                                     '<a href="{{geojson.properties.website_url}}" ',
-                                     'target="_blank">{{geojson.properties.website_url}}</a>',
+                                     '<p class="links"><a class="destination-website-link" ',
+                                     'href="{{geojson.properties.website_url}}" ',
+                                     'target="_blank">Visit website</a>',
                                      '<a class="destination-directions-link" ',
-                                     'id="{{geojson.properties.id}}">Get Directions</a>'
+                                     'id="{{geojson.properties.id}}">Get Directions</a></p>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});

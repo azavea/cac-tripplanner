@@ -38,6 +38,10 @@
             order: auto;
             width: 100%;
             border: 0;
+
+            .leaflet-control-zoom {
+                display: none;
+            }
         }
     }
 

@@ -39,19 +39,30 @@
         justify-content: flex-start;
         height: $route-summary-height;
         margin-bottom: 20px;
-        padding: 6px 10px 4px 14px;
-        background-color: $white;
-        box-shadow: $place-card-drop-shadow;
+        padding: 6px 10px 4px 16px;
+        background-color: #f6f6f6;
         cursor: pointer;
-        opacity: .5;
 
         @include respond-to('xxs') {
             margin: 0;
         }
 
         &.selected {
+            background-color: $white;
+            box-shadow: $place-card-drop-shadow;
 
-            opacity: 1;
+            .route-name {
+                color: $gophillygo-blue;
+                font-weight: $font-weight-bold;
+            }
+
+            .route-summary-primary-details {
+                color: inherit;
+            }
+
+            .route-summary-secondary-details {
+                color: $lt-gray;
+            }
 
             .route-modes {
                 .icon-walk,
@@ -85,14 +96,13 @@
             flex-flow: column nowrap;
             align-items: stretch;
             justify-content: flex-start;
-            max-width: calc(100% - 17px);
         }
 
         .route-name {
             flex: 1 0 auto;
-            color: $gophillygo-blue;
+            color: $default-background-line-color;
             font-size: 1.6rem;
-            font-weight: $font-weight-bold;
+            font-weight: $font-weight-medium;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
@@ -104,6 +114,7 @@
             flex-flow: row nowrap;
             align-items: center;
             justify-content: flex-start;
+            color: $lt-gray;
             font-size: 1.5rem;
             font-weight: $font-weight-medium;
         }
