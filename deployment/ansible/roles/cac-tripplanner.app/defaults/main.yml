@@ -21,13 +21,13 @@ app_cron_event_feed: "cd {{ root_app_dir }} && python manage.py load_events >> {
 
 cac_python_dependencies:
     - { name: 'base58', version: '0.2.4' }
-    - { name: 'boto', version: '2.43.0' }
-    - { name: 'django', version: '1.8.16' }
+    - { name: 'boto', version: '2.45.0' }
+    - { name: 'django', version: '1.8.17' }
     - { name: 'django-ckeditor', version: '5.1.1' }
-    - { name: 'django-extensions', version: '1.7.4' }
+    - { name: 'django-extensions', version: '1.7.5' }
     - { name: 'django-storages-redux', version: '1.3.2' }
-    - { name: 'gunicorn', version: '19.6.0'}
-    - { name: 'ipython', version: '4.2.1' }
+    - { name: 'gunicorn', version: '19.6.0' }
+    - { name: 'ipython', version: '5.1.0' }
     - { name: 'pillow', version: '3.4.2' }
     - { name: 'psycopg2', version: '2.6.2' }
     - { name: 'pytz', version: '2016.10' }
