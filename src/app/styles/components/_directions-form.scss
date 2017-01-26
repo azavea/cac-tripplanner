@@ -180,6 +180,7 @@
     .btn-options {
         display: flex;
         align-items: center;
+        align-self: stretch;
         justify-content: center;
         width: 50px;
         margin-top: -5px;
@@ -189,7 +190,7 @@
         cursor: pointer;
 
         i.icon-sliders {
-            font-size: 1.8rem;
+            font-size: 2rem;
         }
 
         @include respond-to('xxs') {
@@ -430,7 +431,6 @@
                 display: block;
             }
         }
-
     }
 
     .directions-to {

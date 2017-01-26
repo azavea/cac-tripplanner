@@ -214,7 +214,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     // Template for itinerary summaries
     function itineraryList(itineraries) {
         var source = [
-        '<h1>Choose a route</h1><div class="routes-list"></div>',
+        '<h1>Choose a route</h1><div class="routes-list">',
         '{{#each itineraries}}',
             '<div class="route-summary" data-itinerary="{{this.id}}">',
             '<div class="route-summary-details">',
@@ -232,7 +232,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '</div>',
                 '</div>',
             '</div>',
-        '</div>{{/each}}'].join('');
+        '</div>{{/each}}',
+        '</div>'].join('');
 
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});

@@ -17,7 +17,8 @@
         width: 100%;
         height: $route-summary-height;
         overflow: hidden;
-        z-index: 100;
+        z-index: 1000;
+        box-shadow: 0 0 16px rgba(128, 128, 128, 0.7);
     }
 
     h1 {
@@ -37,6 +38,7 @@
         flex-flow: row nowrap;
         align-items: stretch;
         justify-content: flex-start;
+        width: 100vw;
         height: $route-summary-height;
         margin-bottom: 20px;
         padding: 6px 10px 4px 16px;
