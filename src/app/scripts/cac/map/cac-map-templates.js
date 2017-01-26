@@ -232,6 +232,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '</div>',
                 '</div>',
             '</div>',
+            '<div class="route-summary-go-btn">Go</div>',
         '</div>{{/each}}',
         '</div>'].join('');
 
