@@ -105,9 +105,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         $.ajax({
             type: 'GET',
             data: payload,
-            cache: false,
-            url: isochroneUrl,
-            contentType: 'application/json'
+            dataType: 'json',
+            crossDomain: true,
+            url: isochroneUrl
         }).done(deferred.resolve).fail(deferred.reject);
         return deferred.promise();
     }
