@@ -5,7 +5,7 @@
   version: 0.2.6
 
 - src: azavea.opentripplanner
-  version: 1.0.3
+  version: 1.0.4
 
 - src: azavea.nginx
   version: 0.2.2
