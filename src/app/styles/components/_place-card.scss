@@ -53,7 +53,7 @@
 .place-card-travel-logistics {
     margin: 0 0 1em;
     padding: 0 1em;
-    color: $font-secondary-color;
+    color: $gophillygo-green;
     font-size: 1.3rem;
     font-weight: $font-weight-medium;
     line-height: 1.2;
@@ -61,14 +61,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-}
-
-.place-card-travel-logistics-duration {
-    font-weight: $font-weight-bold;
-}
-
-.place-card-travel-logistics-origin {
-    font-weight: $font-weight-bold;
 }
 
 .place-card-actions {
