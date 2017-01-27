@@ -45,6 +45,10 @@
         &.hidden {
             display: none;
         }
+
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
     }
 
     h1 {
