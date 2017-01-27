@@ -14,6 +14,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             // typeahead
             typeaheadFrom: '#input-directions-from',
             typeaheadTo: '#input-directions-to',
+            typeaheadText: 'input.tt-input',
 
             // used for error display
             origin: '.directions-from.directions-text-input',
@@ -185,7 +186,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         var $input = $(options.selectors[key]);
         if (UserPreferences.getPreference(key)) {
             $input.removeClass(options.selectors.errorClass);
-        } else {
+        } else if ($input.find(options.selectors.typeaheadText).val().length > 0) {
             $input.addClass(options.selectors.errorClass);
         }
     }
