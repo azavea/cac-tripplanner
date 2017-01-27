@@ -1,4 +1,30 @@
-.leaflet-popup {
+.route-tooltip {
+    // width: auto;
+    // top: 40px;
+    // left: 50px;
+    // padding: .5em;
+    // background-color: $white;
+
+    .leaflet-popup-tip-container {
+        display: none;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+    }
+
+    .leaflet-popup-content {
+        margin: 2px 4px;
+    }
+}
+
+.poi-popup,
+.bikeshare-popup,
+.event-popup {
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+    }
 
     .leaflet-popup-close-button {
         top: 8px !important;

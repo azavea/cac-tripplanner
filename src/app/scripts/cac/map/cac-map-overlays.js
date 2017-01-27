@@ -79,7 +79,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
         });
         var latLng = cartodb.L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
         var marker = new cartodb.L.marker(latLng, { icon: icon });
-        marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share), {});
+        marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share), {className: 'bikeshare-popup'});
         return marker;
     }
 
@@ -91,7 +91,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
             prefix: 'fa'
         });
         var marker = new cartodb.L.marker(latLng, { icon: icon });
-        marker.bindPopup(CAC.Map.Templates.eventPopup(event), {});
+        marker.bindPopup(CAC.Map.Templates.eventPopup(event), {className: 'event-popup'});
         return marker;
     }
 

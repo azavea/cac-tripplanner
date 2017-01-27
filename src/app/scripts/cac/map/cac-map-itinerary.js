@@ -121,7 +121,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: waypointIcon
-                    }).bindPopup('Drag to change route', {closeButton: false}
+                    }).bindPopup('Drag to change route', {closeButton: false, className: 'route-tooltip'}
                     ).on('dragstart', function(e) {
                         dragging = true;
                         var pt = e.target.getLatLng();
@@ -196,7 +196,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                         redrawWaypointDrag(event, geojson.properties.index, false);
                     });
 
-            marker.bindPopup('Drag to change. Click to remove.', {closeButton: false})
+            marker.bindPopup('Drag to change. Click to remove.', {closeButton: false, className: 'route-tooltip'})
                     .on('mouseover', function () {
                         clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
