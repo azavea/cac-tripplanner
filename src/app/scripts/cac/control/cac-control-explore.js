@@ -106,7 +106,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     // trigger re-query when trip options are changed
     function setOptions() {
         // set text output to match slider
-        $(options.selectors.isochroneOutput).val($(options.selectors.isochroneSlider).val());
+        $(options.selectors.isochroneOutput).text($(options.selectors.isochroneSlider).val());
         if (exploreLatLng) {
             clickedExplore();
         }
@@ -315,7 +315,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // set explore time preference
         var exploreMinutes = UserPreferences.getPreference('exploreMinutes');
         $(options.selectors.isochroneSlider).val(exploreMinutes);
-        $(options.selectors.isochroneOutput).val(exploreMinutes);
+        $(options.selectors.isochroneOutput).text(exploreMinutes);
 
 
         var exploreOrigin = UserPreferences.getPreference('origin');
