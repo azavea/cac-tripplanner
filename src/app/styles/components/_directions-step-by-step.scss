@@ -39,6 +39,12 @@
         }
     }
 
+    .directions-step-by-step-content {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
+    }
+
     .step-by-step-header {
         display: flex;
         flex-flow: row nowrap;

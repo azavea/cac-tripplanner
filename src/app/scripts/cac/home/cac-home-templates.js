@@ -31,7 +31,7 @@ CAC.Home.Templates = (function (Handlebars) {
                         '{{else}}',
                             'src="https://placehold.it/400x400.jpg"',
                         '{{/if}}',
-                        'width="400" height="200"',
+                        'width="310" height="155"',
                         'alt="{{ this.name }}" />',
                     '</div>',
                     '<h2 class="place-card-name">{{ this.name }}</h2>',

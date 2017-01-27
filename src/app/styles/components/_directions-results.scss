@@ -35,10 +35,11 @@
 
     .route-summary {
         display: flex;
+        position: relative;
         flex-flow: row nowrap;
         align-items: stretch;
         justify-content: flex-start;
-        width: 100vw;
+        width: 100%;
         height: $route-summary-height;
         margin-bottom: 20px;
         padding: 6px 10px 4px 16px;
@@ -46,6 +47,7 @@
         cursor: pointer;
 
         @include respond-to('xxs') {
+            width: 100vw;
             margin: 0;
         }
 
@@ -98,6 +100,7 @@
             flex-flow: column nowrap;
             align-items: stretch;
             justify-content: flex-start;
+            overflow: hidden;
         }
 
         .route-name {
@@ -108,6 +111,10 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
+
+            @include respond-to('xxs') {
+                margin-right: 8rem;
+            }
         }
 
         .route-summary-primary-details {
@@ -150,6 +157,27 @@
             .icon-walk {
                 position: relative;
                 right: -3px;
+            }
+        }
+
+        .route-summary-go-btn {
+            display: none;
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            width: 7rem;
+            height: 3.5rem;
+            border: 2px solid $white;
+            background-color: $gophillygo-green;
+            color: $white;
+            font-size: 1.4rem;
+            line-height: 3.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            box-sizing: content-box;
+
+            @include respond-to('xxs') {
+                display: block;
             }
         }
     }
