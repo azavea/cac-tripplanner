@@ -19,8 +19,8 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             // used for error display
             origin: '.directions-from.directions-text-input',
             destination: '.directions-to.directions-text-input',
+            directionsTextInput: '.directions-text-input',
             alert: '.alert',
-
             errorClass: 'error',
         }
     };
@@ -67,6 +67,13 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         typeaheads.origin.events.on(typeaheads.origin.eventNames.cleared, onTypeaheadCleared);
 
         $(options.selectors.reverseButton).click($.proxy(reverseOriginDestination, this));
+
+        // remove input error class when input receives focus
+        $(options.selectors.typeaheadText).focus(function(event) {
+            $(event.target)
+                .closest(options.selectors.directionsTextInput)
+                .removeClass(options.selectors.errorClass);
+        });
 
         setFromUserPreferences();
     }
