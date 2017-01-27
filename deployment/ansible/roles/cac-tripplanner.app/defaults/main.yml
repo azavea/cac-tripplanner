@@ -27,7 +27,6 @@ cac_python_dependencies:
     - { name: 'django-extensions', version: '1.7.5' }
     - { name: 'django-storages-redux', version: '1.3.2' }
     - { name: 'gunicorn', version: '19.6.0' }
-    - { name: 'ipython', version: '5.1.0' }
     - { name: 'pillow', version: '3.4.2' }
     - { name: 'psycopg2', version: '2.6.2' }
     - { name: 'pytz', version: '2016.10' }
