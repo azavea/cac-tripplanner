@@ -1,5 +1,6 @@
 .places {
     @include sidebar-main;
+    position: relative;
 
     @include respond-to('xxs') {
         width: 100%;

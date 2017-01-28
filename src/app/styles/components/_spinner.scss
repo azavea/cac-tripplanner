@@ -1,5 +1,10 @@
 .sk-spinner {
     display: flex;
+    position: absolute;
+    flex-flow: row nowrap;
+    justify-content: center;
+    width: 100%;
+
     &.hidden {
         display: none;
     }
