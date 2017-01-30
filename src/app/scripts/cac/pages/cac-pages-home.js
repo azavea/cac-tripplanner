@@ -331,16 +331,25 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     function onPlaceClicked(event) {
+        if (!mapControl || !mapControl.isochroneControl) {
+            return;
+        }
         var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
         mapControl.isochroneControl.highlightDestination(placeId, { panTo: true });
     }
 
     function onPlaceHovered(event) {
+        if (!mapControl || !mapControl.isochroneControl) {
+            return;
+        }
         var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
         mapControl.isochroneControl.highlightDestination(placeId);
     }
 
     function onPlaceBlurred() {
+        if (!mapControl || !mapControl.isochroneControl) {
+            return;
+        }
         mapControl.isochroneControl.highlightDestination(null);
     }
 
