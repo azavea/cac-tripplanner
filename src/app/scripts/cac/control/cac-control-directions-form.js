@@ -99,6 +99,11 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
             UserPreferences.clearLocation(key);
         } else {
             UserPreferences.setLocation(key, location);
+
+            if (key === 'origin') {
+                // shift focus to destination after origin selected
+                $(options.selectors.typeaheadTo).focus();
+            }
         }
 
         events.trigger(eventNames.selected, [key, location]);
