@@ -46,6 +46,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         events: events,
         eventNames: eventNames,
         moveOriginDestination: moveOriginDestination,
+        clearFocus: clearFocus,
         clearAll: clearAll,
         setLocation: setLocation,
         setError: setError,
@@ -148,8 +149,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         Geocoder.reverse(position.lat, position.lng).then(function (data) {
             if (data && data.address) {
                 // prevent typeahead dropdown from opening by removing focus
-                $(options.selectors.typeaheadFrom).blur();
-                $(options.selectors.typeaheadTo).blur();
+                clearFocus();
 
                 var location = Utils.convertReverseGeocodeToLocation(data);
                 UserPreferences.setPreference(key, location);
@@ -168,6 +168,11 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
                 events.trigger(eventNames.geocodeError, key);
             }
         });
+    }
+
+    function clearFocus() {
+        $(options.selectors.typeaheadFrom).blur();
+        $(options.selectors.typeaheadTo).blur();
     }
 
     // Clear both fields and any errors
