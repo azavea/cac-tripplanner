@@ -1,5 +1,6 @@
 .directions-results {
     @include sidebar-main;
+    position: relative;
 
     .body-home &,
     .body-map-explore &,
@@ -12,13 +13,22 @@
     }
 
     @include respond-to('xxs') {
-        flex: 0 0 $route-summary-height;
+        flex: 0 1 auto;
         order: 10;
         width: 100%;
-        height: $route-summary-height;
+        height: auto;
+        max-height: $route-summary-height;
         overflow: hidden;
         z-index: 1000;
         box-shadow: 0 0 16px rgba(128, 128, 128, 0.7);
+
+        .routes-list {
+            height: $route-summary-height;
+
+            &:empty {
+                display: none;
+            }
+        }
     }
 
     h1 {

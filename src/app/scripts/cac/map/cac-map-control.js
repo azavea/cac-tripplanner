@@ -288,11 +288,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var originOptions = {
                     icon: originIcon,
                     draggable: true,
-                    title: 'origin',
+                    title: 'Drag to change origin',
                     zIndexOffset: 1001
                 };
-                directionsMarkers.origin = new cartodb.L.marker(origin, originOptions)
-                                                        .bindPopup('<p>Origin</p>');
+                directionsMarkers.origin = new cartodb.L.marker(origin, originOptions);
                 directionsMarkers.origin.addTo(map);
                 directionsMarkers.origin.on('dragend', markerDrag);
             }
@@ -309,11 +308,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var destOptions = {
                     icon: destIcon,
                     draggable: true,
-                    title: 'destination',
+                    title: 'Drag to change destination',
                     zIndexOffset: 1000
                 };
-                directionsMarkers.destination = new cartodb.L.marker(destination, destOptions)
-                                                             .bindPopup('<p>Destination</p>');
+                directionsMarkers.destination = new cartodb.L.marker(destination, destOptions);
                 directionsMarkers.destination.addTo(map);
                 directionsMarkers.destination.on('dragend', markerDrag);
             }

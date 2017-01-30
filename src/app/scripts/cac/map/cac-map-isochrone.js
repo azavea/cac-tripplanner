@@ -3,7 +3,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
 
     var defaults = {
         selectors: {
-            destinationPopup: '.destination-directions-link'
+            destinationPopup: '.destination-directions-link',
+            poiPopupClassName: 'poi-popup'
         }
     };
 
@@ -229,7 +230,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
                 var marker = new cartodb.L.marker(latLng, {icon: destinationIcon})
-                        .bindPopup(popupContent);
+                        .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
                 destinationMarkers[markerId] = {
                     marker: marker,
                     destination: destinations[geojson.properties.id]

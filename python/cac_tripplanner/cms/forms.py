@@ -23,4 +23,4 @@ class ArticleForm(ModelForm):
 
     def clean_narrow_image(self):
         """Custom validator for narrow image field"""
-        return validate_image(self.cleaned_data.get('narrow_image', False), 400, 600)
+        return validate_image(self.cleaned_data.get('narrow_image', False), 310, 218)

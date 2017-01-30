@@ -1,5 +1,6 @@
 .places {
     @include sidebar-main;
+    position: relative;
 
     @include respond-to('xxs') {
         width: 100%;
@@ -22,6 +23,7 @@
         width: 100%;
         max-width: $home-main-max-width;
         height: auto;
+        min-height: 100px;
         margin: 0 auto $home-section-margin;
         padding: 0 $home-section-padding 10px;
         background-color: $home-section-bg-color;
