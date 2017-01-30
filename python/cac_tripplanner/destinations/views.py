@@ -55,6 +55,7 @@ def home(request):
 
     return base_view(request, 'home.html', context=context)
 
+
 def explore(request):
     """
     Enables loading the explore view via URL.
@@ -178,7 +179,7 @@ class SearchDestinations(View):
         results = []
         if lat and lon:
             try:
-                searchPoint = Point(float(lon), float(lat))
+                search_point = Point(float(lon), float(lat))
             except ValueError as e:
                 error = json.dumps({
                     'msg': 'Invalid latitude/longitude pair',
@@ -186,7 +187,7 @@ class SearchDestinations(View):
                 })
                 return HttpResponse(error, 'application/json')
             results = (Destination.objects.filter(published=True)
-                       .distance(searchPoint)
+                       .distance(search_point)
                        .order_by('distance', 'priority'))
         elif text is not None:
             results = Destination.objects.filter(published=True, name__icontains=text)
