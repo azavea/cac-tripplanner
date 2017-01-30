@@ -104,6 +104,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             return;
         }
 
+        directionsFormControl.clearFocus();
+
         // show spinner while loading
         showSpinner();
 
