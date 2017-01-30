@@ -89,7 +89,7 @@ class Article(models.Model):
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
                                    help_text='The wide image. Will be displayed at 1440x400.')
     narrow_image = models.ImageField(upload_to=generate_filename, null=True,
-                                     help_text='The narrow image. Will be displayed at 400x600.')
+                                     help_text='The narrow image. Will be displayed at 310x218.')
 
     @property
     def published(self):
