@@ -1,13 +1,19 @@
 CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
     'use strict';
 
-    var defaults = {};
+    var defaults = {
+        selectors: {
+            bikeSharePopupClassName: 'bikeshare-popup',
+            eventPopupClassName: 'event-popup'
+        }
+    };
 
+    var options = null;
     var bikeShareFeatureGroup = null;
     var eventsFeatureGroup = null;
 
-    function OverlaysControl(options) {
-        this.options = $.extend({}, defaults, options);
+    function OverlaysControl(opts) {
+        options = $.extend({}, defaults, opts);
     }
 
     OverlaysControl.prototype.bikeShareOverlay = bikeShareOverlay;
@@ -79,7 +85,8 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
         });
         var latLng = cartodb.L.latLng(share.geometry.coordinates[1], share.geometry.coordinates[0]);
         var marker = new cartodb.L.marker(latLng, { icon: icon });
-        marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share), {className: 'bikeshare-popup'});
+        marker.bindPopup(CAC.Map.Templates.bikeSharePopup(share),
+                         {className: options.selectors.bikeSharePopupClassName});
         return marker;
     }
 
@@ -91,7 +98,8 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
             prefix: 'fa'
         });
         var marker = new cartodb.L.marker(latLng, { icon: icon });
-        marker.bindPopup(CAC.Map.Templates.eventPopup(event), {className: 'event-popup'});
+        marker.bindPopup(CAC.Map.Templates.eventPopup(event),
+                         {className: options.selectors.eventPopupClassName});
         return marker;
     }
 

@@ -1,6 +1,12 @@
 CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     'use strict';
 
+    var defaults = {
+        selectors: {
+            routeTooltipClassName: 'route-tooltip'
+        }
+    };
+
     var map = null;
     var itineraries = {};
 
@@ -13,6 +19,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var itineraryHoverListener = null;
     var liveUpdatingItinerary = false; // true when live update request sent but not completed
     var waypointsLayer = null;
+
+    var options = null;
 
     var waypointRadius = 6;
     var waypointFillColor = 'white';
@@ -32,10 +40,11 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         popupAnchor: [60, 40]
     } );
 
-    function ItineraryControl(options) {
+    function ItineraryControl(opts) {
         this.events = events;
         this.eventNames = eventNames;
-        map = options.map;
+        options = $.extend({}, defaults, opts);
+        map = opts.map;
     }
 
     ItineraryControl.prototype.plotItinerary = plotItinerary;
@@ -121,7 +130,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 lastItineraryHoverMarker = new cartodb.L.Marker(e.latlng, {
                         draggable: true,
                         icon: waypointIcon
-                    }).bindPopup('Drag to change route', {closeButton: false, className: 'route-tooltip'}
+                    }).bindPopup('Drag to change route',
+                                 {closeButton: false, className: options.selectors.routeTooltipClassName}
                     ).on('dragstart', function(e) {
                         dragging = true;
                         var pt = e.target.getLatLng();
@@ -196,7 +206,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                         redrawWaypointDrag(event, geojson.properties.index, false);
                     });
 
-            marker.bindPopup('Drag to change. Click to remove.', {closeButton: false, className: 'route-tooltip'})
+            marker.bindPopup('Drag to change. Click to remove.',
+                             {closeButton: false, className: options.selectors.routeTooltipClassName})
                     .on('mouseover', function () {
                         clearTimeout(popupTimeout);
                         return dragging || this.openPopup();
