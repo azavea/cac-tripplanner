@@ -11,6 +11,11 @@
         margin: ($home-section-margin - 20px) auto;
     }
 
+    .body-home & {
+        height: $directions-form-home-height;
+        min-height: $directions-form-home-height;
+    }
+
     .body-map & {
         max-width: $sidebar-width;
         margin: 0;
@@ -18,6 +23,7 @@
         @include respond-to('xxs') {
             width: 100%;
             max-width: 100%;
+            height: auto;
         }
     }
 }
@@ -40,6 +46,10 @@
         padding: 0 10px;
     }
 
+    .body-home & {
+        height: $directions-form-home-height;
+    }
+
     .body-map & {
         width: $sidebar-width;
         max-width: $sidebar-width;
@@ -50,6 +60,7 @@
         @include respond-to('xxs') {
             width: 100%;
             max-width: 100%;
+            height: auto;
         }
     }
 
