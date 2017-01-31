@@ -9,5 +9,10 @@
         <p class="info-article-p-link-inline">
             <a href="{{ destination.website_url }}" target="_blank">Visit website</a>
         </p>
+        <div class="info-article-p-actions">
+            <a class="place-action-go"
+                data-destination-id="{{ destination.id }}"
+                href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Get directions</a>
+        </div>
     </section>
 </article>
