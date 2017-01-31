@@ -237,6 +237,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         currentItinerary.highlight(true);
         directionsListControl.hide();
         itineraryListControl.show();
+        mapControl.fitToBounds(currentItinerary.geojson.getBounds());
     }
 
     /**
@@ -259,6 +260,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             directionsListControl.setItinerary(itinerary);
             itineraryListControl.hide();
             directionsListControl.show();
+            mapControl.fitToBounds(itinerary.geojson.getBounds());
         }
     }
 
