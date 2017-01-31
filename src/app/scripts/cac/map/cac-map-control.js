@@ -84,6 +84,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     }
 
     MapControl.prototype.isLoaded = isLoaded;
+    MapControl.prototype.fitToBounds = fitToBounds;
     MapControl.prototype.loadMap = loadMap;
     MapControl.prototype.setGeocodeMarker = setGeocodeMarker;
     MapControl.prototype.setDirectionsMarkers = setDirectionsMarkers;
@@ -207,6 +208,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 $(selectors.leafletLayerList).hide();
             }
         });
+    }
+
+    function fitToBounds(bounds) {
+        map.invalidateSize();
+        map.fitBounds(bounds);
     }
 
     function setGeocodeMarker(latLng) {
