@@ -87,7 +87,12 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {Object} Error object returned from OTP
      */
     function setItinerariesError(error) {
-        var alert = MapTemplates.alert(error.msg, 'Could not plan trip', 'danger');
+        var msg = error.msg;
+        // override default error message for out-of-bounds or non-navigable orign/destination
+        if (msg.indexOf('your start or end point might not be safely accessible') > -1) {
+            msg = 'Make sure the origin and destination are accessible addresses within the Greater Philadelphia area.';
+        }
+        var alert = MapTemplates.alert(msg, 'Could not plan trip', 'danger');
         $container.html(alert);
 
         // handle alert close button click
