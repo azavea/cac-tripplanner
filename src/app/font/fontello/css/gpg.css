@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'gpg';
-  src: url('../font/gpg.eot?98193865');
-  src: url('../font/gpg.eot?98193865#iefix') format('embedded-opentype'),
-       url('../font/gpg.woff2?98193865') format('woff2'),
-       url('../font/gpg.woff?98193865') format('woff'),
-       url('../font/gpg.ttf?98193865') format('truetype'),
-       url('../font/gpg.svg?98193865#gpg') format('svg');
+  src: url('../font/gpg.eot?83827807');
+  src: url('../font/gpg.eot?83827807#iefix') format('embedded-opentype'),
+       url('../font/gpg.woff2?83827807') format('woff2'),
+       url('../font/gpg.woff?83827807') format('woff'),
+       url('../font/gpg.ttf?83827807') format('truetype'),
+       url('../font/gpg.svg?83827807#gpg') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'gpg';
-    src: url('../font/gpg.svg?98193865#gpg') format('svg');
+    src: url('../font/gpg.svg?83827807#gpg') format('svg');
   }
 }
 */
