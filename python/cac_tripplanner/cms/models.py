@@ -87,9 +87,9 @@ class Article(models.Model):
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The wide image. Will be displayed at 1440x400.')
+                                   help_text='The large image. Will be displayed at 680x200.')
     narrow_image = models.ImageField(upload_to=generate_filename, null=True,
-                                     help_text='The narrow image. Will be displayed at 310x218.')
+                                     help_text='The small image. Will be displayed at 310x218.')
 
     @property
     def published(self):
