@@ -49,6 +49,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         this.$element = null;
 
         var createTypeahead = _.bind(function() {
+            var thisTypeahead = this;
             var $element = $(selector).typeahead(this.options, {
                 name: 'featured',
                 displayKey: 'name',
@@ -89,7 +90,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                                 var fullAddress = data.address.Match_addr;
                                 /*jshint camelcase: true */
 
-                                $element.typeahead('val', fullAddress).change();
+                                thisTypeahead.setValue(fullAddress);
                                 events.trigger(eventNames.selected, [typeaheadKey, location]);
                             }
                         });
