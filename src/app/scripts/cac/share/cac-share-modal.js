@@ -233,7 +233,7 @@ CAC.Share.ShareModal = (function ($, Settings, Modal) {
                           shortUrl
                          ].join('');
         mailToLink = encodeURI(mailToLink);
-        window.location.href = mailToLink;
+        window.open(mailToLink, '_blank');
     }
 
      /**
