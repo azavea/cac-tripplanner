@@ -59,10 +59,10 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             // mapping of option IDs to what to set in user preferences if option picked
             optionPreferences: {
                 'wheelchair': {name: 'wheelchair', value: true},
-                'noWheelchair': {name: 'wheelchair', value: false},
-                'noBikeShare': {name: 'bikeShare', value: false},
+                'noWheelchair': {name: 'wheelchair', value: undefined},
+                'noBikeShare': {name: 'bikeShare', value: undefined},
                 'useBikeShare': {name: 'bikeShare', value: true},
-                'bikeTriangleAny': {name: 'bikeTriangle', value: 'any'},
+                'bikeTriangleAny': {name: 'bikeTriangle', value: undefined},
                 'bikeTriangleFast': {name: 'bikeTriangle', value: 'fast'},
                 'bikeTriangleFlat': {name: 'bikeTriangle', value: 'flat'},
                 'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'},
@@ -260,7 +260,11 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
 
             var $toSelect = $('#' + toSelect);
             $toSelect.siblings().removeClass(options.selectors.selectedClass);
-            $toSelect.addClass(options.selectors.selectedClass);
+
+            // if value is defined, it is non-default and to be marked as selected
+            if (toSelect) {
+                $toSelect.addClass(options.selectors.selectedClass);
+            }
         });
     }
 
