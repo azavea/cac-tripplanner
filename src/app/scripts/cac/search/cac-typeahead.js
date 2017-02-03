@@ -32,7 +32,8 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     };
 
     var selectors = {
-        geolocate: '.icon-geolocate'
+        geolocate: '.icon-geolocate',
+        spinClass: 'spin'
     };
 
     function CACTypeahead(selector, options) {
@@ -81,6 +82,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             // Wire up locator button
             if ('geolocation' in navigator) {
                 $element.parent().parent().find(selectors.geolocate).on('click', function() {
+                    $(selectors.geolocate).addClass(selectors.spinClass);
                     navigator.geolocation.getCurrentPosition(function(pos) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
@@ -92,12 +94,16 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
 
                                 thisTypeahead.setValue(fullAddress);
                                 events.trigger(eventNames.selected, [typeaheadKey, location]);
+                                $(selectors.geolocate).removeClass(selectors.spinClass);
                             }
+                        }).catch(function (error) {
+                            console.error('reverse geocoding error:', error);
+                            $(selectors.geolocate).removeClass(selectors.spinClass);
                         });
 
                     }, function(error) {
-                        console.error('geolocation error:');
-                        console.error(error);
+                        console.error('geolocation error:', error);
+                        $(selectors.geolocate).removeClass(selectors.spinClass);
                     });
                 });
             }

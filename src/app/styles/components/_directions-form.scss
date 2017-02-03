@@ -412,7 +412,7 @@
             color: $lt-gray;
             cursor: pointer;
 
-            &.spin i {
+            & i.spin {
                 display: inline-block;
                 animation: full-rotation 2s infinite linear;
             }
