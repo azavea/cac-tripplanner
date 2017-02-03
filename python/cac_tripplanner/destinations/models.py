@@ -37,9 +37,9 @@ class Destination(models.Model):
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
     image = models.ImageField(upload_to=generate_filename, null=True,
-                              help_text='The large image. Will be displayed at 310x155.')
+                              help_text='The small image. Will be displayed at 310x155.')
     wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The small image. Will be displayed at 680x400.')
+                                   help_text='The large image. Will be displayed at 680x400.')
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
 
