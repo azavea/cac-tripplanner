@@ -52,6 +52,7 @@
         justify-content: space-between;
 
         @include respond-to('xxs') {
+            align-items: stretch;
             width: 100%;
             background-color: $gophillygo-blue;
             color: $white;
@@ -60,6 +61,7 @@
 
         button {
             flex: 0 0 40px;
+            padding: 0;
             border: 0;
             border-radius: 0;
             background: none;
