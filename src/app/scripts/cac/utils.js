@@ -92,12 +92,12 @@ CAC.Utils = (function (_) {
         WALK: brandColors.BLUE,
         BICYCLE: brandColors.PURPLE,
         BUS: brandColors.YELLOW,
-        TRAM: brandColors.ORANGE,
-        SUBWAY: brandColors.ORANGE,
-        TRAIN: brandColors.ORANGE,
-        RAIL: brandColors.ORANGE,
+        TRAM: brandColors.YELLOW,
+        SUBWAY: brandColors.YELLOW,
+        TRAIN: brandColors.YELLOW,
+        RAIL: brandColors.YELLOW,
         CAR: '#111111',
-        FERRY: brandColors.BLUE
+        FERRY: brandColors.YELLOW
     };
 
     var module = {

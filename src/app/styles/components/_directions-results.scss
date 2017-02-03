@@ -79,8 +79,7 @@
             }
 
             .route-modes {
-                .icon-walk,
-                .icon-ferry {
+                .icon-walk {
                     color: $gophillygo-blue;
                 }
 
@@ -88,14 +87,12 @@
                     color: $gophillygo-purple;
                 }
 
-                .icon-bus {
-                    color: $gophillygo-yellow;
-                }
-
+                .icon-bus,
                 .icon-subway,
                 .icon-train,
-                .icon-tram {
-                    color: $gophillygo-orange;
+                .icon-tram,
+                .icon-ferry {
+                    color: $gophillygo-yellow;
                 }
 
                 .icon-car {
