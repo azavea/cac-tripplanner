@@ -264,7 +264,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             var latlng = new cartodb.L.LatLng(position.lat, position.lng);
             marker.setLatLng(latlng, {draggable: true});
 
-            var trigger = (marker.options.title === 'origin') ?
+            var trigger = (marker.options.isOrigin) ?
                             eventNames.originMoved : eventNames.destinationMoved;
 
             events.trigger(trigger, position);
@@ -294,6 +294,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var originOptions = {
                     icon: originIcon,
                     draggable: true,
+                    isOrigin: true,
                     title: 'Drag to change origin',
                     zIndexOffset: 1001
                 };
@@ -314,6 +315,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                 var destOptions = {
                     icon: destIcon,
                     draggable: true,
+                    isOrigin: false,
                     title: 'Drag to change destination',
                     zIndexOffset: 1000
                 };
