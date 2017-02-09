@@ -80,6 +80,7 @@
     .info-article-image-hero,
     .info-place-image-hero {
         background-repeat: no-repeat;
+        background-position: center;
         background-size: cover;
 
         @include respond-to('xxs') {
