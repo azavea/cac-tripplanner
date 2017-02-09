@@ -1,6 +1,6 @@
 <div class="preview-card">
     <a href="{% url 'place-detail' pk=destination.pk %}" class="preview-card-link">
-        <img class="preview-photo" src="{{ destination.wide_image.url }}" width="310" alt="{{ destination.name }}" />
+        <img class="preview-photo" src="{{ destination.image.url }}" width="310" alt="{{ destination.name }}" />
         <div class="preview-details">
             <h2>{{ destination.name }}</h2>
             <p class="lede">{{ destination.description|striptags|truncatewords:20 }}</p>
