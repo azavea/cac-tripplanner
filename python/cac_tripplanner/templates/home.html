@@ -73,9 +73,9 @@
                     <div class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
-                                src="{{ destination.wide_image.url }}"
+                                src="{{ destination.image.url }}"
                             {% else %}
-                                src="https://placehold.it/400x400.jpg"
+                                src="https://placehold.it/310x155.jpg"
                             {% endif %}
                             width="310" height="155"
                             alt="{{ destination.name }}" />
