@@ -17,6 +17,8 @@ var KarmaServer = require('karma').Server;
 var mainBower = require('main-bower-files');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
+var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
@@ -27,19 +29,16 @@ var $ = require('gulp-load-plugins')();
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
 
-var filterCSS = gulpFilter('**/*.css', {restore: true});
+var filterCSS = gulpFilter(['**/*.css', '!**/leaflet.css'], {restore: true});
 
 var stat = {
-    fonts: staticRoot + '/fonts',
+    fonts: staticRoot + '/fontello',
     scripts: staticRoot + '/scripts',
     styles: staticRoot + '/styles',
     images: staticRoot + '/images'
 };
 
-var bootstrapSelectRoot = 'bower_components/bootstrap-select/dist/';
-var awesomeIconsRoot = 'bower_components/Leaflet.awesome-markers/dist/images';
-var materialIconsRoot = 'bower_components/material-design-iconic-font/svg/maps';
-var cartoDbRoot = 'bower_components/cartodb.js/src/';
+var cartoDbJs = 'bower_components/cartodb.js/cartodb.uncompressed.js';
 
 // Define the minification order for our js files
 var scriptOrder = [
@@ -50,15 +49,18 @@ var scriptOrder = [
     '**/utils.js',
     '**/cac/search/cac-search-params.js',
     '**/cac/map/cac-map-templates.js',
+    '**/cac/home/cac-home-templates.js',
+    '**/cac/control/cac-control-modal.js',
     '**/cac/share/*.js',
     '**/cac/user/*.js',
     '**/cac/search/*.js',
     '**/cac/routing/*.js',
     '**/cac/urlrouting/*.js',
+    '**/cac/control/cac-control-mode-options.js',
     '**/cac/control/*.js',
     '**/cac/map/*.js',
     '**/cac/home/*.js',
-    '**/*.js'
+    '**/*.js',
 ];
 
 // Helper for copying over bower files
@@ -106,21 +108,26 @@ var copyVendorJS = function(filter, extraFiles) {
     var bowerStream = copyBowerFiles(filter, extraFiles);
     var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
     vendorStream.add(bowerStream);
+    // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
+    // running jQuery in noConflict mode for JotForms.
+    // (Breaks loading Carto layers when it tries to reference $.ajax.)
+    vendorStream.pipe(replace(/\$\.ajax/g, 'jQuery.ajax'));
     return vendorStream;
 };
 
 gulp.task('clean', function() {
     // This must be done synchronously to prevent sporadic failures
     return del.sync([
-        stat.styles + '/**',
-        stat.scripts + '/**',
-        stat.images + '/**'
+        stat.fonts,
+        stat.scripts,
+        stat.styles,
+        stat.images
     ], { force: true });
 });
 
 gulp.task('minify:scripts', function(cb) {
     pump([
-        gulp.src('app/scripts/**/*.js'),
+        gulp.src(['app/scripts/**/*.js']),
         order(scriptOrder),
         vinylBuffer(),
         concat('main.js'),
@@ -135,8 +142,6 @@ gulp.task('minify:vendor-scripts', function(cb) {
                         // Exclude minified vendor scripts that also have a non-minified version.
                         // We run our own minifier, and want to include each script only once.
                         '!**/*.min.js',
-                        // ...except for bootstrap datetiempicker
-                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet and jquery (loaded over CDN)
                         '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
                         []),
@@ -154,13 +159,10 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles('**/*.css',
-                          // FIXME: excluding minified CSS results in console error
-                          // about missing font awesome webfonts
-                          //'!**/*.min.css',
+    return copyBowerFiles(['**/*.css',
+                          '!**/*.min.css',
                           // leaflet loaded over CDN
-                          '!**/leaflet/dist/*.css',
-                          [bootstrapSelectRoot + 'css/bootstrap-select.css'])
+                          '!**/leaflet.css'], [])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -169,29 +171,19 @@ gulp.task('copy:vendor-css', function() {
         .pipe(gulp.dest(stat.styles));
 });
 
-gulp.task('copy:bootstrap-select-map', function() {
-    return copyBowerFiles('**.*.map', [bootstrapSelectRoot + 'css/bootstrap-select.css.map'])
-        .pipe(concat('bootstrap-select.css.map'))
-        .pipe(gulp.dest(stat.styles));
-});
-
 gulp.task('copy:vendor-images', function() {
-    return copyBowerFiles('**/*.png', [])
+    return copyBowerFiles(['**/*.png'], [])
         .pipe(gulp.dest(stat.images + '/vendor'));
 });
 
-gulp.task('copy:fa-images', function() {
-    return copyBowerFiles('**/*.png', [awesomeIconsRoot + '/*.png'])
+gulp.task('copy:marker-images', function() {
+    return gulp.src(['bower_components/*eaflet*/dist/images/*.png'])
+        .pipe(rename({dirname: ''}))
         .pipe(gulp.dest(stat.styles + '/images'));
 });
 
-gulp.task('copy:md-images', function() {
-    return copyBowerFiles('**/*.svg', [materialIconsRoot + '/*.svg'])
-        .pipe(gulp.dest(stat.styles + '/images'));
-});
-
-gulp.task('copy:md-fonts', function() {
-    return copyBowerFiles('**/*.{woff,tiff,svg,eot}', [materialIconsRoot + '/*.{woff,tiff,svg,eot}'])
+gulp.task('copy:fontello-fonts', function() {
+    return gulp.src(['app/font/fontello/**'])
         .pipe(gulp.dest(stat.fonts));
 });
 
@@ -204,11 +196,11 @@ gulp.task('copy:vendor-scripts', function() {
     return copyVendorJS(['**/*.js',
                         // exclude minified versions
                         '!**/*.min.js',
-                        // ...except for bootstrap datetiempicker
-                        '**/bootstrap-datetimepicker.min.js',
                         // exclude leaflet
-                        '!**/leaflet.js', '!**/leaflet-src.js'],
-                        [])
+                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/cartodb**'],
+                        // load the uncompressed version of CartoDB in development,
+                        // for easier debugging
+                        [cartoDbJs])
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -249,7 +241,7 @@ gulp.task('test:copy-jquery', function() {
 
 // Since cartodb.js is loaded from a CDN, we need to pull it in manually here.
 gulp.task('test:copy-cartodb', function() {
-    return copyBowerFiles('cartodb.js', [cartoDbRoot + '**/cartodb.js'])
+    return copyBowerFiles('cartodb.js', [cartoDbJs])
         .pipe(gulp.dest(stat.scripts));
 });
 
@@ -288,27 +280,21 @@ gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
 );
 
 gulp.task('common:build', ['clean'], sequence([
+        'copy:fontello-fonts',
         'copy:vendor-css',
-        'copy:bootstrap-select-map',
         'copy:vendor-images',
-        'copy:fa-images',
-        'copy:md-images',
-        'copy:md-fonts',
+        'copy:marker-images',
         'copy:app-images',
         'sass',
         'collectstatic'])
 );
 
 gulp.task('test', sequence([
-            'production',
             'test:copy-jquery',
             'test:copy-cartodb',
-            'minify:scripts',
-            'minify:vendor-scripts',
+            'production',
             'test:production',
             'development',
-            'copy:vendor-scripts',
-            'copy:scripts',
             'test:coverage'])
 );
 

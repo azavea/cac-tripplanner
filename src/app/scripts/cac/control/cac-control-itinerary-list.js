@@ -14,7 +14,26 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         // Should the share button be shown in the control
         showShareButton: false,
         selectors: {
-            container: '.itineraries'
+            alert: '.alert',
+            container: '.directions-list',
+            hiddenClass: 'hidden',
+            itineraryList: '.routes-list',
+            itineraryItem: '.route-summary'
+        },
+        // Settings for 'slick' carousel for swiping itineraries on mobile
+        slick: {
+            arrows: false,
+            dots: true,
+            infinite: false,
+            mobileFirst: true,
+            variableWidth: true,
+            responsive : [
+                {
+                    // Breakpoint must match 'xxs' in _breakpoints.scss
+                    breakpoint: 480,
+                    settings: 'unslick'
+                }
+            ]
         }
     };
     var options = {};
@@ -53,12 +72,14 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     function setItineraries(newItineraries) {
         itineraries = newItineraries;
 
-
         // Show the directions div and populate with itineraries
         var html = MapTemplates.itineraryList(itineraries);
         $container.html(html);
-        $('.block-itinerary').on('click', onItineraryClicked);
-        $('.block-itinerary').hover(onItineraryHover);
+
+        enableCarousel(itineraries);
+
+        $(options.selectors.itineraryItem).on('click', onItineraryClicked);
+        $(options.selectors.itineraryItem).hover(onItineraryHover);
     }
 
     /**
@@ -66,8 +87,34 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {Object} Error object returned from OTP
      */
     function setItinerariesError(error) {
-        var $alert = MapTemplates.alert('Could not plan trip: ' + error.msg, 'danger');
-        $container.html($alert);
+        var msg = error.msg;
+        // override default error message for out-of-bounds or non-navigable orign/destination
+        if (msg.indexOf('Your start or end point might not be safely accessible') > -1) {
+            msg = 'Make sure the origin and destination are accessible addresses within the Greater Philadelphia area.';
+        }
+        var alert = MapTemplates.alert(msg, 'Could not plan trip', 'danger');
+        $container.html(alert);
+
+        // handle alert close button click
+        $container.one('click', options.selectors.alert, function() {
+            $(options.selectors.alert).remove();
+        });
+    }
+
+    /**
+     * Enable 'slick' carousel for swiping itineraries on mobile
+     * @param {[object]} itineraries An open trip planner itinerary object, as returned from the plan endpoint
+     */
+    function enableCarousel(itineraries) {
+        if (itineraries.length < 2) {
+            return;
+        }
+
+        $(options.selectors.itineraryList)
+            .slick(options.slick)
+            .on('afterChange', function(event, slick, currentSlide) {
+                $(options.selectors.itineraryItem).eq(currentSlide).triggerHandler('mouseenter');
+            });
     }
 
     function getItineraryById(id) {
@@ -93,7 +140,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     }
 
     function show() {
-        $container.removeClass('hidden');
+        $container.removeClass(options.selectors.hiddenClass);
     }
 
     /**
@@ -102,17 +149,17 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {Boolean} show If false, will make all itineraries transparent (hide them)
      */
     function showItineraries(show) {
-        for (var i in itineraries) {
-            itineraries[i].show(show);
-        }
+        _.forEach(itineraries, function(itinerary) {
+            itinerary.show(show);
+        });
     }
 
     function hide() {
-        $container.addClass('hidden');
+        $container.addClass(options.selectors.hiddenClass);
     }
 
     function toggle() {
-        if ($container.hasClass('hidden')) {
+        if ($container.hasClass(options.selectors.hiddenClass)) {
             show();
         } else {
             hide();

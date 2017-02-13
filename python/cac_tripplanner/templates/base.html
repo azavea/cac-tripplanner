@@ -5,32 +5,33 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
-    <title>{% block title %}Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
+
+    {% block pagetitle %}
+    <title>{% block title %}GoPhillyGo | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
+
+    <meta property="og:title" content="GoPhillyGo Trip Planner" />
+    <meta name="twitter:title" content="GoPhillyGo Trip Planner" />
+    {% endblock %}
 
     {% block extrametatags %}
     <meta property="fb:app_id" content="{{ fb_app_id }}" />
     <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
-    <meta property="og:title" content="Trip Planner" />
     <meta property="og:description"
         content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
-    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
+    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
     <meta property="og:site_name" content="GoPhillyGo" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@go_philly_go" />
-    <meta name="twitter:title" content="GoPhillyGo" />
     <meta name="twitter:description" content="Helping you get around greater Philly" />
-    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_color.png" />
+    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     {% endblock %}
 
     {% block cssimports %}
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
     <link href="{% static 'styles/main.css' %}" rel="stylesheet">
 
@@ -44,6 +45,9 @@
 	<link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/apple-touch-icon-152x152.png' %}" />
 	<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" sizes="32x32" />
 
+    {% endblock %}
+
+    {% block extracss %}
     {% endblock %}
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -64,11 +68,19 @@
     })(window,document,'script','dataLayer','GTM-KNZ9R2');</script>
     <!-- End Google Tag Manager -->
 
-    {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
+    {% block body %}
+    <div id="body-div" class="body-{{ tab|default:'home' }}
+        {% if 'map' in tab %}body-map{% endif %}">
+        {% block content %}<h1>I'm abstract - you should never see me!</h1>{% endblock %}
+    </div>
+    {% endblock body %}
 
     {% block jsimports %}
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript">
+        jQuery.noConflict(); // because JotForms.
+    </script>
 
     {% if debug %}
 
@@ -85,21 +97,19 @@
     }(document, 'script', 'facebook-jssdk'));</script>
     {% endif %}
 
-    <script src="{% static 'scripts/vendor/cartodb.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap.js' %}"></script>
-    <script src="{% static 'scripts/vendor/jquery.storageapi.js' %}"></script>
+    <script src="{% static 'scripts/vendor/cartodb.uncompressed.js' %}"></script>
+    <script src="{% static 'scripts/vendor/leaflet.awesome-markers.js' %}"></script>
+    <script src="{% static 'scripts/vendor/js.storage.js' %}"></script>
     <script src="{% static 'scripts/vendor/lodash.js' %}"></script>
     <script src="{% static 'scripts/vendor/handlebars.js' %}"></script>
     <script src="{% static 'scripts/vendor/Polyline.encoded.js' %}"></script>
     <script src="{% static 'scripts/vendor/typeahead.bundle.js' %}"></script>
-    <script src="{% static 'scripts/vendor/leaflet.awesome-markers.js' %}"></script>
     <script src="{% static 'scripts/vendor/turf-helpers.js' %}"></script>
     <script src="{% static 'scripts/vendor/turf-point-on-line.js' %}"></script>
     <script src="{% static 'scripts/vendor/moment.js' %}"></script>
     <script src="{% static 'scripts/vendor/moment-duration-format.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap-datetimepicker.min.js' %}"></script>
-    <script src="{% static 'scripts/vendor/bootstrap-select.js' %}"></script>
     <script src="{% static 'scripts/vendor/navigo.js' %}"></script>
+    <script src="{% static 'scripts/vendor/slick.js' %}"></script>
 
     <script src="{% static 'scripts/main/cac/cac.js' %}"></script>
     <script src="{% static 'scripts/main/cac/utils.js' %}"></script>
@@ -107,22 +117,26 @@
     <script src="{% static 'scripts/main/cac/search/cac-search-params.js' %}"></script>
     <script src="{% static 'scripts/main/cac/search/cac-geocoder.js' %}"></script>
     <script src="{% static 'scripts/main/cac/search/cac-typeahead.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/share/cac-social-sharing.js' %}"></script>
     <script src="{% static 'scripts/main/cac/routing/cac-routing-itinerary.js' %}"></script>
     <script src="{% static 'scripts/main/cac/routing/cac-routing-plans.js' %}"></script>
     <script src="{% static 'scripts/main/cac/urlrouting/cac-urlrouting.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/home/cac-home-templates.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-control.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-isochrone.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/map/cac-map-itinerary.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-overlays.js' %}"></script>
     <script src="{% static 'scripts/main/cac/map/cac-map-templates.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/control/cac-control-bike-mode-options.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/control/cac-control-sidebar-tab.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/control/cac-control-sidebar-explore.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/control/cac-control-sidebar-directions.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-mode-options.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-modal.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-tab.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/share/cac-share-modal.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-trip-options.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-directions-form.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-explore.js' %}"></script>
+    <script src="{% static 'scripts/main/cac/control/cac-control-directions.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-itinerary-list.js' %}"></script>
     <script src="{% static 'scripts/main/cac/control/cac-control-directions-list.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/home/cac-home-templates.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-home.js' %}"></script>
-    <script src="{% static 'scripts/main/cac/pages/cac-pages-map.js' %}"></script>
     <script src="{% static 'scripts/main/cac/pages/cac-pages-directions.js' %}"></script>
 
     {% else %}

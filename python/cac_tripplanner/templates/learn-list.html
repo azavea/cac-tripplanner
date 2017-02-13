@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+    {% include "partials/header.html" %}
+    <div class="main">
+        <h1>Tips, Posts, and Announcements</h1>
+        <div class="summaries-list">
+            {% for article in articles %}
+                {% include "partials/article-card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% include "partials/footer.html" %}
+{% endblock %}

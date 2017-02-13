@@ -1,211 +1,124 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block content %}
-<div class="homepage">
-    {% include "header-mixin.html" %}
-    <section class="jumbotron">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                    <h1 class="text-center">GoPhillyGo is a new online mapping tool for the Greater Philadelphia area.</h1>
-                    <h3 class="text-center hidden-xs">There are 2 easy ways to use the map:</h3>
-                    <div class="text-center toggle-search hidden-xs">
-                        <button class="btn btn-lg active" id="toggle-explore">Explore nearby locations</button>
-                        <small>or</small>
-                        <button class="btn btn-lg" id="toggle-directions">Help me find directions</button>
+    {% include "partials/header.html" %}
+
+    <div class="the-map" id="map"></div>
+
+    <form class="directions-form-element" action="" method="post">
+        <div class="directions-form">
+            <div class="mode-picker">
+                <div class="mode-toggle">
+                    <div class="walk mode-option on" title ="Walk there">
+                        <i class="icon-walk"></i> <span class="mode-label">Walk</span>
                     </div>
+                    <div class="bike mode-option" title ="Bike there">
+                        <i class="icon-bike"></i> <span class="mode-label">Bike</span>
+                    </div>
+                    <input type="hidden" name="mode" value="walk">
+                </div>
+                <div class="transit mode-option on" title ="Click to disable transit">
+                    <i class="icon-transit-on"></i> <span class="mode-label">Transit</span>
+                    <input type="hidden" name="transit" value="on">
+                </div>
+                <div class="btn-options" title="Route options">
+                    <i class="icon-sliders"></i>
                 </div>
             </div>
-        </div>
-        <div class="search text-center hidden-xs">
-            <form id="explore">
-                <span class="text hidden-sm">Where can I go in</span>
-                <input id="exploreTime" type="number" value="20" min="5" step="5" max="120" />
-                <span class="text">minutes from</span>
-                <input id="exploreOrigin" class="typeahead" type="search"
-                    data-typeahead-key="origin" />
-                <span class="text">using</span>
-                <div id="exploreMode" class="btn-toolbar transit-types-container">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Walking">
-                            <input type="radio" name="anytime-mode"
-                                value="WALK" checked />
-                            <i class="md md-directions-walk"></i>
-                        </label>
-                        <label class="btn btn-primary btn-transit" title=""
-                            data-original-title="Biking">
-                            <input type="radio" name="anytime-mode" value="BICYCLE" />
-                            <i class="md md-directions-bike"></i>
-                        </label>
-                    </div>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Transit">
-                            <input type="checkbox" name="public-transit-mode" value="TRANSIT" checked/>
-                            <i class="md md-directions-transit"></i>
-                        </label>
-                    </div>
-                </div>
-                <button type="submit">&rarr;</button>
-            </form>
-            <form id="directions" class="hidden">
-                <span class="text hidden-sm">How do I get from</span>
-                <input id="directionsFrom" class="typeahead" type="search"
-                    data-typeahead-key="from" />
-                <span class="text">to</span>
-                <input id="directionsTo" class="typeahead" type="search"
-                    data-typeahead-key="to" />
-                <span class="text">using</span>
-                <div id="directionsMode" class="btn-toolbar transit-types-container">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Walking">
-                            <input type="radio" name="anytime-mode"
-                                value="WALK" checked />
-                            <i class="md md-directions-walk"></i>
-                        </label>
-                        <label class="btn btn-primary btn-transit" title=""
-                            data-original-title="Biking">
-                            <input type="radio" name="anytime-mode"
-                                value="BICYCLE" />
-                            <i class="md md-directions-bike"></i>
-                        </label>
-                    </div>
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary btn-transit active" title=""
-                            data-original-title="Transit">
-                            <input type="checkbox" name="public-transit-mode"
-                                value="TRANSIT" checked />
-                            <i class="md md-directions-transit"></i>
-                        </label>
-                    </div>
-                </div>
-                <button type="submit">&rarr;</button>
-            </form>
-        </div>
-    </section>
-    <section class="content content-gray">
-        <div class="container">
-            <h1>Featured Locations <small>
-                <a id="viewAllDestinations" href="#">View all &raquo;</a>
-            </small></h1>
-            <div id="#destinationsSpinner" class="sk-spinner sk-three-bounce hidden">
-                <div class="sk-child sk-bounce1"></div>
-                <div class="sk-child sk-bounce2"></div>
-                <div class="sk-child sk-bounce3"></div>
+            <div class="directions-from directions-text-input">
+                <label for="input-directions-from">from</label>
+                <input type="search" id="input-directions-from" name="input-directions-from"
+                    value="" placeholder="Enter a starting point"
+                    tabindex="1" class="typeahead" data-typeahead-key="origin">
+                <button class="btn-geolocate" title="Detect current location" type="button"
+                    tabindex="3" name="geolocate"><i class="icon-geolocate"></i></button>
             </div>
-            <div class="row destinations">
-                {% for destination in destinations|slice:":2" %}
-                    <div class="col-sm-6 col-md-4">
-                        <a class="block block-destination" data-destination-id="{{ destination.id }}" href="#">
-                            <h3 class="destination-name">{{ destination.name }}</h3>
-                            <h5 class="destination-address">{{ destination.address }}</h5>
-                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
+            <div class="directions-to directions-tab-button directions-text-input">
+                <label for="input-directions-to">to</label>
+                <input type="search" id="input-directions-to" name="input-directions-to" value=""
+                    placeholder="Enter a destination — or choose one below"
+                    tabindex="2" class="typeahead" data-typeahead-key="destination">
+                <button class="btn-reverse" title="Swap starting point and destination"
+                    tabindex="4" type="button" name="reverse"><i class="icon-reverse"></i></button>
+            </div>
+            <div class="isochrone-control directions-tab-button directions-text-input hidden">
+                <label for="isochrone-slider">within</label>
+                <div id="output-directions-within">15</div>
+                <input type="range" id="isochrone-slider" name="isochrone-slider" value="15"
+                    tabindex="5" min="15" max="60" step="15">
+            </div>
+        </div>
+    </form>
+
+    <div class="sidebar-banner indego-banner">
+        <div class="banner-message">Need wheels? Click <i class="icon-sliders"></i> for Indego bike sharing</div>
+        <button title="Dismiss this message" name="close"
+            class="btn-dismiss-sidebar-banner"><i class="icon-cancel"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-banner trip-options-banner hidden"></div>
+
+    <div class="places">
+        <div class="places-content">
+            <header class="places-header">
+                <h1>Places we love</h1>
+                <a href="#" class="map-view-btn">Map View</a>
+            </header>
+            <ul class="place-list">
+                {% for destination in destinations %}
+                <li class="place-card no-origin" data-destination-id="{{ destination.id }}"
+                    data-destination-x="{{ destination.point.x }}"
+                    data-destination-y="{{ destination.point.y }}">
+                    <div class="place-card-photo-container">
+                        <img class="place-card-photo"
                             {% if destination.image %}
-                            <img src="{{ destination.image.url }}" width="400" height="400"/>
+                                src="{{ destination.image.url }}"
                             {% else %}
-                            <img src="https://placehold.it/400x400.jpg" />
+                                src="https://placehold.it/310x155.jpg"
                             {% endif %}
-                        </a>
+                            width="310" height="155"
+                            alt="{{ destination.name }}" />
                     </div>
-                {% endfor %}
-                <div class="col-sm-6 col-md-4">
-                    {% for destination in destinations|slice:"2:4" %}
-                        <a class="block block-destination block-half" data-destination-id="{{ destination.id }}" href="#">
-                            <h3 class="destination-name">{{ destination.name }}</h3>
-                            <h5 class="destination-address">{{ destination.address }}</h5>
-                            <h5 class="destination-address-2">{{ destination.city }}, {{ destination.state }} {{ destination.zip }}</h5>
-                            {% if destination.wide_image %}
-                            <img src="{{ destination.wide_image.url }}" width="400" height="200"/>
-                            {% else %}
-                            <img src="https://placehold.it/400x400.jpg" />
-                            {% endif %}
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="content">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <h3>GoPhillyGo Spotlight <small>
-                        <a id="viewAllArticles" href="#">View all &raquo;</a>
-                    </small></h3>
-                    <div id="articlesSpinner" class="sk-spinner sk-three-bounce hidden">
-                        <div class="sk-child sk-bounce1"></div>
-                        <div class="sk-child sk-bounce2"></div>
-                        <div class="sk-child sk-bounce3"></div>
+                    <h2 class="place-card-name">{{ destination.name }}</h2>
+                    <div class="place-card-travel-logistics">
+                        <span class="place-card-travel-logistics-duration">N</span> min from <span class="place-card-travel-logistics-origin">origin</span>
                     </div>
-                    <div class="row articles">
-                      {% if community_profile %}
-                        <div class="col-sm-6">
-                          <a class="block block-spotlight"
-                             href="{% url 'community-profile-detail' community_profile.slug %}">
-                                <h3 class="destination-name">{{ community_profile.title }}</h3>
-                                <h5>Community Profile</h5>
-                                {% if community_profile.narrow_image %}
-                                <img src="{{ community_profile.narrow_image.url }}" width="400" height="600"/>
-                                {% else %}
-                                <img src="https://placehold.it/400x600.jpg" />
-                                {% endif %}
-                            </a>
-                        </div>
-                        {% endif %}
-                        {% if tips_and_tricks %}
-                        <div class="col-sm-6">
-                          <a class="block block-spotlight"
-                             href="{% url 'tips-and-tricks-detail' tips_and_tricks.slug %}">
-                                <h3 class="destination-name">{{ tips_and_tricks.title }}</h3>
-                                <h5>Tips & Tricks</h5>
-                                {% if tips_and_tricks.wide_image %}
-                                <img src="{{ tips_and_tricks.narrow_image.url }}" width="400" height="600"/>
-                                {% else %}
-                                <img src="https://placehold.it/400x600.jpg" />
-                                {% endif %}
-                            </a>
-                        </div>
-                        {% endif %}
+                    <div class="place-card-actions">
+                        <a class="place-card-action place-action-go"
+                            data-destination-id="{{ destination.id }}" href="#">Directions</a>
+                        <a class="place-card-action place-action-details"
+                           href="{% url 'place-detail' pk=destination.pk %}">More info</a>
                     </div>
-                </div>
-                <div class="col-md-4 hidden-xs hidden-sm">
-                    <h3>Stay Connected</h3>
-                    <a class="twitter-timeline" href="https://twitter.com/go_philly_go"
-                        data-widget-id="591426048786587650">Tweets by @go_philly_go</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-                    </script>
-                </div>
-            </div>
+                </li>
+            {% endfor %}
+            </ul>
         </div>
-        </div>
-    </section>
-    <div id="submit-error-modal" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4>We had trouble recognizing that address</h4>
-          </div>
-          <div class="modal-body">
-            <p>Please try again and select an option from the list.</p>
-            <p>Intersections are difficult to interpret - try using an address instead.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-    {% include "contact-form-mixin.html" %}
-    {% include "footer-mixin.html" %}
-</div>
+        {% include "partials/spinner.html" %}
+    </div>
+
+    {% if article %}
+        {% include "partials/article-card.html" with show_link=True %}
+    {% endif %}
+
+    <div class="directions-results">
+        {% include "partials/spinner.html" %}
+        <div class="directions-list"></div>
+    </div>
+
+    <div class="directions-step-by-step"></div>
+
+    {% include "partials/modals.html" %}
+
+    {% include "partials/footer.html" %}
 {% endblock %}
 
 {%block jspage %}
 <script type="text/javascript">
-jQuery.noConflict(); // because JotForms.
 jQuery(document).ready(function ($) {
     CAC.Settings.fbAppId = '{{ fb_app_id }}';
+    CAC.Settings.routingUrl = '{{ routing_url }}';
+    CAC.Settings.isochroneUrl = '{{ isochrone_url }}';
     var home = new CAC.Pages.Home();
     home.initialize();
 });

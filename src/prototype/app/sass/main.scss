@@ -1,7 +1,11 @@
+// Vendors
+@import
+'vendors/inputrange';
+
 // Utils
 @import
-'utils/variables',
 'utils/color',
+'utils/variables',
 'utils/functions',
 'utils/mixins',
 'utils/breakpoints';

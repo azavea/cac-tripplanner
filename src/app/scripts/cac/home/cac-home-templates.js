@@ -2,7 +2,6 @@ CAC.Home.Templates = (function (Handlebars) {
     'use strict';
 
     var module = {
-        articles: articles,
         destinations: destinations
     };
 
@@ -16,42 +15,42 @@ CAC.Home.Templates = (function (Handlebars) {
      */
     function destinations(useDestinations) {
         var source = [
-            '{{#each destinations}}',
-            '<div class="col-sm-6 col-md-4">',
-            '<a class="block block-destination block-half" data-destination-id="{{this.id}}" href="#">',
-            '<h3 class="destination-name">{{this.name}}</h3>',
-            '<h5 class="destination-address">{{this.address}}</h5>',
-            '<h5 class="destination-address-2">{{this.city}}, {{this.state}} {{this.zip}}</h5>',
-            '<img src="{{#if this.wide_image}}{{ this.wide_image }}{{^}}https://placehold.it/300x150{{/if}}"',
-            ' width="400" height="200"/>',
-            '</a>',
-            '</div>',
-            '{{/each}}'
+            '<header class="places-header">',
+                '<h1>Places we love</h1>',
+                '<a href="#" class="map-view-btn">Map View</a>',
+            '</header>',
+            '<ul class="place-list">',
+                '{{#each destinations}}',
+                '<li class="place-card no-origin" data-destination-id="{{ this.id }}" ',
+                    'data-destination-x="{{ this.location.x }}" ',
+                    'data-destination-y="{{ this.location.y }}">',
+                    '<div class="place-card-photo-container">',
+                    '<img class="place-card-photo"',
+                        '{{#if this.image}}',
+                            'src="{{ this.image }}"',
+                        '{{else}}',
+                            'src="https://placehold.it/310x155.jpg"',
+                        '{{/if}}',
+                        'width="310" height="155"',
+                        'alt="{{ this.name }}" />',
+                    '</div>',
+                    '<h2 class="place-card-name">{{ this.name }}</h2>',
+                    '<div class="place-card-travel-logistics">',
+                        '<span class="place-card-travel-logistics-duration"></span> ',
+                        'from <span class="place-card-travel-logistics-origin">origin</span>',
+                    '</div>',
+                    '<div class="place-card-actions">',
+                        '<a class="place-card-action place-action-go"',
+                            'data-destination-id="{{ this.id }}" href="#">Directions</a>',
+                        '<a class="place-card-action place-action-details"',
+                           'href="/place/{{ this.id }}/">More info</a>',
+                    '</div>',
+                '</li>',
+                '{{/each}}',
+            '</ul>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({destinations: useDestinations});
-        return html;
-    }
-
-    /**
-     * Take list of articles and return templated HTML snippet for sidebar.
-     *
-     * @param articles {Array} Collection of JSON destinations from /api/artic
-     * @return html {String} Snippets for boxes to display on home page for each destination
-     */
-    function articles(useArticles) {
-        var source = [
-            '{{#each articles}}',
-            '<div class="col-sm-6">',
-            '<a class="block block-spotlight" href="{{this.url}}">',
-            '<h3 class="destination-name">{{this.title}}</h3>',
-            '<h5>Community Profile</h5>',
-            '{{#if this.narrow_image}}<img src="{{this.narrow_image}}" width="400" height="600"/>',
-            '{{else}}<img src="https://placehold.it/400x600.jpg" />',
-            '{{/if}}</a></div>{{/each}}'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({articles: useArticles});
         return html;
     }
 

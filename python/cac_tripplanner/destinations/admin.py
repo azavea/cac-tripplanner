@@ -8,7 +8,7 @@ from .models import Destination
 class DestinationAdmin(admin.OSMGeoAdmin):
     form = DestinationForm
 
-    list_display = ('name', 'published', 'address', 'city', 'state', 'zip')
+    list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zip')
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
 

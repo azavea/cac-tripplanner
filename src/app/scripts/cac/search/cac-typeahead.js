@@ -22,12 +22,18 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
     var defaults = {
         highlight: true,
         minLength: 1, // empty input is checked differently, 0 minLength no longer needed
+        hint: true,
         autoselect: true
     };
     var defaultTypeaheadKey = 'default';
     var eventNames = {
         cleared: 'cac:typeahead:cleared',
         selected: 'cac:typeahead:selected'
+    };
+
+    var selectors = {
+        geolocate: '.icon-geolocate',
+        spinClass: 'spin'
     };
 
     function CACTypeahead(selector, options) {
@@ -40,10 +46,11 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         this.eventNames = eventNames;
 
         // For keeping track of the last selected value
-        this.lastSelectedValue = null;
+        this.lastSelectedValue = '';
         this.$element = null;
 
         var createTypeahead = _.bind(function() {
+            var thisTypeahead = this;
             var $element = $(selector).typeahead(this.options, {
                 name: 'featured',
                 displayKey: 'name',
@@ -62,34 +69,41 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
 
             // Whenever the typeahead is switched away from (be it from a tab, click-away, etc.),
             // check to see whether or not the value in the typeahead is something that has been
-            // selected. If it has not been selected, trigger a change even with a null location
+            // selected. If it has not been selected, trigger a change even with a blank location
             // in order to warn listeners that the displayed value has not been geocoded.
-            $element.blur($.proxy(function() {
-                if ($element.typeahead('val') !== this.lastSelectedValue) {
+            $element.blur($.proxy(function(event) {
+                if (event.currentTarget && $element.typeahead('val') !== this.lastSelectedValue) {
                     var key = $(event.currentTarget).data('typeahead-key') || defaultTypeaheadKey;
-                    this.events.trigger(eventNames.selected, [key, null]);
+
+                    this.events.trigger(eventNames.selected, [key, '']);
                 }
             }, this));
 
-            // Add locator button and wire it up
-            var locatorTemplate = '<i class="fa fa-crosshairs locate-icon"></i>';
-            var $locator = $(locatorTemplate).insertBefore($element);
+            // Wire up locator button
             if ('geolocation' in navigator) {
-                $element.parent().on('click', '.locate-icon', function() {
+                $element.parent().parent().find(selectors.geolocate).on('click', function() {
+                    $(selectors.geolocate).addClass(selectors.spinClass);
                     navigator.geolocation.getCurrentPosition(function(pos) {
                         var coords = pos.coords;
                         Geocoder.reverse(coords.latitude, coords.longitude).then(function (data) {
                             if (data && data.address) {
-                                var location = Utils.convertReverseGeocodeToFeature(data);
+                                var location = Utils.convertReverseGeocodeToLocation(data);
                                 /*jshint camelcase: false */
                                 var fullAddress = data.address.Match_addr;
                                 /*jshint camelcase: true */
 
-                                $element.typeahead('val', fullAddress).change();
+                                thisTypeahead.setValue(fullAddress);
                                 events.trigger(eventNames.selected, [typeaheadKey, location]);
+                                $(selectors.geolocate).removeClass(selectors.spinClass);
                             }
+                        }).catch(function (error) {
+                            console.error('reverse geocoding error:', error);
+                            $(selectors.geolocate).removeClass(selectors.spinClass);
                         });
 
+                    }, function(error) {
+                        console.error('geolocation error:', error);
+                        $(selectors.geolocate).removeClass(selectors.spinClass);
                     });
                 });
             }
@@ -97,11 +111,9 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             // Trigger cleared event when user clears the input via keyboard or clicking the x
             $element.on('keyup search change', function() {
                 if ($element.val()) {
-                    $locator.hide();
                 } else {
                     $element.typeahead('close');
                     events.trigger(eventNames.cleared, [typeaheadKey]);
-                    $locator.show();
                 }
             });
         }, this);
@@ -128,7 +140,6 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             this.lastSelectedValue = suggestion.text;
             CAC.Search.Geocoder.search(suggestion.text, suggestion.magicKey).then(
                 function (location) {
-                    // location will be null if no results found
                     events.trigger(eventNames.selected, [typeaheadKey, location]);
                 }, function (error) {
                     console.error(error);
@@ -163,7 +174,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest';
 
         var params = {
-            searchExtent: SearchParams.searchBounds,
+            searchExtent: SearchParams.searchExtent,
             category: SearchParams.searchCategories,
             f: 'pjson'
         };
@@ -178,7 +189,16 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                     // do not behave well with the follow-up geocode.
                     // See: https://github.com/azavea/cac-tripplanner/issues/307
                     return _.filter(list.suggestions, { isCollection: false });
-                }
+                },
+                replace: function(url, query) {
+                    // overriding replace to modify bias location per request
+                    url = url.replace('%QUERY', encodeURIComponent(query));
+                    url += '&' + $.param({
+                        location: SearchParams.getLocation(),
+                        distance: SearchParams.distance
+                    });
+                    return url;
+                },
             }
         });
         adapter.initialize();

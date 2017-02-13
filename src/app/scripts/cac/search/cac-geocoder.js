@@ -1,11 +1,11 @@
 CAC.Search.Geocoder = (function ($, SearchParams) {
     'use strict';
 
-    var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find';
+    var url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates';
     var reverseUrl = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode';
 
     var defaults = {
-        bbox: SearchParams.searchBounds,
+        searchExtent: SearchParams.searchExtent,
         category: SearchParams.searchCategories,
         outFields: 'StAddr,City,Region,Postal',
         f: 'pjson',
@@ -19,28 +19,36 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
 
     return module;
 
+    function getParams(text, magicKey) {
+        var params = $.extend({}, defaults, {
+            magicKey: magicKey || null,
+            singleLine: text,
+            location: SearchParams.getLocation(),
+            distance: SearchParams.distance
+        });
+
+        if (magicKey && params.searchExtent) {
+            // The find endpoint apparently dislikes returning previously found results with
+            //  suggest when bounds supplied for a given text & magickey
+            delete params.searchExtent;
+        }
+
+        return params;
+    }
+
     // Note: this function is also used in the Django admin interface.
     // If the interface changes, make sure to update accordingly.
     function search(text, magicKey) {
         var dfd = $.Deferred();
-        var params = $.extend({}, defaults, {
-            text: text,
-            magicKey: magicKey || null
-        });
-        if (magicKey && params.bbox) {
-            // The find endpoint apparently dislikes returning previously found results with
-            //  suggest when bbox is supplied for a given text & magickey
-            delete params.bbox;
-        }
         $.ajax(url, {
-            data: params,
+            data: getParams(text, magicKey),
             dataType: 'json',
             cache: true,
             success: function (data) {
-                if (data && data.locations && data.locations.length &&
-                        data.locations[0].feature.attributes.StAddr.length) {
+                if (data && data.candidates && data.candidates.length &&
+                        data.candidates[0].attributes.StAddr.length) {
                     // results with a street address are probably good
-                    dfd.resolve(data.locations[0]);
+                    dfd.resolve(data.candidates[0]);
                 } else {
                     // Deal with geocoder not being able to handle all POI results from
                     // suggest service when POI name comes before street address.
@@ -54,14 +62,14 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
                                 newText += splitText[i] + ', ';
                             }
                             // try searching again without the POI name part
-                            params.text = newText;
                             $.ajax(url, {
-                                data: params,
+                                data: getParams(newText, magicKey),
                                 dataType: 'json',
                                 cache: true,
                                 success: function (data) {
                                     returnLocation(data, dfd);
                                 }, error: function (error) {
+                                    console.error(error);
                                     dfd.reject(error);
                                 }
                             });
@@ -74,6 +82,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
                 }
             },
             error: function (error) {
+                console.error(error);
                 dfd.reject(error);
             }
         });
@@ -84,8 +93,8 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
     // Helper function to encapsulate the "return whatever location we have, if we have one"
     // logic, since it's needed repeatedly
     function returnLocation(data, dfd) {
-        if (data && data.locations && data.locations.length) {
-            dfd.resolve(data.locations[0]);
+        if (data && data.candidates && data.candidates.length) {
+            dfd.resolve(data.candidates[0]);
         } else {
             dfd.resolve(null);
         }

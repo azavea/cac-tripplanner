@@ -1,0 +1,125 @@
+.places {
+    @include sidebar-main;
+    position: relative;
+
+    @include respond-to('xxs') {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .body-map-directions & {
+        display: none;
+    }
+
+    .body-map & .map-view-btn {
+        display: none;
+    }
+
+    .body-home & {
+        // Nesting the `sidebar-main` mixin inside a class makes the calculated height stop working,
+        // so instead that's the default and we need to set some properties back to default values
+        // for the home page view.
+        flex: 1 0 auto;
+        width: 100%;
+        max-width: $home-main-max-width;
+        height: auto;
+        min-height: 400px;
+        margin: 0 auto $home-section-margin;
+        padding: 0 $home-section-padding 10px;
+        background-color: $home-section-bg-color;
+        overflow: visible;
+
+        @include respond-to('xs') {
+            max-width: $place-card-width + (2 * $home-section-padding);
+            margin-bottom: $home-section-margin / 2;
+        }
+
+        @include respond-to('xxs') {
+            background-color: inherit;
+        }
+    }
+
+    .places-header {
+        position: relative;
+    }
+
+    .places-content {
+        &.hidden {
+            display: none;
+        }
+
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: $font-weight-bold;
+        line-height: 3;
+        text-align: center;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            font-size: 2rem;
+            line-height: 3;
+        }
+
+        .body-map & {
+            font-size: 1.4rem;
+            line-height: 4;
+        }
+    }
+
+    a.map-view-btn {
+        @include delinkify($gophillygo-blue);
+        display: block;
+        position: absolute;
+        top: 1.7rem;
+        right: 0;
+        height: 4rem;
+        padding-right: 2rem;
+        padding-left: 4rem;
+        border: 2px solid $gophillygo-blue;
+        line-height: 3.8rem;
+        text-align: center;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            display: none;
+        }
+
+        &:before {
+            content: '\f279';
+            position: absolute;
+            height: 100%;
+            left: 1rem;
+            color: $gophillygo-blue;
+            font-family: 'gpg';
+        }
+
+        &:hover {
+            background-color: $gophillygo-blue;
+            color: $white;
+
+            &:before {
+                color: $white;
+            }
+        }
+    }
+
+    .place-list {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0;
+
+        @include respond-to('xs') {
+            flex-flow: column nowrap;
+            align-items: center;
+        }
+    }
+}

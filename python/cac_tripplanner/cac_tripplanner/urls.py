@@ -1,39 +1,44 @@
 from django.conf.urls import include, url
+from django.views.generic import RedirectView
 from django.contrib.gis import admin
 
 from django.contrib.staticfiles import views as staticviews
 
 from cms import views as cms_views
-from destinations.views import (FindReachableDestinations, SearchDestinations, FeedEvents,
-                                map as map_view, directions as directions_view)
+from destinations import views as dest_views
+
 import settings
 
 urlpatterns = [
-    # Home
-    url(r'^$', cms_views.home, name='home'),
+    # Home view, which is also the directions and explore views
+    url(r'^$', dest_views.home, name='home'),
+    url(r'^explore$', dest_views.explore, name='explore'),
 
     # Map
-    url(r'^api/destinations/search$', SearchDestinations.as_view(), name='api_destinations_search'),
-    url(r'^api/feedevents$', FeedEvents.as_view(), name='api_feedevents'),
-    url(r'^map/reachable$', FindReachableDestinations.as_view(), name='reachable'),
-    url(r'^map/', map_view, name='map'),
-    url(r'^directions/', directions_view, name='directions'),
+    url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
+        name='api_destinations_search'),
+    url(r'^api/feedevents$', dest_views.FeedEvents.as_view(), name='api_feedevents'),
+    url(r'^map/reachable$', dest_views.FindReachableDestinations.as_view(), name='reachable'),
 
-    # About and FAQ
-    url(r'^info/(?P<slug>[\w-]+)/$', cms_views.about_faq, name='about-faq'),
+    # print directions view. TODO: update or delete
+    # url(r'^directions/', dest_views.directions, name='directions'),
+
+    # Handle pre-redesign URLs by redirecting
+    url(r'^(?:map/)?directions/', RedirectView.as_view(pattern_name='home', query_string=True,
+                                                       permanent=True)),
+
+    # Places
+    url(r'^place/(?P<pk>[\d-]+)/$', dest_views.place_detail, name='place-detail'),
+
+    # About (no more FAQ)
+    url(r'^(?P<slug>about)/$', cms_views.about_faq, name='about'),
 
     # All Published Articles
     url(r'^api/articles$', cms_views.AllArticles.as_view(), name='api_articles'),
 
     # Community Profiles
-    url(r'^community-profile/(?P<slug>[\w-]+)/$',
-        cms_views.community_profile_detail,
-        name='community-profile-detail'),
-
-    # Tips and Tricks
-    url(r'^tips-and-tricks/(?P<slug>[\w-]+)/$',
-        cms_views.tips_and_tricks_detail,
-        name='tips-and-tricks-detail'),
+    url(r'^learn/$', cms_views.learn_list, name='learn-list'),
+    url(r'^learn/(?P<slug>[\w-]+)/$', cms_views.learn_detail, name='learn-detail'),
 
     # Link Shortening
     url(r'^link/', include('shortlinks.urls')),

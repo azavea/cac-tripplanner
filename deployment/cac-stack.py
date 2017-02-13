@@ -79,9 +79,9 @@ def main():
                             default=None,
                             help='One of "dev", "staging", "prod"')
     cac_stacks.add_argument('--stack-color', type=str, required=True,
-                            choices=['green', 'blue'],
+                            choices=['green', 'blue', 'orange'],
                             default=None,
-                            help='One of "green", "blue"')
+                            help='One of "green", "blue", "orange"')
     cac_stacks.set_defaults(func=launch_stacks)
 
     # AMI Management
