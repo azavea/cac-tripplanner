@@ -77,6 +77,14 @@
         text-align: center;
     }
 
+    .info-article-image-hero {
+        height: 200px;
+    }
+
+    .info-place-image-hero {
+        height: 400px;
+    }
+
     .info-article-image-hero,
     .info-place-image-hero {
         background-repeat: no-repeat;
@@ -88,20 +96,16 @@
         }
     }
 
-    .info-article-image-hero {
-        height: 200px;
-    }
-
-    .info-place-image-hero {
-        height: 400px;
-    }
-
     .info-article-category {
         margin: 20px 60px 0;
         color: $gophillygo-red;
         font-size: 1.4rem;
         line-height: 1;
         text-transform: uppercase;
+
+        @include respond-to('xxs') {
+            margin: 20px;
+        }
     }
 
     .info-article-title {
@@ -111,6 +115,7 @@
         line-height: 2;
 
         @include respond-to('xxs') {
+            margin: 20px;
             font-size: 2.5rem;
         }
     }
