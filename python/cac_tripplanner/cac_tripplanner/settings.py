@@ -14,6 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import yaml
+import logging.config
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 try:
@@ -163,6 +164,32 @@ STATICFILES_DIRS = ()
 
 MEDIA_ROOT = '/media/cac/'
 MEDIA_URL = '/media/'
+
+# LOGGING CONFIGURATION
+LOGGING_CONFIG = None
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'datefmt': '%Y-%m-%d %H:%M:%S %z',
+            'format': ('[%(asctime)s] [%(process)d] [%(levelname)s]'
+                       ' %(message)s'),
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    }
+})
 
 # TEMPLATE CONFIGURATION
 # See https://docs.djangoproject.com/en/1.8/ref/settings/#templates
