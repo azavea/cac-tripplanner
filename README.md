@@ -16,7 +16,7 @@ Development Installation
 3. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development` and edit variables
 4. Run `vagrant up`
 5. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
-6. Running `npm run gulp-watch` from `/opt/app/src` will automatically collect static files together when changes are detected for Django template consumption.
+6. Running `npm run gulp-watch` from `/opt/app/src` will automatically collect static files together when changes are detected for Django template consumption. Alternatively, `npm run gulp-development` can be run manually whenever changes are made to the static files.
 
 Building AMIs
 ------------------------

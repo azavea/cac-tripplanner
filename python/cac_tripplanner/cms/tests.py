@@ -50,14 +50,18 @@ class ArticleTests(TestCase):
             **common_args)
 
     def test_home_view(self):
-        """Verify that home view includes both tips and a community profile"""
+        """Verify that home view includes one article"""
+
+        # Delete second published article so random always returns the same item
+        self.published_tips.delete()
+
         url = reverse('home')
         response = self.client.get(url)
-        self.assertContains(response, self.published_comm.slug, count=2, status_code=200)
-        self.assertContains(response, self.published_tips.slug, count=2, status_code=200)
+        self.assertContains(response, 'Places we love', status_code=200)
+        self.assertContains(response, self.published_comm.title, status_code=200)
 
     def test_community_profile_manager(self):
-        """Test that community profile manager works"""
+        """Test that article manager properly filters community articles"""
         community_profiles_count = Article.profiles.count()
         self.assertEqual(community_profiles_count, 2)
 
@@ -69,7 +73,7 @@ class ArticleTests(TestCase):
         self.assertEqual(random, published)
 
     def test_tips_and_tricks_manager(self):
-        """Test that community profile manager works"""
+        """Test that article manager properly filters tip articles"""
 
         tips_count = Article.tips.count()
         self.assertEqual(tips_count, 2)
@@ -82,31 +86,27 @@ class ArticleTests(TestCase):
         self.assertEqual(random, published)
 
     def test_article_manager(self):
-        """Test that community profile manager works"""
+        """Test that article manager filters unpublished articles"""
 
         published_articles_count = Article.objects.published().count()
         self.assertEqual(published_articles_count, 2)
 
-    def test_community_profile_detail_view(self):
-        """Test that community profile detail view works"""
-        url = reverse('community-profile-detail',
+    def test_learn_detail_view(self):
+        """Test that learn detail view works"""
+        url = reverse('learn-detail',
                       kwargs={'slug': self.published_comm.slug})
         response = self.client.get(url)
         self.assertContains(response, 'published-comm', status_code=200)
 
-        url = reverse('community-profile-detail',
+        url = reverse('learn-detail',
                       kwargs={'slug': self.unpublished_comm.slug})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
 
-    def test_tips_and_tricks_detail_view(self):
-        """Test that tips and tricks detail view works"""
-        url = reverse('tips-and-tricks-detail',
-                      kwargs={'slug': self.published_tips.slug})
+    def test_learn_list_view(self):
+        """Test that learn list view works"""
+        url = reverse('learn-list')
         response = self.client.get(url)
-        self.assertContains(response, 'published-tips', status_code=200)
 
-        url = reverse('tips-and-tricks-detail',
-                      kwargs={'slug': self.unpublished_tips.slug})
-        response_404 = self.client.get(url)
-        self.assertEqual(response_404.status_code, 404)
+        self.assertContains(response, self.published_comm.title, status_code=200)
+        self.assertContains(response, self.published_tips.title, status_code=200)

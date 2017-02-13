@@ -17,7 +17,8 @@ stack_types = {
 
 stack_colors = {
     'green': 'Green',
-    'blue': 'Blue'
+    'blue': 'Blue',
+    'orange': 'Orange'
 }
 
 
@@ -39,5 +40,6 @@ def build_stacks(options, stack_type, stack_color):
     if not stack_color:
         d.go()
     else:
-        OtpServerStack(globalconfig=g, VPC=v, DataPlane=d).go()
+        if options['StackColor'] != 'Orange':
+            OtpServerStack(globalconfig=g, VPC=v, DataPlane=d).go()
         WebServerStack(globalconfig=g, VPC=v, DataPlane=d).go()

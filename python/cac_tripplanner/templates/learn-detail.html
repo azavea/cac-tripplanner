@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block pagetitle %}
+<title>{% block title %}GoPhillyGo | {{ article.title }}{% endblock %}</title>
+
+<meta property="og:title" content="GoPhillyGo | {{ article.title|striptags }}" />
+<meta name="twitter:title" content="GoPhillyGo | {{ article.title|striptags }}" />
+{% endblock %}
+
+{% block extrametatags %}
+<meta property="fb:app_id" content="{{ fb_app_id }}" />
+<meta property="og:url"
+    content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
+<meta property="og:description" content="{{ article.teaser|striptags }}" />
+<meta property="og:image" content="{{ article.image.url }}" />
+<meta property="og:image:width" content="400" />
+<meta property="og:image:height" content="400" />
+<meta property="og:site_name" content="GoPhillyGo" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@go_philly_go" />
+<meta name="twitter:description" content="{{ article.teaser|striptags }}" />
+<meta name="twitter:image" content="{{ article.image.url }}" />
+{% endblock %}
+
+{% block content %}
+    {% include "partials/header.html" %}
+    <div class="main">
+        <h1><a href="{% url 'learn-list' %}">Tips, Posts, and Announcements</a></h1>
+        {% include "partials/article-detail.html" %}
+
+        <div class="summaries-list">
+            <h3>More tips, post, and announcements</h3>
+            {% for article in more_articles %}
+                {% include "partials/article-card.html" %}
+            {% endfor %}
+            <div class="more-link">
+                <a href="{% url 'learn-list' %}">See them all</a>
+            </div>
+        </div>
+    </div>
+    {% include "partials/footer.html" %}
+{% endblock %}

@@ -1,0 +1,257 @@
+.body-info, .body-explore, .body-about {
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    background-color: $body-color;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+
+    .main {
+        max-width: $home-main-max-width;
+        margin: 0 auto;
+
+        @include respond-to('xs') {
+            margin-right: 20px;
+            margin-left: 20px;
+        }
+
+        @include respond-to('xxs') {
+            width: 100%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+    }
+
+    h1 {
+        margin: 5rem auto;
+        font-size: 2.5rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+        text-align: center;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            margin: 4rem auto;
+            font-size: 2rem;
+            line-height: 1.75;
+        }
+
+        a {
+            @include delinkify;
+        }
+    }
+
+    .preview-card {
+        @include respond-to('xxs') {
+            margin-bottom: $home-section-margin/2;
+        }
+    }
+
+    .info-article {
+        background-color: $white;
+        font-size: 1.6rem;
+        line-height: 1.7;
+        margin-bottom: 140px;
+        padding-bottom: 40px;
+        box-shadow: $place-card-drop-shadow;
+
+        @include respond-to('xxs') {
+            box-shadow: none;
+        }
+
+        @include respond-to('xxs') {
+            margin-bottom: 50px;
+        }
+    }
+
+    .info-article-header {
+        text-align: center;
+    }
+
+    .info-article-image-hero {
+        height: 200px;
+    }
+
+    .info-place-image-hero {
+        height: 400px;
+
+        @include respond-to('xxs') {
+            height: 60vw; // Honor destination image aspect ratio
+        }
+    }
+
+    .info-article-image-hero,
+    .info-place-image-hero {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+    }
+
+    .info-article-category {
+        margin: 20px 60px 0;
+        color: $gophillygo-red;
+        font-size: 1.4rem;
+        line-height: 1;
+        text-transform: uppercase;
+
+        @include respond-to('xs') {
+            margin: 20px;
+        }
+    }
+
+    .info-article-title {
+        margin: 20px 60px;
+        font-size: 3rem;
+        font-style: italic;
+        line-height: 1.75;
+
+        @include respond-to('xs') {
+            margin: 20px;
+            font-size: 2.5rem;
+        }
+    }
+
+    .info-article-aside {
+        width: 240px;
+        margin: 0 0 20px 20px;
+        padding: 0 4rem 0 2rem;
+        float: right;
+        border-left: 2px solid $gophillygo-green;
+        color: #555;
+        font-size: 1.3rem;
+        font-style: italic;
+        line-height: 1.8;
+
+        p {
+            margin: 0 0 1em;
+        }
+
+        a {
+            color: $gophillygo-orange;
+        }
+
+        @include respond-to('xs') {
+            display: none;
+        }
+
+        // @include respond-to('xxs') {
+        //     width: 36%;
+        // }
+    }
+
+    .info-article-section {
+        padding: 0 4rem;
+
+        @include respond-to('xxs') {
+            padding: 0 2rem;
+        }
+
+        p {
+            margin: 0 0 1em;
+        }
+
+        a {
+            color: $gophillygo-orange;
+        }
+
+        strong {
+            font-weight: $font-weight-bold;
+        }
+
+    }
+
+    .info-article-p-image-inline {
+        text-align: center;
+
+        img {
+            max-width: 100%;
+        }
+    }
+
+    .info-article-p-link-inline {
+        text-align: center;
+
+        a {
+            @include delinkify;
+            color: $gophillygo-blue !important;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    .info-article-p-actions {
+        margin: 2rem 0 0;
+        line-height: 4;
+        text-align: center;
+
+        .place-action-go {
+            @include delinkify($white);
+            background-color: $gophillygo-purple;
+            padding: 1em 3em;
+            font-style: italic;
+            font-size: 1.5rem;
+            font-weight: $font-weight-bold;
+            line-height: 2.75;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+    }
+
+    .summaries-list {
+        h3 {
+            margin: 40px 10px;
+            font-size: 2rem;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .more-link {
+            line-height: 4;
+            text-align: center;
+
+            a {
+                @include delinkify($white);
+                background-color: $gophillygo-purple;
+                padding: 1em 4em;
+                font-style: italic;
+                font-size: 1.5rem;
+                font-weight: $font-weight-bold;
+                line-height: 2.75;
+                text-align: center;
+                text-transform: uppercase;
+                cursor: pointer;
+
+            }
+        }
+
+    }
+
+    .faq {
+        padding-top: 4rem;
+
+        /* Redesign prototype uses `dt` and `dd` but existing About page in database uses
+         * `h3` and `p`, so applying the styles to both. */
+        dt, h3 {
+            color: $gophillygo-red;
+            font-weight: $font-weight-bold;
+            font-size: $font-size-base;
+        }
+
+        dd, p {
+            margin: 1em 0 3em 0;
+        }
+    }
+
+    .app-footer {
+        margin-top: 10rem;
+    }
+}

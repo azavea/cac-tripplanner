@@ -1,0 +1,272 @@
+.body-step-by-step {
+
+    @include respond-to('xxs') {
+
+        .directions-form {
+            display: none;
+        }
+
+        .sidebar-banner {
+            display: none;
+        }
+
+        .the-map {
+            flex: 1 1 100px;
+        }
+    }
+}
+
+.directions-step-by-step {
+    @include sidebar-main;
+    display: none;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    .body-step-by-step & {
+        display: block;
+    }
+
+    @include respond-to('xxs') {
+        flex: 1 0 auto;
+        order: 10;
+        width: 100%;
+        overflow: auto;
+        z-index: 100;
+
+        .sidebar-banner {
+            display: none;
+        }
+    }
+
+    .directions-step-by-step-content {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
+    }
+
+    .step-by-step-header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
+
+        @include respond-to('xxs') {
+            align-items: stretch;
+            width: 100%;
+            background-color: $gophillygo-blue;
+            color: $white;
+            z-index: 100;
+        }
+
+        button {
+            flex: 0 0 40px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: none;
+            cursor: pointer;
+
+            @include respond-to('xxs') {
+                color: $white;
+            }
+        }
+
+        h1 {
+            flex: 1 1 auto;
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: $font-weight-bold;
+            line-height: 4;
+            text-align: center;
+
+            @include respond-to('xs') {
+                font-size: 2rem;
+                line-height: 3;
+            }
+
+            @include respond-to('xxs') {
+                font-size: 1.5rem;
+                font-weight: $font-weight-medium;
+                line-height: 3;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    .directions-leg {
+        display: block;
+        padding: 13px 0 13px 43px;
+        border-top: 1px solid #ddd;
+        background: $white;
+    }
+
+    .directions-step {
+        position: relative;
+        padding-right: 20px;
+
+        &::before {
+            position: absolute;
+            top: 1px;
+            left: -43px;
+            width: 40px;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            font-family: gpg;
+            font-size: 2rem;
+            line-height: 1;
+            text-align: center;
+            content: '';
+        }
+
+        & + .directions-step {
+            margin-top: .75em;
+            padding-top: .85em;
+            border-top: 1px solid #ddd;
+
+            &::before {
+                top: 11px;
+            }
+        }
+    }
+
+    .directions-instruction {
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+    }
+
+    .directions-time {
+        margin-top: .5em;
+        color: $lt-gray;
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+        line-height: 1.5;
+    }
+
+    .directions-distance {
+        margin-top: .5em;
+        color: $lt-gray;
+        font-size: 1.3rem;
+        line-height: 2;
+    }
+
+    .directions-step-origin {
+        &::before {
+            color: $gophillygo-green;
+            content: '\e80a';
+        }
+    }
+
+    .directions-step-destination {
+        &::before {
+            color: $gophillygo-red;
+            content: '\e80a';
+        }
+    }
+
+    .directions-step-walk {
+        &::before {
+            content: '\e803';
+        }
+    }
+
+    .directions-step-turn-left {
+        &::before {
+            content: '\e809';
+        }
+    }
+
+    .directions-step-turn-right {
+        &::before {
+            content: '\e808';
+        }
+    }
+
+    .directions-step-continue {
+        &::before {
+            content: '\e814';
+        }
+    }
+
+    .directions-step-bike {
+        &::before {
+            content: '\e801';
+        }
+    }
+
+    .directions-step-indego {
+        &::before {
+            padding-top: 2px;
+            color: $indego-purple;
+            content: '\e80f';
+        }
+    }
+
+    .directions-step-car {
+        &::before {
+            content: '\f1b9';
+        }
+    }
+
+    .directions-step-bus {
+        &::before {
+            content: '\e802';
+        }
+    }
+
+    .directions-step-train {
+        &::before {
+            content: '\f238';
+        }
+    }
+
+    .directions-step-rail {
+        &::before {
+            content: '\f238';
+        }
+    }
+
+    .directions-step-subway {
+        &::before {
+            content: '\e811';
+        }
+    }
+
+    .directions-step-ferry {
+        &::before {
+            content: '\e816';
+        }
+    }
+
+    .directions-step-tram {
+        &::before {
+            content: '\e812';
+        }
+    }
+
+    .directions-step-elevator {
+        &::before {
+            content: '\e813';
+        }
+    }
+
+    .directions-step-continue {
+        &::before {
+            content: '\e814';
+        }
+    }
+
+    .directions-step-clockwise {
+        &::before {
+            content: '\e815';
+        }
+    }
+
+    .directions-step-counterclockwise {
+        &::before {
+            content: '\e817';
+        }
+    }
+}

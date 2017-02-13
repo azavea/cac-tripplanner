@@ -1,0 +1,93 @@
+.route-tooltip {
+    // width: auto;
+    // top: 40px;
+    // left: 50px;
+    // padding: .5em;
+    // background-color: $white;
+
+    .leaflet-popup-tip-container {
+        display: none;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+    }
+
+    .leaflet-popup-content {
+        margin: 2px 4px;
+    }
+}
+
+.poi-popup,
+.bikeshare-popup,
+.event-popup {
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+    }
+
+    .leaflet-popup-close-button {
+        top: 8px !important;
+        right: 8px !important;
+        font-size: 2rem !important;
+    }
+
+    .leaflet-popup-content {
+        margin: 16px;
+        min-width: 200px;
+        color: $font-color;
+        font-family: 'Cabin', sans-serif;
+        line-height: 1.5;
+
+        .bikeshare-logo {
+            margin-bottom: .5rem;
+        }
+
+        h4 {
+            margin-top: 0;
+            width: 90%;
+            font-size: 1.6rem;
+            font-weight: $font-weight-semibold;
+
+            &.bikeshare-name {
+                margin-top: inherit;
+                margin-bottom: 0;
+            }
+        }
+
+        p {
+            font-size: 1.4rem;
+            font-weight: $font-weight-medium;
+
+            &.bikeshare-address {
+                margin-top: .5rem;
+                color: $gray;
+            }
+
+            &.bikeshare-status {
+                font-weight: $font-weight-semibold;
+            }
+
+            &.bikeshare-status,
+            &.bikeshare-bikes,
+            &.bikeshare-docks,
+            &.bikeshare-trikes {
+                margin: .5rem 0;
+            }
+        }
+
+        p.links {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .destination-website-link,
+        .destination-directions-link {
+            @include delinkify($gophillygo-blue);
+            cursor: pointer;
+        }
+    }
+}

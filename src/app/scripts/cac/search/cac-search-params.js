@@ -6,7 +6,7 @@ CAC.Search.SearchParams = (function () {
 
     // bounds to cover are the counties here:
     // http://pecpa.org/wp-content/uploads/Recreation-The-Circuit-map-photo-Patrick-1260x979.jpg
-    var searchBounds = [
+    var searchExtent = [
         '-76.209582',
         '39.467695',
         '-74.243725',
@@ -22,10 +22,26 @@ CAC.Search.SearchParams = (function () {
                             'POI'
                             ].join(',');
 
+    var rankDistance = 160934; // preferentially rank results within this many meters (100mi)
+    var cityHall = '-75.163572,39.952368'; // default center for results bias
+    var mapCenter = null; // update to modify center for results bias
+
     var module = {
-        searchBounds: searchBounds,
-        searchCategories: searchCategories
+        searchExtent: searchExtent,
+        searchCategories: searchCategories,
+        distance: rankDistance,
+        getLocation: getLocation,
+        updateMapCenter: updateMapCenter
     };
+
+    function getLocation() {
+        return mapCenter || cityHall;
+    }
+
+    // set location to map center for geocoder results bias on map move
+    function updateMapCenter(event, coords) {
+        mapCenter = [coords.lng, coords.lat].join(',');
+    }
 
     return Object.freeze(module);
 
