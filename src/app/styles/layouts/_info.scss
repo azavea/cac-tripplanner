@@ -77,23 +77,23 @@
         text-align: center;
     }
 
-    .info-article-image-hero,
-    .info-place-image-hero {
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
-
-        @include respond-to('xxs') {
-            height: 200px;
-        }
-    }
-
     .info-article-image-hero {
         height: 200px;
     }
 
     .info-place-image-hero {
         height: 400px;
+
+        @include respond-to('xxs') {
+            height: 60vw; // Honor destination image aspect ratio
+        }
+    }
+
+    .info-article-image-hero,
+    .info-place-image-hero {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
     }
 
     .info-article-category {
@@ -102,15 +102,20 @@
         font-size: 1.4rem;
         line-height: 1;
         text-transform: uppercase;
+
+        @include respond-to('xs') {
+            margin: 20px;
+        }
     }
 
     .info-article-title {
         margin: 20px 60px;
         font-size: 3rem;
         font-style: italic;
-        line-height: 2;
+        line-height: 1.75;
 
-        @include respond-to('xxs') {
+        @include respond-to('xs') {
+            margin: 20px;
             font-size: 2.5rem;
         }
     }
@@ -190,7 +195,7 @@
         .place-action-go {
             @include delinkify($white);
             background-color: $gophillygo-purple;
-            padding: 1em 4em;
+            padding: 1em 3em;
             font-style: italic;
             font-size: 1.5rem;
             font-weight: $font-weight-bold;
@@ -203,7 +208,7 @@
 
     .summaries-list {
         h3 {
-            margin: 40px auto;
+            margin: 40px 10px;
             font-size: 2rem;
             font-style: italic;
             text-align: center;
