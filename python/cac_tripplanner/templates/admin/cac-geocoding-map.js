@@ -21,11 +21,12 @@ var projWM = new OpenLayers.Projection('EPSG:900913');
 var geocodeThrottleMillis = 500;
 
 $address.on('input', _.debounce(function () {
-    CAC.Search.Geocoder.search($address.val()).then(function (location) {
-        if (!location) {
+    CAC.Search.Geocoder.search($address.val()).then(function (result) {
+        if (!result) {
             return; // no result found
         }
-        var geom = location.feature.geometry;
+
+        var geom = result.location;
         var point = new OpenLayers.Geometry.Point(geom.x, geom.y).transform(projLatLng, projWM);
         var vectorLayer = module.layers.vector;
         vectorLayer.addFeatures([new OpenLayers.Feature.Vector(point)]);

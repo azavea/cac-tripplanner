@@ -20,7 +20,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.id = index.toString();
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
-        this.distanceMiles = getDistanceMiles(otpItinerary.legs);
+        this.formattedDistance = getFormattedItineraryDistance(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
@@ -32,10 +32,12 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: this.getFeatures(otpItinerary.legs)});
-        this.geojson.setStyle(getStyle(true, false));
 
-        // expose functions
-        this.getStyle = getStyle;
+        // expose method to change linestring styling
+        this.setLineColors = setLineColors;
+
+        // default to visible, backgrounded linestring styling
+        this.setLineColors(true, false);
 
         // set by CAC.Routing.Plans with the arguments sent to planTrip:
         // coordsFrom, coordsTo, when, extraOptions
@@ -44,11 +46,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     Itinerary.prototype.highlight = function(isHighlighted) {
-        this.geojson.setStyle(getStyle(true, isHighlighted));
+        this.setLineColors(true, isHighlighted);
     };
 
     Itinerary.prototype.show = function(isShown) {
-        this.geojson.setStyle(getStyle(isShown, false));
+        this.setLineColors(isShown, false);
     };
 
     /**
@@ -105,16 +107,33 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to get total distance in miles for an itinerary
+     * Helper function to get total distance in feet or miles for an itinerary
      *
      * @param {array} legs Legs property of OTP itinerary
-     * @return {float} distance of itinerary in miles (rounded to 2nd decimal)
+     * @return {string} distance of itinerary in miles (rounded to 2nd decimal), or,
+     *                 if less than .2 mile, in feet (rounded to nearest foot); includes unit.
      */
-    function getDistanceMiles(legs) {
+    function getFormattedItineraryDistance(legs) {
         var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
             return sum + n;
         });
-        return Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100;
+        return getFormattedDistance(distanceMeters);
+    }
+
+    /**
+     * Helper function to get formatted string in feet or miles for a given distance in meters
+     *
+     * @param {double} distanceMeters Distance to format
+     * @return {string} distance in miles or feet, rounded, with unit
+     */
+    function getFormattedDistance(distanceMeters) {
+        // less than ~0.2 miles
+        if (distanceMeters < 322) {
+            return Math.round(distanceMeters * 3.28084).toString() + ' ft';
+        }
+
+        // return miles
+        return (Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100).toString() + ' mi';
     }
 
     /**
@@ -124,17 +143,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
     function getFormattedDuration(otpItineraryLeg) {
-        // x hrs, y min, z s (will trim empty units from left)
-        var fmt = 'h [hrs], m [min], ss [s]';
-        var str = moment.duration(otpItineraryLeg.duration, 'seconds').format(fmt);
-        // trim empty seconds from right of string
-        var emptySecIdx = str.indexOf(', 00 s');
-        if (emptySecIdx > 0) {
-            str = str.substring(0, emptySecIdx);
-        }
-        // fix hour singular
-        str = str.replace('1 hrs,', '1 hr,');
-        return str;
+        return moment.duration(otpItineraryLeg.duration, 'seconds').humanize();
     }
 
     /**
@@ -180,14 +189,16 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Check leg from/to place name; if it's an OSM node label, reverse geocode it and update label
-     * Also, if there are waypoints, call the function to merge legs across them.
+     * Does some post-processing for the legs, for cleanup and template convenience
      *
      * @params {Array} legs Itinerary legs returned by OTP
      * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
-     * @returns {Array} Itinerary legs, with prettified place labels
+     * @returns {Array} Itinerary legs, with prettified place labels and other improvements
      */
     function getLegs(legs, hasWaypoints) {
+        // Check leg from/to place name; if it's an OSM node label, reverse geocode it
+        // and update label
+
         var newLegs = _.map(legs, function(leg) {
             if (leg.from.name.indexOf('Start point 0.') > -1) {
                 getOsmNodeName(leg.from).then(function(name) {
@@ -201,10 +212,30 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             }
             return leg;
         });
+
+        // If there are waypoints, call the function to merge legs across them.
         if (hasWaypoints) {
             newLegs = mergeLegsAcrossWaypoints(newLegs);
         }
-        _.forEach(newLegs, function (leg) { leg.formattedDuration = getFormattedDuration(leg); });
+
+        // Add some derived data to be used in the template:
+        // - Format duration on leg and distance on leg and its steps
+        _.forEach(newLegs, function (leg) {
+            leg.formattedDistance = getFormattedDistance(leg.distance);
+            leg.formattedDuration = getFormattedDuration(leg);
+            _.forEach(leg.steps, function(step) {
+                step.formattedDistance = getFormattedDistance(step.distance);
+            });
+        });
+        // - Set a flag on the last leg, so we can avoid diplaying arriving there right above
+        //   also arriving at the final destination
+        newLegs[newLegs.length - 1].lastLeg = true;
+        // - And set a flag on legs that end at bike share stations (whether on a bike or walking
+        //   to a station), so we can show the icon
+        _.forEach(newLegs, function (leg) {
+            leg.toBikeShareStation = leg.to.vertexType === 'BIKESHARE';
+        });
+
         return newLegs;
     }
 
@@ -261,29 +292,41 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     /**
-     * Helper function to construct style object for an itinerary
+     * Helper function to set style for an itinerary
      *
      * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
      * @param {Boolean} highlighted Should this itinerary be highlighted on the map
-     * @return {Object} Leaflet style object to apply to geojson
      */
-    function getStyle(shown, highlighted) {
+    function setLineColors(shown, highlighted) {
+
         if (!shown) {
-            return {opacity: 0};
+            this.geojson.setStyle({opacity: 0});
+            return;
         }
+
         var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
-                            color: '#d02d2d',
-                            dashArray: null,
-                            lineCap: 'round',
-                            lineJoin: 'round',
-                            opacity: 0.75};
+                        color: Utils.defaultModeColor,
+                        dashArray: null,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                        opacity: 0.75};
+
         if (highlighted) {
             defaultStyle.dashArray = null;
+            defaultStyle.opacity = 1;
+            this.geojson.setStyle(defaultStyle);
+
+            // set color for each leg based on mode
+            this.geojson.eachLayer(function(layer) {
+                var modeColor = Utils.getModeColor(layer.feature.properties.mode);
+                layer.setStyle({color: modeColor});
+            });
         } else {
-            defaultStyle.color = '#2c7fb8';
+            // in background
+            defaultStyle.color = Utils.defaultBackgroundLineColor;
             defaultStyle.dashArray = [5, 8];
+            this.geojson.setStyle(defaultStyle);
         }
-        return defaultStyle;
     }
 
 })(jQuery, cartodb, L, _, moment, CAC.Search.Geocoder, CAC.Utils);

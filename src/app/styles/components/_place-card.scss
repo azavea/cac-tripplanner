@@ -1,0 +1,92 @@
+.place-card {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: $place-card-width;
+    margin: 0 0 20px;
+    background-color: $place-card-bg-color;
+    box-shadow: $place-card-drop-shadow;
+
+    .body-map & {
+        margin-right: auto;
+        margin-left: auto;
+
+        .place-card-photo-container {
+            background-color: white;
+        }
+
+        &:hover {
+            background-color: $v-lt-blue;
+
+            .place-card-photo {
+                opacity: 0.95;
+            }
+        }
+    }
+
+    h2 {
+        width: 100%;
+        margin: .5em 0 0;
+        padding: 0 1em;
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+        line-height: 2.5;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    &.no-origin .place-card-travel-logistics {
+        display: none;
+        margin-bottom: 12px;
+    }
+}
+
+.place-card-photo {
+    display: block;
+    width: 100%;
+}
+
+.place-card-travel-logistics {
+    margin: 0 0 1em;
+    padding: 0 1em;
+    color: $gophillygo-green;
+    font-size: 1.3rem;
+    font-weight: $font-weight-medium;
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.place-card-actions {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.place-card-action {
+    @include delinkify;
+    width: 90px;
+    margin: 6px 20px 20px;
+    border: 1px solid $gophillygo-blue;
+    font-size: 1.2rem;
+    font-weight: $font-weight-semibold;
+    line-height: 2.75;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &.place-action-go {
+        background-color: $gophillygo-blue;
+        color: $white;
+    }
+
+    &.place-action-details {
+        background-color: transparent;
+    }
+}

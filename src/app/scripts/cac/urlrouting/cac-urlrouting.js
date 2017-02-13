@@ -1,8 +1,8 @@
 /**
  * A basic URL router and related utilities.
  *
- * The app is still based on local storage, but this enables some URL navigation and facilitates
- * the interaction between that and local storage.
+ * The app still uses a UserPreferences component to store and retrieve all parameters, but this
+ * enables some URL navigation and facilitates the interaction between that and UserPreferences.
  */
 
 CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
@@ -10,64 +10,128 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     'use strict';
 
     // User pref parameters for different views
-    var SHARED_ENCODE = ['origin', 'originText', 'mode'];
-    var SHARED_READ = ['maxWalk', 'wheelchair', 'bikeTriangle'];
-    var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreTime']);
-    var EXPLORE_READ = EXPLORE_ENCODE.concat(SHARED_READ);
-    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination', 'destinationText', 'waypoints']);
-    var DIRECTIONS_READ = DIRECTIONS_ENCODE.concat(SHARED_READ).concat(['arriveBy']);
+    var SHARED_ENCODE = ['origin',
+                         'originText',
+                         'mode',
+                         'maxWalk',
+                         'wheelchair',
+                         'bikeTriangle',
+                         'arriveBy',
+                         'dateTime'];
+
+    var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreMinutes']);
+
+    var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
+                                                 'destinationText',
+                                                 'waypoints']);
+
+    var events = $({});
+    var eventNames = {
+        changed: 'cac:control:urlrouting:changed'
+    };
 
     var router = null;
+    var updatingUrl = false;
 
     function UrlRouter() {
-        router = new Navigo('/map');
-
-        router.on(new RegExp('/places/?\?'), setExplorePrefsFromUrl);
-        router.on(new RegExp('/directions/?\?'), setDirectionsPrefsFromUrl);
-
+        router = new Navigo('/');
+        router.on('explore', loadExplore);
+        router.on('*', setPrefsFromUrl, {
+            before: function (done) {
+                if (updatingUrl) {
+                    // If we're updating the URL from the directions or explore controllers, we
+                    // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
+                    updatingUrl = false;
+                    done(false);
+                } else {
+                    done();
+                }
+            }
+        });
         router.resolve();
     }
 
     UrlRouter.prototype.updateUrl = updateUrl;
     UrlRouter.prototype.clearUrl = clearUrl;
-    UrlRouter.prototype.setExplorePrefsFromUrl = setExplorePrefsFromUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
-    UrlRouter.prototype.setDirectionsPrefsFromUrl = setDirectionsPrefsFromUrl;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
+    UrlRouter.prototype.events = events;
+    UrlRouter.prototype.eventNames = eventNames;
 
     return UrlRouter;
 
-    // Updates the displayed URL without triggering any routing callbacks
+    /* Updates the displayed URL without triggering any routing callbacks. It prevents unwanted
+     * routing callbacks by:
+     * 1. Checking whether it's being asked to update the URL to the current URL. This can happen
+     *    if e.g. a `Directions.planTrip` is triggered by browser navigation. The change in URL
+     *    will trigger the controllers to update, but they needn't/shouldn't re-update the URL,
+     *    since that will muddy up the history. It's hard to differentiate that case in a way that
+     *    can be checked inside the controllers, so handle it here.
+     * 2. Setting `updatingUrl`, which gets read by the routing handler as a signal to cancel.
+     */
     function updateUrl(url) {
-        router.pause(true);
-        router.navigate(url);
-        router.pause(false);
+        if (decodeURI(location.search) === decodeURI(url.slice(1))) {
+            return;
+        }
+        updatingUrl = true;
+        router.navigate(url, true);
     }
 
     function clearUrl() {
-        updateUrl('');
-    }
-
-    function setExplorePrefsFromUrl() {
-        UserPreferences.setPreference('method', 'explore');
-        setPrefsFromUrl(EXPLORE_READ);
+        updateUrl('/');
     }
 
     function buildExploreUrlFromPrefs() {
-        return '/places?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
+        return '/?' + buildUrlParamsFromPrefs(EXPLORE_ENCODE);
     }
 
-    function setDirectionsPrefsFromUrl() {
-        UserPreferences.setPreference('method', 'directions');
-        setPrefsFromUrl(DIRECTIONS_READ);
+    /* Enables direct linking to the blank Explore view (i.e. from the Learn tab)
+     *
+     * Sets the 'mode' preference, which causes the javascript to initialize with the Explore view
+     * active, but clears the URL because the URL-manipulation done by Directions and Explore
+     * assume/require that they be at /
+     */
+    function loadExplore() {
+        UserPreferences.setPreference('method', 'explore');
+        router.pause();
+        router.navigate('/', true);
+        router.resume();
+    }
+
+    /* Read URL parameters into user preferences
+     *
+     * Figures out whether to set 'directions' or 'explore' based on whether destination and
+     * origin are present, then calls setPrefs to read the appropriate parameters into
+     * UserPreferences.
+     *
+     * Does nothing if there's no origin or destination (i.e. the home view with no query params)
+     */
+    function setPrefsFromUrl() {
+        var params = Utils.getUrlParams();
+        if (params.destination) {
+            UserPreferences.setPreference('method', 'directions');
+            setPrefs(DIRECTIONS_ENCODE, params);
+        } else if (params.origin) {
+            UserPreferences.setPreference('method', 'explore');
+            setPrefs(EXPLORE_ENCODE, params);
+        } else {
+            UserPreferences.setPreference('method', undefined);
+        }
+
+        // set bike share preference separate from mode
+        if (params.mode) {
+            var bikeShare = params.mode.indexOf('_RENT') >= 0;
+            UserPreferences.setPreference('bikeShare', bikeShare, true);
+        }
+        events.trigger(eventNames.changed);
     }
 
     function buildDirectionsUrlFromPrefs() {
-        return '/directions?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
+        return '/?' + buildUrlParamsFromPrefs(DIRECTIONS_ENCODE);
     }
 
 
-    /* Parses the URL and saves parameter values into local storage
+    /* Saves the URL query parameter values to UserPreferences
      *
      * Field names in the URL must match those in UserPreferences
      * 'origin' and 'destination' get special handling to convert from coordinates to GeoJSON
@@ -76,12 +140,11 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * for origin and destination, which get set to undefined.
      *
      * Fields that are omitted will be ignored, not unset, so anything that uses those params will
-     * get what's already in local storage or else the default.
+     * get what's already in UserPreferences or else the default.
      *
      * @param {List[String]} fields : The field names to store values from
      */
-    function setPrefsFromUrl(fields) {
-        var params = Utils.getUrlParams();
+    function setPrefs(fields, params) {
         _.forEach(fields, function(field) {
             // Only set values actually given, don't clobber fields that weren't provided
             if (!_.isUndefined(params[field])) {
@@ -89,10 +152,10 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                 if (field === 'origin' || field === 'destination') {
                     var coords = _.map(params[field].split(','), parseFloat);
                     if (isNaN(coords[0])) {
-                        UserPreferences.setPreference(field, undefined);
+                        UserPreferences.setPreference(field, undefined, true);
                     } else {
-                        var feature = makeFeature(coords, params[field + 'Text']);
-                        UserPreferences.setPreference(field, feature);
+                        var location = makeLocation(coords, params[field + 'Text']);
+                        UserPreferences.setPreference(field, location, true);
                     }
                 } else if (field === 'waypoints') {
                     var waypoints = _.map(params[field].split(';'), function(waypoint) {
@@ -101,15 +164,21 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                             return coords;
                         }
                     });
-                    UserPreferences.setPreference(field, waypoints);
+                    UserPreferences.setPreference(field, waypoints, true);
+                } else if (field === 'dateTime') {
+                    if (!params[field]) {
+                        UserPreferences.setPreference(field, undefined, true);
+                    } else {
+                        UserPreferences.setPreference(field, parseInt(params[field]), true);
+                    }
                 } else {
-                    UserPreferences.setPreference(field, params[field]);
+                    UserPreferences.setPreference(field, params[field], true);
                 }
             }
         });
     }
 
-    /* Reads values for the given fields from local storage and composes a URL query string
+    /* Reads values for the given fields from UserPreferences and composes a URL query string
      * from them.
      *
      * It won't set undefined fields to default values during lookup. Undefined preferences get
@@ -122,10 +191,10 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {
-                var location = UserPreferences.getPreference(field, false);
-                if (location && location.feature && location.feature.geometry) {
-                    opts[field] = [_.round(location.feature.geometry.y, COORDINATE_ROUND),
-                                   _.round(location.feature.geometry.x, COORDINATE_ROUND)
+                var place = UserPreferences.getPreference(field, false);
+                if (place && place.location) {
+                    opts[field] = [_.round(place.location.y, COORDINATE_ROUND),
+                                   _.round(place.location.x, COORDINATE_ROUND)
                                   ].join(',');
                 } else {
                     opts[field] = '';
@@ -150,14 +219,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         return Utils.encodeUrlParams(opts);
     }
 
-    function makeFeature(coords, name) {
+    function makeLocation(coords, name) {
         return {
-            name: name,
-            feature: {
-                geometry: {
-                    x: coords[1],
-                    y: coords[0]
-                }
+            address: name,
+            location: {
+                x: coords[1],
+                y: coords[0]
             }
         };
     }

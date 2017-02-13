@@ -6,7 +6,7 @@ postgres_host: "192.168.8.25"
 django_workers: 5
 production: False
 
-app_sass_version: "3.4.9"
+app_sass_version: "3.4.22"
 
 app_log: "/var/log/cac-tripplanner-app.log"
 app_cron_event_feed_log: "/var/log/event-feed.log"

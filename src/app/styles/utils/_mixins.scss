@@ -1,0 +1,41 @@
+@mixin delinkify($color : inherit) {
+    &:link, &:visited, &:focus, &:hover, &:active {
+        color: $color;
+        text-decoration: none;
+    }
+}
+
+@mixin button-hover {
+    box-shadow: $place-card-drop-shadow;
+}
+
+@mixin retina {
+    @media only screen and (-moz-min-device-pixel-ratio: 1.5),
+    only screen and (-o-min-device-pixel-ratio: 3/2),
+    only screen and (-webkit-min-device-pixel-ratio: 1.5),
+    only screen and (min-devicepixel-ratio: 1.5),
+    only screen and (min-resolution: 1.5dppx) {
+        @content;
+    }
+}
+
+@mixin sidebar-main {
+    width: $sidebar-width;
+    height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height});
+    margin: 0;
+    background-color: $body-color;
+    overflow: hidden;
+
+    .body-has-sidebar-banner & {
+        height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height} - #{$sidebar-banner-height});
+    }
+}
+
+@mixin sidebar-main-inner-scroll {
+    // Chrome Windows/Linux:
+    // Scrollbar pushes map aside unless we use an inner scroll container
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: none;
+}

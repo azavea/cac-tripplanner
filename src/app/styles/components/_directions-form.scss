@@ -1,0 +1,496 @@
+.directions-form-element {
+    width: 100%;
+    max-width: $home-main-max-width;
+    margin: $home-section-margin auto;
+
+    @include respond-to('xs') {
+        margin-bottom: ($home-section-margin - 10px);
+    }
+
+    @include respond-to('xxs') {
+        margin: ($home-section-margin - 20px) auto;
+    }
+
+    .body-home & {
+        height: $directions-form-home-height;
+        min-height: $directions-form-home-height;
+    }
+
+    .body-map & {
+        max-width: $sidebar-width;
+        margin: 0;
+
+        @include respond-to('xxs') {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+        }
+    }
+}
+
+.directions-form {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    max-width: $home-main-max-width;
+    padding: 0 20px 10px;
+    background-color: $gophillygo-blue;
+    box-shadow: $place-card-drop-shadow;
+
+    @include respond-to('xs') {
+        padding: 0 10px;
+    }
+
+    @include respond-to('xxs') {
+        padding: 0 10px;
+    }
+
+    .body-home & {
+        height: $directions-form-home-height;
+    }
+
+    .body-map & {
+        width: $sidebar-width;
+        max-width: $sidebar-width;
+        height: $directions-form-sidebar-height;
+        margin: 0;
+        padding: 0 10px 10px;
+
+        @include respond-to('xxs') {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+        }
+    }
+
+    .isochrone-control {
+        display: flex;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
+    .mode-picker {
+        display: flex;
+        flex: 0 0 60px;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        color: $mode-picker-text-color;
+        font-size: 1.4rem;
+        font-weight: $font-weight-medium;
+        line-height: 3rem;
+        text-transform: uppercase;
+
+        @include respond-to('xxs') {
+            justify-content: flex-end;
+            margin-right: 5px;
+        }
+
+        .body-map & {
+            flex-basis: 55px;
+            justify-content: flex-end;
+            margin-right: -10px;
+            padding-top: 3px;
+            padding-left: 60px;
+
+            .mode-label {
+                display: none;
+            }
+        }
+
+        i {
+            font-size: 2.2rem;
+
+            .body-map & {
+                font-size: 2.5rem;
+            }
+
+            &::before {
+                margin-right: .3em;
+                margin-left: 0;
+                line-height: 3rem;
+            }
+
+            &.icon-walk::before {
+                margin-right: .2em;
+
+                .body-map & {
+                    margin-right: 0;
+                }
+            }
+
+            &.icon-bike::before {
+                vertical-align: middle;
+
+                .body-map & {
+                    margin-right: 0;
+                }
+            }
+
+            &.icon-transit-on,
+            &.icon-transit-off {
+
+                &::before {
+                    width: 1.5em;
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    .mode-toggle {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-right: 80px;
+
+        @include respond-to('xs') {
+            margin-right: 60px;
+        }
+
+        .body-map & {
+            margin-right: 50px;
+
+            @include respond-to('xxs') {
+                margin-right: 70px;
+            }
+        }
+
+        .mode-option.on {
+            border-bottom-color: $mode-picker-text-color;
+        }
+
+        .walk {
+            margin-right: 20px;
+        }
+
+        .bike {
+        }
+    }
+
+    .mode-option {
+        padding-right: .25em;
+        border-top: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        opacity: .5;
+
+        .body-map & {
+            padding-right: 0;
+        }
+
+        &.on {
+            opacity: 1;
+        }
+    }
+
+    .btn-options {
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        justify-content: center;
+        width: 50px;
+        margin-top: -5px;
+        margin-left: 24px;
+        padding-top: 3px;
+        background-color: $gophillygo-blue-dark;
+        cursor: pointer;
+
+        i.icon-sliders {
+            font-size: 2rem;
+        }
+
+        @include respond-to('xxs') {
+            margin-left: 40px;
+        }
+
+        i::before {
+            margin-right: 0;
+        }
+
+        .body-home & {
+            display: none;
+        }
+    }
+
+    .directions-text-input {
+        display: flex;
+        position: relative;
+        flex: 0 0 40px;
+        flex-flow: row nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        margin-bottom: 15px;
+        background-color: $directions-form-text-input-background-color;
+
+        .body-map & {
+            flex: 0 0 30px;
+            margin-bottom: 0;
+            border: 1px solid $white;
+            background-color: $gophillygo-blue;
+
+            @include respond-to('xxs-up') {
+                &.directions-from label {
+                    background-color: $gophillygo-blue;
+                }
+
+                &.directions-tab-button label {
+                    position: relative;
+                    background-color: $gophillygo-blue-dark;
+                    cursor: pointer;
+                }
+
+                &.directions-to label {
+                    padding-right: .5rem;
+                }
+
+                &.isochrone-control label {
+                    padding-right: 1rem;
+                }
+            }
+
+            &:after {
+                position: absolute;
+                width: 30px;
+                height: 28px;
+                background: linear-gradient(to right, rgba($gophillygo-blue,0) 0%,rgba($gophillygo-blue,1) 30%,rgba($gophillygo-blue,1) 100%);
+                content: '';
+                right: 0;
+            }
+
+            &.error {
+                background-color: rgba($gophillygo-red, .5);
+
+                &:after {
+                    opacity: 0;
+                }
+            }
+
+            &.directions-tab-button {
+                border-top-width: 0;
+            }
+        }
+
+        .body-map-explore &.directions-to {
+            display: none;
+        }
+
+        label {
+            flex: 0 0 5.5rem;
+            padding-right: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: $font-weight-bold;
+            line-height: 40px;
+            text-align: right;
+            cursor: text;
+
+            .body-map & {
+                flex-basis: 4rem;
+                margin-right: .5rem;
+                padding-right: .5rem;
+                padding-left: .7rem;
+                font-size: 1.2rem;
+                font-weight: $font-weight-medium;
+                line-height: 30px;
+                color: rgba(255, 255, 255, .9);
+                text-align: left;
+            }
+        }
+
+        input[type=text], input[type=search] {
+            flex: 1 0 auto;
+            border: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            font-size: 1.4rem;
+            background-color: transparent;
+            line-height: 40px;
+            border-radius: 0;
+
+            .body-map & {
+                padding: 0;
+                color: $white !important;
+                font-weight: $font-weight-medium;
+                line-height: 28px;
+
+                &.tt-hint {
+                    color: rgba($white, .7) !important;
+                }
+
+                &::placeholder {
+                    color: $white;
+                }
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .twitter-typeahead {
+            display: flex !important;
+            flex: 1;
+            flex-flow: row nowrap;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+
+        .tt-hint {
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            color: rgba($font-color, .7);
+
+            .body-map & {
+                height: 28px;
+                line-height: 28px;
+                color: rgba($white, .7) !important;
+            }
+        }
+
+        .tt-input {
+            flex: 1 0 auto;
+
+            .body-map & {
+                background-color: $gophillygo-blue;
+                color: $white !important;
+                font-weight: $font-weight-medium;
+                line-height: 30px;
+            }
+        }
+
+        .tt-dropdown-menu {
+            width: calc(100% + 5.5rem);
+            margin-left: -5.5rem;
+            background-color: $directions-form-text-input-background-color;
+            font-size: 1.4rem;
+            line-height: 1.25;
+            z-index: 1000 !important;
+
+            .body-map & {
+                width: calc(100% + 4.5rem);
+                margin-left: -4.5rem;
+                font-size: 1.3rem;
+                line-height: 2;
+            }
+        }
+
+        .tt-suggestion {
+            padding: .5rem 1em;
+            color: $font-secondary-color;
+
+            p {
+                margin: 0;
+
+                .body-map & {
+                    text-overflow: ellipsis;
+                    white-space: nowrap !important;
+                    overflow: hidden;
+                }
+            }
+        }
+
+        .tt-highlight {
+            font-weight: $font-weight-bold;
+            color: $font-color;
+        }
+
+        .tt-cursor {
+            background-color: $v-lt-gray;
+        }
+
+        .btn-geolocate {
+            padding: 0 .3em;
+            border: 0;
+            background-color: inherit;
+            font-size: 1.8rem;
+            color: $lt-gray;
+            cursor: pointer;
+
+            & i.spin {
+                display: inline-block;
+                animation: full-rotation 2s infinite linear;
+            }
+
+            .body-map & {
+                display: none;
+            }
+        }
+
+        .btn-reverse {
+            display: none;
+            position: absolute;
+            top: -16px;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 0;
+            border-radius: 100%;
+            background-color: $gophillygo-blue;
+            color: $white;
+            font-size: 2rem;
+            line-height: 20px;
+            cursor: pointer;
+            z-index: 10;
+
+            .body-map & {
+                display: block;
+            }
+        }
+    }
+
+    .directions-to {
+         &.isochrone-control {
+             display: none;
+         }
+
+         &.directions-text-input {
+             display: flex;
+         }
+     }
+
+     #isochrone-slider {
+        align-self: center;
+        width: 80px;
+        margin: 0 1rem 0 0;
+        padding: 0;
+        background-color: $gophillygo-blue;
+    }
+
+    .directions-tab-button.isochrone-control {
+            &:after {
+                background: $gophillygo-blue;
+            }
+        }
+
+        .directions-to label {
+            padding-right: 1em;
+            margin-right: .2em;
+        }
+
+        #output-directions-within {
+            position: relative;
+            min-width: 5em;
+            margin: 0 2rem 0 .5rem;
+            color: $white;
+            font-size: 1.4rem;
+            font-weight: $font-weight-medium;
+            line-height: 30px;
+            text-align: right;
+
+            &:after {
+                content: ' minutes';
+            }
+        }
+}
+
+@keyframes full-rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(359deg); }
+}

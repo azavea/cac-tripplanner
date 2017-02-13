@@ -93,7 +93,7 @@ class AppServerStack(StackNode):
 
         self.param_color = self.add_parameter(Parameter(
             'StackColor', Type='String',
-            Description='Stack color', AllowedValues=['Blue', 'Green']),
+            Description='Stack color', AllowedValues=['Blue', 'Green', 'Orange']),
             source='StackColor')
 
         self.param_stacktype = self.add_parameter(Parameter(

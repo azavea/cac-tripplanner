@@ -31,22 +31,30 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
      * http://getbootstrap.com/components/#alerts
      *
      * @param {string} message Message to display
+     * @param {string} title Header for message
      * @param {string} type Alert type (success, warning, info, or danger)
      * @returns {String} Compiled Handlebars template for the Bootstrap alert
      */
-    function alert(message, type) {
+    function alert(message, title, type) {
         var info = {
             message: message,
+            title: title,
             type: type
         };
+
         var source = [
-            '<div class="alert-container">',
-            '<div class="alert alert-{{info.type}} alert-dismissible" role="alert">',
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
-            '<span aria-hidden="true">&times;</span></button>',
+            '<div class="alert alert-{{info.type}}">',
+            '<div class="alert-title">',
+            '{{info.title}}',
+            '<button title="Dismiss this message" name="close" class="close" aria-label="Close">',
+            '<i class="icon-cancel"></i></button>',
+            '</div>',
+            '<div class="alert-body">',
             '{{info.message}}',
-            '</div></div>'
+            '</div>',
+            '</div>'
         ].join('');
+
         var template = Handlebars.compile(source);
         var html = template({info: info});
         return html;
@@ -79,15 +87,19 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
         // message is not templated, so we can embed links
         var source = [
-            '<div class="alert-container">',
-            '<div class="alert alert-{{type}} alert-dismissible" role="alert">',
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
-            '<span aria-hidden="true">&times;</span></button>',
+            '<div class="alert alert-bicycle">',
+            '<div class="alert-title">',
+            'Notice',
+            '<button title="Dismiss this message" name="close" class="close" aria-label="Close">',
+            '<i class="icon-cancel"></i></button>',
+            '</div>',
+            '<div class="alert-body">',
             msg,
-            '</div></div>'
+            '</div>',
+            '</div>'
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({type: 'warning'});
+        var html = template();
         return html;
     }
 
@@ -99,7 +111,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             console.warn('Could not parse time string ' + timeString);
             return timeString;
         }
-        return time.format('hh:mm A');
+        return time.format('h:mma');
     }
 
     function bikeSharePopup(share) {
@@ -112,15 +124,15 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         }
         share.properties.indegoLogo = Utils.getImageUrl('indego_logo.png');
         var source = [
-            '<h4>{{share.name}}</h4>',
-            '<p class="bikeshare"><strong>{{share.addressStreet}}</strong></p>',
-            '<p class="bikeshare">Status: {{share.kioskPublicStatus}}</p>',
+            '<p class="bikeshare-logo"><a href="https://www.rideindego.com/" target="_blank">',
+            '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a></p>',
+            '<h4 class="bikeshare-name">{{share.name}}</h4>',
+            '<p class="bikeshare-address">{{share.addressStreet}}</p>',
+            '<p class="bikeshare-status">{{share.kioskPublicStatus}}</p>',
             '{{#if share.isEventBased}}<p>Event hours: {{share.eventStart}} to {{share.eventEnd}}</p>{{/if}}',
-            '<p class="bikeshare">{{share.bikesAvailable}} bikes available</p>',
-            '<p class="bikeshare">{{share.docksAvailable}} docks open</p>',
-            '{{#if share.trikesAvailable}}<p>{{share.trikesAvailable}} trikes available</p>{{/if}}',
-            '<a href="https://www.rideindego.com/" target="_blank">',
-            '<img alt="Indego" src="{{share.indegoLogo}}" width="48px" height="18.75px" /></a>',
+            '<p class="bikeshare-bikes">{{share.bikesAvailable}} bikes available</p>',
+            '{{#if share.trikesAvailable}}<p class="bikeshare-trikes">{{share.trikesAvailable}} trikes available</p>{{/if}}',
+            '<p class="bikeshare-docks">{{share.docksAvailable}} docks open</p>',
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({share: share.properties});
@@ -158,7 +170,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<div class="block-detail">',
                 '<div class="trip-numbers">{{#if d.formattedDuration}}<div class="trip-duration"> ',
                 '{{ d.formattedDuration }}</div>{{/if}}<div class="trip-distance">',
-                '{{ d.distanceMiles }}</div></div>',
+                '{{ d.formattedDistance }}</div></div>',
                 '<h3>{{ d.name }}</h3>',
                 '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}',
                     '{{^}}https://placehold.it/300x150{{/if}}" />',
@@ -201,23 +213,29 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     // Template for itinerary summaries
     function itineraryList(itineraries) {
-        var source = '{{#each itineraries}}' +
-                '<div class="block block-itinerary" data-itinerary="{{this.id}}">' +
-                    '<div class="trip-numbers">' +
-                        '<div class="trip-duration"> {{this.formattedDuration}}</div>' +
-                        '<div class="trip-distance"> {{this.distanceMiles}} mi</div>' +
-                    '</div>' +
-                    '<div class="trip-details">' +
-                        '{{#each this.modes}}' +
-                            '<div class="direction-icon">' +
-                                ' {{modeIcon this}}' +
-                            '</div>' +
-                        '{{/each}}' +
-                        '<span class="short-description"> via {{this.via}}</span>' +
-                        '<a class="itinerary" data-itinerary="{{this.id}}"> View Directions</a>' +
-                    '</div>' +
-                '</div>' +
-                '{{/each}}';
+        var source = [
+        '<h1>Choose a route</h1><div class="routes-list">',
+        '{{#each itineraries}}',
+            '<div class="route-summary" data-itinerary="{{this.id}}">',
+            '<div class="route-summary-details">',
+                '<div class="route-name">via {{this.via}}</div>',
+                '<div class="route-summary-primary-details">',
+                    '<div class="route-duration">{{this.formattedDuration}}</div>',
+                    '<div class="route-distance">{{this.formattedDistance}}</div>',
+                '</div>',
+                '<div class="route-summary-secondary-details">',
+                    '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
+                    '<div class="route-modes">',
+                        '{{#each this.modes}}',
+                            ' {{modeIcon this}}',
+                        '{{/each}}',
+                    '</div>',
+                '</div>',
+            '</div>',
+            '<div class="route-summary-go-btn">Go</div>',
+        '</div>{{/each}}',
+        '</div>'].join('');
+
         var template = Handlebars.compile(source);
         var html = template({itineraries: itineraries});
         return html;
@@ -226,79 +244,73 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function itinerary(templateData) {
         // The &nbsp;'s are used instead of 'hide' classes because of some styling-related issues
         var source = [
-            '<div class="block block-step directions-header">',
-                'Directions',
-                '{{#if data.showBackButton}}<div class="pull-right"><a class="back pull-right">',
-                '<i class="md md-close"></i></a></div>{{/if}}',
-                '<div class="share-dropdown pull-right dropdown">{{#if data.showShareButton}}',
-                    '<a class="share dropdown-toggle" data-toggle="dropdown">',
-                    '<i class="md md-share"></i></a>',
-                    '<ul class="dropdown-menu">',
-                        '<li><a id="directLinkBtn" title="Link" data-toggle="tooltip" ',
-                            'data-target="link-modal" data-toggle="link-modal" ',
-                                '<i class="fa fa-2x fa-link"></i>',
-                        '</a></li>',
-                        '<li><a id="twShareBtn" title="Twitter" data-toggle="tooltip"',
-                            'data-target="#" <i class="fa fa-2x fa-twitter-square"></i>',
-                        '</a></li>',
-                        '<li><a id="fbShareBtn" title="Facebook" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-facebook-official"></i>',
-                        '</a></li>',
-                        '<li><a id="gpShareBtn" title="Google+" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-google-plus"></i>',
-                        '</a></li>',
-                        '<li><a id="emailShareBtn" title="E-Mail" data-toggle="tooltip" ',
-                            'data-target="#" <i class="fa fa-2x fa-envelope"></i>',
-                        '</a></li>',
-                    '</ul>{{/if}} ',
-                    '<span class="directions-header-divider">|</span> ',
+            '<div class="directions-step-by-step-content">',
+                '<header class="step-by-step-header">',
+                    '{{#if data.showBackButton}}',
+                        '<button name="back-to-directions-results" class="back-to-directions-results" title="List all routes">',
+                        '<i class="icon-left-big"></i></button>',
+                    '{{/if}}',
+                    '<h1>Directions</h1>',
+                    '{{#if data.showShareButton}}',
+                        '<button name="share-directions" class="share-directions">',
+                            '<i class="icon-share"></i>',
+                        '</button>',
+                    '{{/if}}',
+                '</header>',
+                '<div class="directions-list-of-steps" data-itinerary-id="{{data.id}}">',
+                    '<div class="directions-leg directions-leg-origin">',
+                        '<div class="directions-step directions-step-origin">',
+                        '<div class="directions-instruction">Depart {{data.start.text}}</div>',
+                        '<div class="directions-time">at {{datetime data.start.time}}</div>',
+                    '</div>',
                 '</div>',
-            '</div>',
-            '<div class="block block-step direction-depart">',
-                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
-                    '<td>Depart from <strong>{{data.start.text}} at {{datetime data.start.time}}</td>',
-                '</tr></table></strong>',
-            '</div>',
-            '<div class="block-legs">',
                 '{{#each data.legs}}',
-                    '<div class="block block-leg">',
-                        '<div class="trip-numbers">',
-                            '<div class="trip-duration">',
-                                '{{this.formattedDuration}}',
+                    '<div class="directions-leg" ',
+                        'data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}">',
+                        '{{#if this.transitLeg}}',
+                            // transit step directions
+                            '<div class="directions-step {{modeClass this.mode}}" ',
+                                'data-lat="{{ this.from.lat }}" data-lon="{{ this.from.lon }}">',
+                                '<div class="directions-instruction">Board {{this.agencyName}} ',
+                                '{{this.route}} {{this.headsign}}</div>',
+                                '<div class="directions-time">at {{datetime this.startTime}}</div>',
+                                '<div class="directions-distance">{{this.formattedDistance}}</div>',
                             '</div>',
-                            '<div class="trip-distance">',
-                                '{{inMiles this.distance}} mi',
+                            '<div class="directions-step directions-step-disembark" ',
+                                'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                                '<div class="directions-instruction">Disembark <strong>',
+                                    '{{this.to.name}}</strong></div>',
                             '</div>',
-                        '</div>',
-                        '<div class="trip-details">',
-                            '<div class="direction-section"><table><tr>',
-                            '<td class="direction-icon">',
-                            '{{modeIcon this.mode}}</td><td class="direction-text direction-item"',
-                            ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
-                            '{{#if this.transitLeg}}{{this.agencyName}} {{this.route}} ',
-                                '{{this.headsign}}{{/if}} ',
-                            'to {{this.to.name}}',
-                            '{{#if this.transitLeg }} at {{datetime this.startTime}}{{/if}}',
-                            '</td></tr></table></div>',
-                            '<div class="block direction-item"',
-                            ' data-lat="{{this.from.lat}}" data-lon="{{this.from.lon}}" >',
-                                '{{#each steps}}',
-                                    '<div class="block block-step direction-item"',
-                                        ' data-lat="{{ lat }}" data-lon="{{ lon }}" >',
-                                        '<span>{{ directionText }}</span>',
-                                        '<span class="pull-right">{{ inMiles this.distance }} mi</span>',
-                                    '</div>',
-                                '{{/each}}',
-                            '</div>',
-                        '</div>',
+                        '{{else}}',
+                            // non-transit step directions
+                            '{{#each steps}}',
+                                '<div class="directions-step ',
+                                    '{{directionClass this.relativeDirection ../this.mode @index}}" ',
+                                    'data-lat="{{ lat }}" data-lon="{{ lon }}">',
+                                    '<div class="directions-instruction">{{directionText ../this @index}}</div>',
+                                    '<div class="directions-distance">{{this.formattedDistance}}</div>',
+                                '</div>',
+                            '{{/each}}',
+                            '{{#unless this.lastLeg}}',
+                                '<div class="directions-step ',
+                                    '{{#if this.toBikeShareStation}}directions-step-indego"',
+                                    '{{else}}directions-step-arrive"{{/if}}',
+                                    'data-lat="{{ this.to.lat }}" data-lon="{{ this.to.lon }}">',
+                                    '<div class="directions-instruction"><strong>Arrive ',
+                                    '{{#if this.toBikeShareStation}}Indego station, {{/if}}',
+                                    '{{this.to.name}}</strong></div>',
+                                '</div>',
+                            '{{/unless}}', // unless last step
+                        '{{/if}}', // end if transit or not
                     '</div>',
                 '{{/each}}',
-            '</div>',
-            '<div class="block block-step direction-arrive">',
-                '<table><tr><td class="direction-icon"><i class="md md-place"></i></td>',
-                    '<td>Arrive at <strong>{{data.end.text}} at {{datetime data.end.time}}</td>',
-                '</tr></table></strong>',
-            '</div>',
+                '<div class="directions-leg directions-leg-destination">',
+                    '<div class="directions-step directions-step-destination">',
+                        '<div class="directions-instruction">Arrive {{data.end.text}}</div>',
+                        '<div class="directions-time">at {{datetime data.end.time}}</div>',
+                    '</div>',
+                '</div>',
+            '</div>'
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({data: templateData});
@@ -306,13 +318,17 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     function registerListItemHelpers() {
-        Handlebars.registerHelper('directionIcon', function(direction) {
-            return new Handlebars.SafeString('<span class="glyphicon '+
-                                             getTurnIconName(direction) + '"></span>');
+        Handlebars.registerHelper('directionClass', function(direction, mode, index) {
+            return new Handlebars.SafeString(getTurnIconClass(direction, mode, index));
         });
-        Handlebars.registerHelper('directionText', function () {
-            var text = turnText(this.relativeDirection, this.streetName, this.absoluteDirection);
+
+        Handlebars.registerHelper('directionText', function (leg, index) {
+            var text = turnText(this, leg, index);
             return new Handlebars.SafeString('<span>' + text + '</span>');
+        });
+
+        Handlebars.registerHelper('modeClass', function(modeString) {
+            return new Handlebars.SafeString(getModeClass(modeString));
         });
 
         Handlebars.registerHelper('modeIcon', function(modeString) {
@@ -320,47 +336,76 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         });
 
         Handlebars.registerHelper('datetime', function(dateTime) {
-            return new Handlebars.SafeString(new Date(dateTime).toLocaleTimeString());
-        });
-
-        Handlebars.registerHelper('inMiles', function(meters) {
-            return new Handlebars.SafeString(Math.round(((meters / 1000) * 0.621371) * 100) / 100);
+            // round to the nearest minute
+            var COEFF = 60000; // to round Unix timestamp to nearest minute
+            var dt = moment(Math.round(dateTime / COEFF) * COEFF);
+            return new Handlebars.SafeString(dt.format('h:mma'));
         });
     }
 
-    function getTurnIconName(turnType) {
+    function getModeClass(modeText) {
+        switch (modeText) {
+            case 'BICYCLE':
+                return 'directions-step-bike';
+            default:
+                return 'directions-step-' + modeText.toLowerCase();
+        }
+    }
+
+    // Get icon class for step. The first step in a leg gets the mode icon (and absolute direction)
+    function getTurnIconClass(turnType, modeText, index) {
+        if (index === 0) {
+            return getModeClass(modeText);
+        }
         switch (turnType) {
             case 'DEPART':
+                return getModeClass(modeText);
             case 'CONTINUE':
-                return 'glyphicon-arrow-up';
-            // Temporarily fall through to similar cases for left/right
+                return 'directions-step-continue';
+            // fall through to similar cases for left/right
             case 'LEFT':
             case 'SLIGHTLY_LEFT':
             case 'HARD_LEFT':
             case 'UTURN_LEFT':
-                return 'glyphicon-arrow-left';
+                return 'directions-step-turn-left';
             case 'RIGHT':
             case 'SLIGHTLY_RIGHT':
             case 'HARD_RIGHT':
             case 'UTURN_RIGHT':
-                return 'glyphicon-arrow-right';
+                return 'directions-step-turn-right';
             case 'CIRCLE_CLOCKWISE':
+                return 'directions-step-clockwise';
             case 'CIRCLE_COUNTERCLOCKWISE':
-                return 'glyphicon-repeat';
+                return 'directions-step-counterclockwise';
             case 'ELEVATOR':
-                return 'glyphicon-cloud-upload';
+                return 'directions-step-elevator';
             default:
-                return 'glyphicon-remove-circle';
+                return '';
         }
     }
 
-    function turnText(turn, street, direction) {
+    function getModeText(leg) {
+        switch (leg.mode) {
+            case 'BICYCLE':
+                return 'Bike';
+            case 'WALK':
+                return 'Walk' + (leg.rentedBike ? ' the bike' : '');
+            default:
+                return 'Head';
+        }
+    }
+
+    // Get the text for a step. The first step in a leg gets absolute direction.
+    function turnText(step, leg, index) {
+        var turn = step.relativeDirection;
+        var street = step.streetName;
+        var direction = step.absoluteDirection;
         var turnTextString = '';
         var turnLower = turn.toLowerCase();
         var turnSplit = turnLower.replace('_', ' ');
         street = Utils.abbrevStreetName(street);
-        if (turn === 'DEPART') {
-            turnTextString = 'Head ' + direction.toLowerCase() + ' on ' + street;
+        if (turn === 'DEPART' || index === 0) {
+            turnTextString = getModeText(leg) + ' ' + direction.toLowerCase() + ' on ' + street;
         } else if (turn === 'CONTINUE') {
             turnTextString = 'Continue on to ' + street;
         } else if (turn === 'ELEVATOR') {

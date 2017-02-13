@@ -1,0 +1,27 @@
+<footer class="app-footer">
+    <div class="footer-subscribe">
+        {% include "partials/contact-form.html" %}
+    </div>
+    <div class="footer-follow">
+        <h2>Follow us</h2>
+        <ul class="social-sites">
+            <li><a class="social-twitter" target="_blank" title="Follow us on Twitter" href="https://twitter.com/go_philly_go"><i class="icon-twitter"></i></a></li>
+            <li><a class="social-facebook" target="_blank" title="Like us on Facebook" href="https://www.facebook.com/gophillygo"><i class="icon-facebook"></i></a></li>
+            <li><a class="social-instagram" target="_blank" title="Follow us on Instagram" href="https://www.instagram.com/go_philly_go/"><i class="icon-instagram"></i></a></li>
+            <li><a class="social-youtube" target="_blank" title="Watch us on YouTube" href="https://www.youtube.com/channel/UCJSbm760xytSCZdJ16kS1Cg"><i class="icon-youtube"></i></a></li>
+        </ul>
+    </div>
+    <div class="footer-about">
+        <a class="goto-about" title="Learn more about GoPhillyGo" href="/about/">
+            <h2>About</h2>
+            <p>
+                GoPhillyGo is a project of the Clean Air Council, Azavea, and Warkulwiz Design Associates. The project is funded by the William Penn Foundation.
+            </p>
+        </a>
+    </div>
+    <div class="footer-compact tab-control">
+        <a class="nav-item explore-link" data-tab-id="EXPLORE">Explore</a>
+        <a class="nav-item directions-link" data-tab-id="DIRECTIONS">Directions</a>
+        <a href="{% url 'learn-list' %}">Learn</a>
+    </div>
+</footer>

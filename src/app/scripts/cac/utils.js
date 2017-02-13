@@ -1,15 +1,6 @@
 CAC.Utils = (function (_) {
     'use strict';
 
-    var module = {
-        convertReverseGeocodeToFeature: convertReverseGeocodeToFeature,
-        getImageUrl: getImageUrl,
-        abbrevStreetName: abbrevStreetName,
-        getUrlParams: getUrlParams,
-        encodeUrlParams: encodeUrlParams,
-        modeStringHelper: modeStringHelper
-    };
-
     var directions = {
         north: 'N',
         northeast: 'NE',
@@ -62,18 +53,98 @@ CAC.Utils = (function (_) {
         wy: 'Wy',
     };
 
-    return module;
+    // Note:  the three bike options must sum to 1, or OTP won't plan the trip
+    var bikeTriangle = {
+        any: {
+            triangleSafetyFactor: 0.34,
+            triangleSlopeFactor: 0.33,
+            triangleTimeFactor: 0.33
+        },
+        flat: {
+            triangleSafetyFactor: 0.17,
+            triangleSlopeFactor: 0.66,
+            triangleTimeFactor: 0.17
+        },
+        fast: {
+            triangleSafetyFactor: 0.17,
+            triangleSlopeFactor: 0.17,
+            triangleTimeFactor: 0.66
+        },
+        safe: {
+            triangleSafetyFactor: 0.66,
+            triangleSlopeFactor: 0.17,
+            triangleTimeFactor: 0.17
+        }
+    };
+
+    // linestring colors for each mode
+    var brandColors = {
+        BLUE: '#2e68a3',
+        GREEN: '#60a244',
+        YELLOW: '#efa722',
+        PURPLE: '#6a4388',
+        ORANGE: '#f05223',
+        RED: '#e23331'
+    };
+    var defaultModeColor = brandColors.RED;
+    var defaultBackgroundLineColor = '#8B9cae';
+    var modeColors = {
+        WALK: brandColors.BLUE,
+        BICYCLE: brandColors.PURPLE,
+        BUS: brandColors.YELLOW,
+        TRAM: brandColors.YELLOW,
+        SUBWAY: brandColors.YELLOW,
+        TRAIN: brandColors.YELLOW,
+        RAIL: brandColors.YELLOW,
+        CAR: '#111111',
+        FERRY: brandColors.YELLOW
+    };
+
+    var module = {
+        getBikeTriangle: getBikeTriangle,
+        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
+        defaultBackgroundLineColor: defaultBackgroundLineColor,
+        defaultModeColor: defaultModeColor,
+        getImageUrl: getImageUrl,
+        abbrevStreetName: abbrevStreetName,
+        getUrlParams: getUrlParams,
+        encodeUrlParams: encodeUrlParams,
+        getModeColor: getModeColor,
+        modeStringHelper: modeStringHelper
+    };
+
+    return Object.freeze(module);
 
     /**
-     * Convert ESRI reverse geocode response into feature formatted like typeahead results.
+     * Get OTP values for the bikeTriangle parameter, which weights based on
+     * relative preference for safety, speed, or flatness of route.
+     *
+     * @param {string} option Key for which option to prefer
+     * @returns {Object} Values that sum to 1 and weight for the preferred option
+     */
+    function getBikeTriangle(option) {
+        if (_.has(bikeTriangle, option)) {
+            return bikeTriangle[option];
+        }
+
+        console.error('bike triangle option ' + option + ' not found');
+        return bikeTriangle.any;
+    }
+
+    /**
+     * Convert ESRI reverse geocode response into location formatted like typeahead results.
      *
      * @param {Object} response JSON response from ESRI reverse geocode service
-     * @returns {Object} Feature object structured like the typeahead results, for use on map page.
+     * @returns {Object} Location object structured like the typeahead results, for use on map page.
      */
-    function convertReverseGeocodeToFeature(response) {
-        var feature = {
+    function convertReverseGeocodeToLocation(response) {
+        var location = {
+            location: {
+                x: response.location.x,
+                y: response.location.y
+            },
             /*jshint camelcase: false */
-            name: response.address.Match_addr,
+            address: response.address.Match_addr,
             /*jshint camelcase: true */
             extent: {
                 xmax: response.location.x,
@@ -81,20 +152,14 @@ CAC.Utils = (function (_) {
                 ymax: response.location.y,
                 ymin: response.location.y
             },
-            feature: {
-                attributes: {
-                    City: response.address.City,
-                    Postal: response.address.Postal,
-                    Region: response.address.Region,
-                    StAddr: response.address.Address,
-                },
-                geometry: {
-                    x: response.location.x,
-                    y: response.location.y
-                }
-            }
+            attributes: {
+                City: response.address.City,
+                Postal: response.address.Postal,
+                Region: response.address.Region,
+                StAddr: response.address.Address,
+            },
         };
-        return feature;
+        return location;
     }
 
     // Source: https://github.com/azavea/nih-wayfinding/blob/develop/src/nih_wayfinding/app/scripts/routing/abbreviate-filter.js
@@ -176,23 +241,27 @@ CAC.Utils = (function (_) {
         }).join('&');
     }
 
+    function getModeColor(modeString) {
+        return modeColors[modeString] || defaultModeColor;
+    }
+
     function modeStringHelper(modeString) {
         var modeIcons = {
-            BUS: {name: 'bus', font: 'fa'},
-            SUBWAY: {name: 'subway', font: 'fa'},
-            CAR: {name: 'car', font: 'fa'},
-            TRAIN: {name: 'train', font: 'fa'},
-            RAIL: {name: 'train', font: 'fa'},
-            BICYCLE: {name: 'bicycle', font: 'fa'},
-            WALK: {name: 'directions-walk', font: 'md'},
-            TRAM: {name: 'directions-subway', font: 'md'},
-            FERRY: {name: 'directions-ferry', font: 'md'}
+            BUS: {name: 'bus', font: 'icon'},
+            SUBWAY: {name: 'subway', font: 'icon'},
+            CAR: {name: 'car', font: 'icon'},
+            TRAIN: {name: 'train', font: 'icon'},
+            RAIL: {name: 'train', font: 'icon'},
+            BICYCLE: {name: 'bike', font: 'icon'},
+            WALK: {name: 'walk', font: 'icon'},
+            TRAM: {name: 'tram', font: 'icon'},
+            FERRY: {name: 'ferry', font: 'icon'}
         };
 
         var mode = modeIcons[modeString];
 
         if (!mode) {
-            mode = {name: 'md-directoins-transit', font: 'md'};
+            mode = {name: 'default', font: 'icon'};
             console.error('Unrecognized transit mode: ' + modeString + '. Using default icon.');
         }
 
