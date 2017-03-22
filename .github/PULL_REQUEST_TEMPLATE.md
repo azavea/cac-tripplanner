@@ -22,4 +22,10 @@ Optional. Ancillary topics, caveats, alternative strategies that didn't work out
  * Include test case, and expected output
 
 
+## Checklist
+- [ ] No gulp lint warnings
+- [ ] No python lint warnings
+- [ ] Python tests pass
+
+
 Connects #XXX
