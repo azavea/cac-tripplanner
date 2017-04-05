@@ -29,7 +29,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             crossDomain: true,
             data: urlParams,
             processData: false
-        }).then(function(data) {
+        }).done(function(data) {
             if (data.plan) {
                 // Ensure unique itineraries.
                 // Due to issue: https://github.com/opentripplanner/OpenTripPlanner/issues/1894
@@ -64,7 +64,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             } else {
                 deferred.reject(data.error);
             }
-        }, function (error) {
+        }).fail(function (error) {
             deferred.reject(error);
         });
         return deferred.promise();
@@ -96,7 +96,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             crossDomain: true,
             data: urlParams,
             processData: false
-        }).then(function(data) {
+        }).done(function(data) {
             if (data.plan) {
                 var otpItinerary = data.plan.itineraries[0];
 
@@ -108,7 +108,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             } else {
                 deferred.reject(data.error);
             }
-        }, function (error) {
+        }).fail(function (error) {
             deferred.reject(error);
         });
         return deferred.promise();
