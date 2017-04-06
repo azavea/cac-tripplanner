@@ -98,12 +98,12 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
             crossDomain: true,
             data: otpParams,
             processData: false
-        }).then(function(data) {
+        }).done(function(data) {
             var itineraries = data.plan.itineraries;
             var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
-        }, function (error) {
+        }).fail(function (error) {
             console.error(error);
         });
 
