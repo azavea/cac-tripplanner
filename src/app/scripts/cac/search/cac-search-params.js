@@ -4,11 +4,12 @@
 CAC.Search.SearchParams = (function () {
     'use strict';
 
-    // bounds to cover are the counties here:
+    // bounds to cover are the counties of the DVRPC region, as shown here:
     // http://pecpa.org/wp-content/uploads/Recreation-The-Circuit-map-photo-Patrick-1260x979.jpg
+    // and also extended to cover the state of Delaware fully
     var searchExtent = [
         '-76.209582',
-        '39.467695',
+        '38.441753',
         '-74.243725',
         '40.725449'
     ].join(',');
