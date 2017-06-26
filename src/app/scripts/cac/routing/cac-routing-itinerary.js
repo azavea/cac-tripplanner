@@ -20,6 +20,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.id = index.toString();
         this.via = getVia(otpItinerary.legs);
         this.modes = getModes(otpItinerary.legs);
+        this.modeSummaries = getModeSummaries(otpItinerary.legs);
         this.formattedDistance = getFormattedItineraryDistance(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary);
         this.startTime = otpItinerary.startTime;
@@ -104,6 +105,24 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      */
     function getModes(legs) {
         return _.chain(legs).map('mode').uniq().value();
+    }
+
+    /**
+     * Helper function to get the total travel time and distance for each mode in the itinerary.
+     *
+     * @param {array} legs Legs property of OTP itinerary
+     * @return {object} Mode keys mapped to formatted and raw total distance and duration
+     */
+    function getModeSummaries(legs) {
+        return _.chain(legs).groupBy('mode').mapValues(function(modeLegs) {
+            var dist = _.map(modeLegs, 'distance').reduce(function(sum, d) { return sum + d; });
+            var time = _.map(modeLegs, 'duration').reduce(function(sum, d) { return sum + d; });
+            return {distance: dist,
+                    duration: time,
+                    formattedDistance: getFormattedDistance(dist),
+                    formattedDuration: getFormattedDuration(time)
+            };
+        }).value();
     }
 
     /**
