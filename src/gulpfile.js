@@ -21,9 +21,13 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var sequence = require('gulp-sequence');
 var shell = require('gulp-shell');
-var uglify = require('gulp-uglify');
 var vinylBuffer = require('vinyl-buffer');
 var vinylSourceStream = require('vinyl-source-stream');
+
+var uglifyLib = require('uglify-es');
+var uglifyComposer = require('gulp-uglify/composer');
+var uglify = uglifyComposer(uglifyLib, console);
+
 var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
