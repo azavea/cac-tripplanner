@@ -216,6 +216,12 @@
         }
     }
 
+    .directions-step-transit {
+        &::before {
+            content: '\f238';
+        }
+    }
+
     .directions-step-train {
         &::before {
             content: '\f238';
