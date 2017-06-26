@@ -75,29 +75,29 @@ gulp.task('collectstatic', function () {
 });
 
 // turf module needs to be run through browserify to pack it with its dependencies
-var turfRoot = './node_modules/@turf/point-on-line';
+var turfRoot = './node_modules/@turf/';
 
 var buildTurfHelpers = function() {
-    return browserify(turfRoot + '/node_modules/@turf/helpers', {
+    return browserify(turfRoot + 'helpers', {
             standalone: 'turf',
             expose: ['helpers']
         })
-        .require(turfRoot + '/node_modules/@turf/helpers',
+        .require(turfRoot + 'helpers',
                  {expose: 'turf-helpers'})
         .bundle()
         .pipe(vinylSourceStream('turf-helpers.js'));
 };
 
 var buildTurfPointOnLine = function() {
-    return browserify('./node_modules/@turf/point-on-line', {
+    return browserify(turfRoot + 'point-on-line', {
             standalone: 'turf.pointOnLine',
-            exclude: [turfRoot + '/node_modules/@turf/helpers']
+            exclude: [turfRoot + 'helpers']
         })
         .transform(aliasify, {aliases: {
-            'turf-helpers': turfRoot + '/node_modules/@turf/helpers',
-            'turf-distance': turfRoot + '/node_modules/@turf/distance',
-            'turf-bearing': turfRoot + '/node_modules/@turf/bearing',
-            'turf-destination': turfRoot + '/node_modules/@turf/destination'
+            'turf-helpers': turfRoot + 'helpers',
+            'turf-distance': turfRoot + 'distance',
+            'turf-bearing': turfRoot + 'bearing',
+            'turf-destination': turfRoot + 'destination'
         }})
         .bundle()
         .pipe(vinylSourceStream('turf-point-on-line.js'));
