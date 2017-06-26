@@ -22,7 +22,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.modes = getModes(otpItinerary.legs);
         this.modeSummaries = getModeSummaries(otpItinerary.legs);
         this.formattedDistance = getFormattedItineraryDistance(otpItinerary.legs);
-        this.formattedDuration = getFormattedDuration(otpItinerary);
+        this.formattedDuration = getFormattedDuration(otpItinerary.duration);
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));
@@ -114,7 +114,9 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @return {object} Mode keys mapped to formatted and raw total distance and duration
      */
     function getModeSummaries(legs) {
-        return _.chain(legs).groupBy('mode').mapValues(function(modeLegs) {
+        return _.chain(legs).groupBy(function(leg) {
+            return leg.transitLeg ? 'TRANSIT' : leg.mode;
+        }).mapValues(function(modeLegs) {
             var dist = _.map(modeLegs, 'distance').reduce(function(sum, d) { return sum + d; });
             var time = _.map(modeLegs, 'duration').reduce(function(sum, d) { return sum + d; });
             return {distance: dist,
@@ -158,11 +160,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     /**
      * Helper function to get formatted duration string for an itinerary or leg
      *
-     * @param {object} otpItinerary OTP itinerary or leg (both have duration property)
+     * @param {object} duration Duration in seconds, as on OTP itinerary or leg
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
-    function getFormattedDuration(otpItineraryLeg) {
-        return moment.duration(otpItineraryLeg.duration, 'seconds').humanize();
+    function getFormattedDuration(duration) {
+        return moment.duration(duration, 'seconds').humanize();
     }
 
     /**
@@ -245,7 +247,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // - Format duration on leg and distance on leg and its steps
         _.forEach(newLegs, function (leg) {
             leg.formattedDistance = getFormattedDistance(leg.distance);
-            leg.formattedDuration = getFormattedDuration(leg);
+            leg.formattedDuration = getFormattedDuration(leg.duration);
             _.forEach(leg.steps, function(step) {
                 step.formattedDistance = getFormattedDistance(step.distance);
             });
