@@ -44,6 +44,15 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // coordsFrom, coordsTo, when, extraOptions
         // (not used by directions list page)
         this.routingParams = null;
+
+        // set the number of transfers on the mode summary, if transit taken
+        if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
+            this.modeSummaries.TRANSIT.transfers = otpItinerary.transfers + ' xfer';
+            if (otpItinerary.transfers > 1) {
+                // pluralize
+                this.modeSummaries.TRANSIT.transfers += 's';
+            }
+        }
     }
 
     Itinerary.prototype.highlight = function(isHighlighted) {

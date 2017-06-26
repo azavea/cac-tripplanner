@@ -230,6 +230,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '{{#each modeSummaries}}',
                         '<div class="{{modeClass @key}}">',
                             '{{this.formattedDistance}} &bull; {{this.formattedDuration}}',
+                            '{{#if this.transfers}} &bull; {{this.transfers}}{{/if}}',
                         '</div>',
                     '{{/each}}',
                 '</div>',
