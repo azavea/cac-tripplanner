@@ -123,6 +123,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @return {object} Mode keys mapped to formatted and raw total distance and duration
      */
     function getModeSummaries(legs) {
+        // minimum length of travel via a given mode for it to show up in the summary
+        // (about a city block)
+        const MIN_MODE_LENGTH_METERS = 120;
+
         return _.chain(legs).groupBy(function(leg) {
             return leg.transitLeg ? 'TRANSIT' : leg.mode;
         }).mapValues(function(modeLegs) {
@@ -133,6 +137,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                     formattedDistance: getFormattedDistance(dist),
                     formattedDuration: getFormattedDuration(time)
             };
+        }).pickBy(function(summary) {
+            return summary.distance > MIN_MODE_LENGTH_METERS;
         }).value();
     }
 
