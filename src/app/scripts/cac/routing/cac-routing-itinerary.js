@@ -45,8 +45,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // (not used by directions list page)
         this.routingParams = null;
 
-        // set the number of transfers on the mode summary, if transit taken
-        if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
+        // do not display mode summary for only one mode
+        if (_.keys(this.modeSummaries).length < 2) {
+            this.modeSummaries = {};
+        } else if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
+            // set the number of transfers on the mode summary, if transit taken
             this.modeSummaries.TRANSIT.transfers = otpItinerary.transfers + ' xfer';
             if (otpItinerary.transfers > 1) {
                 // pluralize
