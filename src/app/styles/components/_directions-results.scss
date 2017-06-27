@@ -150,10 +150,11 @@
         .route-duration {
             margin-right: 2em;
             font-weight: $font-weight-bold;
+            font-family: gpg;
         }
 
         .route-distance {
-            margin-right: 1em;
+            font-weight: $font-weight-medium;
         }
 
         .route-start-stop {

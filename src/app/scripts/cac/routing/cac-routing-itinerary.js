@@ -45,10 +45,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // (not used by directions list page)
         this.routingParams = null;
 
-        // do not display mode summary for only one mode
-        if (_.keys(this.modeSummaries).length < 2) {
-            this.modeSummaries = {};
-        } else if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
+        // only show summary of mode types if more than one mode in use for more than the
+        // minimum travel distance to display
+        this.showSummaryModes = _.keys(this.modeSummaries).length > 1;
+
+        if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
             // set the number of transfers on the mode summary, if transit taken
             this.modeSummaries.TRANSIT.transfers = otpItinerary.transfers + ' xfer';
             if (otpItinerary.transfers > 1) {
@@ -128,7 +129,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     function getModeSummaries(legs) {
         // minimum length of travel via a given mode for it to show up in the summary
         // (about a city block)
-        const MIN_MODE_LENGTH_METERS = 120;
+        var MIN_MODE_LENGTH_METERS = 120;
 
         return _.chain(legs).groupBy(function(leg) {
             return leg.transitLeg ? 'TRANSIT' : leg.mode;
