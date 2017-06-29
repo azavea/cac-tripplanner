@@ -220,19 +220,24 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<div class="route-summary-details">',
                 '<div class="route-name">via {{this.via}}</div>',
                 '<div class="route-summary-primary-details">',
-                    '<div class="route-duration">{{this.formattedDuration}}</div>',
+                    '<div class="route-duration {{#unless showSummaryModes}}{{onlyModeClass modeSummaries}}{{/unless}}">',
+                        '{{this.formattedDuration}} &bull; </div>',
                     '<div class="route-distance">{{this.formattedDistance}}</div>',
-                '</div>',
-                '<div class="route-summary-secondary-details">',
-                    '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
-                    '<div class="route-modes">',
-                        '{{#each this.modes}}',
-                            ' {{modeIcon this}}',
-                        '{{/each}}',
+                    '<div>',
+                        '{{#if showSummaryModes}}',
+                        '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
+                        '{{/if}}',
                     '</div>',
                 '</div>',
+                '<div class="mode-summary route-summary-secondary-details">',
+                    '{{#if showSummaryModes}}{{#each modeSummaries}}',
+                        '<div class="{{modeClass @key}}">',
+                            '{{this.formattedDistance}} &bull; {{this.formattedDuration}}',
+                            '{{#if this.transfers}} &bull; {{this.transfers}}{{/if}}',
+                        '</div>',
+                    '{{/each}}{{/if}}',
+                '</div>',
             '</div>',
-            '<div class="route-summary-go-btn">Go</div>',
         '</div>{{/each}}',
         '</div>'].join('');
 
@@ -340,6 +345,13 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             var COEFF = 60000; // to round Unix timestamp to nearest minute
             var dt = moment(Math.round(dateTime / COEFF) * COEFF);
             return new Handlebars.SafeString(dt.format('h:mma'));
+        });
+
+        // class for the icon for the first mode in the mode summaries, for use when
+        // there is only one mode present
+        Handlebars.registerHelper('onlyModeClass', function(modeSummaries) {
+            var modeString = _.keys(modeSummaries).first();
+            return new Handlebars.SafeString(getModeClass(modeString));
         });
     }
 

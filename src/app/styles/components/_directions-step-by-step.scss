@@ -130,143 +130,149 @@
             }
         }
     }
+}
 
-    .directions-instruction {
-        font-size: 1.5rem;
-        font-weight: $font-weight-bold;
-        line-height: 1.5;
+.directions-instruction {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.5;
+}
+
+.directions-time {
+    margin-top: .5em;
+    color: $lt-gray;
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.5;
+}
+
+.directions-distance {
+    margin-top: .5em;
+    color: $lt-gray;
+    font-size: 1.3rem;
+    line-height: 2;
+}
+
+.directions-step-origin {
+    &::before {
+        color: $gophillygo-green;
+        content: '\e80a';
     }
+}
 
-    .directions-time {
-        margin-top: .5em;
-        color: $lt-gray;
-        font-size: 1.5rem;
-        font-weight: $font-weight-bold;
-        line-height: 1.5;
+.directions-step-destination {
+    &::before {
+        color: $gophillygo-red;
+        content: '\e80a';
     }
+}
 
-    .directions-distance {
-        margin-top: .5em;
-        color: $lt-gray;
-        font-size: 1.3rem;
-        line-height: 2;
+.directions-step-walk {
+    &::before {
+        content: '\e803';
     }
+}
 
-    .directions-step-origin {
-        &::before {
-            color: $gophillygo-green;
-            content: '\e80a';
-        }
+.directions-step-turn-left {
+    &::before {
+        content: '\e809';
     }
+}
 
-    .directions-step-destination {
-        &::before {
-            color: $gophillygo-red;
-            content: '\e80a';
-        }
+.directions-step-turn-right {
+    &::before {
+        content: '\e808';
     }
+}
 
-    .directions-step-walk {
-        &::before {
-            content: '\e803';
-        }
+.directions-step-continue {
+    &::before {
+        content: '\e814';
     }
+}
 
-    .directions-step-turn-left {
-        &::before {
-            content: '\e809';
-        }
+.directions-step-bike {
+    &::before {
+        content: '\e801';
     }
+}
 
-    .directions-step-turn-right {
-        &::before {
-            content: '\e808';
-        }
+.directions-step-indego {
+    &::before {
+        padding-top: 2px;
+        color: $indego-purple;
+        content: '\e80f';
     }
+}
 
-    .directions-step-continue {
-        &::before {
-            content: '\e814';
-        }
+.directions-step-car {
+    &::before {
+        content: '\f1b9';
     }
+}
 
-    .directions-step-bike {
-        &::before {
-            content: '\e801';
-        }
+.directions-step-bus {
+    &::before {
+        content: '\e802';
     }
+}
 
-    .directions-step-indego {
-        &::before {
-            padding-top: 2px;
-            color: $indego-purple;
-            content: '\e80f';
-        }
+.directions-step-transit {
+    &::before {
+        content: '\f238';
     }
+}
 
-    .directions-step-car {
-        &::before {
-            content: '\f1b9';
-        }
+.directions-step-train {
+    &::before {
+        content: '\f238';
     }
+}
 
-    .directions-step-bus {
-        &::before {
-            content: '\e802';
-        }
+.directions-step-rail {
+    &::before {
+        content: '\f238';
     }
+}
 
-    .directions-step-train {
-        &::before {
-            content: '\f238';
-        }
+.directions-step-subway {
+    &::before {
+        content: '\e811';
     }
+}
 
-    .directions-step-rail {
-        &::before {
-            content: '\f238';
-        }
+.directions-step-ferry {
+    &::before {
+        content: '\e816';
     }
+}
 
-    .directions-step-subway {
-        &::before {
-            content: '\e811';
-        }
+.directions-step-tram {
+    &::before {
+        content: '\e812';
     }
+}
 
-    .directions-step-ferry {
-        &::before {
-            content: '\e816';
-        }
+.directions-step-elevator {
+    &::before {
+        content: '\e813';
     }
+}
 
-    .directions-step-tram {
-        &::before {
-            content: '\e812';
-        }
+.directions-step-continue {
+    &::before {
+        content: '\e814';
     }
+}
 
-    .directions-step-elevator {
-        &::before {
-            content: '\e813';
-        }
+.directions-step-clockwise {
+    &::before {
+        content: '\e815';
     }
+}
 
-    .directions-step-continue {
-        &::before {
-            content: '\e814';
-        }
-    }
-
-    .directions-step-clockwise {
-        &::before {
-            content: '\e815';
-        }
-    }
-
-    .directions-step-counterclockwise {
-        &::before {
-            content: '\e817';
-        }
+.directions-step-counterclockwise {
+    &::before {
+        content: '\e817';
     }
 }

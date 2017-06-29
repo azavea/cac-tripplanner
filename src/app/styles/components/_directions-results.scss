@@ -143,15 +143,18 @@
             justify-content: space-between;
             color: $lt-gray;
             font-weight: $font-weight-medium;
+            font-size: 1.4rem;
+            font-family: gpg;
         }
 
         .route-duration {
             margin-right: 2em;
             font-weight: $font-weight-bold;
+            font-family: gpg;
         }
 
         .route-distance {
-            margin-right: 1em;
+            font-weight: $font-weight-medium;
         }
 
         .route-start-stop {
@@ -164,27 +167,6 @@
             .icon-walk {
                 position: relative;
                 right: -3px;
-            }
-        }
-
-        .route-summary-go-btn {
-            display: none;
-            position: absolute;
-            top: 6px;
-            right: 10px;
-            width: 7rem;
-            height: 3.5rem;
-            border: 2px solid $white;
-            background-color: $gophillygo-green;
-            color: $white;
-            font-size: 1.4rem;
-            line-height: 3.5rem;
-            text-align: center;
-            text-transform: uppercase;
-            box-sizing: content-box;
-
-            @include respond-to('xxs') {
-                display: block;
             }
         }
     }
