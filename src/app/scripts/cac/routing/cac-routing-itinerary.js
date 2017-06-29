@@ -134,8 +134,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         return _.chain(legs).groupBy(function(leg) {
             return leg.transitLeg ? 'TRANSIT' : leg.mode;
         }).mapValues(function(modeLegs) {
-            var dist = _.map(modeLegs, 'distance').reduce(function(sum, d) { return sum + d; });
-            var time = _.map(modeLegs, 'duration').reduce(function(sum, d) { return sum + d; });
+            var dist = _.sumBy(modeLegs, 'distance');
+            var time = _.sumBy(modeLegs, 'duration');
             return {distance: dist,
                     duration: time,
                     formattedDistance: getFormattedDistance(dist),
@@ -154,10 +154,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      *                 if less than .2 mile, in feet (rounded to nearest foot); includes unit.
      */
     function getFormattedItineraryDistance(legs) {
-        var distanceMeters = _.chain(legs).map('distance').reduce(function(sum, n) {
-            return sum + n;
-        });
-        return getFormattedDistance(distanceMeters);
+        return getFormattedDistance(_.sumBy(legs, 'distance'));
     }
 
     /**
