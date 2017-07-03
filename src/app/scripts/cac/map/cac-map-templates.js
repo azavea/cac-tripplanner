@@ -315,6 +315,23 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '<div class="directions-time">at {{datetime data.end.time}}</div>',
                     '</div>',
                 '</div>',
+                // per-mode summary
+                '{{#if data.showSummaryModes}}',
+                '<div class="directions-mode-summary">',
+                    '<div class="mode-summary-header">',
+                        '<div>Travel time</div>',
+                        '<div>Distance</div>',
+                    '</div>',
+                    '{{#each data.modeSummaries}}<div class="mode-summary-item">',
+                        '<div class="{{modeClass @key}}"></div>',
+                        '<div>{{this.formattedDuration}}</div>',
+                        '<div>{{this.formattedDistance}}</div>',
+                    '</div>{{/each}}',
+                    '<div class="mode-summary-footer">',
+                        '<div>{{data.formattedDuration}}</div>',
+                        '<div>{{data.formattedDistance}}</div>',
+                    '</div>',
+                '</div>{{/if}}',
             '</div>'
         ].join('');
         var template = Handlebars.compile(source);

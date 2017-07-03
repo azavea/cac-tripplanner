@@ -130,6 +130,31 @@
             }
         }
     }
+
+    .directions-mode-summary {
+
+        display: flex;
+        font-weight: $font-weight-medium;
+        overflow: hidden;
+
+        padding: 13px 0 13px 43px;
+        border-top: 1px solid #ddd;
+        background: $v-lt-gray;
+
+        font-family: gpg;
+
+        .mode-summary-header {
+            font-weight: $font-weight-bold;
+        }
+
+        .mode-summary-item {
+            font-weight: $font-weight-medium;
+        }
+
+        .mode-summary-footer {
+            font-weight: $font-weight-bold;
+        }
+    }
 }
 
 .directions-instruction {
