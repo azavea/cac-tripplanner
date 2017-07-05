@@ -129,7 +129,11 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
                 text: itinerary.toText,
                 time: itinerary.endTime
             },
-            legs: itinerary.legs
+            legs: itinerary.legs,
+            formattedDistance: itinerary.formattedDistance,
+            formattedDuration: itinerary.formattedDuration,
+            showSummaryModes: itinerary.showSummaryModes,
+            modeSummaries: itinerary.modeSummaries
         };
 
         return MapTemplates.itinerary(templateData);
