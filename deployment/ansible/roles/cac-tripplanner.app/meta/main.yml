@@ -2,7 +2,7 @@
   dependencies:
     - { role: "azavea.git" }
     - { role: "azavea.nginx" }
-    - { role: "azavea.nodejs", nodejs_npm_version: "2.1.5" }
+    - { role: "azavea.nodejs", nodejs_npm_version: "3.10.10" }
     - { role: "azavea.packer" }
     - { role: "cac-tripplanner.papertrail", when: production }
     - { role: "azavea.virtualenv" }

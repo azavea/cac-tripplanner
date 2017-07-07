@@ -17,7 +17,7 @@
     chdir: "{{ root_src_dir }}"
 
 - name: Create Static Directory
-  file: path="{{ root_static_dir }}" state=directory mode=0755 owner="{{ app_username }}"
+  file: path="{{ root_static_dir }}" state=directory mode=0755 owner="{{ app_username }}" group="{{ app_username }}"
   become: yes
 
 - name: Install application javascript dependencies with bower
