@@ -10,12 +10,3 @@ Font license info
    Homepage:  http://fortawesome.github.com/Font-Awesome/
 
 
-## Maki
-
-   Copyright (C) Mapbox, LCC
-
-   Author:    Mapbox
-   License:   BSD (https://github.com/mapbox/maki/blob/gh-pages/LICENSE.txt)
-   Homepage:  http://mapbox.com/maki/
-
-

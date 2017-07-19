@@ -5,7 +5,6 @@
 .icon-walk:before { content: '\e803'; } /* '' */
 .icon-reverse:before { content: '\e804'; } /* '' */
 .icon-transit-off:before { content: '\e805'; } /* '' */
-.icon-transit:before { content: '\e806'; } /* '' */
 .icon-left-big:before { content: '\e807'; } /* '' */
 .icon-turn-right:before { content: '\e808'; } /* '' */
 .icon-turn-left:before { content: '\e809'; } /* '' */
@@ -25,6 +24,8 @@
 .icon-counterclockwise:before { content: '\e817'; } /* '' */
 .icon-layers:before { content: '\e818'; } /* '' */
 .icon-minus:before { content: '\e819'; } /* '' */
+.icon-rail:before { content: '\e81b'; } /* '' */
+.icon-train:before { content: '\e81c'; } /* '' */
 .icon-twitter:before { content: '\f099'; } /* '' */
 .icon-gplus:before { content: '\f0d5'; } /* '' */
 .icon-email:before { content: '\f0e0'; } /* '' */
@@ -40,7 +41,7 @@
 .icon-share:before { content: '\f1e0'; } /* '' */
 .icon-bus:before { content: '\f207'; } /* '' */
 .icon-facebook:before { content: '\f230'; } /* '' */
-.icon-train:before { content: '\f238'; } /* '' */
+.icon-transit:before { content: '\f238'; } /* '' */
 .icon-flag:before { content: '\f239'; } /* '' */
 .icon-home:before { content: '\f240'; } /* '' */
 .icon-map:before { content: '\f279'; } /* '' */

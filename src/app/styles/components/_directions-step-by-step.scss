@@ -112,12 +112,10 @@
             width: 40px;
             margin: 0;
             padding: 0;
-            color: inherit;
             font-family: gpg;
             font-size: 2rem;
             line-height: 1;
             text-align: center;
-            content: '';
         }
 
         & + .directions-step {
@@ -290,7 +288,7 @@
 
 .directions-step-bus {
     &::before {
-        content: '\e802';
+        content: '\f207';
     }
 }
 
@@ -308,7 +306,7 @@
 
 .directions-step-rail {
     &::before {
-        content: '\f238';
+        content: '\e81c';
     }
 }
 
