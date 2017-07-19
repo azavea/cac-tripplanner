@@ -1,11 +1,11 @@
 
 .icon-plus:before { content: '\e800'; } /* '' */
 .icon-bike:before { content: '\e801'; } /* '' */
-.icon-transit:before { content: '\e802'; } /* '' */
+.icon-transit-on:before { content: '\e802'; } /* '' */
 .icon-walk:before { content: '\e803'; } /* '' */
 .icon-reverse:before { content: '\e804'; } /* '' */
 .icon-transit-off:before { content: '\e805'; } /* '' */
-.icon-transit-on:before { content: '\e806'; } /* '' */
+.icon-transit:before { content: '\e806'; } /* '' */
 .icon-left-big:before { content: '\e807'; } /* '' */
 .icon-turn-right:before { content: '\e808'; } /* '' */
 .icon-turn-left:before { content: '\e809'; } /* '' */
