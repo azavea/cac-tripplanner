@@ -27,6 +27,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             infinite: false,
             mobileFirst: true,
             variableWidth: true,
+            adaptiveHeight: true,
             responsive : [
                 {
                     // Breakpoint must match 'xxs' in _breakpoints.scss

@@ -1,6 +1,6 @@
 .slick-dots {
-    bottom: 0;
-    
+    bottom: -16px;
+
     li {
         width: 18px;
         height: 18px;
@@ -13,6 +13,10 @@
     }
 
     li button:before {
-        font-size: 20px;
+        font-size: 18px;
     }
+}
+
+.slick-dotted.slick-slider {
+    margin-bottom: 14px;
 }
