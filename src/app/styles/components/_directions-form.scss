@@ -90,6 +90,27 @@
             margin-right: 5px;
         }
 
+        @include respond-to('xxxs') {
+            // Labels wrap nastily on iPhone SE
+            flex-basis: 55px;
+            justify-content: center;
+            padding-top: 3px;
+            padding-left: 60px;
+
+            .mode-option {
+                padding-right: 0;
+                padding-left: 6px;
+            }
+
+            .mode-toggle .walk {
+                margin-right: 24px;
+            }
+
+            .mode-label {
+                display: none;
+            }
+        };
+
         .body-map & {
             flex-basis: 55px;
             justify-content: flex-end;

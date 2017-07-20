@@ -166,11 +166,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     function getFormattedDistance(distanceMeters) {
         // less than ~0.2 miles
         if (distanceMeters < 322) {
-            return Math.round(distanceMeters * 3.28084).toString() + ' ft';
+            return Math.round(distanceMeters * 3.28084).toString() + ' feet';
         }
 
         // return miles
-        return (Math.round(((distanceMeters / 1000) * 0.621371) * 100) / 100).toString() + ' mi';
+        return (Math.round(((distanceMeters / 1000) * 0.621371) * 10) / 10).toString() + ' miles';
     }
 
     /**

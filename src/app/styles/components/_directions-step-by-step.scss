@@ -112,12 +112,10 @@
             width: 40px;
             margin: 0;
             padding: 0;
-            color: inherit;
             font-family: gpg;
             font-size: 2rem;
             line-height: 1;
             text-align: center;
-            content: '';
         }
 
         & + .directions-step {
@@ -132,27 +130,79 @@
     }
 
     .directions-mode-summary {
-
         display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 1em;
+        font-size: 1.4rem;
         font-weight: $font-weight-medium;
-        overflow: hidden;
+        line-height: 2.5;
 
-        padding: 13px 0 13px 43px;
-        border-top: 1px solid #ddd;
-        background: $v-lt-gray;
-
-        font-family: gpg;
+        .mode-summary-section {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 200px;
+        }
 
         .mode-summary-header {
+            color: $lt-gray;
             font-weight: $font-weight-bold;
         }
 
         .mode-summary-item {
+            position: relative;
+            color: $lt-gray;
             font-weight: $font-weight-medium;
+
+            &::before {
+                position: absolute;
+                left: 0;
+                width: 20px;
+                margin: 0;
+                padding: 0;
+                color: inherit;
+                font-family: gpg;
+                font-size: 1em;
+                line-height: 3.5rem;
+                text-align: center;
+            }
+
+            &.directions-step-walk::before {
+                font-size: 1.3em;
+                color: $gophillygo-blue;
+            }
+
+            &.directions-step-bike::before {
+                font-size: 1.3em;
+                color: $gophillygo-purple;
+            }
+
+            &.directions-step-transit::before {
+                font-size: 1.4em;
+                color: $gophillygo-yellow;
+            }
         }
 
         .mode-summary-footer {
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid $v-lt-gray;
             font-weight: $font-weight-bold;
+        }
+
+        .duration {
+            flex: none;
+            width: 42%;
+            text-align: right;
+        }
+
+        .distance {
+            flex: none;
+            width: 42%;
+            text-align: left;
         }
     }
 }
@@ -238,7 +288,7 @@
 
 .directions-step-bus {
     &::before {
-        content: '\e802';
+        content: '\f207';
     }
 }
 
@@ -256,7 +306,7 @@
 
 .directions-step-rail {
     &::before {
-        content: '\f238';
+        content: '\e81c';
     }
 }
 

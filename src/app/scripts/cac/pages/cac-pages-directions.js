@@ -24,6 +24,12 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
 
     Directions.prototype.initialize = function () {
 
+        moment.updateLocale('en', {
+            relativeTime : {
+                mm: '%d min',
+            }
+        });
+
         // Note: date/time does not get passed and so always defaults to departing now
 
         var rawParams = _.map(location.search.slice(1).split('&'), function(p) {

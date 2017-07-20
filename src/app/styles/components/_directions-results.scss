@@ -17,13 +17,13 @@
         order: 10;
         width: 100%;
         height: auto;
-        max-height: $route-summary-height;
+        background-color: darken($white, 5%);
         overflow: hidden;
         z-index: 1000;
         box-shadow: 0 0 16px rgba(128, 128, 128, 0.7);
 
         .routes-list {
-            height: $route-summary-height;
+            height: auto;
 
             &:empty {
                 display: none;
@@ -46,73 +46,62 @@
     .route-summary {
         display: flex;
         position: relative;
-        flex-flow: row nowrap;
+        flex-flow: column nowrap;
         align-items: stretch;
         justify-content: flex-start;
         width: 100%;
-        height: $route-summary-height;
         margin-bottom: 20px;
-        padding: 6px 10px 4px 16px;
-        background-color: #f6f6f6;
+        padding: 6px 0 4px;
+        background-color: rgba($white, .4);
         cursor: pointer;
+        overflow: hidden;
 
         @include respond-to('xxs') {
             width: 100vw;
             margin: 0;
+            background-color: $white;
         }
 
         &.selected {
             background-color: $white;
-            box-shadow: $place-card-drop-shadow;
+
+            @include respond-to('xxs-up') {
+                box-shadow: $place-card-drop-shadow;
+            }
 
             .route-name {
                 color: $gophillygo-blue;
                 font-weight: $font-weight-bold;
             }
 
-            .route-summary-primary-details {
+            .route-stats {
                 color: inherit;
             }
 
-            .route-summary-secondary-details {
-                color: $lt-gray;
-            }
-
-            .route-modes {
-                .icon-walk {
+            .directions-step-walk {
+                &::before {
                     color: $gophillygo-blue;
                 }
+            }
 
-                .icon-bike {
-                    color: $gophillygo-purple;
-                }
-
-                .icon-bus,
-                .icon-subway,
-                .icon-train,
-                .icon-tram,
-                .icon-ferry {
+            .directions-step-transit {
+                &::before {
                     color: $gophillygo-yellow;
                 }
+            }
 
-                .icon-car {
-                    color: #111;
+            .directions-step-bike {
+                &::before {
+                    color: $gophillygo-purple;
                 }
             }
-        }
-
-        .route-summary-details {
-            display: flex;
-            flex: 1 1 auto;
-            flex-flow: column nowrap;
-            align-items: stretch;
-            justify-content: flex-start;
-            overflow: hidden;
         }
 
         .route-name {
             flex: 1 0 auto;
-            color: $default-background-line-color;
+            margin-bottom: 4px;
+            padding: 0 12px;
+            color: lighten(desaturate($gophillygo-blue, 30%), 20%);
             font-size: 1.6rem;
             font-weight: $font-weight-medium;
             text-overflow: ellipsis;
@@ -124,33 +113,41 @@
             }
         }
 
-        .route-summary-primary-details {
-            display: flex;
-            flex: 1 0 auto;
-            flex-flow: row nowrap;
-            align-items: center;
-            justify-content: flex-start;
-            color: $lt-gray;
-            font-size: 1.5rem;
-            font-weight: $font-weight-medium;
-        }
-
-        .route-summary-secondary-details {
+        .route-details {
             display: flex;
             flex: 1 0 auto;
             flex-flow: row nowrap;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 4px;
+            padding: 0 12px;
+            font-size: 1.5rem;
+        }
+
+        .route-stats {
             color: $lt-gray;
-            font-weight: $font-weight-medium;
-            font-size: 1.4rem;
-            font-family: gpg;
+            text-align: left;
+        }
+
+        .route-single-mode {
+            position: relative;
+
+            &::before {
+                position: absolute;
+                left: 0;
+                width: 20px;
+                margin: 0;
+                padding: 0;
+                color: inherit;
+                font-family: gpg;
+                font-size: 1em;
+                text-align: left;
+                content: '';
+            }
         }
 
         .route-duration {
-            margin-right: 2em;
-            font-weight: $font-weight-bold;
-            font-family: gpg;
+            font-weight: $font-weight-medium;
         }
 
         .route-distance {
@@ -158,15 +155,72 @@
         }
 
         .route-start-stop {
-            font-size: 1.4rem;
+            color: $lt-gray;
+            font-weight: $font-weight-medium;
+            text-align: right;
         }
 
-        .route-modes {
-            font-size: 1.7rem;
+        .route-per-mode-details {
+            display: flex;
+            flex: 1 0 auto;
+            flex-flow: row wrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            margin-top: 4px;
+            padding: 4px 12px 0;
+            color: $lt-gray;
+            font-size: 1.3rem;
+            line-height: 2;
+            border-top: 1px solid darken($white, 10%);
+        }
 
-            .icon-walk {
-                position: relative;
-                right: -3px;
+        .route-mode-stats {
+            position: relative;
+            white-space: nowrap;
+
+            &:not(:last-of-type) {
+                margin-right: 1.8rem;
+            }
+
+            &::before {
+                position: absolute;
+                left: 0;
+                width: 20px;
+                margin: 0;
+                padding: 0;
+                color: inherit;
+                font-family: gpg;
+                font-size: 1.2em;
+                line-height: 1.8;
+                text-align: left;
+                content: '';
+            }
+        }
+
+        .directions-step-walk {
+            padding-left: 19px;
+
+            &::before {
+                content: '\e803';
+                color: desaturate($gophillygo-blue, 40%);
+            }
+        }
+
+        .directions-step-transit {
+            padding-left: 21px;
+
+            &::before {
+                content: '\f238';
+                color: desaturate($gophillygo-yellow, 50%);
+            }
+        }
+
+        .directions-step-bike {
+            padding-left: 23px;
+
+            &::before {
+                content: '\e801';
+                color: desaturate($gophillygo-purple, 40%);
             }
         }
     }
