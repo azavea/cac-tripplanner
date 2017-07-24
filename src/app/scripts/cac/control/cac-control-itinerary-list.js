@@ -27,6 +27,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             infinite: false,
             mobileFirst: true,
             variableWidth: true,
+            adaptiveHeight: true,
             responsive : [
                 {
                     // Breakpoint must match 'xxs' in _breakpoints.scss
@@ -141,6 +142,15 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
 
     function show() {
         $container.removeClass(options.selectors.hiddenClass);
+        layoutCarousel();
+    }
+
+    function layoutCarousel() {
+        // necessary hack for when first itinerary is single-mode
+        // but subsequent itineraries are multi-modal (hence taller).
+        if (itineraries.length > 1) {
+            $(options.selectors.itineraryList).slick('setPosition');
+        }
     }
 
     /**

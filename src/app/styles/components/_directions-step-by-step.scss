@@ -112,12 +112,10 @@
             width: 40px;
             margin: 0;
             padding: 0;
-            color: inherit;
             font-family: gpg;
             font-size: 2rem;
             line-height: 1;
             text-align: center;
-            content: '';
         }
 
         & + .directions-step {
@@ -131,142 +129,225 @@
         }
     }
 
-    .directions-instruction {
-        font-size: 1.5rem;
-        font-weight: $font-weight-bold;
-        line-height: 1.5;
-    }
+    .directions-mode-summary {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 1em;
+        font-size: 1.4rem;
+        font-weight: $font-weight-medium;
+        line-height: 2.5;
 
-    .directions-time {
-        margin-top: .5em;
-        color: $lt-gray;
-        font-size: 1.5rem;
-        font-weight: $font-weight-bold;
-        line-height: 1.5;
-    }
+        .mode-summary-section {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 200px;
+        }
 
-    .directions-distance {
-        margin-top: .5em;
-        color: $lt-gray;
-        font-size: 1.3rem;
-        line-height: 2;
-    }
+        .mode-summary-header {
+            color: $lt-gray;
+            font-weight: $font-weight-bold;
+        }
 
-    .directions-step-origin {
-        &::before {
-            color: $gophillygo-green;
-            content: '\e80a';
+        .mode-summary-item {
+            position: relative;
+            color: $lt-gray;
+            font-weight: $font-weight-medium;
+
+            &::before {
+                position: absolute;
+                left: 0;
+                width: 20px;
+                margin: 0;
+                padding: 0;
+                color: inherit;
+                font-family: gpg;
+                font-size: 1em;
+                line-height: 3.5rem;
+                text-align: center;
+            }
+
+            &.directions-step-walk::before {
+                font-size: 1.3em;
+                color: $gophillygo-blue;
+            }
+
+            &.directions-step-bike::before {
+                font-size: 1.3em;
+                color: $gophillygo-purple;
+            }
+
+            &.directions-step-transit::before {
+                font-size: 1.4em;
+                color: $gophillygo-yellow;
+            }
+        }
+
+        .mode-summary-footer {
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid $v-lt-gray;
+            font-weight: $font-weight-bold;
+        }
+
+        .duration {
+            flex: none;
+            width: 42%;
+            text-align: right;
+        }
+
+        .distance {
+            flex: none;
+            width: 42%;
+            text-align: left;
         }
     }
+}
 
-    .directions-step-destination {
-        &::before {
-            color: $gophillygo-red;
-            content: '\e80a';
-        }
+.directions-instruction {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.5;
+}
+
+.directions-time {
+    margin-top: .5em;
+    color: $lt-gray;
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.5;
+}
+
+.directions-distance {
+    margin-top: .5em;
+    color: $lt-gray;
+    font-size: 1.3rem;
+    line-height: 2;
+}
+
+.directions-step-origin {
+    &::before {
+        color: $gophillygo-green;
+        content: '\e80a';
     }
+}
 
-    .directions-step-walk {
-        &::before {
-            content: '\e803';
-        }
+.directions-step-destination {
+    &::before {
+        color: $gophillygo-red;
+        content: '\e80a';
     }
+}
 
-    .directions-step-turn-left {
-        &::before {
-            content: '\e809';
-        }
+.directions-step-walk {
+    &::before {
+        content: '\e803';
     }
+}
 
-    .directions-step-turn-right {
-        &::before {
-            content: '\e808';
-        }
+.directions-step-turn-left {
+    &::before {
+        content: '\e809';
     }
+}
 
-    .directions-step-continue {
-        &::before {
-            content: '\e814';
-        }
+.directions-step-turn-right {
+    &::before {
+        content: '\e808';
     }
+}
 
-    .directions-step-bike {
-        &::before {
-            content: '\e801';
-        }
+.directions-step-continue {
+    &::before {
+        content: '\e814';
     }
+}
 
-    .directions-step-indego {
-        &::before {
-            padding-top: 2px;
-            color: $indego-purple;
-            content: '\e80f';
-        }
+.directions-step-bike {
+    &::before {
+        content: '\e801';
     }
+}
 
-    .directions-step-car {
-        &::before {
-            content: '\f1b9';
-        }
+.directions-step-indego {
+    &::before {
+        padding-top: 2px;
+        color: $indego-purple;
+        content: '\e80f';
     }
+}
 
-    .directions-step-bus {
-        &::before {
-            content: '\e802';
-        }
+.directions-step-car {
+    &::before {
+        content: '\f1b9';
     }
+}
 
-    .directions-step-train {
-        &::before {
-            content: '\f238';
-        }
+.directions-step-bus {
+    &::before {
+        content: '\f207';
     }
+}
 
-    .directions-step-rail {
-        &::before {
-            content: '\f238';
-        }
+.directions-step-transit {
+    &::before {
+        content: '\f238';
     }
+}
 
-    .directions-step-subway {
-        &::before {
-            content: '\e811';
-        }
+.directions-step-train {
+    &::before {
+        content: '\f238';
     }
+}
 
-    .directions-step-ferry {
-        &::before {
-            content: '\e816';
-        }
+.directions-step-rail {
+    &::before {
+        content: '\e81c';
     }
+}
 
-    .directions-step-tram {
-        &::before {
-            content: '\e812';
-        }
+.directions-step-subway {
+    &::before {
+        content: '\e811';
     }
+}
 
-    .directions-step-elevator {
-        &::before {
-            content: '\e813';
-        }
+.directions-step-ferry {
+    &::before {
+        content: '\e816';
     }
+}
 
-    .directions-step-continue {
-        &::before {
-            content: '\e814';
-        }
+.directions-step-tram {
+    &::before {
+        content: '\e812';
     }
+}
 
-    .directions-step-clockwise {
-        &::before {
-            content: '\e815';
-        }
+.directions-step-elevator {
+    &::before {
+        content: '\e813';
     }
+}
 
-    .directions-step-counterclockwise {
-        &::before {
-            content: '\e817';
-        }
+.directions-step-continue {
+    &::before {
+        content: '\e814';
+    }
+}
+
+.directions-step-clockwise {
+    &::before {
+        content: '\e815';
+    }
+}
+
+.directions-step-counterclockwise {
+    &::before {
+        content: '\e817';
     }
 }

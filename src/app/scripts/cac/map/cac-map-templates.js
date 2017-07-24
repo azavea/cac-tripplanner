@@ -217,23 +217,30 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         '<h1>Choose a route</h1><div class="routes-list">',
         '{{#each itineraries}}',
             '<div class="route-summary" data-itinerary="{{this.id}}">',
-            '<div class="route-summary-details">',
                 '<div class="route-name">via {{this.via}}</div>',
-                '<div class="route-summary-primary-details">',
-                    '<div class="route-duration">{{this.formattedDuration}}</div>',
-                    '<div class="route-distance">{{this.formattedDistance}}</div>',
+                '<div class="route-details">',
+                    '<div class="route-stats{{#unless showSummaryModes}} route-single-mode {{onlyModeClass modeSummaries}}{{/unless}}">',
+                        '<span class="route-duration">',
+                            '{{this.formattedDuration}}</span>',
+                        '&ensp;&middot;&ensp;',
+                        '<span class="route-distance">{{this.formattedDistance}}</span>',
+                    '</div>',
+                    '{{#if showSummaryModes}}',
+                        '<div class="route-start-stop">{{datetime this.startTime}}&ndash;{{datetime this.endTime}}</div>',
+                    '{{/if}}',
                 '</div>',
-                '<div class="route-summary-secondary-details">',
-                    '<div class="route-start-stop">{{datetime this.startTime}} – {{datetime this.endTime}}</div>',
-                    '<div class="route-modes">',
-                        '{{#each this.modes}}',
-                            ' {{modeIcon this}}',
+                '{{#if showSummaryModes}}',
+                    '<div class="route-per-mode-details">',
+                        '{{#each modeSummaries}}',
+                            '<div class="route-mode-stats {{modeClass @key}}">',
+                                '{{this.formattedDuration}}&nbsp;&middot;&nbsp;{{this.formattedDistance}}',
+                                '{{#if this.transfers}}&nbsp;&middot;&nbsp;{{this.transfers}}{{/if}}',
+                            '</div>',
                         '{{/each}}',
                     '</div>',
-                '</div>',
+                '{{/if}}',
             '</div>',
-            '<div class="route-summary-go-btn">Go</div>',
-        '</div>{{/each}}',
+        '{{/each}}',
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
@@ -310,6 +317,22 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '<div class="directions-time">at {{datetime data.end.time}}</div>',
                     '</div>',
                 '</div>',
+                // per-mode summary
+                '{{#if data.showSummaryModes}}',
+                '<div class="directions-mode-summary">',
+                    '<div class="mode-summary-section mode-summary-header">',
+                        '<div class="duration">Travel time</div>',
+                        '<div class="distance">Distance</div>',
+                    '</div>',
+                    '{{#each data.modeSummaries}}<div class="mode-summary-section mode-summary-item {{modeClass @key}}">',
+                        '<div class="duration">{{this.formattedDuration}}</div>',
+                        '<div class="distance">{{this.formattedDistance}}</div>',
+                    '</div>{{/each}}',
+                    '<div class="mode-summary-section mode-summary-footer">',
+                        '<div class="duration">{{data.formattedDuration}}</div>',
+                        '<div class="distance">{{data.formattedDistance}}</div>',
+                    '</div>',
+                '</div>{{/if}}',
             '</div>'
         ].join('');
         var template = Handlebars.compile(source);
@@ -340,6 +363,13 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             var COEFF = 60000; // to round Unix timestamp to nearest minute
             var dt = moment(Math.round(dateTime / COEFF) * COEFF);
             return new Handlebars.SafeString(dt.format('h:mma'));
+        });
+
+        // class for the icon for the first mode in the mode summaries, for use when
+        // there is only one mode present
+        Handlebars.registerHelper('onlyModeClass', function(modeSummaries) {
+            var modeString = _.keys(modeSummaries).first();
+            return new Handlebars.SafeString(getModeClass(modeString));
         });
     }
 

@@ -81,6 +81,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
+        moment.updateLocale('en', {
+            relativeTime : {
+                mm: "%d min",
+            }
+        });
+
         showHideNeedWheelsBanner();
 
         _setupEvents();
