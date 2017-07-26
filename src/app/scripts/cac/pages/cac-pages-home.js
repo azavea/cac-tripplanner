@@ -83,7 +83,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         moment.updateLocale('en', {
             relativeTime : {
-                mm: "%d min",
+                mm: '%d min',
             }
         });
 
