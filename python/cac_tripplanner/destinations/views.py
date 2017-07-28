@@ -76,6 +76,14 @@ def directions(request):
     return base_view(request, 'directions.html', {})
 
 
+def manifest(request):
+    """Render the app manifest
+
+    https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/?utm_source=devtools
+    """
+    return render(request, 'manifest.json', {})
+
+
 def place_detail(request, pk):
     destination = get_object_or_404(Destination.objects.published(), pk=pk)
     more_destinations = Destination.objects.published().exclude(pk=destination.pk)[:3]

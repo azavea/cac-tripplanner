@@ -14,6 +14,9 @@ urlpatterns = [
     url(r'^$', dest_views.home, name='home'),
     url(r'^explore$', dest_views.explore, name='explore'),
 
+    # App Manifest
+    url('^manifest.json$', dest_views.manifest),
+
     # Map
     url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
         name='api_destinations_search'),
