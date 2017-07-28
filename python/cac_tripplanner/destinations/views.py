@@ -77,11 +77,40 @@ def directions(request):
 
 
 def manifest(request):
-    """Render the app manifest
+    """Render the app manifest for a PWA app that can install to homescreen
 
     https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/?utm_source=devtools
     """
     return render(request, 'manifest.json', {})
+
+
+def service_worker(request):
+    """Render the service worker for a PWA app that can install to homescreen
+
+    https://developers.google.com/web/fundamentals/getting-started/primers/service-workers
+    """
+
+    # files to cache in either development or production
+    cache_files = [
+        '/',
+        '/static/styles/vendor.css',
+        '/static/styles/main.css'
+    ]
+
+    # additional files to cache in production
+    prod_cache_files = [
+        '/static/scripts/vendor.js',
+        '/static/scripts/main.js',
+        '/static/fontello/css/gpg.css'
+    ]
+
+    if not settings.DEBUG:
+        cache_files += prod_cache_files
+
+    return render(request,
+                  'service-worker.js',
+                  {'cache_files': json.dumps(cache_files)},
+                  content_type='application/javascript')
 
 
 def place_detail(request, pk):

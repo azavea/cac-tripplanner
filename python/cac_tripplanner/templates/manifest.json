@@ -74,6 +74,8 @@
     }
 
   ],
-  "start_url": "?launcher=true",
-  "display": "standalone"
+  "start_url": "/?launcher=true",
+  "display": "standalone",
+  "background_color": "#245280",
+  "theme_color": "#2e68a3"
 }
