@@ -187,9 +187,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         var hours = duration.hours();
         var minutes = duration.minutes();
         if (hours > 0 && minutes > 0 && duration.days() < 1) {
-            var hoursDuration = moment.duration(hours, 'hours');
             var minutesDuration = moment.duration(minutes, 'minutes');
-            return hoursDuration.humanize() + ', ' + minutesDuration.humanize();
+            return hours + ' h ' + minutesDuration.humanize();
         }
 
         return duration.humanize();
