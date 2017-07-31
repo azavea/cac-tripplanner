@@ -100,7 +100,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
 
-            updateUrl();  // Still update the URL if they request one-sided directions
+            // Still update the URL and show marker if they request one-sided directions
+            updateUrl();
+            mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
             return;
         }
 
@@ -400,7 +402,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             directions.destination = [destination.location.y, destination.location.x ];
         }
 
-        if (origin && destination && tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS) && (origin || destination)) {
             planTrip();
         }
     }
