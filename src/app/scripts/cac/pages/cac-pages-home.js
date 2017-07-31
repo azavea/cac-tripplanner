@@ -87,6 +87,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }
         });
 
+        // Do not round to hour or day. Default is to round at 45 min/22 hours
+        // https://momentjs.com/docs/#/customization/relative-time-threshold/
+        moment.relativeTimeThreshold('m', 60);
+        moment.relativeTimeThreshold('h', 24);
+
         showHideNeedWheelsBanner();
 
         _setupEvents();
