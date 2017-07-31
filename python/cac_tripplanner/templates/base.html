@@ -11,8 +11,8 @@
     {% block pagetitle %}
     <title>{% block title %}GoPhillyGo | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
 
-    <meta property="og:title" content="GoPhillyGo Trip Planner" />
-    <meta name="twitter:title" content="GoPhillyGo Trip Planner" />
+    <meta property="og:title" content="GoPhillyGo" />
+    <meta name="twitter:title" content="GoPhillyGo" />
     {% endblock %}
 
     {% block extrametatags %}
@@ -20,7 +20,7 @@
     <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
     <meta property="og:description"
-        content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
+        content="GoPhillyGo from the Clean Air Council, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
     <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
