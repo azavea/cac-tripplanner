@@ -59,7 +59,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         });
 
         mapControl = new MapControl({
-            tabControl: tabControl
+            tabControl: tabControl,
+            isMobile: $(window).width() < MD_UP_BREAKPOINT
         });
 
         modeOptionsControl = new ModeOptions();
