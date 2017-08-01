@@ -184,11 +184,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
 
         // For durations less than a day and greater than an hour, format to display both
         // hours and minutes.
-        var hours = duration.hours();
-        var minutes = duration.minutes();
-        if (hours > 0 && minutes > 0 && duration.days() < 1) {
-            var minutesDuration = moment.duration(minutes, 'minutes');
-            return hours + ' h ' + minutesDuration.humanize();
+        if (duration.hours() > 0 && duration.minutes() > 0 && duration.days() < 1) {
+            return duration.hours() + 'h ' + duration.minutes() + 'm';
         }
 
         return duration.humanize();
