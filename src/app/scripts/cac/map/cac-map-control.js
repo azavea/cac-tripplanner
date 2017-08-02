@@ -256,7 +256,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {Boolean} [zoomToFit] Zoom the view to the marker(s)
      */
     function setDirectionsMarkers(originCoords, destinationCoords, zoomToFit) {
-
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
             var marker = event.target;
