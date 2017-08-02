@@ -434,6 +434,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             } else {
                 currentLocationMarker.setLatLng(event.latlng);
             }
+
+            if (map && componentsLoaded) {
+                currentLocationMarker.addTo(map);
+            }
         });
 
         map.on('locationerror', function(error) {
