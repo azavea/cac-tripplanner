@@ -1,4 +1,4 @@
-CAC.Utils = (function (_) {
+CAC.Utils = (function (_, moment) {
     'use strict';
 
     var directions = {
@@ -110,7 +110,8 @@ CAC.Utils = (function (_) {
         getUrlParams: getUrlParams,
         encodeUrlParams: encodeUrlParams,
         getModeColor: getModeColor,
-        modeStringHelper: modeStringHelper
+        modeStringHelper: modeStringHelper,
+        initializeMoment: initializeMoment
     };
 
     return Object.freeze(module);
@@ -276,4 +277,27 @@ CAC.Utils = (function (_) {
         return modeStr;
     }
 
-})(_);
+    /**
+     * Customize moment library. Should be called once, on app initialization.
+     */
+    function initializeMoment() {
+        // Override time duration formatting strings
+        // https://momentjs.com/docs/#/customization/relative-time/
+        moment.updateLocale('en', {
+            relativeTime : {
+                s: '%d sec',
+                ss: '%d sec',
+                m: '%d min',
+                mm: '%d min',
+                h:  '1 hour',
+                hh: '%d hours'
+            }
+        });
+
+        // Do not round to hour or day. Default is to round at 45 min/22 hours
+        // https://momentjs.com/docs/#/customization/relative-time-threshold/
+        moment.relativeTimeThreshold('m', 60);
+        moment.relativeTimeThreshold('h', 24);
+    }
+
+})(_, moment);

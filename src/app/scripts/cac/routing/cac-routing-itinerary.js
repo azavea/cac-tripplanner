@@ -179,8 +179,16 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @param {object} duration Duration in seconds, as on OTP itinerary or leg
      * @return {string} duration of itinerary/leg, formatted with units (hrs, min, s)
      */
-    function getFormattedDuration(duration) {
-        return moment.duration(duration, 'seconds').humanize();
+    function getFormattedDuration(seconds) {
+        var duration = moment.duration(seconds, 'seconds');
+
+        // For durations less than a day and greater than an hour, format to display both
+        // hours and minutes.
+        if (duration.hours() > 0 && duration.minutes() > 0 && duration.days() < 1) {
+            return duration.hours() + 'h ' + duration.minutes() + 'm';
+        }
+
+        return duration.humanize();
     }
 
     /**

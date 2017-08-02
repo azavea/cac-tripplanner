@@ -1,4 +1,4 @@
-CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
+CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Utils) {
     'use strict';
 
     var center = [39.95, -75.1667];
@@ -24,11 +24,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
 
     Directions.prototype.initialize = function () {
 
-        moment.updateLocale('en', {
-            relativeTime : {
-                mm: '%d min',
-            }
-        });
+        Utils.initializeMoment();
 
         // Note: date/time does not get passed and so always defaults to departing now
 
@@ -162,4 +158,4 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings) {
 
     return Directions;
 
-})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings);
+})(jQuery, _, CAC.Control.DirectionsList, CAC.Routing.Itinerary, CAC.Settings, CAC.Utils);

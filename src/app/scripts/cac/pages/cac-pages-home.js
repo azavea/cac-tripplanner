@@ -1,5 +1,5 @@
 CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            UserPreferences, UrlRouter) {
+                            UserPreferences, UrlRouter, Utils) {
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
@@ -81,14 +81,9 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
-        moment.updateLocale('en', {
-            relativeTime : {
-                mm: '%d min',
-            }
-        });
 
+        Utils.initializeMoment();
         showHideNeedWheelsBanner();
-
         _setupEvents();
     };
 
@@ -506,4 +501,4 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
+    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter, CAC.Utils);
