@@ -281,9 +281,16 @@ CAC.Utils = (function (_, moment) {
      * Customize moment library. Should be called once, on app initialization.
      */
     function initializeMoment() {
+        // Override time duration formatting strings
+        // https://momentjs.com/docs/#/customization/relative-time/
         moment.updateLocale('en', {
             relativeTime : {
+                s: '%d sec',
+                ss: '%d sec',
+                m: '%d min',
                 mm: '%d min',
+                h:  '1 hour',
+                hh: '%d hours'
             }
         });
 
