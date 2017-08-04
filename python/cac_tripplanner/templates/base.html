@@ -35,6 +35,8 @@
     <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     {% endblock %}
 
+    {% include "partials/ios-weblinks.html" %}
+
     {% block cssimports %}
 
     <link href="{% static 'styles/vendor.css' %}" rel="stylesheet">
