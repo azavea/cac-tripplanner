@@ -48,7 +48,6 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // only show summary of mode types if more than one mode in use for more than the
         // minimum travel distance to display
         this.showSummaryModes = _.keys(this.modeSummaries).length > 1;
-
         if (this.modeSummaries.TRANSIT && otpItinerary.transfers > 0) {
             // set the number of transfers on the mode summary, if transit taken
             this.modeSummaries.TRANSIT.transfers = otpItinerary.transfers + ' xfer';
@@ -131,18 +130,24 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // (about a city block)
         var MIN_MODE_LENGTH_METERS = 120;
 
+        // In case all legs are shorter than the minimum, keep the longest leg
+        var farthest = 0;
+
         return _.chain(legs).groupBy(function(leg) {
             return leg.transitLeg ? 'TRANSIT' : leg.mode;
         }).mapValues(function(modeLegs) {
             var dist = _.sumBy(modeLegs, 'distance');
             var time = _.sumBy(modeLegs, 'duration');
+            if (dist > farthest) {
+                farthest = dist;
+            }
             return {distance: dist,
                     duration: time,
                     formattedDistance: getFormattedDistance(dist),
                     formattedDuration: getFormattedDuration(time)
             };
         }).pickBy(function(summary) {
-            return summary.distance > MIN_MODE_LENGTH_METERS;
+            return summary.distance > MIN_MODE_LENGTH_METERS || summary.distance === farthest;
         }).value();
     }
 
