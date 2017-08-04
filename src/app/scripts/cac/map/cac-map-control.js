@@ -17,10 +17,28 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var map = null;
     var currentLocationMarker = null;
+    var currentLocationMarkerHalo = null;
     var geocodeMarker = null;
     var directionsMarkers = {
         origin: null,
         destination: null
+    };
+
+    var currentLocationMarkerOptions = {
+        color: '#fff',
+        opacity: 1,
+        weight: 2,
+        fillColor: '#3f88ef',
+        fillOpacity: 1,
+        radius: 6
+    };
+
+    var currentLocationMarkerHaloOptions = {
+        color: '#3f88ef',
+        weight: 0,
+        fillColor: '#3f88ef',
+        fillOpacity: 0.3,
+        radius: 16
     };
 
     var overlaysControl = null;
@@ -430,9 +448,12 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
         map.on('locationfound', function(event) {
             if (!currentLocationMarker) {
-                currentLocationMarker = new cartodb.L.circleMarker(event.latlng, 4);
+                currentLocationMarker = new cartodb.L.LayerGroup([
+                    new cartodb.L.circleMarker(event.latlng, currentLocationMarkerHaloOptions),
+                    new cartodb.L.circleMarker(event.latlng, currentLocationMarkerOptions)
+                ]);
             } else {
-                currentLocationMarker.setLatLng(event.latlng);
+                currentLocationMarker.invoke('setLatLng', event.latlng);
             }
 
             if (map && componentsLoaded) {
