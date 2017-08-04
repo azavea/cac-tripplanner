@@ -5,12 +5,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2e68a3">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#2e68a3">
 
     {% block pagetitle %}
     <title>{% block title %}GoPhillyGo | Trip Planning for Bikes, Public Transit, and Walking | Clean Air Council{% endblock %}</title>
 
-    <meta property="og:title" content="GoPhillyGo Trip Planner" />
-    <meta name="twitter:title" content="GoPhillyGo Trip Planner" />
+    <meta property="og:title" content="GoPhillyGo" />
+    <meta name="twitter:title" content="GoPhillyGo" />
+    <meta name="apple-mobile-web-app-title" content="GoPhillyGo">
     {% endblock %}
 
     {% block extrametatags %}
@@ -18,7 +23,7 @@
     <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
     <meta property="og:description"
-        content="CAC Trip Planner, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
+        content="GoPhillyGo from the Clean Air Council, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
     <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     <meta property="og:image:width" content="332" />
     <meta property="og:image:height" content="314" />
@@ -29,6 +34,8 @@
     <meta name="twitter:description" content="Helping you get around greater Philly" />
     <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
     {% endblock %}
+
+    {% include "partials/ios-weblinks.html" %}
 
     {% block cssimports %}
 
@@ -44,6 +51,7 @@
 	<link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/apple-touch-icon-76x76.png' %}" />
 	<link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/apple-touch-icon-152x152.png' %}" />
 	<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" sizes="32x32" />
+    <link rel="manifest" href="/manifest.json">
 
     {% endblock %}
 

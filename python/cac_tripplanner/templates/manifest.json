@@ -1,0 +1,81 @@
+{
+  "short_name": "GoPhillyGo",
+  "name": "GoPhillyGo",
+  "icons": [
+    {
+      "src": "/static/images/apple-touch-icon-57x57.png",
+      "type": "image/png",
+      "sizes": "57x57"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-60x60.png",
+      "type": "image/png",
+      "sizes": "60x60"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-57x57.png",
+      "type": "image/png",
+      "sizes": "57x57"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-72x72.png",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-76x76.png",
+      "type": "image/png",
+      "sizes": "76x76"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-114x114.png",
+      "type": "image/png",
+      "sizes": "114x114"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-120x120.png",
+      "type": "image/png",
+      "sizes": "120x120"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-144x144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/static/images/apple-touch-icon-152x152.png",
+      "type": "image/png",
+      "sizes": "152x152"
+    },
+    {
+      "src": "/static/images/logo-blue.png",
+      "type": "image/png",
+      "sizes": "50x50"
+    },
+    {
+      "src": "/static/images/logo-blue@2x.png",
+      "type": "image/png",
+      "sizes": "100x100"
+    },
+    {
+      "src": "/static/images/logo.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    },
+    {
+      "src": "/static/images/logo@2x.png",
+      "type": "image/png",
+      "sizes": "360x360"
+    },
+    {
+      "src": "/static/images/favicon.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    }
+
+  ],
+  "start_url": "/?launcher=true",
+  "display": "standalone",
+  "background_color": "#245280",
+  "theme_color": "#2e68a3"
+}

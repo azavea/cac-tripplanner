@@ -86,6 +86,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
         _setupEvents();
+        setupServiceWorker();
     };
 
     return Home;
@@ -486,6 +487,24 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
         // show trip options instead, if applicable
         updateTripOptionsBanner();
+    }
+
+    /**
+     * Set up a service worker to make this a PWA app.
+     * Necessary to support 'add to homescreen' with the app manifest.json.
+     * Service worker is defined in Django template.
+     */
+    function setupServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function() {
+                    // success. worker scoped here to domain.
+                }, function(err) {
+                    // registration failed
+                    console.error('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
     }
 
     /**
