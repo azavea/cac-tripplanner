@@ -38,6 +38,10 @@ $goto-more-button-height: 4rem;
     @include respond-to('xs') {
         flex-flow: column nowrap;
         align-items: stretch;
+
+        .body-home & {
+            background-color: $gophillygo-yellow;
+        }
     }
 
     .goto-post {
@@ -71,6 +75,11 @@ $goto-more-button-height: 4rem;
         font-size: 1.4rem;
         font-weight: $font-weight-bold;
         text-transform: uppercase;
+
+        @include respond-to('xs') {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
     }
 
     h2 {
@@ -81,8 +90,10 @@ $goto-more-button-height: 4rem;
         text-transform: uppercase;
 
         @include respond-to('xs') {
+            margin: 1rem 0;
             font-size: 1.8rem;
             line-height: 1.5;
+            text-align: center;
         }
     }
 
@@ -115,6 +126,8 @@ $goto-more-button-height: 4rem;
 
     @include respond-to('xs') {
         left: $home-section-padding;
+        background-color: $gophillygo-orange;
+        color: $white !important;
     }
 
     &:hover {
