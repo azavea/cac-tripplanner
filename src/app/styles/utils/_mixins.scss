@@ -21,14 +21,14 @@
 
 @mixin sidebar-main {
     width: $sidebar-width;
-    height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height});
+    height: calc(100% - #{$footer-sidebar-height} - #{$directions-form-sidebar-height});
     margin: 0;
     background-color: $body-color;
     overflow: hidden;
 
     .body-has-sidebar-banner & {
         @include respond-to('xxs-up') {
-            height: calc(100vh - #{$footer-sidebar-height} - #{$directions-form-sidebar-height} - #{$sidebar-banner-height});
+            height: calc(100% - #{$footer-sidebar-height} - #{$directions-form-sidebar-height} - #{$sidebar-banner-height});
         }
     }
 }
