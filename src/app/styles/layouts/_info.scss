@@ -40,7 +40,7 @@
         text-transform: uppercase;
 
         @include respond-to('xs') {
-            margin: 4rem auto;
+            margin: 2rem auto;
             font-size: 2rem;
             line-height: 1.75;
         }
@@ -112,7 +112,7 @@
         margin: 20px 60px;
         font-size: 3rem;
         font-style: italic;
-        line-height: 1.75;
+        line-height: 1.5;
 
         @include respond-to('xs') {
             margin: 20px;
@@ -169,39 +169,32 @@
 
     }
 
-    .info-article-p-image-inline {
+    .info-place-actions {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem 0;
+        font-size: 1.6rem;
+        font-style: italic;
+        font-weight: $font-weight-semibold;
+        line-height: 2.4;
         text-align: center;
+        text-transform: uppercase;
 
-        img {
-            max-width: 100%;
+        .place-website-link {
+            @include delinkify($white);
+            background-color: $gophillygo-purple;
+            margin: 0 1em;
+            padding: 0 1em;
+            cursor: pointer;
         }
-    }
-
-    .info-article-p-link-inline {
-        text-align: center;
-
-        a {
-            @include delinkify;
-            color: $gophillygo-blue !important;
-            font-weight: $font-weight-bold;
-        }
-    }
-
-    .info-article-p-actions {
-        margin: 2rem 0 0;
-        line-height: 4;
-        text-align: center;
 
         .place-action-go {
             @include delinkify($white);
-            background-color: $gophillygo-purple;
-            padding: 1em 3em;
-            font-style: italic;
-            font-size: 1.5rem;
-            font-weight: $font-weight-bold;
-            line-height: 2.75;
-            text-align: center;
-            text-transform: uppercase;
+            background-color: $gophillygo-blue;
+            margin: 0 1em;
+            padding: 0 1em;
             cursor: pointer;
         }
     }

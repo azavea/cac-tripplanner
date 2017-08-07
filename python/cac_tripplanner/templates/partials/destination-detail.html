@@ -3,16 +3,16 @@
         <div class="info-place-image-hero"
              style="background-image: url('{{ destination.wide_image.url }}');"></div>
         <h2 class="info-article-title">{{ destination.name }}</h2>
+        <div class="info-place-actions">
+            <a class="place-website-link"
+                href="{{ destination.website_url }}"
+                target="_blank">Website</a>
+            <a class="place-action-go"
+                data-destination-id="{{ destination.id }}"
+                href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Directions</a>
+        </div>
     </header>
     <section class="info-article-section">
         {{ destination.description|safe }}
-        <p class="info-article-p-link-inline">
-            <a href="{{ destination.website_url }}" target="_blank">Visit website</a>
-        </p>
-        <div class="info-article-p-actions">
-            <a class="place-action-go"
-                data-destination-id="{{ destination.id }}"
-                href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Get directions</a>
-        </div>
     </section>
 </article>
