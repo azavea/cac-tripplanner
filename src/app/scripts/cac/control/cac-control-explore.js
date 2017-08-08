@@ -395,9 +395,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         date = date ? moment.unix(date) : moment(); // default to now
 
         // prefer to label with just the street address, and fall back to full address
+        // for featured places, use the label in the 'name' attribute instead of the address
         var origin = UserPreferences.getPreference('origin');
-        var originLabel = origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
-            UserPreferences.getPreference('originText');
+        var originLabel = origin.name ? origin.name :
+            (origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
+            UserPreferences.getPreference('originText'));
 
         var $placeCards = $(options.selectors.placeCard);
         $placeCards.each(function() {
