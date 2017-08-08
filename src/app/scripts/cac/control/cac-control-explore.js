@@ -394,6 +394,13 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
 
+        // prefer to label with just the street address, and fall back to full address
+        // for featured places, use the label in the 'name' attribute instead of the address
+        var origin = UserPreferences.getPreference('origin');
+        var originLabel = origin.name ? origin.name :
+            (origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
+            UserPreferences.getPreference('originText'));
+
         var $placeCards = $(options.selectors.placeCard);
         $placeCards.each(function() {
             var $card = $(this);
@@ -402,10 +409,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             var xCoord = $card.attr(options.selectors.placeAttrX);
             var yCoord = $card.attr(options.selectors.placeAttrY);
             var placeCoords = [yCoord, xCoord];
-
-            // origin text has not been updated on URL, so fromText not set on itineraries
-            // get it from user preferences instead
-            var originLabel = UserPreferences.getPreference('originText');
 
             // get travel time to destination and update place card
             Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions)
