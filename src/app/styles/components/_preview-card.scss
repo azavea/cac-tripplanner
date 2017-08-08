@@ -49,6 +49,7 @@ $goto-more-button-height: 4rem;
     }
 
     .preview-photo {
+        flex: none;
         width: $place-card-width;
         height: auto;
         margin-right: $home-section-padding;
@@ -61,9 +62,15 @@ $goto-more-button-height: 4rem;
 
     .preview-details {
         display: flex;
+        flex: auto;
         flex-flow: column nowrap;
         align-items: stretch;
         justify-content: space-between;
+        width: 50%;
+
+        @include respond-to('xs') {
+            width: auto;
+        }
 
         .body-home & {
             margin-bottom: calc(#{$goto-more-button-height} + #{$home-section-padding});
