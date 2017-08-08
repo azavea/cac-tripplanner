@@ -424,11 +424,12 @@
         }
 
         .btn-geolocate {
-            padding: 0 .3em;
+            padding: 0 .8rem;
             border: 0;
-            background-color: inherit;
-            font-size: 1.8rem;
+            background-color: transparent;
             color: $lt-gray;
+            font-size: 1.8rem;
+            text-align: center;
             cursor: pointer;
 
             & i.spin {
@@ -437,29 +438,29 @@
             }
 
             .body-map & {
-                display: none;
+                width: 30px;
+                padding: 0;
+                color: rgba($white, .9);
+                font-size: 1.6rem;
+                line-height: 1;
+                z-index: 10;
             }
         }
 
         .btn-reverse {
-            display: none;
-            position: absolute;
-            top: -16px;
-            right: 0;
             width: 30px;
-            height: 30px;
             padding: 0;
             border: 0;
-            border-radius: 100%;
-            background-color: $gophillygo-blue;
-            color: $white;
-            font-size: 2rem;
-            line-height: 20px;
+            background-color: transparent;
+            color: rgba($white, .9);
+            font-size: 2.2rem;
+            line-height: 1;
+            text-align: center;
             cursor: pointer;
             z-index: 10;
 
-            .body-map & {
-                display: block;
+            .body-home & {
+                display: none;
             }
         }
     }
