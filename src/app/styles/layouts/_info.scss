@@ -1,16 +1,20 @@
 .body-info, .body-explore, .body-about {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    min-height: 100%;
+    height: 100%;
+    max-height: 100%;
     background-color: $body-color;
     overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 
     .main {
-        flex: auto;
-        align-self: center;
+        display: block;
         max-width: $home-main-max-width;
         margin: 0 auto 10rem;
 
