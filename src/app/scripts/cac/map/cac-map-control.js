@@ -5,6 +5,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         id: 'map',
         selectors: {
             id: '#map',
+            isMobile: false,
             leafletMinimizer: '.leaflet-minimize',
             leafletLayerList: '.leaflet-control-layers-list',
             leafletLayerControl: '.leaflet-control-layers',
@@ -15,10 +16,29 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
     };
 
     var map = null;
+    var currentLocationMarker = null;
+    var currentLocationMarkerHalo = null;
     var geocodeMarker = null;
     var directionsMarkers = {
         origin: null,
         destination: null
+    };
+
+    var currentLocationMarkerOptions = {
+        color: '#fff',
+        opacity: 1,
+        weight: 2,
+        fillColor: '#3f88ef',
+        fillOpacity: 1,
+        radius: 6
+    };
+
+    var currentLocationMarkerHaloOptions = {
+        color: '#3f88ef',
+        weight: 0,
+        fillColor: '#3f88ef',
+        fillOpacity: 0.3,
+        radius: 16
     };
 
     var overlaysControl = null;
@@ -123,7 +143,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         tabControl = this.options.tabControl;
 
         // put zoom control on top right
-        zoomControl = new cartodb.L.Control.Zoom({ position: 'topright', zoomInText: '<i class="icon-plus"></i>', zoomOutText: '<i class="icon-minus"></i>' });
+        zoomControl = new cartodb.L.Control.Zoom({
+            position: 'topright',
+            zoomInText: '<i class="icon-plus"></i>',
+            zoomOutText: '<i class="icon-minus"></i>'
+        });
 
         initializeBasemaps();
 
@@ -135,6 +159,11 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
                                         function(event, place) {
                                             events.trigger(eventNames.destinationPopupClick, place);
                                         });
+
+        if (this.options.isMobile) {
+            showCurrentLocation();
+        }
+
         mapLoaded = true;
     }
 
@@ -256,7 +285,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {Boolean} [zoomToFit] Zoom the view to the marker(s)
      */
     function setDirectionsMarkers(originCoords, destinationCoords, zoomToFit) {
-
         // helper for when origin/destination dragged to new place
         function markerDrag(event) {
             var marker = event.target;
@@ -350,6 +378,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             zoomControl.addTo(map);
             initializeOverlays();
             initializeLayerControl.apply(this, null);
+            if (currentLocationMarker) {
+                currentLocationMarker.addTo(map);
+            }
             componentsLoaded = true;
         }
     }
@@ -362,6 +393,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         }
         if (layerControl) {
             layerControl.removeFrom(map);
+        }
+        if (currentLocationMarker) {
+            map.removeLayer(currentLocationMarker);
         }
 
         map.removeLayer(overlays['Bike Share Locations']);
@@ -400,6 +434,41 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             map.removeLayer(lastDisplayPointMarker);
             lastDisplayPointMarker = null;
         }
+    }
+
+    /**
+     * Track user location with map marker.
+     */
+    function showCurrentLocation() {
+        map.locate({
+            watch: true,
+            enableHighAccuracy: true,
+            maximumAge: 3000 // use cached location up to 3 seconds
+        });
+
+        map.on('locationfound', function(event) {
+            if (!currentLocationMarker) {
+                currentLocationMarker = new cartodb.L.LayerGroup([
+                    new cartodb.L.circleMarker(event.latlng, currentLocationMarkerHaloOptions),
+                    new cartodb.L.circleMarker(event.latlng, currentLocationMarkerOptions)
+                ]);
+            } else {
+                currentLocationMarker.invoke('setLatLng', event.latlng);
+            }
+
+            if (map && componentsLoaded) {
+                currentLocationMarker.addTo(map);
+            }
+        });
+
+        map.on('locationerror', function(error) {
+            console.error('could not get user location:');
+            console.error(error);
+
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+            }
+        });
     }
 
 })(jQuery, Handlebars, cartodb, L, turf, _);

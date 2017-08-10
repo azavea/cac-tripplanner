@@ -1,5 +1,5 @@
 CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            UserPreferences, UrlRouter) {
+                            UserPreferences, UrlRouter, Utils) {
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
@@ -59,7 +59,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         });
 
         mapControl = new MapControl({
-            tabControl: tabControl
+            tabControl: tabControl,
+            isMobile: $(window).width() < MD_UP_BREAKPOINT
         });
 
         modeOptionsControl = new ModeOptions();
@@ -81,15 +82,11 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
-        moment.updateLocale('en', {
-            relativeTime : {
-                mm: "%d min",
-            }
-        });
 
+        Utils.initializeMoment();
         showHideNeedWheelsBanner();
-
         _setupEvents();
+        setupServiceWorker();
     };
 
     return Home;
@@ -493,6 +490,24 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
+     * Set up a service worker to make this a PWA app.
+     * Necessary to support 'add to homescreen' with the app manifest.json.
+     * Service worker is defined in Django template.
+     */
+    function setupServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function() {
+                    // success. worker scoped here to domain.
+                }, function(err) {
+                    // registration failed
+                    console.error('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    }
+
+    /**
      * Helper to check user agent string to see if on Mobile Safari browser
      *
      @returns {boolean} True if visiting from Mobile Safari
@@ -506,4 +521,4 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
 })(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter);
+    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter, CAC.Utils);

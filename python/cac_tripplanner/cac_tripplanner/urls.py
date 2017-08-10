@@ -14,6 +14,10 @@ urlpatterns = [
     url(r'^$', dest_views.home, name='home'),
     url(r'^explore$', dest_views.explore, name='explore'),
 
+    # App manifest and service worker for PWA app
+    url('^manifest.json$', dest_views.manifest),
+    url('^service-worker.js$', dest_views.service_worker),
+
     # Map
     url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
         name='api_destinations_search'),

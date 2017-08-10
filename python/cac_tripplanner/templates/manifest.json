@@ -1,0 +1,26 @@
+{
+  "short_name": "GoPhillyGo",
+  "name": "GoPhillyGo",
+  "icons": [
+    {
+      "src": "/static/images/android-app-icon-96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "/static/images/android-app-icon-144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/static/images/android-app-icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+
+  ],
+  "start_url": "/?launcher=true",
+  "display": "standalone",
+  "background_color": "#245280",
+  "theme_color": "#2e68a3"
+}
