@@ -260,16 +260,23 @@
 
                 &.directions-tab-button label {
                     position: relative;
+                    padding-right: 2rem;
                     background-color: $gophillygo-blue-dark;
                     cursor: pointer;
-                }
 
-                &.directions-to label {
-                    padding-right: .5rem;
-                }
-
-                &.isochrone-control label {
-                    padding-right: 1rem;
+                    &:after {
+                        position: absolute;
+                        right: 4px;
+                        width: 20px;
+                        margin: 0;
+                        padding: 0;
+                        color: inherit;
+                        font-family: gpg;
+                        font-size: .7em;
+                        line-height: 30px;
+                        text-align: right;
+                        content: '\e813';
+                    }
                 }
             }
 

@@ -184,7 +184,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         // .back and .getdirections are used to select these elements for the click event
                         '<div class="col-sm-6"><a class="back btn btn-primary btn-block hidden-xs">Back</a></div>',
                         '<div class="col-sm-6"><a class="getdirections btn btn-primary btn-block">',
-                            'Get Directions</a></div>',
+                            'Get directions</a></div>',
                     '</div>',
                 '</div>',
             '</div>'
