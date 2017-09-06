@@ -179,7 +179,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
+            'level': 'INFO',
             'formatter': 'verbose',
         },
         'logfile': {
@@ -192,7 +192,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'logfile'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'ckeditor': {
