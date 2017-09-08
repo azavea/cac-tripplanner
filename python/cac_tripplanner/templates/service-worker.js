@@ -27,9 +27,15 @@ self.addEventListener('fetch', function(event) {
             return response;
         } else {
             return fetch(event.request).then(function (response) {
-                // cache fetched request if it is on this domain and does not require authentication
-                if (!event.request.url.includes('/admin') &&
-                        event.request.url.startsWith(location.origin)) {
+                // Cache fetched request if it is on this domain,
+                // does not involve a routing request (has an origin),
+                // and does not require authentication credentials (cookies are not passed).
+                var url = event.request.url;
+                if (url.startsWith(location.origin) &&
+                    !url.includes('origin=') &&
+                    !url.includes('/admin') &&
+                    event.request.method === 'GET') {
+
                     var responseClone = response.clone();
                     caches.open(CACHE_NAME).then(function (cache) {
                         cache.put(event.request, responseClone);
@@ -38,6 +44,7 @@ self.addEventListener('fetch', function(event) {
                 return response;
             }).catch(function (error) {
                 console.error(error);
+                console.error(event);
                 return fetch(event.request);
             });
         }
