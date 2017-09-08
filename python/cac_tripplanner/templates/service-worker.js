@@ -27,15 +27,17 @@ self.addEventListener('fetch', function(event) {
             return response;
         } else {
             return fetch(event.request).then(function (response) {
-                // cache fetched request if it is on this domain
-                if (!location.href.includes('/admin') && request.url.startsWith(location.href)) {
+                // cache fetched request if it is on this domain and does not require authentication
+                if (!event.request.url.includes('/admin') &&
+                        event.request.url.startsWith(location.origin)) {
                     var responseClone = response.clone();
                     caches.open(CACHE_NAME).then(function (cache) {
                         cache.put(event.request, responseClone);
                     });
                 }
                 return response;
-            }).catch(function () {
+            }).catch(function (error) {
+                console.error(error);
                 return fetch(event.request);
             });
         }
