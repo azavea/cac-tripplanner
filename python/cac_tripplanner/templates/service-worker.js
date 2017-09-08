@@ -27,14 +27,10 @@ self.addEventListener('fetch', function(event) {
             return response;
         } else {
             return fetch(event.request).then(function (response) {
-                // Cache fetched request if it is on this domain,
-                // does not involve a routing request (has an origin),
-                // and does not require authentication credentials (cookies are not passed).
+                // Only cache static and media assets on this domain
                 var url = event.request.url;
                 if (url.startsWith(location.origin) &&
-                    !url.includes('origin=') &&
-                    !url.includes('/admin') &&
-                    event.request.method === 'GET') {
+                    (url.includes('/static') || url.includes('/media'))) {
 
                     var responseClone = response.clone();
                     caches.open(CACHE_NAME).then(function (cache) {
