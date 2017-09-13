@@ -3,7 +3,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
-    var MD_UP_BREAKPOINT = 992;
+    var XXS_BREAKPOINT = 480;
 
     var defaults = {
         selectors: {
@@ -60,7 +60,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         mapControl = new MapControl({
             tabControl: tabControl,
-            isMobile: $(window).width() < MD_UP_BREAKPOINT
+            isMobile: $(window).width() < XXS_BREAKPOINT
         });
 
         modeOptionsControl = new ModeOptions();
@@ -168,7 +168,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
             // only allow explore mode on desktop and only respond to label in map view
             if (tabControl.isTabShowing(tabControl.TABS.HOME) ||
-                $(window).width() < MD_UP_BREAKPOINT) {
+                $(window).width() < XXS_BREAKPOINT) {
 
                 return;
             }
