@@ -3,10 +3,8 @@
         {
             type: "bike-rental",
             frequencySec: {{ bikeshare_update_interval_s}},
-            network: "{{ bikeshare_update_network_name }}",
-            sourceType: "b-cycle",
-            url: "{{ bikeshare_update_url }}",
-            apiKey: "{{ bcycle_api_key }}"
+            sourceType: "gbfs",
+            url: "{{ bikeshare_update_url }}"
         }
     ]
 }
