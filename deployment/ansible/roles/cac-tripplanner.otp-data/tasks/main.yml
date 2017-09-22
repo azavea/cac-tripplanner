@@ -44,13 +44,6 @@
 
 - name: Copy Router Configuration to Graph Directory
   template: src=router-config.json.j2 dest={{ otp_data_dir }}/{{ otp_router }}/router-config.json
-  when: not(
-          (bcycle_api_key is undefined)
-          or
-          (bcycle_api_key is none)
-          or
-          (bcycle_api_key | trim == '')
-        )
 
 - name: Move Graph to Graph Directory (test/develop)
   command: mv {{ otp_data_dir }}/Graph.obj {{ otp_data_dir }}/{{ otp_router }}

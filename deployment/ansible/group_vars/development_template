@@ -24,6 +24,3 @@ use_s3_storage: false
 default_admin_username: 'admin'
 default_admin_password: 'admin'
 default_admin_email: 'systems+cac@azavea.com'
-
-# for bike share directions
-bcycle_api_key: ''

@@ -1,4 +1,3 @@
 ---
-bikeshare_update_interval_s: 500
-bikeshare_update_network_name: 'Indego'
-bikeshare_update_url: 'https://publicapi.bcycle.com/api/1.0/ListProgramKiosks/3'
+bikeshare_update_interval_s: 120
+bikeshare_update_url: 'https://gbfs.bcycle.com/bcycle_indego/'
