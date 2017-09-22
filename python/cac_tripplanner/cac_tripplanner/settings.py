@@ -14,7 +14,6 @@ from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import yaml
-import logging.config
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 try:
