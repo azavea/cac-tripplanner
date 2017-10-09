@@ -71,7 +71,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         showPlacesContent();
     }
 
-    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
+    var fetchIsochrone = _.debounce(_fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
     var getNearbyPlaces = _.debounce(_getNearbyPlaces, ISOCHRONE_DEBOUNCE_MILLIS);
 
@@ -162,17 +162,17 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         mapControl.isochroneControl.clearIsochrone();
 
         if (exploreLatLng) {
-            debouncedFetchIsochrone();
+            fetchIsochrone();
+        } else {
+            getNearbyPlaces();
         }
-
-        getNearbyPlaces();
     }
 
     /**
      * Load options and compose OTP params, fetch travelshed from OpenTripPlanner,
      * then populate side bar with featured locations found within the travelshed.
      */
-    function fetchIsochrone() {
+    function _fetchIsochrone() {
         showSpinner();
 
         // do not hide spinner until isochrone fetch resolves
@@ -200,8 +200,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
-            function () {
+            function (data) {
                 fetchingIsochrone = false;
+                listIsochronePlaces(data);
                 showPlacesContent();
             }, function (error) {
                 console.error(error);
@@ -258,9 +259,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
             exploreLatLng = null;
-            // selectedPlaceId = null;
             $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
+            // get all places in sidebar when no origin set
+            getNearbyPlaces();
         }
     }
 
@@ -325,6 +327,28 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         } else {
             exploreLatLng = null;
         }
+    }
+
+    // Given desintations from the FindReachableDestinations app endpoint,
+    // display the returned list of places within the travelshed in the sidebar cards.
+    function listIsochronePlaces(destinations) {
+        showSpinner();
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+        var newPlaces = HomeTemplates.destinations(destinations);
+        $(options.selectors.placesContent).html(newPlaces);
+
+        // also draw on explore map
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+            mapControl.isochroneControl.drawDestinations(destinations);
+        }
+
+        showPlacesContent();
+
+        // now places list has been updated, go fetch the travel time
+        // from the new origin to each place
+        getTimesToPlaces();
     }
 
     function _getNearbyPlaces() {
@@ -421,6 +445,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
                         .text(originLabel);
                     $card.removeClass(options.selectors.noOriginClass);
                 }
+            }).fail(function(error) {
+                console.error('error finding travel time to a place');
+                console.error(error);
             });
         });
     }

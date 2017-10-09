@@ -96,12 +96,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
     }
 
     /**
-     * Fetch an isochrone (travelshed).
+     * Fetch an isochrone (travelshed) and the places within it.
      *
-     * @return {Object} Promise resolving to JSON with isochrone
+     * @return {Object} Promise resolving to JSON with isochrone and destinations
      */
     function _fetchIsochrone(payload) {
-        var isochroneUrl = Settings.isochroneUrl;
+        var isochroneUrl = '/map/reachable';
         var deferred = $.Deferred();
         $.ajax({
             type: 'GET',
@@ -117,10 +117,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
      * Makes an isochrone request. Only allows one isochrone request at a time.
      * If another request comes in while one is active, the results of the active
      * request will be discarded upon completion, and the new query issued.
+     * Draws isochrone on query completion, and resolves with the destinations.
      *
      * @param {Deferred} A jQuery Deferred object used for resolution
      * @param {Object} Parameters to be sent along with the request
      * @param {boolean} Whether to pan/zoom map to fit returned isochrone
+     * @return {Object} Promise resolving to JSON with destinations
      */
     function getIsochrone(deferred, params, zoomToFit) {
         // Check if there's already an active request. If there is one,
@@ -154,8 +156,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
                 deferred.resolve();
                 return;
             }
-            drawIsochrone(data, zoomToFit);
-            deferred.resolve();
+            drawIsochrone(data.isochrone, zoomToFit);
+            deferred.resolve(data.matched);
         }, function(error) {
             activeIsochroneRequest = null;
             pendingIsochroneRequest = null;
@@ -178,9 +180,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         var params = {
             time: formattedTime,
             date: formattedDate,
-            cutoffSec: exploreMinutes * 60, // API expects seconds
-            routerId: 'default',
-            algorithm: 'accSampling'
+            cutoffSec: exploreMinutes * 60 // API expects seconds
         };
 
         // Default precision of 200m; 100m seems good for improving response times on non-transit
@@ -206,6 +206,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         // put destination details onto point geojson object's properties
         // build map of unconverted destination objects
         var destinations = {};
+        clearDestinations();
         var locationGeoJSON = _.map(matched, function(destination) {
             destinations[destination.id] = destination;
             var point = _.property('point')(destination);
@@ -283,4 +284,4 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settin
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Settings);
+})(jQuery, Handlebars, cartodb, L, turf, _);

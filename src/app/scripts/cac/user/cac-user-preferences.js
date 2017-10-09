@@ -107,7 +107,7 @@ CAC.User.Preferences = (function(Storages, _) {
     }
 
     /**
-     * Convenience method to avoid having to manually set both preferences for 'origin' and
+     * Convenience method to avoid having to manually set both preferences for origin and
      * destination.
      *
      * 'text' is optional and defaults to location.address if omitted

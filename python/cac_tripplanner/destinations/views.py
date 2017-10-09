@@ -186,6 +186,25 @@ class FindReachableDestinations(View):
             obj['point'] = json.loads(obj['point'].json)
             obj['image'] = image_to_url(obj, 'image')
             obj['wide_image'] = image_to_url(obj, 'wide_image')
+            # convert to format like properties on ESRI geocoder results
+            extent = {
+                'xmax': obj['point']['coordinates'][0],
+                'xmin': obj['point']['coordinates'][0],
+                'ymax': obj['point']['coordinates'][1],
+                'ymin': obj['point']['coordinates'][1]
+            }
+            obj['extent'] = extent
+            obj['attributes'] = {
+                'City': obj['city'],
+                'Postal': obj['zip'],
+                'Region': obj['state'],
+                'StAddr': obj['address']
+            }
+
+            obj['location'] = {
+                'x': obj['point']['coordinates'][0],
+                'y': obj['point']['coordinates'][1]
+            }
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
