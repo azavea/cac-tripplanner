@@ -159,7 +159,6 @@ def set_destination_properties(destination):
 
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
-    # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
     otp_router = 'default'
     isochrone_url = settings.ISOCHRONE_URL
@@ -190,6 +189,12 @@ class FindReachableDestinations(View):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
         Return both the isochrone GeoJSON and the list of matched destinations."""
         params = request.GET.copy()  # make mutable
+
+        # allow a max travelshed size of 60 minutes in a query
+        cutoff_sec = int(params.get('cutoffSec', -1))
+        if not cutoff_sec or cutoff_sec < 0 or cutoff_sec > 3600:
+            return HttpResponse(status=400,
+                                reason='cutoffSec must be greater than 0 and less than 360')
 
         json_poly = self.isochrone(params)
 
