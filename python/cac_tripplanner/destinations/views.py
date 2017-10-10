@@ -132,6 +132,31 @@ def image_to_url(dest_dict, field_name):
     return image.url if image else ''
 
 
+def set_destination_properties(destination):
+    """Helper for adding and converting properties in serializing destinations as JSON
+
+    :param destination: Destination model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(destination)
+    obj['address'] = obj['name']
+    obj['image'] = image_to_url(obj, 'image')
+    obj['wide_image'] = image_to_url(obj, 'wide_image')
+    obj['point'] = json.loads(obj['point'].json)
+    # convert to format like properties on ESRI geocoder results
+    x = obj['point']['coordinates'][0]
+    y = obj['point']['coordinates'][1]
+    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
+    obj['location'] = {'x': x, 'y': y}
+    obj['attributes'] = {
+        'City': obj['city'],
+        'Postal': obj['zip'],
+        'Region': obj['state'],
+        'StAddr': obj['address']
+    }
+    return obj
+
+
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
     # TODO: make decisions on acceptable ranges of values that this endpoint will support
@@ -181,30 +206,7 @@ class FindReachableDestinations(View):
             matched_objects = []
 
         # make locations JSON serializable
-        matched_objects = [model_to_dict(x) for x in matched_objects]
-        for obj in matched_objects:
-            obj['point'] = json.loads(obj['point'].json)
-            obj['image'] = image_to_url(obj, 'image')
-            obj['wide_image'] = image_to_url(obj, 'wide_image')
-            # convert to format like properties on ESRI geocoder results
-            extent = {
-                'xmax': obj['point']['coordinates'][0],
-                'xmin': obj['point']['coordinates'][0],
-                'ymax': obj['point']['coordinates'][1],
-                'ymin': obj['point']['coordinates'][1]
-            }
-            obj['extent'] = extent
-            obj['attributes'] = {
-                'City': obj['city'],
-                'Postal': obj['zip'],
-                'Region': obj['state'],
-                'StAddr': obj['address']
-            }
-
-            obj['location'] = {
-                'x': obj['point']['coordinates'][0],
-                'y': obj['point']['coordinates'][1]
-            }
+        matched_objects = [set_destination_properties(x) for x in matched_objects]
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
@@ -258,31 +260,7 @@ class SearchDestinations(View):
                 return HttpResponse(error, 'application/json')
             results = results[:limit_int]
 
-        data = [model_to_dict(x) for x in results]
-        for obj in data:
-            obj['address'] = obj['name']
-            obj['point'] = json.loads(obj['point'].json)
-            obj['image'] = image_to_url(obj, 'image')
-            obj['wide_image'] = image_to_url(obj, 'wide_image')
-            # convert to format like properties on ESRI geocoder results
-            extent = {
-                'xmax': obj['point']['coordinates'][0],
-                'xmin': obj['point']['coordinates'][0],
-                'ymax': obj['point']['coordinates'][1],
-                'ymin': obj['point']['coordinates'][1]
-            }
-            obj['extent'] = extent
-            obj['attributes'] = {
-                'City': obj['city'],
-                'Postal': obj['zip'],
-                'Region': obj['state'],
-                'StAddr': obj['address']
-            }
-
-            obj['location'] = {
-                'x': obj['point']['coordinates'][0],
-                'y': obj['point']['coordinates'][1]
-            }
+        data = [set_destination_properties(x) for x in results]
 
         response = {'destinations': data}
         return HttpResponse(json.dumps(response), 'application/json')
