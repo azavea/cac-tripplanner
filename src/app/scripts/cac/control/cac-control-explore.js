@@ -57,6 +57,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         directionsFormControl.events.on(directionsFormControl.eventNames.geocodeError,
                                         onGeocodeError);
 
+        showSpinner();
+
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
             clickedExplore();
@@ -86,11 +88,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     return ExploreControl;
 
-    // When the explore tab is activated, do the thing. If some other tab is activated, clear the
-    // isochrone and destination markers.
+    // When the explore tab is activated, load destinations and isochrone, if origin set.
+    // If some other tab is activated, clear the isochrone and destination markers.
     function onTabShown(event, tabId) {
+        // always show spinner on tab change, to avoid stale destinations list flashing
+        showSpinner();
         if (tabId === tabControl.TABS.EXPLORE) {
-            showSpinner();
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
@@ -203,7 +206,6 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             function (data) {
                 fetchingIsochrone = false;
                 listIsochronePlaces(data);
-                showPlacesContent();
             }, function (error) {
                 console.error(error);
                 fetchingIsochrone = false;
@@ -329,8 +331,41 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         }
     }
 
-    function displayPlaces(destinations) {
-        var newPlaces = HomeTemplates.destinations(destinations);
+    /**
+     * Helper to build and show templated place cards
+     *
+     * @param destinations {Array} Detination objects to load into template cards
+     * @Param exploreMinutes {String} String representation of integer number of travel minutes
+                                     the travelshed encompasses; -1 if not in travelshed mode
+     */
+    function displayPlaces(destinations, exploreMinutes='-1') {
+        var isTransit = UserPreferences.getPreference('mode').indexOf('TRANSIT') > -1;
+        var isMax = (exploreMinutes === $(options.selectors.isochroneSlider).prop('max'));
+
+        // alternate text string to display if there are no destinations found
+        var text = null;
+        if (!destinations || !destinations.length) {
+            if (exploreMinutes === '-1') {
+                // if not in travel mode, should fetch all destinations; should always have some
+                console.error('No destinations in the app!');
+                text = 'No featured destinations found. Please check back later';
+            } else if (!isTransit && !isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try including transit or allowing for more time.';
+            } else if (!isTransit && isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try including transit, or removing the travel time limit ' +
+                    '(click "within" above).';
+            } else if (isTransit && !isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try allowing for more time.';
+            } else {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try removing the travel time limit (click "within" above).';
+            }
+        }
+
+        var newPlaces = HomeTemplates.destinations(destinations, text);
         $(options.selectors.placesContent).html(newPlaces);
 
         // also draw on explore map
@@ -352,7 +387,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
-        displayPlaces(destinations);
+        displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
     }
 
     function _getNearbyPlaces() {
@@ -383,7 +418,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             if (!data || !data.destinations) {
                 console.error('no places found');
                 console.error(data);
-                showPlacesContent();
+                displayPlaces([]);
                 return;
             }
 
