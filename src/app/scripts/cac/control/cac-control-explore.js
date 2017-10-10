@@ -329,13 +329,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         }
     }
 
-    // Given desintations from the FindReachableDestinations app endpoint,
-    // display the returned list of places within the travelshed in the sidebar cards.
-    function listIsochronePlaces(destinations) {
-        showSpinner();
-        var $placeCards = $(options.selectors.placeCard);
-        // hide existing times to places now showing (if any)
-        $placeCards.addClass(options.selectors.noOriginClass);
+    function displayPlaces(destinations) {
         var newPlaces = HomeTemplates.destinations(destinations);
         $(options.selectors.placesContent).html(newPlaces);
 
@@ -349,6 +343,16 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // now places list has been updated, go fetch the travel time
         // from the new origin to each place
         getTimesToPlaces();
+    }
+
+    // Given desintations from the FindReachableDestinations app endpoint,
+    // display the returned list of places within the travelshed in the sidebar cards.
+    function listIsochronePlaces(destinations) {
+        showSpinner();
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+        displayPlaces(destinations);
     }
 
     function _getNearbyPlaces() {
@@ -383,19 +387,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
                 return;
             }
 
-            var newPlaces = HomeTemplates.destinations(data.destinations);
-            $(options.selectors.placesContent).html(newPlaces);
-
-            // also draw on explore map
-            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-                mapControl.isochroneControl.drawDestinations(data.destinations);
-            }
-
-            showPlacesContent();
-
-            // now places list has been updated, go fetch the travel time
-            // from the new origin to each place
-            getTimesToPlaces();
+            displayPlaces(data.destinations);
 
         }).fail(function(error) {
             console.error('error fetching destinations:');
