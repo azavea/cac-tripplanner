@@ -1,4 +1,4 @@
-CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Settings) {
+CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     'use strict';
 
     var defaults = {
