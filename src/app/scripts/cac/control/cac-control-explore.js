@@ -338,7 +338,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
      * @Param exploreMinutes {String} String representation of integer number of travel minutes
                                      the travelshed encompasses; -1 if not in travelshed mode
      */
-    function displayPlaces(destinations, exploreMinutes='-1') {
+    function displayPlaces(destinations, exploreMinutes) {
+        exploreMinutes = exploreMinutes || '-1';
         var isTransit = UserPreferences.getPreference('mode').indexOf('TRANSIT') > -1;
         var isMax = (exploreMinutes === $(options.selectors.isochroneSlider).prop('max'));
 
@@ -355,13 +356,13 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             } else if (!isTransit && isMax) {
                 text = 'No featured destinations within ' + exploreMinutes +
                     ' minutes. Try including transit, or removing the travel time limit ' +
-                    '(click "within" above).';
+                    '(click \"within\" above).';
             } else if (isTransit && !isMax) {
                 text = 'No featured destinations within ' + exploreMinutes +
                     ' minutes. Try allowing for more time.';
             } else {
                 text = 'No featured destinations within ' + exploreMinutes +
-                    ' minutes. Try removing the travel time limit (click "within" above).';
+                    ' minutes. Try removing the travel time limit (click \"within\" above).';
             }
         }
 
@@ -418,11 +419,11 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             if (!data || !data.destinations) {
                 console.error('no places found');
                 console.error(data);
-                displayPlaces([]);
+                displayPlaces([], '-1');
                 return;
             }
 
-            displayPlaces(data.destinations);
+            displayPlaces(data.destinations, '-1');
 
         }).fail(function(error) {
             console.error('error fetching destinations:');
