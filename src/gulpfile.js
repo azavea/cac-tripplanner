@@ -28,6 +28,11 @@ var uglifyLib = require('uglify-es');
 var uglifyComposer = require('gulp-uglify/composer');
 var uglify = uglifyComposer(uglifyLib, console);
 
+var pkg = require('./package');
+var jshintConfig = pkg.jshintConfig;
+
+jshintConfig.lookup = false;
+
 var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
@@ -210,14 +215,14 @@ gulp.task('copy:vendor-scripts', function() {
 
 gulp.task('jshint', function () {
     return gulp.src('app/scripts/cac/**/*.js')
-        .pipe($.jshint())
+        .pipe($.jshint(jshintConfig))
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.jshint.reporter('fail'));
 });
 
 gulp.task('jshint:jenkins', function () {
     return gulp.src('app/scripts/cac/**/*.js')
-        .pipe($.jshint())
+        .pipe($.jshint(jshintConfig))
         .pipe($.jshint.reporter(jshintXMLReporter))
         .on('end', jshintXMLReporter.writeFile({
             alwaysReport: true,
