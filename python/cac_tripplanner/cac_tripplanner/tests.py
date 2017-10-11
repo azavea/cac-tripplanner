@@ -59,7 +59,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         # use current date for query
         dt = datetime.now()
         day_str = str(dt.date())
-        isochrone_start = '/map/reachable?fromPlace=39.954688%2C-75.204677&mode%5B%5D=WALK%2DTRANSIT&time=7%3A30am&cutoffSec=5000&maxWalkDistance=5000'
+        isochrone_start = '/map/reachable?fromPlace=39.954688%2C-75.204677&mode%5B%5D=WALK%2DTRANSIT&time=7%3A30am&cutoffSec=3600&maxWalkDistance=5000'
         isochrone_url = ('{start}&date={day_str}').format(start=isochrone_start, day_str=day_str)
         response = self.client.get(isochrone_url)
         json_response = json.loads(response.content)
@@ -80,7 +80,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         dt = datetime.now()
         day_str = str(dt.date())
 
-        isochrone_start = '/map/reachable?fromPlace=79.954688%2D-45.204677&mode%5B%5D=WALK%2DTRANSIT&time=7%3A30am&cutoffSec=5000&maxWalkDistance=5000'
+        isochrone_start = '/map/reachable?fromPlace=79.954688%2D-45.204677&mode%5B%5D=WALK%2DTRANSIT&time=7%3A30am&cutoffSec=2000&maxWalkDistance=5000'
         isochrone_url = ('{start}&date={day_str}').format(start=isochrone_start, day_str=day_str)
 
         response = self.client.get(isochrone_url)
@@ -89,3 +89,16 @@ class CACTripPlannerIsochroneTestCase(TestCase):
         self.assertEqual(0, len(matched))
         isochrone = json_response['isochrone']
         self.assertEqual({}, isochrone)
+
+    def test_isochrone_outside_range(self):
+        """Return error if cutoffSec parameter is outside allowed range"""
+
+        # use current date for query
+        dt = datetime.now()
+        day_str = str(dt.date())
+
+        isochrone_start = '/map/reachable?fromPlace=79.954688%2D-45.204677&mode%5B%5D=WALK%2DTRANSIT&time=7%3A30am&cutoffSec=9000&maxWalkDistance=5000'
+        isochrone_url = ('{start}&date={day_str}').format(start=isochrone_start, day_str=day_str)
+
+        response = self.client.get(isochrone_url)
+        self.assertEqual(400, response.status_code)
