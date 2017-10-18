@@ -53,7 +53,7 @@ CAC.Home.Templates = (function (Handlebars) {
             '{{/unless}}',
             '{{#if alternateMessage}}',
             '<header class="places-header">',
-                '<h2>{{alternateMessage}}</h2>',
+                '<h2 class="no-places">{{alternateMessage}}</h2>',
                 '<a href="#" class="map-view-btn">Map View</a>',
             '</header>',
             '{{/if}}',

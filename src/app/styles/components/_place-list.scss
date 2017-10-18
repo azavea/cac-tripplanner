@@ -72,6 +72,14 @@
         }
     }
 
+    .no-places {
+        margin: 1em;
+        color: $gray;
+        font-size: 1.6rem;
+        line-height: 1.7;
+        text-align: center;
+    }
+
     a.map-view-btn {
         @include delinkify($gophillygo-blue);
         display: block;
