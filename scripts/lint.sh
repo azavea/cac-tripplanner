@@ -8,10 +8,10 @@ set -x
 trap 'mark_unstable' ERR
 
 # Python linting
-# first remove violations file, as it will not get overwritten if there are no warnings
-vagrant ssh app -c "if [ -e /opt/app/python/violations.txt ]; then rm /opt/app/python/violations.txt; fi"
+# first remove contents of violations file, as it will not get overwritten if there are no warnings
+vagrant ssh app -c "touch /opt/app/python/violations.txt"
 # get console output and to write to file
-vagrant ssh app -c "flake8 /opt/app/python --exclude=migrations
+vagrant ssh app -c "flake8 /opt/app/python --exclude=migrations \
                     --output-file=/opt/app/python/violations.txt --exit-zero --tee"
 
 # Run JS linting
