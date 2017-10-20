@@ -26,6 +26,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         prefix: 'icon',
         markerColor: 'orange'
     });
+    var destinationOutsideTravelshedIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'darkred',
+        extraClasses: 'outside'
+    });
     var highlightIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
@@ -201,16 +207,25 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     /**
      * Draw an array of geojson destination points onto the map
+     *
+     * @param {Array} all All destinations to draw
+     * @param {Array} matched Destinations witin the travelshed; styles differ for the markers
      */
-    function drawDestinations(matched) {
+    function drawDestinations(all, matched) {
         // put destination details onto point geojson object's properties
         // build map of unconverted destination objects
         var destinations = {};
         clearDestinations();
-        var locationGeoJSON = _.map(matched, function(destination) {
+
+        var locationGeoJSON = _.map(all, function(destination) {
             destinations[destination.id] = destination;
             var point = _.property('point')(destination);
             point.properties = _.omit(destination, 'point');
+
+            // set matched property to true if destination is within isochrone
+            point.properties.matched = _.findIndex(matched, function(match) {
+                return match.id === destination.id;
+            }) > -1;
             return point;
         });
         destinationMarkers = {};
@@ -230,7 +245,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
-                var marker = new cartodb.L.marker(latLng, {icon: destinationIcon})
+
+                // use a different icon for places outside of the travel than those within it
+                var useIcon = geojson.properties.matched ? destinationIcon:
+                    destinationOutsideTravelshedIcon;
+                var marker = new cartodb.L.marker(latLng, {icon: useIcon})
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
                 destinationMarkers[markerId] = {
                     marker: marker,

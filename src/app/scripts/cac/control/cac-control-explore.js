@@ -374,12 +374,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // also draw all destinations on explore map (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             if (allDestinations.length > 0) {
-                mapControl.isochroneControl.drawDestinations(allDestinations);
+                mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
             } else {
                 // if destinations not cached already, go fetch them
-                getAllPlaces().then(function(destinations) {
-                    allDestinations = destinations;
-                    mapControl.isochroneControl.drawDestinations(allDestinations);
+                getAllPlaces().then(function(fullDestinationsList) {
+                    allDestinations = fullDestinationsList;
+                    mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
                 }).fail(function(error) {
                     console.error('error fetching destinations to map:');
                     console.error(error);
