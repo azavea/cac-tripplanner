@@ -37,6 +37,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     var exploreLatLng = null;
     var fetchingIsochrone = false;
 
+    var allDestinations = []; // cache full list of destinations
+
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
@@ -369,9 +371,21 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         var newPlaces = HomeTemplates.destinations(destinations, text);
         $(options.selectors.placesContent).html(newPlaces);
 
-        // also draw on explore map
+        // also draw all destinations on explore map (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-            mapControl.isochroneControl.drawDestinations(destinations);
+            if (allDestinations.length > 0) {
+                mapControl.isochroneControl.drawDestinations(allDestinations);
+            } else {
+                // if destinations not cached already, go fetch them
+                getAllPlaces().then(function(destinations) {
+                    allDestinations = destinations;
+                    mapControl.isochroneControl.drawDestinations(allDestinations);
+                }).fail(function(error) {
+                    console.error('error fetching destinations to map:');
+                    console.error(error);
+                    allDestinations = [];
+                });
+            }
         }
 
         showPlacesContent();
@@ -391,14 +405,14 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
     }
 
-    function _getNearbyPlaces() {
-        showSpinner();
-        var $placeCards = $(options.selectors.placeCard);
-        // hide existing times to places now showing (if any)
-        $placeCards.addClass(options.selectors.noOriginClass);
-
+    /**
+     * Query Django app for all destinations. If origin set, will order by distance.
+     *
+     * @return {promise} Promise which resolves to list of destinations
+     */
+    function getAllPlaces() {
+        var dfd = $.Deferred();
         var searchUrl = '/api/destinations/search';
-
         var params = {
             url: searchUrl,
             type: 'GET'
@@ -419,16 +433,37 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             if (!data || !data.destinations) {
                 console.error('no places found');
                 console.error(data);
-                displayPlaces([], '-1');
-                return;
+                dfd.resolve([]);
+            } else {
+                dfd.resolve(data.destinations);
             }
-
-            displayPlaces(data.destinations, '-1');
-
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
+            dfd.reject();
+        });
+        return dfd.promise();
+    }
 
+    function _getNearbyPlaces() {
+        showSpinner();
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+
+        // use cached results
+        if (allDestinations.length > 0) {
+            displayPlaces(allDestinations, '-1');
+            return;
+        }
+
+        getAllPlaces().then(function(destinations) {
+            allDestinations = destinations;
+            displayPlaces(destinations, '-1');
+        }).fail(function(error) {
+            console.error('error fetching destinations:');
+            console.error(error);
+            allDestinations = [];
             showPlacesContent();
         });
     }
