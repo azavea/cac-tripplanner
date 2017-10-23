@@ -9,9 +9,6 @@ virtualenv_version: 15.1.0
 
 otp_router: "default"
 
-otp_version: "1.2.0"
-otp_jar_sha1: "a7f659a63a54e894457bab6fc162fb0f47586057"
-
 # used by nginx and gunicorn to set timeouts; OTP defaults to 30s
 otp_session_timeout_s: 30
 
