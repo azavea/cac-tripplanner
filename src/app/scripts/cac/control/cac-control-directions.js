@@ -201,6 +201,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
     }
 
+    // helper to call plan trip if a destination is set, or show places list if no destination
+    function planTripOrShowPlaces() {
+        if (directions.destination) {
+            showPlaces(false);
+            planTrip();
+        } else {
+            showPlaces(true);
+            exploreControl.getNearbyPlaces();
+        }
+    }
+
     /**
      * Get parameters to pass to OpenTripPlanner, based on current settings
      *
@@ -315,7 +326,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     // trigger re-query when trip options update
     function setOptions() {
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            planTrip();
+            planTripOrShowPlaces();
         }
     }
 
@@ -334,7 +345,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
 
         // update the directions for the reverse trip
-        planTrip();
+        planTripOrShowPlaces();
     }
 
     function onTypeaheadCleared(event, key) {
@@ -355,7 +366,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
         setDirections(key, [result.location.y, result.location.x]);
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            planTrip();
+            planTripOrShowPlaces();
         }
     }
 
@@ -424,14 +435,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            // get directions if have origin and destination; if just origin, get nearby places
-            if (origin && !destination) {
-                showPlaces(true);
-                exploreControl.getNearbyPlaces();
-            } else {
-                showPlaces(false);
-                planTrip();
-            }
+            // get nearby places if no destination has been set yet
+            planTripOrShowPlaces();
         } else {
             // explore tab visible
             showPlaces(true);
