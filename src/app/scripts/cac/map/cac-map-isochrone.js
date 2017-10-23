@@ -29,6 +29,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var destinationOutsideTravelshedIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
+        // modified by styles to actually be orange, with reduced opacity
         markerColor: 'darkred',
         extraClasses: 'outside'
     });
