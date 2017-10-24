@@ -12,10 +12,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
     var defaults = {
         selectors: {
+            directions: '.directions-results',
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
+            places: '.places',
             selectedItineraryClass: 'selected',
-            spinner: '.directions-results > .sk-spinner'
+            spinner: '.directions-results > .sk-spinner',
+            visible: ':visible'
         }
     };
     var options = {};
@@ -29,6 +32,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
     var mapControl = null;
     var itineraryControl = null;
+    var exploreControl = null;
     var tabControl = null;
     var urlRouter = null;
     var directionsFormControl = null;
@@ -39,6 +43,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
         tabControl = options.tabControl;
+        exploreControl = options.exploreControl;
         itineraryControl = mapControl.itineraryControl;
         urlRouter = options.urlRouter;
         directionsFormControl = options.directionsFormControl;
@@ -96,6 +101,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
      * Throttled to cut down on requests.
      */
     var planTrip = _.throttle(function() {  // jshint ignore:line
+        showPlaces(false);
         if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
@@ -172,6 +178,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             setFromUserPreferences();
         } else {
             clearDirections();
+            showPlaces(true);
         }
     }
 
@@ -188,9 +195,21 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     function showSpinner() {
+        showPlaces(false);
         itineraryListControl.hide();
         directionsListControl.hide();
         $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
+    }
+
+    // helper to call plan trip if a destination is set, or show places list if no destination
+    function planTripOrShowPlaces() {
+        if (directions.destination) {
+            showPlaces(false);
+            planTrip();
+        } else {
+            showPlaces(true);
+            exploreControl.getNearbyPlaces();
+        }
     }
 
     /**
@@ -307,7 +326,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     // trigger re-query when trip options update
     function setOptions() {
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            planTrip();
+            planTripOrShowPlaces();
         }
     }
 
@@ -326,7 +345,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
 
         // update the directions for the reverse trip
-        planTrip();
+        planTripOrShowPlaces();
     }
 
     function onTypeaheadCleared(event, key) {
@@ -335,6 +354,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
+            showPlaces(true);
+            exploreControl.getNearbyPlaces();
         }
     }
 
@@ -345,7 +366,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
         setDirections(key, [result.location.y, result.location.x]);
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            planTrip();
+            planTripOrShowPlaces();
         }
     }
 
@@ -381,6 +402,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
     }
 
+    // toggles between showing directions tab content or places list (explore mode content)
+    function showPlaces(doShowPlaces) {
+        if (doShowPlaces) {
+            $(options.selectors.directions).hide();
+            $(options.selectors.places).show();
+        } else {
+            $(options.selectors.directions).show();
+            $(options.selectors.places).hide();
+        }
+    }
+
     // Updates the URL to match the currently-selected options
     function updateUrl() {
         urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
@@ -402,8 +434,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             directions.destination = [destination.location.y, destination.location.x ];
         }
 
-        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS) && (origin || destination)) {
-            planTrip();
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            // get nearby places if no destination has been set yet
+            planTripOrShowPlaces();
+        } else {
+            // explore tab visible
+            showPlaces(true);
         }
     }
 
