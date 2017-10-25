@@ -132,9 +132,33 @@ def image_to_url(dest_dict, field_name):
     return image.url if image else ''
 
 
+def set_destination_properties(destination):
+    """Helper for adding and converting properties in serializing destinations as JSON
+
+    :param destination: Destination model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(destination)
+    obj['address'] = obj['name']
+    obj['image'] = image_to_url(obj, 'image')
+    obj['wide_image'] = image_to_url(obj, 'wide_image')
+    obj['point'] = json.loads(obj['point'].json)
+    # convert to format like properties on ESRI geocoder results
+    x = obj['point']['coordinates'][0]
+    y = obj['point']['coordinates'][1]
+    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
+    obj['location'] = {'x': x, 'y': y}
+    obj['attributes'] = {
+        'City': obj['city'],
+        'Postal': obj['zip'],
+        'Region': obj['state'],
+        'StAddr': obj['address']
+    }
+    return obj
+
+
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
-    # TODO: make decisions on acceptable ranges of values that this endpoint will support
 
     otp_router = 'default'
     isochrone_url = settings.ISOCHRONE_URL
@@ -166,6 +190,12 @@ class FindReachableDestinations(View):
         Return both the isochrone GeoJSON and the list of matched destinations."""
         params = request.GET.copy()  # make mutable
 
+        # allow a max travelshed size of 60 minutes in a query
+        cutoff_sec = int(params.get('cutoffSec', -1))
+        if not cutoff_sec or cutoff_sec < 0 or cutoff_sec > 3600:
+            return HttpResponse(status=400,
+                                reason='cutoffSec must be greater than 0 and less than 360')
+
         json_poly = self.isochrone(params)
 
         # Have a FeatureCollection of MultiPolygons
@@ -174,18 +204,14 @@ class FindReachableDestinations(View):
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
                 geom = GEOSGeometry(geom_str)
-                matched_objects = (Destination.objects.filter(published=True)
+                matched_objects = (Destination.objects.filter(published=True, point__within=geom)
                                                       .distance(geom)
                                                       .order_by('distance'))
         else:
             matched_objects = []
 
         # make locations JSON serializable
-        matched_objects = [model_to_dict(x) for x in matched_objects]
-        for obj in matched_objects:
-            obj['point'] = json.loads(obj['point'].json)
-            obj['image'] = image_to_url(obj, 'image')
-            obj['wide_image'] = image_to_url(obj, 'wide_image')
+        matched_objects = [set_destination_properties(x) for x in matched_objects]
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
         return HttpResponse(json.dumps(response), 'application/json')
@@ -239,31 +265,7 @@ class SearchDestinations(View):
                 return HttpResponse(error, 'application/json')
             results = results[:limit_int]
 
-        data = [model_to_dict(x) for x in results]
-        for obj in data:
-            obj['address'] = obj['name']
-            obj['point'] = json.loads(obj['point'].json)
-            obj['image'] = image_to_url(obj, 'image')
-            obj['wide_image'] = image_to_url(obj, 'wide_image')
-            # convert to format like properties on ESRI geocoder results
-            extent = {
-                'xmax': obj['point']['coordinates'][0],
-                'xmin': obj['point']['coordinates'][0],
-                'ymax': obj['point']['coordinates'][1],
-                'ymin': obj['point']['coordinates'][1]
-            }
-            obj['extent'] = extent
-            obj['attributes'] = {
-                'City': obj['city'],
-                'Postal': obj['zip'],
-                'Region': obj['state'],
-                'StAddr': obj['address']
-            }
-
-            obj['location'] = {
-                'x': obj['point']['coordinates'][0],
-                'y': obj['point']['coordinates'][1]
-            }
+        data = [set_destination_properties(x) for x in results]
 
         response = {'destinations': data}
         return HttpResponse(json.dumps(response), 'application/json')

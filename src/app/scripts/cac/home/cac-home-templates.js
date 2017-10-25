@@ -11,10 +11,12 @@ CAC.Home.Templates = (function (Handlebars) {
      * Take list of destination objects and return templated HTML snippet for sidebar.
      *
      * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
+     * @param alternateMessage {String} Text to display if there are no destinations
      * @return html {String} Snippets for boxes to display on home page for each destination
      */
-    function destinations(useDestinations) {
+    function destinations(useDestinations, alternateMessage) {
         var source = [
+            '{{#unless alternateMessage}}',
             '<header class="places-header">',
                 '<h1>Places we love</h1>',
                 '<a href="#" class="map-view-btn">Map View</a>',
@@ -47,10 +49,19 @@ CAC.Home.Templates = (function (Handlebars) {
                     '</div>',
                 '</li>',
                 '{{/each}}',
-            '</ul>'
+            '</ul>',
+            '{{/unless}}',
+            '{{#if alternateMessage}}',
+            '<header class="places-header">',
+                '<h2 class="no-places">{{alternateMessage}}</h2>',
+                '<a href="#" class="map-view-btn">Map View</a>',
+            '</header>',
+            '{{/if}}',
         ].join('');
         var template = Handlebars.compile(source);
-        var html = template({destinations: useDestinations});
+        var html = template({destinations: useDestinations,
+                             alternateMessage:alternateMessage},
+                             {data: {level: Handlebars.logger.WARN}});
         return html;
     }
 

@@ -68,16 +68,17 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         directionsFormControl = new CAC.Control.DirectionsFormControl({});
 
-        directionsControl = new CAC.Control.Directions({
+        exploreControl = new CAC.Control.Explore({
             mapControl: mapControl,
             directionsFormControl: directionsFormControl,
             tabControl: tabControl,
             urlRouter: urlRouter
         });
 
-        exploreControl = new CAC.Control.Explore({
+        directionsControl = new CAC.Control.Directions({
             mapControl: mapControl,
             directionsFormControl: directionsFormControl,
+            exploreControl: exploreControl,
             tabControl: tabControl,
             urlRouter: urlRouter
         });

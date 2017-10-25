@@ -17,7 +17,6 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var map = null;
     var currentLocationMarker = null;
-    var currentLocationMarkerHalo = null;
     var geocodeMarker = null;
     var directionsMarkers = {
         origin: null,

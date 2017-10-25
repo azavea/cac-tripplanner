@@ -171,11 +171,13 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     function getFormattedDistance(distanceMeters) {
         // less than ~0.2 miles
         if (distanceMeters < 322) {
-            return Math.round(distanceMeters * 3.28084).toString() + ' feet';
+            var feet = Math.round(distanceMeters * 3.28084).toString();
+            return feet === '1' ? feet + ' foot' : feet + ' feet';
         }
 
         // return miles
-        return (Math.round(((distanceMeters / 1000) * 0.621371) * 10) / 10).toString() + ' miles';
+        var miles = (Math.round(((distanceMeters / 1000) * 0.621371) * 10) / 10).toString();
+        return miles === '1' ? miles + ' mile' : miles + ' miles';
     }
 
     /**

@@ -37,6 +37,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     var exploreLatLng = null;
     var fetchingIsochrone = false;
 
+    var allDestinations = []; // cache full list of destinations
+
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
         mapControl = options.mapControl;
@@ -57,6 +59,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         directionsFormControl.events.on(directionsFormControl.eventNames.geocodeError,
                                         onGeocodeError);
 
+        showSpinner();
+
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             setFromUserPreferences();
             clickedExplore();
@@ -71,7 +75,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         showPlacesContent();
     }
 
-    var debouncedFetchIsochrone = _.debounce(fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
+    var fetchIsochrone = _.debounce(_fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
 
     var getNearbyPlaces = _.debounce(_getNearbyPlaces, ISOCHRONE_DEBOUNCE_MILLIS);
 
@@ -86,11 +90,12 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     return ExploreControl;
 
-    // When the explore tab is activated, do the thing. If some other tab is activated, clear the
-    // isochrone and destination markers.
+    // When the explore tab is activated, load destinations and isochrone, if origin set.
+    // If some other tab is activated, clear the isochrone and destination markers.
     function onTabShown(event, tabId) {
+        // always show spinner on tab change, to avoid stale destinations list flashing
+        showSpinner();
         if (tabId === tabControl.TABS.EXPLORE) {
-            showSpinner();
             UserPreferences.setPreference('method', 'explore');
             setFromUserPreferences();
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
@@ -162,17 +167,17 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         mapControl.isochroneControl.clearIsochrone();
 
         if (exploreLatLng) {
-            debouncedFetchIsochrone();
+            fetchIsochrone();
+        } else {
+            getNearbyPlaces();
         }
-
-        getNearbyPlaces();
     }
 
     /**
      * Load options and compose OTP params, fetch travelshed from OpenTripPlanner,
      * then populate side bar with featured locations found within the travelshed.
      */
-    function fetchIsochrone() {
+    function _fetchIsochrone() {
         showSpinner();
 
         // do not hide spinner until isochrone fetch resolves
@@ -200,9 +205,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
-            function () {
+            function (data) {
                 fetchingIsochrone = false;
-                showPlacesContent();
+                listIsochronePlaces(data);
             }, function (error) {
                 console.error(error);
                 fetchingIsochrone = false;
@@ -258,9 +263,10 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
             exploreLatLng = null;
-            // selectedPlaceId = null;
             $(options.selectors.alert).remove();
             mapControl.isochroneControl.clearIsochrone();
+            // get all places in sidebar when no origin set
+            getNearbyPlaces();
         }
     }
 
@@ -327,14 +333,86 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         }
     }
 
-    function _getNearbyPlaces() {
+    /**
+     * Helper to build and show templated place cards
+     *
+     * @param destinations {Array} Detination objects to load into template cards
+     * @Param exploreMinutes {String} String representation of integer number of travel minutes
+                                     the travelshed encompasses; -1 if not in travelshed mode
+     */
+    function displayPlaces(destinations, exploreMinutes) {
+        exploreMinutes = exploreMinutes || '-1';
+        var isTransit = UserPreferences.getPreference('mode').indexOf('TRANSIT') > -1;
+        var isMax = (exploreMinutes === $(options.selectors.isochroneSlider).prop('max'));
+
+        // alternate text string to display if there are no destinations found
+        var text = null;
+        if (!destinations || !destinations.length) {
+            if (exploreMinutes === '-1') {
+                // if not in travel mode, should fetch all destinations; should always have some
+                console.error('No destinations in the app!');
+                text = 'No featured destinations found. Please check back later';
+            } else if (!isTransit && !isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try including transit or allowing for more time.';
+            } else if (!isTransit && isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try including transit, or removing the travel time limit ' +
+                    '(click \"within\" above).';
+            } else if (isTransit && !isMax) {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try allowing for more time.';
+            } else {
+                text = 'No featured destinations within ' + exploreMinutes +
+                    ' minutes. Try removing the travel time limit (click \"within\" above).';
+            }
+        }
+
+        var newPlaces = HomeTemplates.destinations(destinations, text);
+        $(options.selectors.placesContent).html(newPlaces);
+
+        // also draw all destinations on explore map (not just those in the isochrone)
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+            if (allDestinations.length > 0) {
+                mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+            } else {
+                // if destinations not cached already, go fetch them
+                getAllPlaces().then(function(fullDestinationsList) {
+                    allDestinations = fullDestinationsList;
+                    mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+                }).fail(function(error) {
+                    console.error('error fetching destinations to map:');
+                    console.error(error);
+                    allDestinations = [];
+                });
+            }
+        }
+
+        showPlacesContent();
+
+        // now places list has been updated, go fetch the travel time
+        // from the new origin to each place
+        getTimesToPlaces();
+    }
+
+    // Given desintations from the FindReachableDestinations app endpoint,
+    // display the returned list of places within the travelshed in the sidebar cards.
+    function listIsochronePlaces(destinations) {
         showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
+        displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
+    }
 
+    /**
+     * Query Django app for all destinations. If origin set, will order by distance.
+     *
+     * @return {promise} Promise which resolves to list of destinations
+     */
+    function getAllPlaces() {
+        var dfd = $.Deferred();
         var searchUrl = '/api/destinations/search';
-
         var params = {
             url: searchUrl,
             type: 'GET'
@@ -355,28 +433,37 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             if (!data || !data.destinations) {
                 console.error('no places found');
                 console.error(data);
-                showPlacesContent();
-                return;
+                dfd.resolve([]);
+            } else {
+                dfd.resolve(data.destinations);
             }
-
-            var newPlaces = HomeTemplates.destinations(data.destinations);
-            $(options.selectors.placesContent).html(newPlaces);
-
-            // also draw on explore map
-            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-                mapControl.isochroneControl.drawDestinations(data.destinations);
-            }
-
-            showPlacesContent();
-
-            // now places list has been updated, go fetch the travel time
-            // from the new origin to each place
-            getTimesToPlaces();
-
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
+            dfd.reject();
+        });
+        return dfd.promise();
+    }
 
+    function _getNearbyPlaces() {
+        showSpinner();
+        var $placeCards = $(options.selectors.placeCard);
+        // hide existing times to places now showing (if any)
+        $placeCards.addClass(options.selectors.noOriginClass);
+
+        // use cached results
+        if (allDestinations.length > 0) {
+            displayPlaces(allDestinations, '-1');
+            return;
+        }
+
+        getAllPlaces().then(function(destinations) {
+            allDestinations = destinations;
+            displayPlaces(destinations, '-1');
+        }).fail(function(error) {
+            console.error('error fetching destinations:');
+            console.error(error);
+            allDestinations = [];
             showPlacesContent();
         });
     }
@@ -421,6 +508,9 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
                         .text(originLabel);
                     $card.removeClass(options.selectors.noOriginClass);
                 }
+            }).fail(function(error) {
+                console.error('error finding travel time to a place');
+                console.error(error);
             });
         });
     }
