@@ -253,6 +253,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     function onDirectionsBackClicked() {
+        // show directions list again
+        showPlaces(false);
         // show the other itineraries again
         itineraryListControl.showItineraries(true);
         currentItinerary.highlight(true);
@@ -265,6 +267,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
      * Handles click events to select a given itinerary
      */
     function onItineraryClicked(event, itinerary) {
+        // hide both the directions list and the places list
+        $(options.selectors.directions).hide();
+        $(options.selectors.places).hide();
         if (itinerary) {
             // hide all other itineraries
             itineraryListControl.showItineraries(false);
@@ -320,6 +325,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
      */
     function queryWithWaypoints(event, points) {
         UserPreferences.setPreference('waypoints', points.waypoints);
+        showPlaces(false);
         planTrip();
     }
 
