@@ -16,7 +16,7 @@
   # Putting 'editable: false' in the entry in cac_python_dependencies should make it install
   # non-editable, but it's getting ignored
 - name: Install django-wpadmin manually to work around ansible bug
-  command: pip install 'git+https://github.com/flibbertigibbet/django-wpadmin@feature/django-1-9#egg=django-wpadmin'
+  command: pip install --upgrade 'git+https://github.com/flibbertigibbet/django-wpadmin@feature/django-1-9#egg=django-wpadmin'
   # FIXME: remove
   #command: pip install 'git+https://github.com/azavea/django-wpadmin@v1.8.13#egg=django-wpadmin'
 
