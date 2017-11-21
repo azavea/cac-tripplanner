@@ -4,13 +4,13 @@
     "node": ">=0.12.0"
   },
   "dependencies": {
-    "@turf/point-on-line": "~5.0.3"
+    "@turf/nearest-point-on-line": "~5.0.4"
   },
   "devDependencies": {
     "aliasify": "^2.0.0",
-    "apache-server-configs": "~2.14.0",
+    "apache-server-configs": "~2.15.0",
     "bower": "~1.8.2",
-    "browserify": "~14.4.0",
+    "browserify": "~14.5.0",
     "chai": "~4.1.2",
     "connect": "~3.6.5",
     "connect-livereload": "~0.6.0",
@@ -18,14 +18,14 @@
     "gulp": "~3.9.1",
     "gulp-add-src": "~0.2.0",
     "gulp-autoprefixer": "~4.0.0",
-    "gulp-cache": "~0.4.5",
+    "gulp-cache": "~1.0.1",
     "gulp-concat": "~2.6.1",
     "gulp-csso": "~3.0.0",
     "gulp-debug": "~3.1.0",
     "gulp-filter": "~5.0.1",
     "gulp-flatten": "~0.3.1",
     "gulp-if": "~2.0.2",
-    "gulp-imagemin": "~3.4.0",
+    "gulp-imagemin": "~4.0.0",
     "gulp-jshint": "~2.0.4",
     "gulp-jshint-xml-file-reporter": "~0.5.1",
     "gulp-load-plugins": "~1.5.0",
@@ -54,7 +54,7 @@
     "merge-stream": "~1.0.0",
     "mocha": "~4.0.1",
     "opn": "~5.1.0",
-    "phantomjs-prebuilt": "^2.1.15",
+    "phantomjs-prebuilt": "^2.1.16",
     "pump": "~1.0.2",
     "requirejs": "~2.3.5",
     "serve-index": "~1.9.1",
