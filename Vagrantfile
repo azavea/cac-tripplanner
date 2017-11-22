@@ -4,11 +4,28 @@
 Vagrant.require_version ">= 1.5"
 require "yaml"
 
+CAC_SHARED_FOLDER_TYPE = ENV.fetch("CAC_SHARED_FOLDER_TYPE", "nfs")
+CAC_NFS_VERSION =  ENV.fetch("CAC_NFS_VERSION_3", true) ? 'vers=3': 'vers=4'
+
+if CAC_SHARED_FOLDER_TYPE == "nfs"
+  if Vagrant::Util::Platform.linux? then
+    CAC_MOUNT_OPTIONS = ['rw', CAC_NFS_VERSION, 'tcp', 'nolock']
+  else
+    CAC_MOUNT_OPTIONS = [CAC_NFS_VERSION, 'udp']
+  end
+else
+  if ENV.has_key?("CAC_MOUNT_OPTIONS")
+    CAC_MOUNT_OPTIONS = ENV.fetch("CAC_MOUNT_OPTIONS").split
+  else
+    CAC_MOUNT_OPTIONS = ["rw"]
+  end
+end
+
 if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
   # OpenTripPlanner needs > 1GB to build and run
-  OTP_MEMORY_MB = "4096"
+  CAC_MEMORY_MB = "4096"
 else
-  OTP_MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
+  CAC_MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
 end
 
 if ENV['CAC_TRIPPLANNER_CPU'].nil?
@@ -118,11 +135,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if testing?
         app.vm.synced_folder ".", "/opt/app"
     else
-        app.vm.synced_folder ".", "/opt/app", :nfs => true, :mount_options => [
-            ("nfsvers=3" if ENV.fetch("CAC_NFS_VERSION_3", false)),
-            "noatime",
-            "actimeo=1",
-        ]
+      app.vm.synced_folder ".", "/opt/app", type: CAC_SHARED_FOLDER_TYPE, mount_options: CAC_MOUNT_OPTIONS
     end
 
     # Web
@@ -170,7 +183,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     otp.vm.provider :virtualbox do |v|
-      v.memory = OTP_MEMORY_MB
+      v.memory = CAC_MEMORY_MB
       v.cpus = CPUS
     end
   end
