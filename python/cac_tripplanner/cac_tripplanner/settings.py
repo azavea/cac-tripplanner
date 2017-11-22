@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
+import django
 
 from boto.utils import get_instance_metadata
 from django.core.exceptions import ImproperlyConfigured
@@ -223,12 +224,20 @@ LOGGING = {
 }
 
 # TEMPLATE CONFIGURATION
-# See https://docs.djangoproject.com/en/1.8/ref/settings/#templates
+# See https://docs.djangoproject.com/en/1.11/ref/settings/#templates
+
+# set renderer
+# https://docs.djangoproject.com/en/1.11/ref/forms/renderers/#django.forms.renderers.TemplatesSetting
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.normpath(os.path.join(BASE_DIR, 'templates')),
+            'django/forms/templates',
+            'templates',
+            os.path.normpath(os.path.join(django.__path__[0] + '/forms/templates'))
         ],
         'APP_DIRS': True,
         'OPTIONS': {
