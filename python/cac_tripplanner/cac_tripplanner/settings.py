@@ -259,9 +259,6 @@ TEMPLATES = [
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
 
-# TODO: delete later.
-CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
-
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': [
