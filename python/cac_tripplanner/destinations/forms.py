@@ -1,3 +1,4 @@
+from django.contrib.admin import widgets
 from django.forms import ModelForm, ValidationError
 
 from .models import Destination, Event
@@ -6,6 +7,7 @@ from cac_tripplanner.image_utils import validate_image
 
 class DestinationForm(ModelForm):
     """Validate image dimensions"""
+
     class Meta:
         model = Destination
         exclude = []
@@ -20,10 +22,20 @@ class DestinationForm(ModelForm):
 
 
 class EventForm(DestinationForm):
-    """Validate image dimensions"""
+    """Admin form for editing events
+
+    Subclasses destination form for image validation.
+    """
+
     class Meta:
         model = Event
         exclude = []
+
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['destination'].widget.can_delete_related = False
+        self.fields['destination'].widget.can_add_related = False
+        self.fields['destination'].widget.can_change_related = False
 
     def clean(self):
         """Validate start date is less than end date"""
