@@ -144,6 +144,7 @@ def set_destination_properties(destination):
         'Region': obj['state'],
         'StAddr': obj['address']
     }
+    obj['categories'] = [c.name for c in obj['categories']]
     return obj
 
 
