@@ -78,17 +78,6 @@
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
   notify: Restart nginx
 
-- name: Touch cron job log file if it does not exist
-  copy: content="" dest="{{ app_cron_event_feed_log }}" force=no
-
-- name: Touch cron job log file if it does not exist, and set permissions
-  file: path={{ app_cron_event_feed_log}} state=touch
-        owner={{ app_username }} group={{ app_username }} mode=0664
-
-# TODO: Add logic in production to only run on a single webserver
-- name: Add cron job for RSS events feed
-  cron: name="Load event feed" minute="45" user="{{ app_username }}" job="{{ app_cron_event_feed }}"
-
 - { include: jslibs.yml }
 
 - { include: dev-test-dependencies.yml, when: develop or test }
