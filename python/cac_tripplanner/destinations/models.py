@@ -27,6 +27,18 @@ class EventManager(DestinationManager):
         return self.get_queryset().filter(start_date__gt=now())
 
 
+class DestinationCategory(models.Model):
+    """Categories for filtering destinations"""
+
+    class Meta:
+        ordering = ['name', ]
+
+    name = models.CharField(max_length=50, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Destination(models.Model):
     """Represents a destination"""
 
@@ -51,6 +63,7 @@ class Destination(models.Model):
                                    help_text='The large image. Will be displayed at 680x400.')
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
+    categories = models.ManyToManyField('DestinationCategory')
 
     objects = DestinationManager()
 
