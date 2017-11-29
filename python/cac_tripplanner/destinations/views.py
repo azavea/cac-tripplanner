@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
-from .models import Destination, FeedEvent
+from .models import Destination
 from cms.models import Article
 
 
@@ -64,16 +64,6 @@ def explore(request):
     """
     context = {'tab': 'map-explore'}
     return base_view(request, 'home.html', context=context)
-
-
-def directions(request):
-    """
-    The directions view
-
-    :param request: Request object
-    :returns: A rendered response
-    """
-    return base_view(request, 'directions.html', {})
 
 
 def manifest(request):
@@ -268,32 +258,4 @@ class SearchDestinations(View):
         data = [set_destination_properties(x) for x in results]
 
         response = {'destinations': data}
-        return HttpResponse(json.dumps(response), 'application/json')
-
-
-class FeedEvents(View):
-    """ API endpoint for the FeedEvent model """
-
-    def get(self, request, *args, **kwargs):
-        """ GET 20 most recent feed events that are published
-
-        TODO: Additional filtering
-        """
-        utc = timezone('UTC')
-        epoch = utc.localize(datetime(1970, 1, 1))
-
-        try:
-            limit = int(request.GET.get('limit'))
-        except (ValueError, TypeError):
-            limit = settings.HOMEPAGE_RESULTS_LIMIT
-
-        results = FeedEvent.objects.published().order_by('end_date')[:limit]
-        response = [model_to_dict(x) for x in results]
-        for obj in response:
-            pnt = obj['point']
-            obj['point'] = json.loads(pnt.json)
-            dt = obj['publication_date']
-            obj['publication_date'] = (dt - epoch).total_seconds()
-            dt = obj['end_date']
-            obj['end_date'] = (dt - epoch).total_seconds()
         return HttpResponse(json.dumps(response), 'application/json')
