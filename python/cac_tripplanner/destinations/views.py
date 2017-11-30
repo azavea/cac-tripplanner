@@ -216,7 +216,8 @@ class SearchDestinations(View):
           - lat + lon params
           - text param
         Optional:
-          - limit param
+          - limit param: maximum number of results to return (integer)
+          - categories param: comma-separated list of destination category names to filter to
 
         A search via text will return destinations that match the destination name
         A search via lat/lon will return destinations that are closest to the search point
@@ -227,6 +228,7 @@ class SearchDestinations(View):
         lon = params.get('lon', None)
         text = params.get('text', None)
         limit = params.get('limit', None)
+        categories = params.get('categories', None)
 
         results = []
         if lat and lon:
@@ -243,6 +245,10 @@ class SearchDestinations(View):
                        .order_by('distance', 'priority'))
         elif text is not None:
             results = Destination.objects.filter(published=True, name__icontains=text)
+
+        if categories:
+            results = results.filter(categories__name__in=categories.split(','))
+
         if limit:
             try:
                 limit_int = int(limit)
