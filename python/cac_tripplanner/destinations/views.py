@@ -176,7 +176,9 @@ class FindReachableDestinations(View):
 
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
-        Return both the isochrone GeoJSON and the list of matched destinations."""
+        Return both the isochrone GeoJSON and the list of matched destinations.
+
+        Can send optional comma-separated `categories` param to filter by destination category."""
         params = request.GET.copy()  # make mutable
 
         # allow a max travelshed size of 60 minutes in a query
@@ -198,6 +200,10 @@ class FindReachableDestinations(View):
                                                       .order_by('distance'))
         else:
             matched_objects = []
+
+        categories = params.get('categories', None)
+        if categories:
+            matched_objects = matched_objects.filter(categories__name__in=categories.split(','))
 
         # make locations JSON serializable
         matched_objects = [set_destination_properties(x) for x in matched_objects]
