@@ -27,6 +27,18 @@ class EventManager(DestinationManager):
         return self.get_queryset().filter(start_date__gt=now())
 
 
+class DestinationCategory(models.Model):
+    """Categories for filtering destinations"""
+
+    class Meta:
+        ordering = ['name', ]
+
+    name = models.CharField(max_length=50, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Destination(models.Model):
     """Represents a destination"""
 
@@ -51,6 +63,7 @@ class Destination(models.Model):
                                    help_text='The large image. Will be displayed at 680x400.')
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
+    categories = models.ManyToManyField('DestinationCategory')
 
     objects = DestinationManager()
 
@@ -82,42 +95,3 @@ class Event(models.Model):
 
     def __unicode__(self):
         return self.name
-
-
-class FeedEventManager(models.GeoManager):
-    """Custom manager for FeedEvents allows filtering on publication_date"""
-
-    def published(self):
-        return self.get_queryset().filter(publication_date__lt=now()).filter(end_date__gt=now())
-
-    def get_queryset(self):
-        return super(FeedEventManager, self).get_queryset()
-
-
-class FeedEvent(models.Model):
-    """ Model for RSS Feed Events, currently served by Uwishunu """
-
-    guid = models.CharField(unique=True, max_length=64)
-    title = models.CharField(max_length=512, null=True)
-    link = models.CharField(max_length=512, null=True)
-    image_url = models.URLField(blank=True, null=True)
-    author = models.CharField(max_length=64, null=True)
-    publication_date = models.DateTimeField()
-    end_date = models.DateTimeField(default=now)
-    categories = models.CharField(max_length=512, null=True)
-    description = models.CharField(max_length=512, null=True)
-    content = RichTextField(blank=True, null=True)
-    point = models.PointField()
-
-    @property
-    def published(self):
-        """Helper property to easily determine if an article is published"""
-        if self.publication_date and self.end_date:
-            return self.publication_date < now() and self.end_date > now()
-        else:
-            return False
-
-    def __unicode__(self):
-        return self.title
-
-    objects = FeedEventManager()
