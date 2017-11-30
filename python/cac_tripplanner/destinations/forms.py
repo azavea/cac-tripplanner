@@ -1,4 +1,3 @@
-from django.contrib.admin import widgets
 from django.forms import ModelForm, ValidationError
 
 from .models import Destination, Event
