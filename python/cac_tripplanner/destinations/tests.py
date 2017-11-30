@@ -6,7 +6,43 @@ from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
 from django.utils.timezone import now
 
-from destinations.models import Destination, FeedEvent
+from destinations.models import Destination, Event, FeedEvent
+
+
+class EventTests(TestCase):
+    def setUp(self):
+        # Clear DB of objects created by migrations
+        Event.objects.all().delete()
+
+        test_image = File(open('default_media/square/BartramsGarden.jpg'))
+
+        self.now = now()
+
+        common_args = dict(
+            description='Sample event for tests',
+            image=test_image,
+            wide_image=test_image
+        )
+
+        self.client = Client()
+
+        self.event_1 = Event.objects.create(name='Current Event',
+                                            published=True,
+                                            start_date=self.now,
+                                            end_date=self.now + timedelta(days=1),
+                                            **common_args)
+
+        self.event_2 = Event.objects.create(name='Unpublished Past Event',
+                                            published=False,
+                                            start_date=self.now - timedelta(days=7),
+                                            end_date=self.now - timedelta(days=2),
+                                            **common_args)
+
+    def test_event_manager_published(self):
+        self.assertEqual(Event.objects.published().count(), 1)
+
+    def test_event_manager_current(self):
+        self.assertEqual(Event.objects.current().count(), 1)
 
 
 class DestinationTests(TestCase):
