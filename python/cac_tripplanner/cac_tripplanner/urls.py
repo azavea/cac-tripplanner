@@ -21,11 +21,7 @@ urlpatterns = [
     # Map
     url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
         name='api_destinations_search'),
-    url(r'^api/feedevents$', dest_views.FeedEvents.as_view(), name='api_feedevents'),
     url(r'^map/reachable$', dest_views.FindReachableDestinations.as_view(), name='reachable'),
-
-    # print directions view. TODO: update or delete
-    # url(r'^directions/', dest_views.directions, name='directions'),
 
     # Handle pre-redesign URLs by redirecting
     url(r'^(?:map/)?directions/', RedirectView.as_view(pattern_name='home', query_string=True,
