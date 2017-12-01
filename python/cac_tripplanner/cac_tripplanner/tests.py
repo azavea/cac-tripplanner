@@ -30,7 +30,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
             address='123 Test ln.',
             city='Gotham',
             state='Euphoria',
-            zip='12345',
+            zipcode='12345',
             published=True
         )
         Destination.objects.create(
@@ -40,7 +40,7 @@ class CACTripPlannerIsochroneTestCase(TestCase):
             address='123 Test ln.',
             city='Thangorodrim',
             state='Angband',
-            zip='12349',
+            zipcode='12349',
             published=True
         )
 

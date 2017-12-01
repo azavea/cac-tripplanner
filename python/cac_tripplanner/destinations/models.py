@@ -65,7 +65,7 @@ class Destination(Attraction):
 
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
-    zip = models.CharField(max_length=5, null=True)
+    zipcode = models.CharField(max_length=5, null=True)
 
     # In the admin interface, display the address right above the map, since it triggers geocoding
     address = models.CharField(max_length=40, null=True,
