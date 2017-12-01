@@ -39,6 +39,18 @@ class DestinationCategory(models.Model):
         return self.name
 
 
+class Activity(models.Model):
+    """Possible things to do at an Attraction"""
+
+    class Meta:
+        ordering = ['name', ]
+
+    name = models.CharField(max_length=50, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Attraction(models.Model):
     """Shared properties of destinations and events"""
 
@@ -55,6 +67,7 @@ class Attraction(models.Model):
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
+    activities = models.ManyToManyField('Activity')
 
 
 class Destination(Attraction):
