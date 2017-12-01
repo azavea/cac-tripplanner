@@ -86,6 +86,10 @@ class Destination(Attraction):
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
     categories = models.ManyToManyField('DestinationCategory')
+    watershed_alliance = models.BooleanField(default=False, help_text="""
+        Does this location belong to the <a target="_blank"
+        href="https://www.watershedalliance.org/centers/">
+        Alliance for Watershed Education</a>?""")
 
     objects = DestinationManager()
 
