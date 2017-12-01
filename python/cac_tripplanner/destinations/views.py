@@ -143,6 +143,7 @@ def set_destination_properties(destination):
         'StAddr': obj['address']
     }
     obj['categories'] = [c.name for c in obj['categories']]
+    obj['activities'] = [a.name for a in obj['activities']]
     return obj
 
 
