@@ -39,15 +39,30 @@ class DestinationCategory(models.Model):
         return self.name
 
 
-class Destination(models.Model):
+class Attraction(models.Model):
+    """Shared properties of destinations and events"""
+
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=50)
+    website_url = models.URLField(blank=True, null=True)
+    description = RichTextField()
+    image = models.ImageField(upload_to=generate_filename, null=True,
+                              help_text='The small image. Will be displayed at 310x155.')
+    wide_image = models.ImageField(upload_to=generate_filename, null=True,
+                                   help_text='The large image. Will be displayed at 680x400.')
+    published = models.BooleanField(default=False)
+    priority = models.IntegerField(default=9999, null=False)
+    accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
+
+
+class Destination(Attraction):
     """Represents a destination"""
 
     class Meta:
         ordering = ['priority', '?']
 
-    name = models.CharField(max_length=50)
-    website_url = models.URLField(blank=True, null=True)
-    description = RichTextField()
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
     zip = models.CharField(max_length=5, null=True)
@@ -57,12 +72,6 @@ class Destination(models.Model):
                                help_text=('The map automatically updates as the address is typed, '
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
-    image = models.ImageField(upload_to=generate_filename, null=True,
-                              help_text='The small image. Will be displayed at 310x155.')
-    wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The large image. Will be displayed at 680x400.')
-    published = models.BooleanField(default=False)
-    priority = models.IntegerField(default=9999, null=False)
     categories = models.ManyToManyField('DestinationCategory')
 
     objects = DestinationManager()
@@ -70,26 +79,16 @@ class Destination(models.Model):
     def __unicode__(self):
         return self.name
 
-class Event(models.Model):
+class Event(Attraction):
     """Represents an event, which has a start and end date"""
 
     class Meta:
         ordering = ['priority', '-start_date']
 
-    name = models.CharField(max_length=50)
-    website_url = models.URLField(blank=True, null=True)
-    description = RichTextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
     destination = models.ForeignKey('Destination', on_delete=models.SET_NULL, null=True, blank=True)
-
-    image = models.ImageField(upload_to=generate_filename, null=True,
-                              help_text='The small image. Will be displayed at 310x155.')
-    wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The large image. Will be displayed at 680x400.')
-    published = models.BooleanField(default=False)
-    priority = models.IntegerField(default=9999, null=False)
 
     objects = EventManager()
 
