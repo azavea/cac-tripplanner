@@ -64,6 +64,7 @@ class Destination(models.Model):
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     categories = models.ManyToManyField('DestinationCategory')
+    accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
 
     objects = DestinationManager()
 
@@ -90,6 +91,7 @@ class Event(models.Model):
                                    help_text='The large image. Will be displayed at 680x400.')
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
+    accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
 
     objects = EventManager()
 
