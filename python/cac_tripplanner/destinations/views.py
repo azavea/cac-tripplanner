@@ -138,11 +138,12 @@ def set_destination_properties(destination):
     obj['location'] = {'x': x, 'y': y}
     obj['attributes'] = {
         'City': obj['city'],
-        'Postal': obj['zip'],
+        'Postal': obj['zipcode'],
         'Region': obj['state'],
         'StAddr': obj['address']
     }
     obj['categories'] = [c.name for c in obj['categories']]
+    obj['activities'] = [a.name for a in obj['activities']]
     return obj
 
 

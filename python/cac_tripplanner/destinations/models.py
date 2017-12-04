@@ -39,6 +39,18 @@ class DestinationCategory(models.Model):
         return self.name
 
 
+class Activity(models.Model):
+    """Possible things to do at an Attraction"""
+
+    class Meta:
+        ordering = ['name', ]
+
+    name = models.CharField(max_length=50, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Attraction(models.Model):
     """Shared properties of destinations and events"""
 
@@ -55,6 +67,7 @@ class Attraction(models.Model):
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
+    activities = models.ManyToManyField('Activity')
 
 
 class Destination(Attraction):
@@ -65,7 +78,7 @@ class Destination(Attraction):
 
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
-    zip = models.CharField(max_length=5, null=True)
+    zipcode = models.CharField(max_length=5, null=True)
 
     # In the admin interface, display the address right above the map, since it triggers geocoding
     address = models.CharField(max_length=40, null=True,
@@ -73,6 +86,10 @@ class Destination(Attraction):
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
     categories = models.ManyToManyField('DestinationCategory')
+    watershed_alliance = models.BooleanField(default=False, help_text="""
+        Does this location belong to the <a target="_blank"
+        href="https://www.watershedalliance.org/centers/">
+        Alliance for Watershed Education</a>?""")
 
     objects = DestinationManager()
 

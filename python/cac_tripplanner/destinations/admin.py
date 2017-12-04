@@ -8,7 +8,7 @@ from .models import Destination, Event
 class DestinationAdmin(gis.admin.OSMGeoAdmin):
     form = DestinationForm
 
-    list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zip')
+    list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
 

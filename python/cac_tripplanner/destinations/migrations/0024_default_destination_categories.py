@@ -83,7 +83,6 @@ def add_sample_categories(apps, schema_editor):
             category = DestinationCategory.objects.get(name=add_category)
             if category:
                 destination.categories.add(category)
-        destination.save()
 
 
 def delete_sample_categories(apps, schema_editor):
