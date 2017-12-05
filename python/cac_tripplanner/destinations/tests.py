@@ -6,7 +6,43 @@ from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
 from django.utils.timezone import now
 
-from destinations.models import Destination, FeedEvent
+from destinations.models import Destination, Event
+
+
+class EventTests(TestCase):
+    def setUp(self):
+        # Clear DB of objects created by migrations
+        Event.objects.all().delete()
+
+        test_image = File(open('default_media/square/BartramsGarden.jpg'))
+
+        self.now = now()
+
+        common_args = dict(
+            description='Sample event for tests',
+            image=test_image,
+            wide_image=test_image
+        )
+
+        self.client = Client()
+
+        self.event_1 = Event.objects.create(name='Current Event',
+                                            published=True,
+                                            start_date=self.now,
+                                            end_date=self.now + timedelta(days=1),
+                                            **common_args)
+
+        self.event_2 = Event.objects.create(name='Unpublished Past Event',
+                                            published=False,
+                                            start_date=self.now - timedelta(days=7),
+                                            end_date=self.now - timedelta(days=2),
+                                            **common_args)
+
+    def test_event_manager_published(self):
+        self.assertEqual(Event.objects.published().count(), 1)
+
+    def test_event_manager_current(self):
+        self.assertEqual(Event.objects.current().count(), 1)
 
 
 class DestinationTests(TestCase):
@@ -55,52 +91,3 @@ class DestinationTests(TestCase):
                       kwargs={'pk': self.place_3.pk})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
-
-
-class FeedEventTests(TestCase):
-
-    def setUp(self):
-        common_args = {
-            'point': Point(0, 0),
-            'title': 'Test article',
-            'content': 'Test content',
-            'description': 'Test description',
-            'link': 'http://uwishunu.com',
-            'author': 'John Smith',
-            'categories': 'Events'
-        }
-        past_published = now() - timedelta(hours=1)
-        future_published = now() + timedelta(hours=1)
-
-        self.pub_future_end_past = FeedEvent.objects.create(
-            guid='1',
-            publication_date=future_published,
-            end_date=past_published,
-            **common_args)
-        self.pub_past_end_future = FeedEvent.objects.create(
-            guid='2',
-            publication_date=past_published,
-            end_date=future_published,
-            **common_args)
-        self.pub_future_end_future = FeedEvent.objects.create(
-            guid='3',
-            publication_date=future_published,
-            end_date=future_published,
-            **common_args)
-        self.pub_past_end_past = FeedEvent.objects.create(
-            guid='4',
-            publication_date=past_published,
-            end_date=past_published,
-            **common_args)
-
-    def test_feed_event_manager(self):
-
-        published_count = FeedEvent.objects.published().count()
-        self.assertEqual(published_count, 1)
-
-    def test_published_property(self):
-        """ Only events that have published < now and end_date > now should be valid """
-        self.assertFalse(self.pub_future_end_past.published)
-        self.assertTrue(self.pub_past_end_future.published)
-        self.assertFalse(self.pub_future_end_future.published)
-        self.assertFalse(self.pub_past_end_past.published)

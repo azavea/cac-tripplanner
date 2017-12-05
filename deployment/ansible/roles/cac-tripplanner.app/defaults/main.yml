@@ -9,7 +9,6 @@ production: False
 app_sass_version: "3.4.22"
 
 app_log: "/var/log/cac-tripplanner-app.log"
-app_cron_event_feed_log: "/var/log/event-feed.log"
 
 root_app_dir: "/opt/app/python/cac_tripplanner"
 root_conf_dir: "/etc/cac_tripplanner.d"
@@ -17,19 +16,17 @@ root_src_dir: "/opt/app/src"
 root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
 
-app_cron_event_feed: "cd {{ root_app_dir }} && python manage.py load_events >> {{ app_cron_event_feed_log }} 2>&1"
-
 cac_python_dependencies:
     - { name: 'base58', version: '0.2.5' }
     - { name: 'boto', version: '2.48.0' }
-    - { name: 'django', version: '1.8.18' }
-    - { name: 'django-ckeditor', version: '5.3.0' }
-    - { name: 'django-extensions', version: '1.9.1' }
+    - { name: 'django', version: '1.11.7' }
+    - { name: 'django-ckeditor', version: '5.3.1' }
+    - { name: 'django-extensions', version: '1.9.7' }
     - { name: 'django-storages', version: '1.6.5' }
     - { name: 'gunicorn', version: '19.7.1' }
     - { name: 'pillow', version: '4.3.0' }
     - { name: 'psycopg2', version: '2.7.3' }
-    - { name: 'pytz', version: '2017.2' }
+    - { name: 'pytz', version: '2017.3' }
     - { name: 'pyyaml', version: '3.12' }
     - { name: 'troposphere', version: '0.7.2'}
     # Note: django-wpadmin is installed manually to work around the fact that ansible-pip

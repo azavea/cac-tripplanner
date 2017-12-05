@@ -98,7 +98,7 @@ var buildTurfHelpers = function() {
 };
 
 var buildTurfPointOnLine = function() {
-    return browserify(turfRoot + 'point-on-line', {
+    return browserify(turfRoot + 'nearest-point-on-line', {
             standalone: 'turf.pointOnLine',
             exclude: [turfRoot + 'helpers']
         })

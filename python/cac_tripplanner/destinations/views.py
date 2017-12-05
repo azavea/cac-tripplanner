@@ -1,5 +1,3 @@
-from datetime import datetime
-from pytz import timezone
 import json
 import requests
 
@@ -10,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
-from .models import Destination, FeedEvent
+from .models import Destination
 from cms.models import Article
 
 
@@ -64,16 +62,6 @@ def explore(request):
     """
     context = {'tab': 'map-explore'}
     return base_view(request, 'home.html', context=context)
-
-
-def directions(request):
-    """
-    The directions view
-
-    :param request: Request object
-    :returns: A rendered response
-    """
-    return base_view(request, 'directions.html', {})
 
 
 def manifest(request):
@@ -150,10 +138,12 @@ def set_destination_properties(destination):
     obj['location'] = {'x': x, 'y': y}
     obj['attributes'] = {
         'City': obj['city'],
-        'Postal': obj['zip'],
+        'Postal': obj['zipcode'],
         'Region': obj['state'],
         'StAddr': obj['address']
     }
+    obj['categories'] = [c.name for c in obj['categories']]
+    obj['activities'] = [a.name for a in obj['activities']]
     return obj
 
 
@@ -187,7 +177,9 @@ class FindReachableDestinations(View):
 
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
-        Return both the isochrone GeoJSON and the list of matched destinations."""
+        Return both the isochrone GeoJSON and the list of matched destinations.
+
+        Can send optional comma-separated `categories` param to filter by destination category."""
         params = request.GET.copy()  # make mutable
 
         # allow a max travelshed size of 60 minutes in a query
@@ -210,6 +202,10 @@ class FindReachableDestinations(View):
         else:
             matched_objects = []
 
+        categories = params.get('categories', None)
+        if categories:
+            matched_objects = matched_objects.filter(categories__name__in=categories.split(','))
+
         # make locations JSON serializable
         matched_objects = [set_destination_properties(x) for x in matched_objects]
 
@@ -227,7 +223,8 @@ class SearchDestinations(View):
           - lat + lon params
           - text param
         Optional:
-          - limit param
+          - limit param: maximum number of results to return (integer)
+          - categories param: comma-separated list of destination category names to filter to
 
         A search via text will return destinations that match the destination name
         A search via lat/lon will return destinations that are closest to the search point
@@ -238,6 +235,7 @@ class SearchDestinations(View):
         lon = params.get('lon', None)
         text = params.get('text', None)
         limit = params.get('limit', None)
+        categories = params.get('categories', None)
 
         results = []
         if lat and lon:
@@ -254,6 +252,10 @@ class SearchDestinations(View):
                        .order_by('distance', 'priority'))
         elif text is not None:
             results = Destination.objects.filter(published=True, name__icontains=text)
+
+        if categories:
+            results = results.filter(categories__name__in=categories.split(','))
+
         if limit:
             try:
                 limit_int = int(limit)
@@ -268,32 +270,4 @@ class SearchDestinations(View):
         data = [set_destination_properties(x) for x in results]
 
         response = {'destinations': data}
-        return HttpResponse(json.dumps(response), 'application/json')
-
-
-class FeedEvents(View):
-    """ API endpoint for the FeedEvent model """
-
-    def get(self, request, *args, **kwargs):
-        """ GET 20 most recent feed events that are published
-
-        TODO: Additional filtering
-        """
-        utc = timezone('UTC')
-        epoch = utc.localize(datetime(1970, 1, 1))
-
-        try:
-            limit = int(request.GET.get('limit'))
-        except (ValueError, TypeError):
-            limit = settings.HOMEPAGE_RESULTS_LIMIT
-
-        results = FeedEvent.objects.published().order_by('end_date')[:limit]
-        response = [model_to_dict(x) for x in results]
-        for obj in response:
-            pnt = obj['point']
-            obj['point'] = json.loads(pnt.json)
-            dt = obj['publication_date']
-            obj['publication_date'] = (dt - epoch).total_seconds()
-            dt = obj['end_date']
-            obj['end_date'] = (dt - epoch).total_seconds()
         return HttpResponse(json.dumps(response), 'application/json')
