@@ -80,7 +80,7 @@ class Article(models.Model):
     title = models.CharField(max_length=80)
     slug = models.SlugField()
     author = models.ForeignKey(User)
-    teaser = RichTextField()  # above the fold
+    teaser = RichTextField(config_name='teaser')  # above the fold
     content = RichTextField(null=True, blank=True)  # below the fold
     publish_date = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
