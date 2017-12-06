@@ -64,7 +64,6 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             isMobile: $(window).width() < XXS_BREAKPOINT
         });
 
-        filterOptionsControl = new FilterOptions();
         modeOptionsControl = new ModeOptions();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
@@ -89,6 +88,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
         _setupEvents();
+        _setupFilterControl();
         setupServiceWorker();
     };
 
@@ -115,14 +115,16 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
         tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
 
-        filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
-
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
         directionsFormControl.events.on(directionsFormControl.eventNames.selected,
                                         $.proxy(onTypeaheadSelected, this));
 
         urlRouter.events.on(urlRouter.eventNames.changed, onUrlChanged);
+
+        // re-initialize filter control after templated HTML rewritten
+        exploreControl.events.on(exploreControl.eventNames.destinationsLoaded,
+                                 _setupFilterControl);
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -234,6 +236,14 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         $(document).ready(setActiveTab);
     }
 
+    // Destinations filter is templated with the destinations list, so must be
+    // re-initialized after destinations list changes. Initialize it with this method.
+    function _setupFilterControl() {
+        filterOptionsControl = new FilterOptions();
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
+        filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
+    }
+
     // Sets the active tab based on the 'method' user preference. The controllers listen for the
     // resulting "tab shown" event and do their thing if they're being activated (or hidden).
     function setActiveTab() {
@@ -286,8 +296,8 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
      * Updates destination filter when filter bar button toggled.
      */
      function toggledFilter(event, filter) {
-        console.log(filter);
-        // TODO: lots
+        UserPreferences.setPreference('destinationFilter', filter);
+        exploreControl.getNearbyPlaces(filter);
      }
 
     /**
@@ -323,6 +333,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
+        _setupFilterControl();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
@@ -343,7 +354,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         // requery for place list once origin field cleared
-        exploreControl.getNearbyPlaces();
+        exploreControl.getNearbyPlaces(UserPreferences.getPreference('destinationFilter'));
     }
 
     function onPlaceClicked(event) {

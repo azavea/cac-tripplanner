@@ -2,7 +2,7 @@ CAC.Control.FilterOptions = (function ($) {
     'use strict';
 
     var defaults = {
-        defaultFilter: 'all',
+        defaultFilter: 'All',
         selectors: {
             // filter related selectors
             filterToggle: '.filter-toggle',
@@ -72,26 +72,25 @@ CAC.Control.FilterOptions = (function ($) {
      * @param filter {String} Destination filter
      */
     function setFilter(filter) {
-        var $filters = $(options.selectors.filterPicker);
-        if (!$filters) {
+        var $filters = $(options.selectors.filterOption);
+        if ($filters.length === 0) {
             console.error('no filter controls found to set');
             return;
         }
 
-        _.each(options.filters, function(val, key) {
+        $filters.removeClass(options.selectors.onClass);
+        $filters.addClass(options.selectors.offClass);
 
-            var $thisFilter = $filters.find('[data-filter="' + key + '"]');
+        var $thisFilter = $(options.selectors.filterPicker).find('[data-filter="' + filter + '"]');
 
-            var addClass = options.selectors.offClass;
-            var removeClass =  options.selectors.onClass;
-            if (filter.indexOf(val) > -1) {
-                addClass = removeClass;
-                removeClass = options.selectors.offClass;
-            }
+        // shouldn't happen, but guard against missing or bad filter being set
+        if ($thisFilter.length !== 1) {
+            console.warn('Could not find filter control matching filter ' + filter);
+            $thisFilter = $filters.first(); // first option is 'All'
+        }
 
-            $thisFilter.addClass(addClass);
-            $thisFilter.removeClass(removeClass);
-        });
+        $thisFilter.removeClass(options.selectors.offClass);
+        $thisFilter.addClass(options.selectors.onClass);
     }
 
 })(jQuery);

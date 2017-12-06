@@ -39,8 +39,16 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
     var allDestinations = []; // cache full list of destinations
 
+    var events = $({});
+    var eventNames = {
+        destinationsLoaded: 'cac:explore:control:placesloaded',
+    };
+
     function ExploreControl(params) {
         options = $.extend({}, defaults, params);
+        this.events = events;
+        this.eventNames = eventNames;
+
         mapControl = options.mapControl;
         tabControl = options.tabControl;
         urlRouter = options.urlRouter;
@@ -349,9 +357,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         var text = null;
         if (!destinations || !destinations.length) {
             if (exploreMinutes === '-1') {
-                // if not in travel mode, should fetch all destinations; should always have some
-                console.error('No destinations in the app!');
-                text = 'No featured destinations found. Please check back later';
+                // not in travel mode; if none found, none match destination category filter
+                text = 'No featured destinations found.';
             } else if (!isTransit && !isMax) {
                 text = 'No featured destinations within ' + exploreMinutes +
                     ' minutes. Try including transit or allowing for more time.';
@@ -370,6 +377,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         var newPlaces = HomeTemplates.destinations(destinations, text);
         $(options.selectors.placesContent).html(newPlaces);
+        // send event that places content changed
+        events.trigger(eventNames.destinationsLoaded);
 
         // also draw all destinations on explore map (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
@@ -403,6 +412,21 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
         displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
+    }
+
+    /**
+     * Filter destinations by category client-side.
+     */
+    function filterPlaces(allPlaces, filter) {
+        if (filter === 'All') {
+            return allPlaces;
+        }
+
+        // TODO: #911 handle events separately
+
+        return _.filter(allPlaces, function(place) {
+            return _.indexOf(place.categories, filter) > -1;
+        });
     }
 
     /**
@@ -445,7 +469,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         return dfd.promise();
     }
 
-    function _getNearbyPlaces() {
+    function _getNearbyPlaces(filter) {
         showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
@@ -453,13 +477,13 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         // use cached results
         if (allDestinations.length > 0) {
-            displayPlaces(allDestinations, '-1');
+            displayPlaces(filterPlaces(allDestinations, filter), '-1');
             return;
         }
 
         getAllPlaces().then(function(destinations) {
             allDestinations = destinations;
-            displayPlaces(destinations, '-1');
+            displayPlaces(filterPlaces(destinations, filter), '-1');
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
