@@ -1,5 +1,5 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            UserPreferences, UrlRouter, Utils) {
+CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOptions, SearchParams,
+                            TabControl, UserPreferences, UrlRouter, Utils) {
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
@@ -39,6 +39,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     };
 
     var options = {};
+    var filterOptionsControl = null;
     var modeOptionsControl = null;
     var mapControl = null;
     var tabControl = null;
@@ -63,6 +64,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             isMobile: $(window).width() < XXS_BREAKPOINT
         });
 
+        filterOptionsControl = new FilterOptions();
         modeOptionsControl = new ModeOptions();
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
 
@@ -112,6 +114,8 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                              $.proxy(clickedDestinationDirectionsPopup, this));
 
         tabControl.events.on(tabControl.eventNames.tabShown, onTabShown);
+
+        filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
@@ -277,6 +281,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         event.preventDefault();
         directionsFormControl.moveOriginDestination('destination', position);
     }
+
+    /**
+     * Updates destination filter when filter bar button toggled.
+     */
+     function toggledFilter(event, filter) {
+        console.log(filter);
+        // TODO: lots
+     }
 
     /**
      * Updates mode user preference when mode button toggled and triggers trip re-query.
@@ -521,5 +533,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         return iOS && webkit && !(/CriOS/i.test(ua)) && !(/OPiOS/i.test(ua));
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter, CAC.Utils);
+})(jQuery, CAC.Control.FilterOptions, CAC.Control.ModeOptions, CAC.Map.Control,
+    CAC.Control.TripOptions, CAC.Search.SearchParams, CAC.Control.Tab, CAC.User.Preferences,
+    CAC.UrlRouting.UrlRouter, CAC.Utils);
