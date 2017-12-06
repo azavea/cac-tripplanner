@@ -73,8 +73,8 @@ CAC.Control.FilterOptions = (function ($) {
      */
     function setFilter(filter) {
         var $filters = $(options.selectors.filterOption);
-        if ($filters.length === 0) {
-            console.error('no filter controls found to set');
+        if (!$filters || $filters.length === 0) {
+            // in test, selector will not exist
             return;
         }
 

@@ -87,8 +87,8 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
-        _setupEvents();
         _setupFilterControl();
+        _setupEvents();
         setupServiceWorker();
     };
 
@@ -333,7 +333,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
-        _setupFilterControl();
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();

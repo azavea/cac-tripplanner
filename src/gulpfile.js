@@ -263,7 +263,9 @@ gulp.task('test:production', ['test:copy-jquery',
             new KarmaServer({
                 configFile: __dirname + '/karma/karma.conf.js',
                 singleRun: true
-            }, done).start();
+            }, function() {
+                done();
+            }).start();
         }, 6000);
     }
 );
