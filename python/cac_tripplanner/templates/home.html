@@ -62,8 +62,33 @@
     <div class="places">
         <div class="places-content">
             <header class="places-header">
-                <h1>Places we love</h1>
-                <a href="#" class="map-view-btn">Map View</a>
+                <div class="places-header-content">
+                    <h1>Places we love</h1>
+                    <a href="#" class="map-view-btn">Map View</a>
+                    <div class="filter-picker">
+                        <div class="filter-toggle">
+                            <div class="all filter-option on" title ="All">
+                                <span class="filter-label">all</span>
+                            </div>
+                            <div class="events filter-option" title ="Events">
+                                <span class="filter-label">events</span>
+                            </div>
+                            <div class="nature filter-option" title ="Nature">
+                                <span class="filter-label">nature</span>
+                            </div>
+                            <div class="exercise filter-option" title ="Exercise">
+                                <span class="filter-label">exercise</span>
+                            </div>
+                            <div class="relax filter-option" title ="Relax">
+                                <span class="filter-label">relax</span>
+                            </div>
+                            <div class="educational filter-option" title ="Educational">
+                                <span class="filter-label">educational</span>
+                            </div>
+                            <input type="hidden" name="destination-filter" value="All">
+                        </div>
+                    </div>
+                </div>
             </header>
             <ul class="place-list">
                 {% for destination in destinations %}

@@ -41,6 +41,129 @@
 
     .places-header {
         position: relative;
+        background-color: $v-lt-blue;
+        margin-left: -$home-section-padding;
+        margin-right: -$home-section-padding;
+
+        @include respond-to('xxs') {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .places-header-content {
+            margin-left: $home-section-padding;
+            margin-right: $home-section-padding;
+
+            @include respond-to('xxs') {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        .filter-picker {
+            display: flex;
+            flex: none;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: flex-start;
+            height: 60px;
+            margin-bottom: 10px;
+            padding-left: 10%;
+            padding-right: 10%;
+            color: $font-color;
+            font-size: 1.6rem;
+            font-weight: $font-weight-bold;
+            line-height: 3rem;
+            text-transform: capitalize;
+
+            .body-home & {
+                @include respond-to('xs') {
+                    font-size: 1.3rem;
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+            }
+
+            .body-map & {
+                flex-basis: 55px;
+                justify-content: space-around;
+                margin-right: -10px;
+                padding-left: 60px;
+
+                .filter-label {
+                    display: none;
+                }
+            }
+
+            .filter-label {
+                margin-left: .16em;
+            }
+
+            i {
+                font-size: 2.2rem;
+
+                .body-home & {
+                    @include respond-to('xxxs') {
+                        font-size: 2.5rem;
+                    }
+                }
+
+                .body-map & {
+                    font-size: 2.5rem;
+                }
+
+                &::before {
+                    line-height: 3rem;
+                }
+            }
+        }
+
+        .filter-toggle {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: -$home-section-padding;
+            width: 100%;
+
+            .body-home & {
+                @include respond-to('xxs') {
+                    margin-right: 16px;
+                    margin-left: 16px;
+                }
+            }
+
+            .body-map & {
+                margin-right: 10px;
+            }
+
+            .filter-option.on {
+                border-bottom-color: $gophillygo-blue;
+            }
+        }
+
+        .filter-option {
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            cursor: pointer;
+            opacity: .5;
+
+            .body-map & {
+                padding-right: 2px;
+                padding-left: 2px;
+            }
+
+            .body-home & {
+                @include respond-to('xxxs') {
+                    padding-right: 2px;
+                    padding-left: 2px;
+                }
+            }
+
+            &.on {
+                opacity: 1;
+            }
+        }
     }
 
     .places-content {
@@ -85,7 +208,7 @@
         display: block;
         position: absolute;
         top: 1.7rem;
-        right: 0;
+        right: $home-section-padding;
         height: 4rem;
         padding-right: 2rem;
         padding-left: 4rem;
