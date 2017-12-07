@@ -76,13 +76,16 @@ def add_sample_categories(apps, schema_editor):
 
     # set the new categories on the default destinations that were added in migration 0012
     for dest in get_sample_destinations():
-        destination = Destination.objects.get(name=dest['name'])
-        if not destination:
+        try:
+            destination = Destination.objects.get(name=dest['name'])
+        except Destination.DoesNotExist:
             continue
         for add_category in dest['categories']:
-            category = DestinationCategory.objects.get(name=add_category)
-            if category:
-                destination.categories.add(category)
+            try:
+                category = DestinationCategory.objects.get(name=add_category)
+            except DestinationCategory.DoesNotExist:
+                continue
+            destination.categories.add(category)
 
 
 def delete_sample_categories(apps, schema_editor):

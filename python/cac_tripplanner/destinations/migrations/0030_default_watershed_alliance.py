@@ -26,8 +26,9 @@ def set_watershed_alliance(apps, schema_editor):
 
     # set the watershed alliance flag on the default destinations that were added in migration 0012
     for dest in get_watershed_alliance_locations():
-        destination = Destination.objects.get(name=dest)
-        if not destination:
+        try:
+            destination = Destination.objects.get(name=dest)
+        except Destination.DoesNotExist:
             continue
         destination.watershed_alliance = True
         destination.save()

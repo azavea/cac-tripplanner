@@ -73,13 +73,16 @@ def add_sample_activities(apps, schema_editor):
 
     # set the new activities on the default destinations that were added in migration 0012
     for dest in get_sample_destinations():
-        destination = Destination.objects.get(name=dest['name'])
-        if not destination:
+        try:
+            destination = Destination.objects.get(name=dest['name'])
+        except Destination.DoesNotExist:
             continue
         for add_activity in dest['activities']:
-            activity = Activity.objects.get(name=add_activity)
-            if activity:
+            try:
+                activity = Activity.objects.get(name=add_activity)
                 destination.activities.add(activity)
+            except Activity.DoesNotExist:
+                continue
 
 
 def delete_sample_activities(apps, schema_editor):
