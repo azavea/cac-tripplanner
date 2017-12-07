@@ -282,6 +282,24 @@ CKEDITOR_CONFIGS = {
              'embed',
              'embedsemantic',
              'autogrow']),
+    },
+    'teaser': {
+        'toolbar': [
+            ["Styles",
+             "Format",
+             "Bold",
+             "Italic",
+             "Underline",
+             "Strike",
+             "SpellChecker",
+             "Undo",
+             "Redo"],
+            [],
+            [],
+            ["SpecialChar"],
+            []
+        ],
+        'extraPlugins': '',
     }
 }
 
