@@ -42,6 +42,7 @@ module.exports = function(config) {
       'app/scripts/cac/map/cac-map-overlays.js',
       'app/scripts/cac/map/cac-map-templates.js',
       'app/scripts/cac/home/cac-home-templates.js',
+      'app/scripts/cac/control/cac-control-filter-options.js',
       'app/scripts/cac/control/cac-control-mode-options.js',
       'app/scripts/cac/control/cac-control-tab.js',
       'app/scripts/cac/control/cac-control-directions-form.js',

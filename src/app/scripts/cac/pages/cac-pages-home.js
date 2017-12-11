@@ -1,5 +1,5 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            UserPreferences, UrlRouter, Utils) {
+CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOptions, SearchParams,
+                            TabControl, UserPreferences, UrlRouter, Utils) {
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
@@ -39,6 +39,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     };
 
     var options = {};
+    var filterOptionsControl = null;
     var modeOptionsControl = null;
     var mapControl = null;
     var tabControl = null;
@@ -86,6 +87,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
 
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
+        _setupFilterControl();
         _setupEvents();
         setupServiceWorker();
     };
@@ -119,6 +121,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                                         $.proxy(onTypeaheadSelected, this));
 
         urlRouter.events.on(urlRouter.eventNames.changed, onUrlChanged);
+
+        // re-initialize filter control after templated HTML rewritten
+        exploreControl.events.on(exploreControl.eventNames.destinationsLoaded,
+                                 _setupFilterControl);
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -230,6 +236,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(document).ready(setActiveTab);
     }
 
+    // Destinations filter is templated with the destinations list, so must be
+    // re-initialized after destinations list changes. Initialize it with this method.
+    function _setupFilterControl() {
+        filterOptionsControl = new FilterOptions();
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
+        filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
+    }
+
     // Sets the active tab based on the 'method' user preference. The controllers listen for the
     // resulting "tab shown" event and do their thing if they're being activated (or hidden).
     function setActiveTab() {
@@ -279,6 +293,14 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     }
 
     /**
+     * Updates destination filter when filter bar button toggled.
+     */
+     function toggledFilter(event, filter) {
+        UserPreferences.setPreference('destinationFilter', filter);
+        exploreControl.getNearbyPlaces(filter);
+     }
+
+    /**
      * Updates mode user preference when mode button toggled and triggers trip re-query.
      *
      * Listen to toggles of the mode buttons for walk, bike, and transit;
@@ -311,6 +333,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
@@ -331,7 +354,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         // requery for place list once origin field cleared
-        exploreControl.getNearbyPlaces();
+        exploreControl.getNearbyPlaces(UserPreferences.getPreference('destinationFilter'));
     }
 
     function onPlaceClicked(event) {
@@ -521,5 +544,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         return iOS && webkit && !(/CriOS/i.test(ua)) && !(/OPiOS/i.test(ua));
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter, CAC.Utils);
+})(jQuery, CAC.Control.FilterOptions, CAC.Control.ModeOptions, CAC.Map.Control,
+    CAC.Control.TripOptions, CAC.Search.SearchParams, CAC.Control.Tab, CAC.User.Preferences,
+    CAC.UrlRouting.UrlRouter, CAC.Utils);
