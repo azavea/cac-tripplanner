@@ -2,8 +2,8 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Routing, Typeahead,
-                                 UserPreferences, Utils) {
+CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, UserPreferences,
+                                 Utils) {
 
     'use strict';
 
@@ -539,5 +539,5 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         });
     }
 
-})(_, jQuery, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans,
-    CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans, CAC.User.Preferences,
+   CAC.Utils);
