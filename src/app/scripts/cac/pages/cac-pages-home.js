@@ -47,6 +47,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
     var directionsFormControl = null;
     var directionsControl = null;
     var exploreControl = null;
+    var tripOptionsTemplate = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -84,6 +85,17 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             urlRouter: urlRouter
         });
 
+        // Precompile trip options template. Do before `showHideNeedWheelsBanner` called.
+        var tripOptions = [
+            '<div class="banner-message">',
+            '{{modeText}}&ensp;&middot;&ensp;',
+            '{{#if rideTypeOrAccessibility}}',
+                '{{rideTypeOrAccessibility}}&ensp;&middot;&ensp;',
+            '{{/if}}',
+            '{{timingText}}',
+            '</div>'
+        ].join('');
+        tripOptionsTemplate = Handlebars.compile(tripOptions);
 
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
@@ -437,16 +449,6 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
      * Sets the HTML in the trip options sidebar banner, based on user preferences.
      */
     function updateTripOptionsBanner() {
-        var source = [
-            '<div class="banner-message">',
-            '{{modeText}}&ensp;&middot;&ensp;',
-            '{{#if rideTypeOrAccessibility}}',
-                '{{rideTypeOrAccessibility}}&ensp;&middot;&ensp;',
-            '{{/if}}',
-            '{{timingText}}',
-            '</div>'
-        ].join('');
-
         var isDefault = true;
 
         var mode = UserPreferences.getPreference('mode');
@@ -490,8 +492,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             return;
         }
 
-        var template = Handlebars.compile(source);
-        var html = template({
+        var html = tripOptionsTemplate({
             modeText: modeText,
             rideTypeOrAccessibility: rideTypeOrAccessibility,
             timingText: timingText
