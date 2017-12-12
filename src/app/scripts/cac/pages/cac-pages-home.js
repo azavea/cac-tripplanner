@@ -239,6 +239,10 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
     // Destinations filter is templated with the destinations list, so must be
     // re-initialized after destinations list changes. Initialize it with this method.
     function _setupFilterControl() {
+        if (filterOptionsControl) {
+            filterOptionsControl.events.off();
+            filterOptionsControl.destroy();
+        }
         filterOptionsControl = new FilterOptions();
         filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
         filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
@@ -268,12 +272,6 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         if (tabId === tabControl.TABS.HOME) {
             UserPreferences.setPreference('method', undefined);
             clearUserSettings();
-            // TODO: change filter component back
-            console.log('use filter button bar now');
-        } else if (tabId === tabControl.TABS.DIRECTIONS || tabId === tabControl.TABS.EXPLORE) {
-            // on switching from Home to one of the two map tabs, change the filter component
-            // TODO:
-            console.log('use filter drop down now');
         }
     }
 
@@ -302,8 +300,14 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
      * Updates destination filter when filter selection changed.
      */
      function toggledFilter(event, filter) {
+        // Do not trigger destination list requery unless filter actually changed.
+        // Avoids possible infinite update loop with map page select control.
+        var currentFilter = UserPreferences.getPreference('destinationFilter');
+        if (currentFilter === filter) {
+            return;
+        }
         UserPreferences.setPreference('destinationFilter', filter);
-        exploreControl.getNearbyPlaces(filter);
+        exploreControl.getNearbyPlaces();
      }
 
     /**
@@ -360,7 +364,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         // reset mode control
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         // requery for place list once origin field cleared
-        exploreControl.getNearbyPlaces(UserPreferences.getPreference('destinationFilter'));
+        exploreControl.getNearbyPlaces();
     }
 
     function onPlaceClicked(event) {

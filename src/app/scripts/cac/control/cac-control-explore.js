@@ -473,7 +473,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         return dfd.promise();
     }
 
-    function _getNearbyPlaces(filter) {
+    function _getNearbyPlaces() {
+        var filter = UserPreferences.getPreference('destinationFilter');
         showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
