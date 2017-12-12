@@ -375,7 +375,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             }
         }
 
-        var newPlaces = HomeTemplates.destinations(destinations, text);
+        var newPlaces = HomeTemplates.destinations(destinations,
+                                                   text,
+                                                   tabControl.isTabShowing(tabControl.TABS.HOME));
         $(options.selectors.placesContent).html(newPlaces);
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
@@ -401,6 +403,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
 
         // now places list has been updated, go fetch the travel time
         // from the new origin to each place
+
+        // TODO: cache travel times for last origin/routing params set?
         getTimesToPlaces();
     }
 
@@ -418,7 +422,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
      * Filter destinations by category client-side.
      */
     function filterPlaces(allPlaces, filter) {
-        if (filter === 'All') {
+        if (!filter || filter === 'All') {
             return allPlaces;
         }
 

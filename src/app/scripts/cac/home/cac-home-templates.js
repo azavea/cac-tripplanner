@@ -4,6 +4,15 @@ CAC.Home.Templates = (function (Handlebars) {
     // precompiled HTML snippets
     var filterButtonBarTemplate = '';
 
+    var filterOptions = [
+        {'class': 'all', 'label': 'All', 'value': 'All'},
+        {'class': 'events', 'label': 'Events', 'value': 'Events'},
+        {'class': 'nature', 'label': 'Nature', 'value': 'Nature'},
+        {'class': 'exercise', 'label': 'Exercise', 'value': 'Exercise'},
+        {'class': 'relax', 'label': 'Relax', 'value': 'Relax'},
+        {'class': 'educational', 'label': 'Educational', 'value': 'Educational'},
+    ];
+
     var module = {
         destinations: destinations,
         getFilterButtonBar: getFilterButtonBar
@@ -20,10 +29,16 @@ CAC.Home.Templates = (function (Handlebars) {
     /**
      * Dynamically select which filter control to use (button bar or dropdown).
      *
+     * @param isHome {Boolean} true if currently on home page
      * @return {String} name of a registered Handlebars partial
      */
-    function filterPartial() {
+    function filterPartial(isHome) {
         // TODO: implement
+        if (isHome) {
+            console.log('is home');
+        } else {
+            console.log('not home');
+        }
         return 'filterButtonBar';
     }
 
@@ -33,29 +48,12 @@ CAC.Home.Templates = (function (Handlebars) {
         var filterButtonBar = [
             '<div class="filter-picker">',
                 '<div class="filter-toggle">',
-                    '<div class="all filter-option on" title="All" data-filter="All">',
-                        '<span class="filter-label">All</span>',
+                    '{{#each filterOptions}}',
+                    '<div class="{{class}} filter-option" title="{{label}}" ',
+                        'data-filter="{{value}}">',
+                        '<span class="filter-label">{{label}}</span>',
                     '</div>',
-                    '<div class="events filter-option" title ="Events" ',
-                        'data-filter="Events">',
-                        '<span class="filter-label">Events</span>',
-                    '</div>',
-                    '<div class="nature filter-option" title="Nature" ',
-                        'data-filter="Nature">',
-                        '<span class="filter-label">Nature</span>',
-                    '</div>',
-                    '<div class="exercise filter-option" title="Exercise"',
-                        'data-filter="Exercise">',
-                        '<span class="filter-label">Exercise</span>',
-                    '</div>',
-                    '<div class="relax filter-option" title="Relax" data-filter="Relax">',
-                        '<span class="filter-label">Relax</span>',
-                    '</div>',
-                    '<div class="educational filter-option" title ="Educational"',
-                        'data-filter="Educational">',
-                        '<span class="filter-label">Educational</span>',
-                    '</div>',
-                    '<input type="hidden" name="destination-filter" value="All">',
+                    '{{/each}}',
                 '</div>',
             '</div>'].join('');
 
@@ -70,15 +68,16 @@ CAC.Home.Templates = (function (Handlebars) {
      *
      * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
      * @param alternateMessage {String} Text to display if there are no destinations
+     * @param isHome {Boolean} True if currently on home page (and not map page)
      * @return html {String} Snippets for boxes to display on home page for each destination
      */
-    function destinations(useDestinations, alternateMessage) {
+    function destinations(useDestinations, alternateMessage, isHome) {
         var source = [
             '<header class="places-header">',
                 '<div class="places-header-content">',
                     '<h1>Places we love</h1>',
                     '<a href="#" class="map-view-btn">Map View</a>',
-                    '{{> (filterPartial) }}',
+                    '{{> (filterPartial isHome) }}',
                 '</div>',
             '</header>',
             '{{#unless alternateMessage}}',
@@ -120,10 +119,11 @@ CAC.Home.Templates = (function (Handlebars) {
         ].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({destinations: useDestinations,
-                             alternateMessage:alternateMessage},
-                             {data: {level: Handlebars.logger.WARN}});
-        return html;
+        return template({destinations: useDestinations,
+                         alternateMessage: alternateMessage,
+                         filterOptions: filterOptions,
+                         isHome: isHome},
+                         {data: {level: Handlebars.logger.WARN}});
     }
 
 })(Handlebars);

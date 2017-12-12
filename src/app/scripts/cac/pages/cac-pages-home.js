@@ -263,11 +263,17 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         }
     }
 
-    // Returning to the Home tab resets everything as though it were loaded fresh
     function onTabShown(event, tabId) {
+        // Returning to the Home tab resets everything as though it were loaded fresh
         if (tabId === tabControl.TABS.HOME) {
             UserPreferences.setPreference('method', undefined);
             clearUserSettings();
+            // TODO: change filter component back
+            console.log('use filter button bar now');
+        } else if (tabId === tabControl.TABS.DIRECTIONS || tabId === tabControl.TABS.EXPLORE) {
+            // on switching from Home to one of the two map tabs, change the filter component
+            // TODO:
+            console.log('use filter drop down now');
         }
     }
 
@@ -293,7 +299,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
     }
 
     /**
-     * Updates destination filter when filter bar button toggled.
+     * Updates destination filter when filter selection changed.
      */
      function toggledFilter(event, filter) {
         UserPreferences.setPreference('destinationFilter', filter);
