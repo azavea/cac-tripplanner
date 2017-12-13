@@ -56,7 +56,7 @@ CAC.Control.FilterOptions = (function ($) {
         // filter drop-down button event handler
         $(options.selectors.filterToggle).on('change', function(e) {
             e.preventDefault();
-            if (!e.target.selectedOptions || ! e.target.selectedOptions.length) {
+            if (!e.target.selectedOptions || !e.target.selectedOptions.length) {
                 return;
             }
 

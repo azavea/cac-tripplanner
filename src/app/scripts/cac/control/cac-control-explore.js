@@ -391,15 +391,18 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
 
-        // also draw all destinations on explore map (not just those in the isochrone)
+        // also draw all destinations on explore map that match the category filter
+        // (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             if (allDestinations.length > 0) {
-                mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+                mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
+                                                             destinations);
             } else {
                 // if destinations not cached already, go fetch them
-                getAllPlaces().then(function(fullDestinationsList) {
-                    allDestinations = fullDestinationsList;
-                    mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+                getAllPlaces().then(function(fullList) {
+                    allDestinations = fullList;
+                    mapControl.isochroneControl.drawDestinations(filterPlacesCategory(fullList),
+                                                                 destinations);
                 }).fail(function(error) {
                     console.error('error fetching destinations to map:');
                     console.error(error);
@@ -413,7 +416,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         // now places list has been updated, go fetch the travel time
         // from the new origin to each place
 
-        // TODO: cache travel times for last origin/routing params set?
+        // TODO: #945 Cache travel times for last origin/routing params set?
         getTimesToPlaces();
     }
 
@@ -426,37 +429,35 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         $placeCards.addClass(options.selectors.noOriginClass);
         isochroneDestinationIds = _.flatMap(destinations, 'id');
         // also filter to category
-        displayPlaces(filterPlacesCategory(destinations,
-                                           UserPreferences.getPreference('destinationFilter')),
+        displayPlaces(filterPlacesCategory(destinations),
                       $(options.selectors.isochroneSlider).val());
     }
 
     /**
      * Filter destinations by both isochrone and category client-side.
      *
-     * @param places {Array} destinations to filter
      * @param filter {String} destination category to filter for a match
      * returns {Array} filtered destinations list
      */
-    function filterPlaces(places, filter) {
+    function filterPlaces(places) {
         // only filter to destinations within isochrone if isochrone filter present
         if (_.isNull(isochroneDestinationIds)) {
-            return filterPlacesCategory(places, filter);
+            return filterPlacesCategory(places);
         }
 
         return filterPlacesCategory(_.filter(places, function(place) {
             return _.includes(isochroneDestinationIds, place.id);
-        }), filter);
+        }));
     }
 
     /**
      * Filter destinations by category client-side.
      *
-     * @param places {Array} destinations to filter
      * @param filter {String} destination category to filter for a match
      * returns {Array} filtered destinations list
      */
-    function filterPlacesCategory(places, filter) {
+    function filterPlacesCategory(places) {
+        var filter = UserPreferences.getPreference('destinationFilter');
         if (!filter || filter === 'All') {
             return places;
         }
