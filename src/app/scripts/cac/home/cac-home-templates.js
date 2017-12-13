@@ -17,7 +17,8 @@ CAC.Home.Templates = (function (Handlebars) {
 
     var module = {
         destinations: destinations,
-        getFilterButtonBar: getFilterButtonBar
+        getFilterButtonBar: getFilterButtonBar,
+        getFilterDropdown: getFilterDropdown
     };
 
     initialize();
@@ -29,8 +30,14 @@ CAC.Home.Templates = (function (Handlebars) {
         compileDestinationListTemplate();
     }
 
+    // returns HTML for the places header, for use on the map page
+    function getFilterDropdown() {
+        return filterDropdownTemplate({filterOptions: filterOptions});
+    }
+
+    // returns HTML for the places header, for use on the home page
     function getFilterButtonBar() {
-        return filterButtonBarTemplate;
+        return filterButtonBarTemplate({filterOptions: filterOptions});
     }
 
     /**
