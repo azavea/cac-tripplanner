@@ -38,6 +38,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
     var fetchingIsochrone = false;
 
     var allDestinations = []; // cache full list of destinations
+    var isochroneDestinationIds = null; // cache IDs of destinations within isochrone
 
     var events = $({});
     var eventNames = {
@@ -109,8 +110,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
             clickedExplore();
         } else {
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
             $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
         }
@@ -171,14 +171,25 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             return;
         }
         showSpinner();
-        $(options.selectors.alert).remove();
-        mapControl.isochroneControl.clearIsochrone();
+        clearIsochrone();
 
         if (exploreLatLng) {
             fetchIsochrone();
         } else {
             getNearbyPlaces();
         }
+    }
+
+    /**
+     * Clears: isochrone from map, any isochrone query error,
+     * and cache of destinations within isochrone.
+     */
+    function clearIsochrone() {
+        // Null ID list to flag there is no isochrone to filter to,
+        // as opposed to an empy list, which would indicate no matching destinations.
+        isochroneDestinationIds = null;
+        $(options.selectors.alert).remove();
+        mapControl.isochroneControl.clearIsochrone();
     }
 
     /**
@@ -271,8 +282,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
             exploreLatLng = null;
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
             // get all places in sidebar when no origin set
             getNearbyPlaces();
         }
@@ -311,8 +321,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             }
         } else {
             exploreLatLng = null;
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
         }
     }
 
@@ -415,20 +424,46 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
-        displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
+        isochroneDestinationIds = _.flatMap(destinations, 'id');
+        // also filter to category
+        displayPlaces(filterPlacesCategory(destinations,
+                                           UserPreferences.getPreference('destinationFilter')),
+                      $(options.selectors.isochroneSlider).val());
+    }
+
+    /**
+     * Filter destinations by both isochrone and category client-side.
+     *
+     * @param places {Array} destinations to filter
+     * @param filter {String} destination category to filter for a match
+     * returns {Array} filtered destinations list
+     */
+    function filterPlaces(places, filter) {
+        // only filter to destinations within isochrone if isochrone filter present
+        if (_.isNull(isochroneDestinationIds)) {
+            return filterPlacesCategory(places, filter);
+        }
+
+        return filterPlacesCategory(_.filter(places, function(place) {
+            return _.includes(isochroneDestinationIds, place.id);
+        }), filter);
     }
 
     /**
      * Filter destinations by category client-side.
+     *
+     * @param places {Array} destinations to filter
+     * @param filter {String} destination category to filter for a match
+     * returns {Array} filtered destinations list
      */
-    function filterPlaces(allPlaces, filter) {
+    function filterPlacesCategory(places, filter) {
         if (!filter || filter === 'All') {
-            return allPlaces;
+            return places;
         }
 
         // TODO: #911 handle events separately
 
-        return _.filter(allPlaces, function(place) {
+        return _.filter(places, function(place) {
             return _.indexOf(place.categories, filter) > -1;
         });
     }
