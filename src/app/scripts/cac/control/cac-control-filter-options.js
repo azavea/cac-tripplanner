@@ -30,24 +30,44 @@ CAC.Control.FilterOptions = (function ($) {
         events: events,
         eventNames: eventNames,
         getFilter: getFilter,
-        setFilter: setFilter
+        setFilter: setFilter,
+        destroy: destroy
     };
 
     return FilterOptionsControl;
 
-    function initialize() {
-        // update classes on filter toggle buttons
-        $(options.selectors.filterToggle).on('click', options.selectors.filterOption, function(e) {
-            e.preventDefault();
-
-            $(this).addClass(options.selectors.onClass)
+    // helper to set the 'on' class for the selected option, and unset it for the others
+    function toggleOn(selector) {
+        $(selector).addClass(options.selectors.onClass)
                 .removeClass(options.selectors.offClass)
                 .siblings(options.selectors.filterOption)
                     .removeClass(options.selectors.onClass)
                     .addClass(options.selectors.offClass);
+    }
 
+    function initialize() {
+        // filter toggle button row event handler
+        $(options.selectors.filterToggle).on('click', options.selectors.filterOption, function(e) {
+            e.preventDefault();
+            toggleOn(this);
             events.trigger(eventNames.toggle, getFilter());
         });
+
+        // filter drop-down button event handler
+        $(options.selectors.filterToggle).on('change', function(e) {
+            e.preventDefault();
+            if (!e.target.selectedOptions || !e.target.selectedOptions.length) {
+                return;
+            }
+
+            toggleOn(e.target.selectedOptions[0]);
+            events.trigger(eventNames.toggle, getFilter());
+        });
+    }
+
+    function destroy() {
+        // clear handlers
+        $(options.selectors.filterToggle).off();
     }
 
     /**
@@ -82,6 +102,9 @@ CAC.Control.FilterOptions = (function ($) {
         $filters.addClass(options.selectors.offClass);
 
         var $thisFilter = $(options.selectors.filterPicker).find('[data-filter="' + filter + '"]');
+
+        // change display if in drop-down
+        $(options.selectors.filterToggle).val(filter).change();
 
         // shouldn't happen, but guard against missing or bad filter being set
         if ($thisFilter.length !== 1) {

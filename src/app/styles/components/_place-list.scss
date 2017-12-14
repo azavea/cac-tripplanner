@@ -86,8 +86,8 @@
 
             .body-map & {
                 flex-basis: 55px;
-                justify-content: space-around;
-                font-size: 1.3rem;
+                justify-content: space-between;
+                font-size: 1.6rem;
                 padding-left: 0;
                 padding-right: 0;
             }
@@ -111,19 +111,25 @@
             }
         }
 
+        select {
+            background-color: $gophillygo-blue;
+            color: $white;
+        }
+
         .filter-toggle {
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: -$home-section-padding;
-            width: 100%;
 
             .body-home & {
                 @include respond-to('xxs') {
                     margin-right: 16px;
                     margin-left: 16px;
                 }
+
+                margin-bottom: -$home-section-padding;
+                width: 100%;
             }
 
             .body-map & {
@@ -183,8 +189,8 @@
         }
 
         .body-map & {
-            font-size: 1.4rem;
-            line-height: 4;
+            font-size: 1.6rem;
+            margin-left: 10px;
         }
     }
 

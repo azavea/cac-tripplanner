@@ -2,8 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Templates, Typeahead,
-                                    UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences, Utils) {
 
     'use strict';
 
@@ -449,5 +448,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
-    CAC.Routing.Plans, CAC.Home.Templates, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);

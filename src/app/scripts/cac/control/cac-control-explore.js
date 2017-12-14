@@ -2,8 +2,8 @@
  *  View control for the sidebar explore tab
  *
  */
-CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Routing, Typeahead,
-                                 UserPreferences, Utils) {
+CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, UserPreferences,
+                                 Utils) {
 
     'use strict';
 
@@ -38,6 +38,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     var fetchingIsochrone = false;
 
     var allDestinations = []; // cache full list of destinations
+    var isochroneDestinationIds = null; // cache IDs of destinations within isochrone
 
     var events = $({});
     var eventNames = {
@@ -109,8 +110,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             $(options.selectors.isochroneSliderContainer).removeClass(options.selectors.hiddenClass);
             clickedExplore();
         } else {
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
             mapControl.isochroneControl.clearDestinations();
             $(options.selectors.isochroneSliderContainer).addClass(options.selectors.hiddenClass);
         }
@@ -171,14 +171,25 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             return;
         }
         showSpinner();
-        $(options.selectors.alert).remove();
-        mapControl.isochroneControl.clearIsochrone();
+        clearIsochrone();
 
         if (exploreLatLng) {
             fetchIsochrone();
         } else {
             getNearbyPlaces();
         }
+    }
+
+    /**
+     * Clears: isochrone from map, any isochrone query error,
+     * and cache of destinations within isochrone.
+     */
+    function clearIsochrone() {
+        // Null ID list to flag there is no isochrone to filter to,
+        // as opposed to an empy list, which would indicate no matching destinations.
+        isochroneDestinationIds = null;
+        $(options.selectors.alert).remove();
+        mapControl.isochroneControl.clearIsochrone();
     }
 
     /**
@@ -271,8 +282,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
             exploreLatLng = null;
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
             // get all places in sidebar when no origin set
             getNearbyPlaces();
         }
@@ -311,8 +321,7 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             }
         } else {
             exploreLatLng = null;
-            $(options.selectors.alert).remove();
-            mapControl.isochroneControl.clearIsochrone();
+            clearIsochrone();
         }
     }
 
@@ -375,20 +384,25 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
             }
         }
 
-        var newPlaces = HomeTemplates.destinations(destinations, text);
+        var newPlaces = HomeTemplates.destinations(destinations,
+                                                   text,
+                                                   tabControl.isTabShowing(tabControl.TABS.HOME));
         $(options.selectors.placesContent).html(newPlaces);
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
 
-        // also draw all destinations on explore map (not just those in the isochrone)
+        // also draw all destinations on explore map that match the category filter
+        // (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             if (allDestinations.length > 0) {
-                mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+                mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
+                                                             destinations);
             } else {
                 // if destinations not cached already, go fetch them
-                getAllPlaces().then(function(fullDestinationsList) {
-                    allDestinations = fullDestinationsList;
-                    mapControl.isochroneControl.drawDestinations(allDestinations, destinations);
+                getAllPlaces().then(function(fullList) {
+                    allDestinations = fullList;
+                    mapControl.isochroneControl.drawDestinations(filterPlacesCategory(fullList),
+                                                                 destinations);
                 }).fail(function(error) {
                     console.error('error fetching destinations to map:');
                     console.error(error);
@@ -401,6 +415,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
 
         // now places list has been updated, go fetch the travel time
         // from the new origin to each place
+
+        // TODO: #945 Cache travel times for last origin/routing params set?
         getTimesToPlaces();
     }
 
@@ -411,20 +427,44 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
-        displayPlaces(destinations, $(options.selectors.isochroneSlider).val());
+        isochroneDestinationIds = _.flatMap(destinations, 'id');
+        // also filter to category
+        displayPlaces(filterPlacesCategory(destinations),
+                      $(options.selectors.isochroneSlider).val());
+    }
+
+    /**
+     * Filter destinations by both isochrone and category client-side.
+     *
+     * @param filter {String} destination category to filter for a match
+     * returns {Array} filtered destinations list
+     */
+    function filterPlaces(places) {
+        // only filter to destinations within isochrone if isochrone filter present
+        if (_.isNull(isochroneDestinationIds)) {
+            return filterPlacesCategory(places);
+        }
+
+        return filterPlacesCategory(_.filter(places, function(place) {
+            return _.includes(isochroneDestinationIds, place.id);
+        }));
     }
 
     /**
      * Filter destinations by category client-side.
+     *
+     * @param filter {String} destination category to filter for a match
+     * returns {Array} filtered destinations list
      */
-    function filterPlaces(allPlaces, filter) {
-        if (filter === 'All') {
-            return allPlaces;
+    function filterPlacesCategory(places) {
+        var filter = UserPreferences.getPreference('destinationFilter');
+        if (!filter || filter === 'All') {
+            return places;
         }
 
         // TODO: #911 handle events separately
 
-        return _.filter(allPlaces, function(place) {
+        return _.filter(places, function(place) {
             return _.indexOf(place.categories, filter) > -1;
         });
     }
@@ -469,7 +509,8 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         return dfd.promise();
     }
 
-    function _getNearbyPlaces(filter) {
+    function _getNearbyPlaces() {
+        var filter = UserPreferences.getPreference('destinationFilter');
         showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
@@ -539,5 +580,5 @@ CAC.Control.Explore = (function (_, $, Geocoder, MapTemplates, HomeTemplates, Ro
         });
     }
 
-})(_, jQuery, CAC.Search.Geocoder, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans,
-    CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans, CAC.User.Preferences,
+   CAC.Utils);

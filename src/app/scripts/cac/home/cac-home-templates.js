@@ -1,54 +1,104 @@
 CAC.Home.Templates = (function (Handlebars) {
     'use strict';
 
+    // precompiled HTML snippets
+    var filterButtonBarTemplate;
+    var filterDropdownTemplate;
+    var destinationListTemplate;
+
+    var filterOptions = [
+        {'class': 'all', 'label': 'All', 'value': 'All'},
+        {'class': 'events', 'label': 'Events', 'value': 'Events'},
+        {'class': 'nature', 'label': 'Nature', 'value': 'Nature'},
+        {'class': 'exercise', 'label': 'Exercise', 'value': 'Exercise'},
+        {'class': 'relax', 'label': 'Relax', 'value': 'Relax'},
+        {'class': 'educational', 'label': 'Educational', 'value': 'Educational'},
+    ];
+
     var module = {
-        destinations: destinations
+        destinations: destinations,
+        getFilterButtonBar: getFilterButtonBar,
+        getFilterDropdown: getFilterDropdown
     };
+
+    initialize();
 
     return module;
 
+    function initialize() {
+        setupFilterTemplates();
+        compileDestinationListTemplate();
+    }
+
+    // returns HTML for the places header, for use on the map page
+    function getFilterDropdown() {
+        return filterDropdownTemplate({filterOptions: filterOptions});
+    }
+
+    // returns HTML for the places header, for use on the home page
+    function getFilterButtonBar() {
+        return filterButtonBarTemplate({filterOptions: filterOptions});
+    }
+
     /**
-     * Take list of destination objects and return templated HTML snippet for sidebar.
+     * Dynamically select which filter control to use (button bar or dropdown).
      *
-     * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
-     * @param alternateMessage {String} Text to display if there are no destinations
-     * @return html {String} Snippets for boxes to display on home page for each destination
+     * @param isHome {Boolean} true if currently on home page
+     * @return {String} name of a registered Handlebars partial
      */
-    function destinations(useDestinations, alternateMessage) {
-        var source = [
+    function filterPartial(isHome) {
+        if (isHome) {
+            return 'filterButtonBar';
+        }
+        return 'filterDropdown';
+    }
+
+    // Initialize by registering the two compiled partials for the filter bar,
+    // which be chosen dynamically when building the destinations list.
+    function setupFilterTemplates() {
+        var filterButtonBar = [
             '<header class="places-header">',
                 '<div class="places-header-content">',
                     '<h1>Places we love</h1>',
                     '<a href="#" class="map-view-btn">Map View</a>',
                     '<div class="filter-picker">',
                         '<div class="filter-toggle">',
-                            '<div class="all filter-option on" title="All" data-filter="All">',
-                                '<span class="filter-label">All</span>',
+                            '{{#each filterOptions}}',
+                            '<div class="{{class}} filter-option" title="{{label}}" ',
+                                'data-filter="{{value}}">',
+                                '<span class="filter-label">{{label}}</span>',
                             '</div>',
-                            '<div class="events filter-option" title ="Events" ',
-                                'data-filter="Events">',
-                                '<span class="filter-label">Events</span>',
-                            '</div>',
-                            '<div class="nature filter-option" title="Nature" ',
-                                'data-filter="Nature">',
-                                '<span class="filter-label">Nature</span>',
-                            '</div>',
-                            '<div class="exercise filter-option" title="Exercise"',
-                                'data-filter="Exercise">',
-                                '<span class="filter-label">Exercise</span>',
-                            '</div>',
-                            '<div class="relax filter-option" title="Relax" data-filter="Relax">',
-                                '<span class="filter-label">Relax</span>',
-                            '</div>',
-                            '<div class="educational filter-option" title ="Educational"',
-                                'data-filter="Educational">',
-                                '<span class="filter-label">Educational</span>',
-                            '</div>',
-                            '<input type="hidden" name="destination-filter" value="All">',
+                            '{{/each}}',
                         '</div>',
                     '</div>',
                 '</div>',
-            '</header>',
+            '</header>'].join('');
+
+        var filterDropdown = [
+            '<header class="places-header">',
+                '<div class="places-header-content">',
+                    '<div class="filter-picker">',
+                        '<h1>Places we love</h1>',
+                        '<select class="filter-toggle">',
+                            '{{#each filterOptions}}',
+                            '<option class="{{class}} filter-option" ',
+                                'data-filter="{{value}}" value="{{value}}">{{label}}</option>',
+                            '{{/each}}',
+                        '</select>',
+                    '</div>',
+                '</div>',
+            '</header>'].join('');
+
+        filterButtonBarTemplate = Handlebars.compile(filterButtonBar);
+        filterDropdownTemplate = Handlebars.compile(filterDropdown);
+        Handlebars.registerPartial('filterButtonBar', filterButtonBarTemplate);
+        Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
+        Handlebars.registerHelper('filterPartial', filterPartial);
+    }
+
+    function compileDestinationListTemplate() {
+        var source = [
+            '{{> (filterPartial isHome) }}',
             '{{#unless alternateMessage}}',
             '<ul class="place-list">',
                 '{{#each destinations}}',
@@ -86,11 +136,25 @@ CAC.Home.Templates = (function (Handlebars) {
             '</div>',
             '{{/if}}',
         ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({destinations: useDestinations,
-                             alternateMessage:alternateMessage},
-                             {data: {level: Handlebars.logger.WARN}});
-        return html;
+
+        destinationListTemplate = Handlebars.compile(source);
+    }
+
+    /**
+     * Take list of destination objects and return templated HTML snippet for places list.
+     * Note this template HTML is also part of the Django template `home.html`.
+     *
+     * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
+     * @param alternateMessage {String} Text to display if there are no destinations
+     * @param isHome {Boolean} True if currently on home page (and not map page)
+     * @return html {String} Snippets for boxes to display on home page for each destination
+     */
+    function destinations(useDestinations, alternateMessage, isHome) {
+        return destinationListTemplate({destinations: useDestinations,
+                                       alternateMessage: alternateMessage,
+                                       filterOptions: filterOptions,
+                                       isHome: isHome},
+                                       {data: {level: Handlebars.logger.WARN}});
     }
 
 })(Handlebars);
