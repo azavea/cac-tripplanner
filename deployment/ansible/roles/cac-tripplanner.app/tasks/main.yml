@@ -3,6 +3,7 @@
   apt: name={{ item }} state=present
   with_items:
     - binutils
+    - bzip2
     - gdal-bin
     - libpq-dev
     - libproj-dev

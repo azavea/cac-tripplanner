@@ -7,6 +7,7 @@
     "@turf/nearest-point-on-line": "~5.0.4"
   },
   "devDependencies": {
+    "phantomjs-prebuilt": "^2.1.16",
     "aliasify": "^2.0.0",
     "apache-server-configs": "~2.15.0",
     "bower": "~1.8.2",
@@ -54,7 +55,6 @@
     "merge-stream": "~1.0.0",
     "mocha": "~4.0.1",
     "opn": "~5.1.0",
-    "phantomjs-prebuilt": "^2.1.16",
     "pump": "~1.0.2",
     "requirejs": "~2.3.5",
     "serve-index": "~1.9.1",
