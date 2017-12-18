@@ -52,7 +52,11 @@ class Activity(models.Model):
 
 
 class Attraction(models.Model):
-    """Shared properties of destinations and events"""
+    """Shared properties of destinations and events.
+
+    Note: for destination field to appear in admin interface, must also be defined on `fields`
+    in `admin.py`.
+    """
 
     class Meta:
         abstract = True
@@ -71,7 +75,10 @@ class Attraction(models.Model):
 
 
 class Destination(Attraction):
-    """Represents a destination"""
+    """Represents a destination.
+
+    Note: for field to appear in admin interface, must also be defined on `fields` in `admin.py`.
+    """
 
     class Meta:
         ordering = ['priority', '?']

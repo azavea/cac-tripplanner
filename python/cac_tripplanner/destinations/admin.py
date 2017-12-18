@@ -11,6 +11,12 @@ class DestinationAdmin(gis.admin.OSMGeoAdmin):
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
+    # To change field display order, define them all here.
+    # Default is order defined in model, but due to inheritance, cannot reorder across
+    # relationship with model field ordering alone.
+    fields = ('name', 'website_url', 'description', 'image', 'wide_image', 'published',
+              'priority', 'accessible', 'categories', 'activities', 'city', 'state', 'zipcode',
+              'address', 'point', 'watershed_alliance')
 
     default_lon, default_lat = -8370000.00, 4860000.00  # 3857
     default_zoom = 12
