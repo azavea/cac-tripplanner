@@ -27,6 +27,7 @@
         margin: 0 auto $home-section-margin;
         padding: 0 $home-section-padding 10px;
         background-color: $home-section-bg-color;
+        box-shadow: $layer-drop-shadow;
         overflow: visible;
 
         @include respond-to('xs') {
@@ -36,79 +37,34 @@
 
         @include respond-to('xxs') {
             background-color: inherit;
+            box-shadow: initial;
         }
     }
 
     .places-header {
         position: relative;
-        background-color: $v-lt-blue;
-        margin-left: -$home-section-padding;
         margin-right: -$home-section-padding;
+        margin-left: -$home-section-padding;
+        padding-right: $home-section-padding;
+        padding-left: $home-section-padding;
+        background-color: lighten($gophillygo-blue, 50%);
+
+        .body-home & {
+            margin-bottom: 20px;
+            background-color: $v-lt-blue;
+        }
+
+        .body-map & {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0;
+            padding: .8rem 1.6rem;
+        }
 
         @include respond-to('xxs') {
             margin-left: 0;
             margin-right: 0;
-        }
-
-        .places-header-content {
-            margin-left: $home-section-padding;
-            margin-right: $home-section-padding;
-
-            @include respond-to('xxs') {
-                margin-left: 0;
-                margin-right: 0;
-            }
-        }
-
-        .filter-picker {
-            display: flex;
-            flex: none;
-            flex-flow: row nowrap;
-            align-items: center;
-            justify-content: flex-start;
-            height: 60px;
-            margin-bottom: 10px;
-            padding-left: 10%;
-            padding-right: 10%;
-            color: $font-color;
-            font-size: 1.6rem;
-            font-weight: $font-weight-bold;
-            line-height: 3rem;
-            text-transform: capitalize;
-
-            .body-home & {
-                @include respond-to('xs') {
-                    font-size: 1.3rem;
-                    padding-left: 0;
-                    padding-right: 0;
-                }
-            }
-
-            .body-map & {
-                flex-basis: 55px;
-                justify-content: space-between;
-                font-size: 1.6rem;
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            .filter-label {
-                margin-left: .16em;
-            }
-
-            i {
-                font-size: 2.2rem;
-
-                .body-home & {
-                    @include respond-to('xxxs') {
-                        font-size: 2.5rem;
-                    }
-                }
-
-                &::before {
-                    line-height: 3rem;
-                }
-            }
         }
 
         select {
@@ -120,32 +76,40 @@
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
 
             .body-home & {
+                width: 100%;
+                margin-bottom: $home-section-padding;
+
                 @include respond-to('xxs') {
                     margin-right: 16px;
                     margin-left: 16px;
                 }
-
-                margin-bottom: -$home-section-padding;
-                width: 100%;
             }
 
             .body-map & {
                 margin-right: 10px;
             }
-
-            .filter-option.on {
-                border-bottom-color: $gophillygo-blue;
-            }
         }
 
         .filter-option {
-            border-top: 4px solid transparent;
+            margin: 0 1.6rem;
+            padding: .8rem .4rem;
             border-bottom: 4px solid transparent;
+            color: $font-secondary-color;
+            font-weight: $font-weight-semibold;
             cursor: pointer;
-            opacity: .5;
+
+            &:hover {
+                color: $font-color;
+            }
+
+            &.on {
+                border-bottom-color: $gophillygo-blue;
+                color: $font-color;
+                font-weight: $font-weight-bold;
+            }
 
             .body-map & {
                 padding-right: 2px;
@@ -157,10 +121,6 @@
                     padding-right: 2px;
                     padding-left: 2px;
                 }
-            }
-
-            &.on {
-                opacity: 1;
             }
         }
     }

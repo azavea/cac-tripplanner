@@ -36,18 +36,10 @@
     max-width: $home-main-max-width;
     padding: 0 20px 10px;
     background-color: $gophillygo-blue;
-    box-shadow: $place-card-drop-shadow;
-
-    @include respond-to('xs') {
-        padding: 0 10px;
-    }
-
-    @include respond-to('xxs') {
-        padding: 0 10px;
-    }
 
     .body-home & {
         height: $directions-form-home-height;
+        box-shadow: $layer-drop-shadow;
     }
 
     .body-map & {
@@ -61,6 +53,18 @@
             width: 100%;
             max-width: 100%;
             height: auto;
+        }
+    }
+
+    @include respond-to('xs') {
+        padding: 0 10px;
+    }
+
+    @include respond-to('xxs') {
+        padding: 0 10px;
+
+        .body-home & {
+            box-shadow: initial;
         }
     }
 
