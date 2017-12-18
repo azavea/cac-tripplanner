@@ -60,7 +60,7 @@ CAC.Home.Templates = (function (Handlebars) {
             '<header class="places-header">',
                 '<h1>Places we love</h1>',
                 '<a href="#" class="map-view-btn">Map View</a>',
-                '<div class="filter-toggle">',
+                '<div class="filter-toggle filter-toggle-tabs">',
                     '{{#each filterOptions}}',
                     '<div class="{{class}} filter-option" ',
                         'data-filter="{{value}}">',
@@ -73,12 +73,14 @@ CAC.Home.Templates = (function (Handlebars) {
         var filterDropdown = [
             '<header class="places-header">',
                 '<h1>Places we love</h1>',
-                '<select class="filter-toggle">',
-                    '{{#each filterOptions}}',
-                    '<option class="{{class}} filter-option" ',
-                        'data-filter="{{value}}" value="{{value}}">{{label}}</option>',
-                    '{{/each}}',
-                '</select>',
+                '<div class="custom-select">',
+                    '<select class="filter-toggle filter-toggle-dropdown">',
+                        '{{#each filterOptions}}',
+                        '<option class="{{class}} filter-option" ',
+                            'data-filter="{{value}}" value="{{value}}">{{label}}</option>',
+                        '{{/each}}',
+                    '</select>',
+                '</div>',
             '</header>'].join('');
 
         filterButtonBarTemplate = Handlebars.compile(filterButtonBar);
