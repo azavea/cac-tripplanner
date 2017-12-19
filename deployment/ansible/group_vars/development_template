@@ -4,7 +4,7 @@ develop: true
 production: false
 
 # open trip planner vars
-otp_process_mem: 2G
+otp_process_mem: 5G
 
 # for cac_secrets
 allowed_hosts: ['127.0.0.1', 'localhost']

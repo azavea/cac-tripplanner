@@ -18,6 +18,8 @@ Development Installation
 5. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
 6. Running `npm run gulp-watch` from `/opt/app/src` will automatically collect static files together when changes are detected for Django template consumption. Alternatively, `npm run gulp-development` can be run manually whenever changes are made to the static files.
 
+Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisioning in development mode will not attempt to rebuild the graph, but will use the one already present.
+
 Building AMIs
 ------------------------
 1. Make a production group_vars file (similarly to how is described above with development). Make sure production is set to true, and also specify an app_username, which should be set to: ubuntu

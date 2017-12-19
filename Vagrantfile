@@ -23,7 +23,7 @@ end
 
 if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
   # OpenTripPlanner needs > 1GB to build and run
-  CAC_MEMORY_MB = "4096"
+  CAC_MEMORY_MB = "8192"
 else
   CAC_MEMORY_MB = ENV['CAC_TRIPPLANNER_MEMORY']
 end
@@ -117,7 +117,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     if ENV['CAC_DATABASE_MEMORY'].nil?
-      DB_MEMORY_MB = "2048"
+      DB_MEMORY_MB = "512"
     else
       DB_MEMORY_MB = ENV['CAC_DATABASE_MEMORY']
     end
@@ -154,7 +154,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     if ENV['CAC_APP_MEMORY'].nil?
-      APP_MEMORY_MB = "2048"
+      APP_MEMORY_MB = "1024"
     else
       APP_MEMORY_MB = ENV['CAC_APP_MEMORY']
     end

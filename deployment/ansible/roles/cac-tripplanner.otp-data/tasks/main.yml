@@ -29,15 +29,22 @@
   copy: src=./otp_data/ dest="{{ otp_data_dir }}/" owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664
   when: develop or test
 
+- name: Check for Existing Graph (develop)
+  stat:
+    path: "{{ otp_data_dir }}/Graph.obj"
+  register: graph
+  when: develop
+
 - name: Build OTP Graph (test/develop)
   command: /usr/bin/java -Xmx{{ otp_process_mem }} -jar {{ otp_bin_dir }}/{{ otp_jar_name }} --build {{ otp_data_dir }}
   args:
     chdir: "{{ otp_bin_dir }}"
-  when: develop or test
+  register: graph_build
+  when: test or (develop and not graph.stat.exists)
 
 - name: Copy Built OTP Graph to Host (develop)
   fetch: src={{ otp_data_dir }}/Graph.obj dest=../../otp_data/ fail_on_missing=yes flat=yes
-  when: develop
+  when: develop and graph_build|changed
 
 - name: Create Graph Directory
   file: path="{{ otp_data_dir}}/{{ otp_router }}" state=directory
