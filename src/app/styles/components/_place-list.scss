@@ -27,6 +27,7 @@
         margin: 0 auto $home-section-margin;
         padding: 0 $home-section-padding 10px;
         background-color: $home-section-bg-color;
+        box-shadow: $layer-drop-shadow;
         overflow: visible;
 
         @include respond-to('xs') {
@@ -36,131 +37,97 @@
 
         @include respond-to('xxs') {
             background-color: inherit;
+            box-shadow: initial;
         }
     }
 
     .places-header {
+        display: flex;
         position: relative;
-        background-color: $v-lt-blue;
-        margin-left: -$home-section-padding;
+        flex-flow: column nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
         margin-right: -$home-section-padding;
+        margin-left: -$home-section-padding;
+        padding-right: $home-section-padding;
+        padding-left: $home-section-padding;
 
         @include respond-to('xxs') {
             margin-left: 0;
             margin-right: 0;
         }
 
-        .places-header-content {
-            margin-left: $home-section-padding;
-            margin-right: $home-section-padding;
+        .body-home & {
+            margin-bottom: 20px;
+            background-color: $body-color;
 
             @include respond-to('xxs') {
-                margin-left: 0;
-                margin-right: 0;
+                background-color: initial;
             }
         }
 
-        .filter-picker {
-            display: flex;
-            flex: none;
-            flex-flow: row nowrap;
-            align-items: center;
-            justify-content: flex-start;
-            height: 60px;
-            margin-bottom: 10px;
-            padding-left: 10%;
-            padding-right: 10%;
-            color: $font-color;
-            font-size: 1.6rem;
-            font-weight: $font-weight-bold;
-            line-height: 3rem;
-            text-transform: capitalize;
-
-            .body-home & {
-                @include respond-to('xs') {
-                    font-size: 1.3rem;
-                    padding-left: 0;
-                    padding-right: 0;
-                }
-            }
-
-            .body-map & {
-                flex-basis: 55px;
-                justify-content: space-between;
-                font-size: 1.6rem;
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            .filter-label {
-                margin-left: .16em;
-            }
-
-            i {
-                font-size: 2.2rem;
-
-                .body-home & {
-                    @include respond-to('xxxs') {
-                        font-size: 2.5rem;
-                    }
-                }
-
-                &::before {
-                    line-height: 3rem;
-                }
-            }
-        }
-
-        select {
-            background-color: $gophillygo-blue;
-            color: $white;
-        }
-
-        .filter-toggle {
-            display: flex;
-            flex-flow: row nowrap;
+        .body-map & {
+            flex-direction: row;
             align-items: center;
             justify-content: space-between;
+            width: $place-card-width;
+            margin: 0 auto;
+            padding: .8rem 0;
+        }
 
-            .body-home & {
-                @include respond-to('xxs') {
-                    margin-right: 16px;
-                    margin-left: 16px;
+        // Override categories dropdown arrow color
+        .custom-select::after {
+            right: .8rem;
+            border-top-color: $white;
+        }
+    }
+
+    .filter-toggle {
+
+        &.filter-toggle-tabs {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+
+            .filter-option {
+                margin: 0 1.6rem;
+                padding: .8rem .4rem;
+                border-bottom: 4px solid transparent;
+                color: $font-secondary-color;
+                font-weight: $font-weight-semibold;
+                cursor: pointer;
+
+                &:hover {
+                    color: $font-color;
                 }
 
-                margin-bottom: -$home-section-padding;
-                width: 100%;
-            }
+                &.on {
+                    border-bottom-color: $gophillygo-blue;
+                    color: $font-color;
+                    font-weight: $font-weight-bold;
+                }
 
-            .body-map & {
-                margin-right: 10px;
-            }
-
-            .filter-option.on {
-                border-bottom-color: $gophillygo-blue;
+                @include respond-to('xs') {
+                    margin: 0 .8rem;
+                    padding: .6rem .2rem;
+                    font-size: 1.4rem;
+                }
             }
         }
 
-        .filter-option {
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
-            cursor: pointer;
-            opacity: .5;
+        &.filter-toggle-dropdown {
+            width: 12rem;
+            min-height: 3.2rem;
+            padding: 0 1rem;
+            border: 0;
+            border-radius: 1px;
+            background-color: $gophillygo-blue;
+            color: $white;
+            line-height: 3.2rem;
 
-            .body-map & {
-                padding-right: 2px;
-                padding-left: 2px;
-            }
-
-            .body-home & {
-                @include respond-to('xxxs') {
-                    padding-right: 2px;
-                    padding-left: 2px;
-                }
-            }
-
-            &.on {
-                opacity: 1;
+            .filter-option {
+                min-height: 3.2rem;
             }
         }
     }
@@ -190,7 +157,7 @@
 
         .body-map & {
             font-size: 1.6rem;
-            margin-left: 10px;
+            text-align: left;
         }
     }
 

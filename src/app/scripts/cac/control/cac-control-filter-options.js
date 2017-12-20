@@ -7,7 +7,6 @@ CAC.Control.FilterOptions = (function ($) {
             // filter related selectors
             filterToggle: '.filter-toggle',
             filterOption: '.filter-option',
-            filterPicker: '.filter-picker', // parent to filterOption
             onClass: 'on',
             offClass: 'off',
             selectedFilter: '.filter-option.on'
@@ -101,7 +100,7 @@ CAC.Control.FilterOptions = (function ($) {
         $filters.removeClass(options.selectors.onClass);
         $filters.addClass(options.selectors.offClass);
 
-        var $thisFilter = $(options.selectors.filterPicker).find('[data-filter="' + filter + '"]');
+        var $thisFilter = $(options.selectors.filterToggle).find('[data-filter="' + filter + '"]');
 
         // change display if in drop-down
         $(options.selectors.filterToggle).val(filter).change();
