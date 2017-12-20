@@ -11,7 +11,6 @@ CAC.Home.Templates = (function (Handlebars) {
         {'class': 'events', 'label': 'Events', 'value': 'Events'},
         {'class': 'nature', 'label': 'Nature', 'value': 'Nature'},
         {'class': 'exercise', 'label': 'Exercise', 'value': 'Exercise'},
-        {'class': 'relax', 'label': 'Relax', 'value': 'Relax'},
         {'class': 'educational', 'label': 'Educational', 'value': 'Educational'},
     ];
 
