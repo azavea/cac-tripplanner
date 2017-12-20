@@ -59,7 +59,11 @@
 
         .body-home & {
             margin-bottom: 20px;
-            background-color: $v-lt-blue;
+            background-color: $body-color;
+
+            @include respond-to('xxs') {
+                background-color: initial;
+            }
         }
 
         .body-map & {
@@ -102,6 +106,12 @@
                     border-bottom-color: $gophillygo-blue;
                     color: $font-color;
                     font-weight: $font-weight-bold;
+                }
+
+                @include respond-to('xs') {
+                    margin: 0 .8rem;
+                    padding: .6rem .2rem;
+                    font-size: 1.4rem;
                 }
             }
         }
