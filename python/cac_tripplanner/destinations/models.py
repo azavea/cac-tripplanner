@@ -71,7 +71,7 @@ class Attraction(models.Model):
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
-    activities = models.ManyToManyField('Activity')
+    activities = models.ManyToManyField('Activity', blank=True)
 
 
 class Destination(Attraction):
@@ -92,7 +92,7 @@ class Destination(Attraction):
                                help_text=('The map automatically updates as the address is typed, '
                                           'but may be overridden manually if incorrect.'))
     point = models.PointField()
-    categories = models.ManyToManyField('DestinationCategory')
+    categories = models.ManyToManyField('DestinationCategory', blank=True)
     watershed_alliance = models.BooleanField(default=False, help_text="""
         Does this location belong to the <a target="_blank"
         href="https://www.watershedalliance.org/centers/">
