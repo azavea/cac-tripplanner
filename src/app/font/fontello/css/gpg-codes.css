@@ -26,6 +26,7 @@
 .icon-minus:before { content: '\e819'; } /* '' */
 .icon-rail:before { content: '\e81b'; } /* '' */
 .icon-train:before { content: '\e81c'; } /* '' */
+.icon-cycling:before { content: '\e820'; } /* '' */
 .icon-twitter:before { content: '\f099'; } /* '' */
 .icon-gplus:before { content: '\f0d5'; } /* '' */
 .icon-email:before { content: '\f0e0'; } /* '' */
@@ -35,7 +36,7 @@
 .icon-youtube:before { content: '\f16a'; } /* '' */
 .icon-instagram:before { content: '\f16d'; } /* '' */
 .icon-marker-poi:before { content: '\f192'; } /* '' */
-.icon-wheelchair:before { content: '\f193'; } /* '' */
+.icon-wheelchair-1:before { content: '\f193'; } /* '' */
 .icon-car:before { content: '\f1b9'; } /* '' */
 .icon-sliders:before { content: '\f1de'; } /* '' */
 .icon-share:before { content: '\f1e0'; } /* '' */
@@ -46,3 +47,4 @@
 .icon-home:before { content: '\f240'; } /* '' */
 .icon-map:before { content: '\f279'; } /* '' */
 .icon-marker-destination:before { content: '\f28d'; } /* '' */
+.icon-wheelchair:before { content: '\f29b'; } /* '' */
