@@ -2,14 +2,37 @@
     <header class="info-article-header">
         <div class="info-place-image-hero"
              style="background-image: url('{{ destination.wide_image.url }}');"></div>
-        <h2 class="info-article-title">{{ destination.name }}</h2>
-        <div class="info-place-actions">
-            <a class="place-website-link"
-                href="{{ destination.website_url }}"
-                target="_blank">Website</a>
-            <a class="place-action-go"
-                data-destination-id="{{ destination.id }}"
-                href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Directions</a>
+        <div class="info-article-header-info">
+            <div class="info-article-header-main">
+                <h2 class="info-article-title">{{ destination.name }}</h2>
+                <div class="info-place-actions">
+                    <a class="place-action-go"
+                        data-destination-id="{{ destination.id }}"
+                        href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Directions</a>
+                    <a class="place-website-link"
+                        href="{{ destination.website_url }}"
+                        target="_blank">Website</a>
+                    <a class="place-awe-link"
+                        href="{{ destination.awe_url }}"
+                        target="_blank"
+                        ><img class="image"
+                             src="/static/images/awe-logo.png"
+                             srcset="/static/images/awe-logo.png 1x, /static/images/awe-logo@2x.png 2x"
+                             height="38"
+                             alt="Alliance for Watershed Education"></a>
+                </div>
+            </div>
+            <div class="info-place-meta">
+                <ul class="info-place-categories">
+                    <li class="category">Nature</li>
+                    <li class="category">Exercise</li>
+                    <li class="category">Educational</li>
+                </ul>
+                <ul class="info-place-activities">
+                    <li class="activity" title="Biking trails"><i class="icon-cycling"></i></li>
+                    <li class="activity" title="Wheelchair accessible"><i class="icon-wheelchair"></i></li>
+                </ul>
+            </div>
         </div>
     </header>
     <section class="info-article-section">
