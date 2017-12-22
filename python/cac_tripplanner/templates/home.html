@@ -114,11 +114,27 @@
                         </div>
                         <h2 class="place-card-name">{{ destination.name }}</h2>
                     </div>
-                    <div class="place-card-actions">
-                        <a class="place-card-action place-action-go"
-                            data-destination-id="{{ destination.id }}" href="#">Directions</a>
-                        <a class="place-card-action place-action-details"
-                           href="{% url 'place-detail' pk=destination.pk %}">More info</a>
+                    <div class="place-card-footer">
+                        <div class="place-card-actions">
+                            <a class="place-card-action place-action-go"
+                                data-destination-id="{{ destination.id }}" href="#">Directions</a>
+                            <a class="place-card-action place-action-details"
+                               href="{% url 'place-detail' pk=destination.pk %}">More info</a>
+                        </div>
+                        <div class="place-card-badges">
+                            <span class="badge activity" title="Biking trails">
+                                <i class="icon-cycling"></i>
+                            </span>
+                            <a class="badge link"
+                                href=""
+                                title="Alliance for Watershed Education"
+                                target="_blank">
+                                <img class="image"
+                                    src="/static/images/awe-icon.png"
+                                    srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
+                                    height="20"
+                                    alt="Alliance for Watershed Education"></a>
+                        </div>
                     </div>
                 </li>
             {% endfor %}

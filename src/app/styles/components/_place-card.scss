@@ -106,6 +106,13 @@
     overflow: hidden;
 }
 
+.place-card-footer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .place-card-actions {
     display: flex;
     flex-flow: row nowrap;
@@ -132,5 +139,18 @@
 
     &.place-action-details {
         background-color: transparent;
+    }
+}
+
+.place-card-badges {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 1.8rem;
+    line-height: 1;
+
+    .badge {
+        margin-left: .8rem;
     }
 }
