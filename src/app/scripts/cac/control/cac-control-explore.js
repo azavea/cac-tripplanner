@@ -22,8 +22,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             spinner: '.places > .sk-spinner',
             placeCard: 'li.place-card',
             noOriginClass: 'no-origin',
-            placeOriginText: '.place-card-travel-logistics-origin',
-            placeDistanceText: '.place-card-travel-logistics-duration',
+            placeOriginText: '.travel-logistics-origin',
+            placeDistanceText: '.travel-logistics-duration',
             placeAttrX: 'data-destination-x',
             placeAttrY: 'data-destination-y'
         }
