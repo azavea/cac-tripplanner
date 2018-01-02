@@ -138,7 +138,7 @@ CAC.Home.Templates = (function (Handlebars) {
                             '</span>',
                             '{{/if}}',
                             '{{#if this.watershed_alliance}}',
-                            '<a class="badge link" href=""',
+                            '<a class="badge link" href="https://www.watershedalliance.org/"',
                                 'title="Alliance for Watershed Education" target="_blank">',
                                 '<img class="image" ',
                                     'src="/static/images/awe-icon.png"',
