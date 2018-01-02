@@ -19,6 +19,8 @@ DEFAULT_CONTEXT = {
     'routing_url': settings.ROUTING_URL
 }
 
+EVENT_CATEGORY = 'Events'
+
 
 def base_view(request, page, context):
     """
@@ -158,6 +160,25 @@ def set_destination_properties(destination):
     return obj
 
 
+def set_event_properties(event):
+    """Helper for adding and converting properties in serializing events as JSON
+
+    :param event: Event model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(event)
+    obj['image'] = image_to_url(obj, 'image')
+    obj['wide_image'] = image_to_url(obj, 'wide_image')
+    obj['activities'] = [a.name for a in obj['activities']]
+    obj['destination_id'] = event.destination.pk if event.destination else None
+    obj['start_date'] = event.start_date.isoformat()
+    obj['end_date'] = event.end_date.isoformat()
+
+    # add convenience property for whether event has cycling
+    obj['cycling'] = event.has_activity('cycling')
+    return obj
+
+
 class FindReachableDestinations(View):
     """Class based view for fetching isochrone and finding destinations of interest within it"""
 
@@ -248,7 +269,9 @@ class SearchDestinations(View):
         limit = params.get('limit', None)
         categories = params.get('categories', None)
 
-        results = []
+        destinations = []
+        events = []
+
         if lat and lon:
             try:
                 search_point = Point(float(lon), float(lat))
@@ -258,14 +281,25 @@ class SearchDestinations(View):
                     'error': str(e),
                 })
                 return HttpResponse(error, 'application/json')
-            results = (Destination.objects.filter(published=True)
-                       .distance(search_point)
-                       .order_by('distance', 'priority'))
+            destinations = (Destination.objects.filter(published=True)
+                            .distance(search_point)
+                            .order_by('distance', 'priority'))
         elif text is not None:
-            results = Destination.objects.filter(published=True, name__icontains=text)
+            destinations = Destination.objects.filter(published=True, name__icontains=text)
 
         if categories:
-            results = results.filter(categories__name__in=categories.split(','))
+            categories = categories.split(',')
+            if EVENT_CATEGORY in categories:
+                categories.remove(EVENT_CATEGORY)
+                events = Event.objects.filter(published=True)
+                if search_point:
+                    # TODO: reorder events based on distance to associated destination?
+                    pass
+                elif text is not None:
+                    events = events.filter(name__icontains=text)
+            destinations = destinations.filter(categories__name__in=categories)
+        else:
+            events = Event.objects.filter(published=True)
 
         if limit:
             try:
@@ -276,9 +310,11 @@ class SearchDestinations(View):
                     'error': str(e),
                 })
                 return HttpResponse(error, 'application/json')
-            results = results[:limit_int]
+            destinations = destinations[:limit_int]
+            events = events[:limit_int]
 
-        data = [set_destination_properties(x) for x in results]
+        destinations = [set_destination_properties(x) for x in destinations]
+        events = [set_event_properties(x) for x in events]
 
-        response = {'destinations': data}
+        response = {'destinations': destinations, 'events': events}
         return HttpResponse(json.dumps(response), 'application/json')
