@@ -1,0 +1,39 @@
+<article class="info-article">
+    <header class="info-article-header">
+        <div class="info-place-image-hero"
+             style="background-image: url('{{ event.wide_image.url }}');"></div>
+        <div class="info-article-header-info">
+            <div class="info-article-header-main">
+                <h2 class="info-article-title">{{ event.name }}</h2>
+                <h3 class="info-article-subtitle">
+                    <a href="">
+                        {{ event.location }}
+                    </a>
+                </h3>
+                <div class="info-place-actions">
+                    <a class="place-action-go"
+                        data-destination-id="{{ event.location.id }}"
+                        href="/?destination={{ event.location.point.y }}%2C{{ event.location.point.x }}&destinationText={{ event.location.name|urlencode }}">Directions</a>
+                    <a class="place-facebook-link"
+                        href="{{ event.facebook_url }}"
+                        target="_blank">Details</a>
+                </div>
+            </div>
+            <div class="info-event-meta">
+                <div class="info-event-date">
+                    <span class="day-of-week">Sat</span>
+                    <span class="month">Dec</span>
+                    <span class="day-of-month">23</span>
+                </div>
+                <div class="info-event-time">
+                    <span class="start-time">9:00am</span>
+                    &ndash;
+                    <span class="end-time">12:00pm</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section class="info-article-section">
+        {{ event.description|safe }}
+    </section>
+</article>

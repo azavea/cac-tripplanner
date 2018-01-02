@@ -59,7 +59,7 @@
 
         .body-home & {
             margin-bottom: 20px;
-            background-color: $body-color;
+            background-color: $primary-nav-bg-color;
 
             @include respond-to('xxs') {
                 background-color: initial;
