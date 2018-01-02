@@ -73,6 +73,15 @@ class Attraction(models.Model):
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
 
+    def has_activity(self, activity_name):
+        """Helper to check if an activity of a given name is available at a destination"""
+        try:
+            if self.activities.get(name=activity_name):
+                return True
+        except Activity.DoesNotExist:
+            pass
+        return False
+
 
 class Destination(Attraction):
     """Represents a destination.

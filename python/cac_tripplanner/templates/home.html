@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load destination_extras %}
 {% block content %}
     {% include "partials/header.html" %}
 
@@ -122,9 +123,13 @@
                                href="{% url 'place-detail' pk=destination.pk %}">More info</a>
                         </div>
                         <div class="place-card-badges">
+                            {% has_activity destination 'cycling' as has_cycling %}
+                            {% if has_cycling %}
                             <span class="badge activity" title="Biking trails">
                                 <i class="icon-cycling"></i>
                             </span>
+                            {% endif %}
+                            {% if destination.watershed_alliance %}
                             <a class="badge link"
                                 href=""
                                 title="Alliance for Watershed Education"
@@ -134,6 +139,7 @@
                                     srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
                                     height="20"
                                     alt="Alliance for Watershed Education"></a>
+                            {% endif %}
                         </div>
                     </div>
                 </li>
