@@ -5,31 +5,44 @@
         <div class="info-article-header-info">
             <div class="info-article-header-main">
                 <h2 class="info-article-title">{{ event.name }}</h2>
+                {% if event.destination %}
                 <h3 class="info-article-subtitle">
-                    <a href="">
-                        {{ event.location }}
+                    <a href="{% url 'place-detail' pk=event.destination.pk %}">
+                        {{ event.destination.name }}
                     </a>
                 </h3>
+                {% endif %}
                 <div class="info-place-actions">
+                    {% if event.destination %}
                     <a class="place-action-go"
-                        data-destination-id="{{ event.location.id }}"
-                        href="/?destination={{ event.location.point.y }}%2C{{ event.location.point.x }}&destinationText={{ event.location.name|urlencode }}">Directions</a>
-                    <a class="place-facebook-link"
-                        href="{{ event.facebook_url }}"
-                        target="_blank">Details</a>
+                        data-destination-id="{{ event.destination.id }}"
+                        href="/?destination={{ event.destination.point.y }}%2C{{ event.destination.point.x }}&destinationText={{ event.destination.name|urlencode }}">Directions</a>
+                    {% endif %}
+                    <a class="place-website-link"
+                        href="{{ event.website_url }}"
+                        target="_blank">Website</a>
                 </div>
             </div>
             <div class="info-event-meta">
+                {% if event.start_date.date == event.end_date.date %}
+                <!-- same-day event -->
                 <div class="info-event-date">
-                    <span class="day-of-week">Sat</span>
-                    <span class="month">Dec</span>
-                    <span class="day-of-month">23</span>
+                    {{ event.start_date|date:"D N j" }}
                 </div>
                 <div class="info-event-time">
-                    <span class="start-time">9:00am</span>
+                    <span class="start-time">{{ event.start_date|time:"P" }}</span>
                     &ndash;
-                    <span class="end-time">12:00pm</span>
+                    <span class="end-time">{{ event.end_date|time:"P" }}</span>
                 </div>
+                {% else %}
+                <!-- event ends on different day than it starts -->
+                <div class="info-event-date info-event-time">
+                    starts: {{ event.start_date|date:"D N j" }} {{ event.start_date|time:"P" }}
+                </div>
+                <div class="info-event-date info-event-time">
+                    ends: {{ event.end_date|date:"D N j" }} {{ event.end_date|time:"P" }}
+                </div>
+                {% endif %}
             </div>
         </div>
     </header>

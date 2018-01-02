@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
-from .models import Destination
+from .models import Destination, Event
 from cms.models import Article
 
 
@@ -107,6 +107,14 @@ def place_detail(request, pk):
     context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
                    **DEFAULT_CONTEXT)
     return base_view(request, 'place-detail.html', context=context)
+
+
+def event_detail(request, pk):
+    event = get_object_or_404(Event.objects.published(), pk=pk)
+    more_events = Event.objects.published().exclude(pk=event.pk)[:3]
+    context = dict(tab='explore', event=event, more_events=more_events,
+                   **DEFAULT_CONTEXT)
+    return base_view(request, 'event-detail.html', context=context)
 
 
 def image_to_url(dest_dict, field_name):

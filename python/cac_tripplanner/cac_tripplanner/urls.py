@@ -30,6 +30,9 @@ urlpatterns = [
     # Places
     url(r'^place/(?P<pk>[\d-]+)/$', dest_views.place_detail, name='place-detail'),
 
+    # Events
+    url(r'^event/(?P<pk>[\d-]+)/$', dest_views.event_detail, name='event-detail'),
+
     # About (no more FAQ)
     url(r'^(?P<slug>about)/$', cms_views.about_faq, name='about'),
 
