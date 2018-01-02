@@ -144,6 +144,9 @@ def set_destination_properties(destination):
     }
     obj['categories'] = [c.name for c in obj['categories']]
     obj['activities'] = [a.name for a in obj['activities']]
+
+    # add convenience property for whether destination has cycling
+    obj['cycling'] = destination.has_activity('cycling')
     return obj
 
 
