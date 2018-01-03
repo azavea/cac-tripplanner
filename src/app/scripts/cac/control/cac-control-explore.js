@@ -224,10 +224,10 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
 
         mapControl.isochroneControl.fetchIsochrone(exploreLatLng, date, exploreMinutes, otpOptions,
                                                    true).then(
-            function (data) {
+            function(data) {
                 fetchingIsochrone = false;
                 listIsochronePlaces(data);
-            }, function (error) {
+            }, function(error) {
                 console.error(error);
                 fetchingIsochrone = false;
                 showPlacesContent();
@@ -281,6 +281,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
 
     function onTypeaheadCleared(event, key) {
         if (key === 'origin') {
+            showSpinner();
             exploreLatLng = null;
             clearIsochrone();
             // get all places in sidebar when no origin set
@@ -294,6 +295,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
             } else {
+                showSpinner();
                 getNearbyPlaces();
             }
         }
@@ -394,21 +396,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         // also draw all destinations on explore map that match the category filter
         // (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-            if (allDestinations.length > 0) {
-                mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                             destinations);
-            } else {
-                // if destinations not cached already, go fetch them
-                getAllPlaces().then(function(fullList) {
-                    allDestinations = fullList;
-                    mapControl.isochroneControl.drawDestinations(filterPlacesCategory(fullList),
-                                                                 destinations);
-                }).fail(function(error) {
-                    console.error('error fetching destinations to map:');
-                    console.error(error);
-                    allDestinations = [];
-                });
-            }
+            // allDestinations has been loaded by now
+            mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
+                                                         destinations);
         }
 
         showPlacesContent();
@@ -421,16 +411,32 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
     }
 
     // Given desintations from the FindReachableDestinations app endpoint,
-    // display the returned list of places within the travelshed in the sidebar cards.
+    // use the returned list of places within the travelshed
+    // to filter displayed destinations and events in the sidebar cards.
     function listIsochronePlaces(destinations) {
         showSpinner();
         var $placeCards = $(options.selectors.placeCard);
         // hide existing times to places now showing (if any)
         $placeCards.addClass(options.selectors.noOriginClass);
         isochroneDestinationIds = _.flatMap(destinations, 'id');
-        // also filter to category
-        displayPlaces(filterPlacesCategory(destinations),
-                      $(options.selectors.isochroneSlider).val());
+
+        // use cached results for all destinations and events, if present
+        var filter = UserPreferences.getPreference('destinationFilter');
+        var isochroneSize = $(options.selectors.isochroneSlider).val();
+        if (allDestinations.length > 0) {
+            displayPlaces(filterPlaces(allDestinations, filter), isochroneSize);
+            return;
+        }
+
+        getAllPlaces().then(function(data) {
+            setDestinationsEvents(data);
+            displayPlaces(filterPlaces(allDestinations, filter), isochroneSize);
+        }).fail(function(error) {
+            console.error('error fetching destinations:');
+            console.error(error);
+            setDestinationsEvents();
+            showPlacesContent();
+        });
     }
 
     /**
@@ -445,8 +451,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             return filterPlacesCategory(places);
         }
 
+        // for events without a destination (placeID), include in results
         return filterPlacesCategory(_.filter(places, function(place) {
-            return _.includes(isochroneDestinationIds, place.id);
+            return !place.placeID || _.includes(isochroneDestinationIds, place.placeID);
         }));
     }
 
@@ -454,15 +461,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
      * Filter destinations by category client-side.
      *
      * @param filter {String} destination category to filter for a match
-     * returns {Array} filtered destinations list
+     * returns {Array} filtered destinations and/or events list
      */
     function filterPlacesCategory(places) {
         var filter = UserPreferences.getPreference('destinationFilter');
         if (!filter || filter === 'All') {
             return places;
         }
-
-        // TODO: #911 handle events separately
 
         return _.filter(places, function(place) {
             return _.indexOf(place.categories, filter) > -1;
@@ -499,7 +504,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
                 console.error(data);
                 dfd.resolve([]);
             } else {
-                dfd.resolve(data.destinations);
+                dfd.resolve(data);
             }
         }).fail(function(error) {
             console.error('error fetching destinations:');
@@ -522,13 +527,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             return;
         }
 
-        getAllPlaces().then(function(destinations) {
-            allDestinations = destinations;
-            displayPlaces(filterPlaces(destinations, filter), '-1');
+        getAllPlaces().then(function(data) {
+            setDestinationsEvents(data);
+            displayPlaces(filterPlaces(allDestinations, filter), '-1');
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
-            allDestinations = [];
+            setDestinationsEvents();
             showPlacesContent();
         });
     }
@@ -560,24 +565,41 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             // read out the location of the destination
             var xCoord = $card.attr(options.selectors.placeAttrX);
             var yCoord = $card.attr(options.selectors.placeAttrY);
-            var placeCoords = [yCoord, xCoord];
 
-            // get travel time to destination and update place card
-            Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions)
-            .then(function (itineraries) {
-                if (itineraries && itineraries.length) {
-                    var itinerary = itineraries[0];
-                    $card.find(options.selectors.placeDistanceText)
-                        .text(itinerary.formattedDuration);
-                    $card.find(options.selectors.placeOriginText)
-                        .text(originLabel);
-                    $card.removeClass(options.selectors.noOriginClass);
-                }
-            }).fail(function(error) {
-                console.error('error finding travel time to a place');
-                console.error(error);
-            });
+            if (xCoord && yCoord) {
+                var placeCoords = [yCoord, xCoord];
+                // get travel time to destination and update place card
+                Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions)
+                .then(function (itineraries) {
+                    if (itineraries && itineraries.length) {
+                        var itinerary = itineraries[0];
+                        $card.find(options.selectors.placeDistanceText)
+                            .text(itinerary.formattedDuration);
+                        $card.find(options.selectors.placeOriginText)
+                            .text(originLabel);
+                        $card.removeClass(options.selectors.noOriginClass);
+                    }
+                }).fail(function(error) {
+                    console.error('error finding travel time to a place');
+                    console.error(error);
+                });
+            }
         });
+    }
+
+    /**
+     * Locally cache response of destination search endpoint.
+     *
+     * Sets both destinations and events. If given empty data, will unset local cache.
+     *
+     * @param data {Object} response from getAllPlaces
+     */
+    function setDestinationsEvents(data) {
+        if (!data) {
+            allDestinations = [];
+            return;
+        }
+        allDestinations = data.destinations.concat(data.events);
     }
 
 })(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Routing.Plans, CAC.User.Preferences,

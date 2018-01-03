@@ -40,11 +40,12 @@ def home(request):
     # Load one random article
     article = Article.objects.random()
     # Show all destinations
-    destinations = Destination.objects.published().all()
+    destinations = list(Destination.objects.published().all())
+    events = list(Event.objects.published().all())
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': destinations
+        'destinations': destinations + events
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
@@ -130,6 +131,31 @@ def image_to_url(dest_dict, field_name):
     return image.url if image else ''
 
 
+def set_location_properties(obj, location):
+    """Helper to set location-related properties on either destinations or events.
+
+    Events have optional related destination, which is the event location.
+
+    :param obj: Dictionary representation of object to which to add location properties
+    :param location: Destination object from which to extract location properties
+    :returns: passed obj dictionary, with added properties
+    """
+    obj['placeID'] = location.pk if location else None
+    obj['point'] = json.loads(location.point.json) if location else None
+    obj['attributes'] = {
+        'City': location.city if location else None,
+        'Postal': location.zipcode if location else None,
+        'Region': location.state if location else None,
+        'StAddr': location.address if location else None
+    }
+    # convert to format like properties on ESRI geocoder results
+    x = obj['point']['coordinates'][0] if location else None
+    y = obj['point']['coordinates'][1] if location else None
+    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
+    obj['location'] = {'x': x, 'y': y}
+    return obj
+
+
 def set_destination_properties(destination):
     """Helper for adding and converting properties in serializing destinations as JSON
 
@@ -140,23 +166,12 @@ def set_destination_properties(destination):
     obj['address'] = obj['name']
     obj['image'] = image_to_url(obj, 'image')
     obj['wide_image'] = image_to_url(obj, 'wide_image')
-    obj['point'] = json.loads(obj['point'].json)
-    # convert to format like properties on ESRI geocoder results
-    x = obj['point']['coordinates'][0]
-    y = obj['point']['coordinates'][1]
-    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
-    obj['location'] = {'x': x, 'y': y}
-    obj['attributes'] = {
-        'City': obj['city'],
-        'Postal': obj['zipcode'],
-        'Region': obj['state'],
-        'StAddr': obj['address']
-    }
     obj['categories'] = [c.name for c in obj['categories']]
     obj['activities'] = [a.name for a in obj['activities']]
-
     # add convenience property for whether destination has cycling
     obj['cycling'] = destination.has_activity('cycling')
+
+    obj = set_location_properties(obj, destination)
     return obj
 
 
@@ -167,15 +182,21 @@ def set_event_properties(event):
     :returns: Dictionary representation of object, with added properties
     """
     obj = model_to_dict(event)
+    obj['address'] = event.name
     obj['image'] = image_to_url(obj, 'image')
     obj['wide_image'] = image_to_url(obj, 'wide_image')
     obj['activities'] = [a.name for a in obj['activities']]
-    obj['destination_id'] = event.destination.pk if event.destination else None
+    obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
     obj['start_date'] = event.start_date.isoformat()
     obj['end_date'] = event.end_date.isoformat()
-
     # add convenience property for whether event has cycling
     obj['cycling'] = event.has_activity('cycling')
+
+    # add properties of related destination, if any
+    obj = set_location_properties(obj, event.destination)
+
+    # if related destination belongs to Watershed Alliance, so does this event
+    obj['watershed_alliance'] = event.destination.watershed_alliance if event.destination else False
     return obj
 
 

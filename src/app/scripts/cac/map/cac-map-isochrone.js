@@ -218,17 +218,22 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         var destinations = {};
         clearDestinations();
 
-        var locationGeoJSON = _.map(all, function(destination) {
-            destinations[destination.id] = destination;
+        var locationGeoJSON = _.chain(all).reject(function(place) {
+            // Do not attempt to map events without a location (destination)
+            return !place.placeID;
+        }).map(function(destination) {
+            // index by combination of ID and place ID to prevent conflict between
+            // event and destination IDs
+            destinations[destination.id + '_' + destination.placeID] = destination;
             var point = _.property('point')(destination);
             point.properties = _.omit(destination, 'point');
 
             // set matched property to true if destination is within isochrone
             point.properties.matched = _.findIndex(matched, function(match) {
-                return match.id === destination.id;
+                return match.placeID && (match.placeID === destination.placeID);
             }) > -1;
             return point;
-        });
+        }).value();
         destinationMarkers = {};
         destinationsLayer = cartodb.L.geoJson(locationGeoJSON, {
             pointToLayer: function (geojson, latLng) {
@@ -241,11 +246,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                      'href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">Visit website</a>',
                                      '<a class="destination-directions-link" ',
-                                     'id="{{geojson.properties.id}}">Get Directions</a></p>'
+                                     'id="{{geojson.properties.placeID}}">Get Directions</a></p>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
-                var markerId = geojson.properties.id;
+                var markerId = geojson.properties.id + '_' + geojson.properties.placeID;
 
                 // use a different icon for places outside of the travel than those within it
                 var useIcon = geojson.properties.matched ? destinationIcon:
@@ -254,7 +259,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
                 destinationMarkers[markerId] = {
                     marker: marker,
-                    destination: destinations[geojson.properties.id]
+                    destination: destinations[geojson.properties.id +
+                                              '_' +
+                                              geojson.properties.placeID]
                 };
 
                 // wait to bind popup click handlers until popup is in the DOM

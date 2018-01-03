@@ -1,4 +1,4 @@
-CAC.Home.Templates = (function (Handlebars) {
+CAC.Home.Templates = (function (Handlebars, moment) {
     'use strict';
 
     // precompiled HTML snippets
@@ -87,6 +87,24 @@ CAC.Home.Templates = (function (Handlebars) {
         Handlebars.registerPartial('filterButtonBar', filterButtonBarTemplate);
         Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
         Handlebars.registerHelper('filterPartial', filterPartial);
+
+        // date/time formatting helpers for events
+        Handlebars.registerHelper('eventDate', function(dateTime) {
+            var dt = moment(dateTime); // get ISO string
+            // format date portion like: Tue Dec 26
+            return new Handlebars.SafeString(dt.format('ddd MMM D'));
+        });
+
+         Handlebars.registerHelper('eventTime', function(dateTime) {
+            var dt = moment(dateTime); // get ISO string
+            // format time portion like: 10:19 am
+            return new Handlebars.SafeString(dt.format('h:mm a'));
+        });
+
+         // Helper to check if event starts and ends on the same day
+         Handlebars.registerHelper('sameDay', function(dt1, dt2) {
+            return(moment(dt1).isSame(dt2, 'day'));
+        });
     }
 
     function compileDestinationListTemplate() {
@@ -95,7 +113,8 @@ CAC.Home.Templates = (function (Handlebars) {
             '{{#unless alternateMessage}}',
             '<ul class="place-list">',
                 '{{#each destinations}}',
-                '<li class="place-card no-origin" data-destination-id="{{ this.id }}" ',
+                '<li class="place-card no-origin {{#if this.start_date}}event-card{{/if}}" ',
+                    'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
                     'data-destination-x="{{ this.location.x }}" ',
                     'data-destination-y="{{ this.location.y }}">',
                     '<div class="place-card-photo-container">',
@@ -118,18 +137,39 @@ CAC.Home.Templates = (function (Handlebars) {
                                 'Upcoming Event',
                             '</div>',
                             '<div class="event-date-time">',
-                                '<span class="event-date"></span>',
-                                '· <span class="event-time"></span>',
+                            '{{#if this.start_date }}',
+                                '{{#if (sameDay this.start_date this.end_date) }}',
+                                '<div class="event-date">',
+                                    '{{eventDate this.start_date }}',
+                                '</div>',
+                                '<div class="event-time">',
+                                    '<span class="start-time">{{eventTime this.start_date }}</span>',
+                                    '&ndash;',
+                                    '<span class="end-time">{{eventTime this.end_date }}</span>',
+                                '</div>',
+                                '{{else}}',
+                                '<div class="event-date event-time">',
+                                    'starts: {{eventDate this.start_date }} {{eventTime this.start_date }}',
+                                '</div>',
+                                '<div class="event-date event-time">',
+                                    'ends: {{eventDate this.end_date }} {{eventTime this.end_date }}',
+                                '</div>',
+                                '{{/if}}',
+                            '{{/if}}',
                             '</div>',
                         '</div>',
                         '<h2 class="place-card-name">{{ this.name }}</h2>',
                     '</div>',
                     '<div class="place-card-footer">',
                         '<div class="place-card-actions">',
+                            '{{#if this.placeID}}',
                             '<a class="place-card-action place-action-go" ',
-                                'data-destination-id="{{ this.id }}" href="#">Directions</a>',
-                            '<a class="place-card-action place-action-details" ',
-                               'href="/place/{{ this.id }}/">More info</a>',
+                                'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
+                                'href="#">Directions</a>',
+                            '{{/if}}',
+                            '<a class="place-card-action place-action-details" href=',
+                            '"/{{#if this.start_date }}event{{else}}place{{/if}}/{{ this.id }}/"',
+                               '>More info</a>',
                         '</div>',
                         '<div class="place-card-badges">',
                             '{{#if this.cycling}}',
@@ -180,4 +220,4 @@ CAC.Home.Templates = (function (Handlebars) {
                                        {data: {level: Handlebars.logger.WARN}});
     }
 
-})(Handlebars);
+})(Handlebars, moment);

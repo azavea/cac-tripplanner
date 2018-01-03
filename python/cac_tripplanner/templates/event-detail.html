@@ -34,7 +34,7 @@
         <div class="summaries-list">
             <h3>More great events around Philly</h3>
             {% for event in more_events %}
-                {% include "partials/destination-card.html" %}
+                {% include "partials/event-card.html" %}
             {% endfor %}
             <div class="more-link">
                 <a href="{% url 'home' %}">See them all</a>

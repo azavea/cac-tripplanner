@@ -86,7 +86,8 @@
             </header>
             <ul class="place-list">
                 {% for destination in destinations %}
-                <li class="place-card no-origin" data-destination-id="{{ destination.id }}"
+                <li class="place-card {% if destination.start_date %}event-card {% endif %} no-origin"
+                    data-destination-id="{{ destination.id }}"
                     data-destination-x="{{ destination.point.x }}"
                     data-destination-y="{{ destination.point.y }}">
                     <div class="place-card-photo-container">
@@ -109,8 +110,28 @@
                                 Upcoming Event
                             </div>
                             <div class="event-date-time">
-                                <span class="event-date"></span>
-                                · <span class="event-time"></span>
+                            <!-- show date/time if an event -->
+                            {% if destination.start_date %}
+                                {% if destination.start_date.date == destination.end_date.date %}
+                                <!-- same-day event -->
+                                <div class="event-date">
+                                    {{ destination.start_date|date:"D N j" }}
+                                </div>
+                                <div class="event-time">
+                                    <span class="start-time">{{ destination.start_date|time:"P" }}</span>
+                                    &ndash;
+                                    <span class="end-time">{{ destination.end_date|time:"P" }}</span>
+                                </div>
+                                {% else %}
+                                <!-- event ends on different day than it starts -->
+                                <div class="event-date event-time">
+                                    starts: {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
+                                </div>
+                                <div class="event-date event-time">
+                                    ends: {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
+                                </div>
+                                {% endif %}
+                            {% endif %}
                             </div>
                         </div>
                         <h2 class="place-card-name">{{ destination.name }}</h2>
@@ -120,7 +141,12 @@
                             <a class="place-card-action place-action-go"
                                 data-destination-id="{{ destination.id }}" href="#">Directions</a>
                             <a class="place-card-action place-action-details"
-                               href="{% url 'place-detail' pk=destination.pk %}">More info</a>
+                               {% if destination.start_date %}
+                               href="{% url 'event-detail' pk=destination.pk %}"
+                               {% else %}
+                               href="{% url 'place-detail' pk=destination.pk %}"
+                               {% endif %}
+                               >More info</a>
                         </div>
                         <div class="place-card-badges">
                             {% has_activity destination 'cycling' as has_cycling %}
