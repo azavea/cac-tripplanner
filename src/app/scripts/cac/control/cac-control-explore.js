@@ -446,14 +446,16 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
      * returns {Array} filtered destinations list
      */
     function filterPlaces(places) {
-        // only filter to destinations within isochrone if isochrone filter present
+        // Only filter by category if no isochrone filter currently set;
+        // will include events without a destination.
         if (_.isNull(isochroneDestinationIds)) {
             return filterPlacesCategory(places);
         }
 
-        // for events without a destination (placeID), include in results
+        // Filter by both isochrone and category.
+        // For events without a destination (placeID), exclude from results
         return filterPlacesCategory(_.filter(places, function(place) {
-            return !place.placeID || _.includes(isochroneDestinationIds, place.placeID);
+            return _.includes(isochroneDestinationIds, place.placeID) ? place.placeID: false;
         }));
     }
 
