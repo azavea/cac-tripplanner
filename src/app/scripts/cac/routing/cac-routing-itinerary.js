@@ -23,6 +23,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.modeSummaries = getModeSummaries(otpItinerary.legs);
         this.formattedDistance = getFormattedItineraryDistance(otpItinerary.legs);
         this.formattedDuration = getFormattedDuration(otpItinerary.duration);
+        this.duration = otpItinerary.duration;
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
         this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));

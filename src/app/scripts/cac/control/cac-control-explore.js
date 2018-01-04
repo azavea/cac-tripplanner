@@ -22,8 +22,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             spinner: '.places > .sk-spinner',
             placeCard: 'li.place-card',
             noOriginClass: 'no-origin',
-            placeOriginText: '.travel-logistics-origin',
-            placeDistanceText: '.travel-logistics-duration',
             placeAttrX: 'data-destination-x',
             placeAttrY: 'data-destination-y'
         }
@@ -386,28 +384,30 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             }
         }
 
-        var newPlaces = HomeTemplates.destinations(destinations,
-                                                   text,
-                                                   tabControl.isTabShowing(tabControl.TABS.HOME));
-        $(options.selectors.placesContent).html(newPlaces);
-        // send event that places content changed
-        events.trigger(eventNames.destinationsLoaded);
+        // Now places list has been updated, go fetch the travel time to each
+        // from the new origin to each place.
+        var promises = getTimesToPlaces(destinations);
+        $.when.apply($, promises).always(function() {
 
-        // also draw all destinations on explore map that match the category filter
-        // (not just those in the isochrone)
-        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-            // allDestinations has been loaded by now
-            mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         destinations);
-        }
+            // order the destinations by travel time
+            destinations = _.sortBy(destinations, ['duration']);
+            var places = HomeTemplates.destinations(destinations,
+                                                    text,
+                                                    tabControl.isTabShowing(tabControl.TABS.HOME));
+            $(options.selectors.placesContent).html(places);
+            // send event that places content changed
+            events.trigger(eventNames.destinationsLoaded);
 
-        showPlacesContent();
+            // also draw all destinations on explore map that match the category filter
+            // (not just those in the isochrone)
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+                // allDestinations has been loaded by now
+                mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
+                                                             destinations);
+            }
 
-        // now places list has been updated, go fetch the travel time
-        // from the new origin to each place
-
-        // TODO: #945 Cache travel times for last origin/routing params set?
-        getTimesToPlaces();
+            showPlacesContent();
+        });
     }
 
     // Given desintations from the FindReachableDestinations app endpoint,
@@ -540,11 +540,23 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         });
     }
 
-    function getTimesToPlaces() {
-        // bail if origin not set
+    /** Get travel times from the orign to each destination.
+     *  Should be called before displaying place list.
+     *
+     * @param destinations {Array} Destination and event objects that will be changed in-place
+     * @returns {Array} Collection of promises, each of which resolve to a destination
+     */
+    function getTimesToPlaces(destinations) {
+        // if origin not set, simply clear the travel times from the destinations
         if (!exploreLatLng) {
+            _.each(destinations, function(destination) {
+                destination.duration = undefined;
+                destination.formattedDuration = undefined;
+                destination.originLabel = undefined;
+            });
             return;
         }
+
         // make ajax requests to get the travel times to each destination
         var otpOptions = getOtpOptions();
         // only using the first itinerary; let OTP know to not bother finding other options
@@ -560,13 +572,17 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
             (origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
             UserPreferences.getPreference('originText'));
 
-        var $placeCards = $(options.selectors.placeCard);
-        $placeCards.each(function() {
-            var $card = $(this);
+        var promises = _.map(destinations, function(destination) {
+            var dfd = $.Deferred();
+            // if already have travel time to destination, skip requerying for it
+            if (destination.originLabel === originLabel) {
+                dfd.resolve(destination);
+                return dfd.promise();
+            }
 
             // read out the location of the destination
-            var xCoord = $card.attr(options.selectors.placeAttrX);
-            var yCoord = $card.attr(options.selectors.placeAttrY);
+            var xCoord = destination.location.x;
+            var yCoord = destination.location.y;
 
             if (xCoord && yCoord) {
                 var placeCoords = [yCoord, xCoord];
@@ -575,18 +591,25 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
                 .then(function (itineraries) {
                     if (itineraries && itineraries.length) {
                         var itinerary = itineraries[0];
-                        $card.find(options.selectors.placeDistanceText)
-                            .text(itinerary.formattedDuration);
-                        $card.find(options.selectors.placeOriginText)
-                            .text(originLabel);
-                        $card.removeClass(options.selectors.noOriginClass);
+                        // set properties for travel time to place and the origin label
+                        destination.duration = itinerary.duration;
+                        destination.formattedDuration = itinerary.formattedDuration;
+                        destination.originLabel = originLabel;
+                        dfd.resolve(destination);
                     }
                 }).fail(function(error) {
-                    console.error('error finding travel time to a place');
+                    console.error('error finding travel time to ' + destination.name);
                     console.error(error);
+                    dfd.reject(error);
                 });
+            } else {
+                // event without a location
+                dfd.resolve(destination);
             }
+            return dfd.promise();
         });
+
+        return promises;
     }
 
     /**

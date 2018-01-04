@@ -279,8 +279,8 @@ class SearchDestinations(View):
           - limit param: maximum number of results to return (integer)
           - categories param: comma-separated list of destination category names to filter to
 
-        A search via text will return destinations that match the destination name
-        A search via lat/lon will return destinations that are closest to the search point
+        A search via text returns destinations and events that match the destination name
+        A search via lat/lon returns destinations and events that are closest to the search point
 
         """
         params = request.GET
@@ -313,10 +313,7 @@ class SearchDestinations(View):
             if EVENT_CATEGORY in categories:
                 categories.remove(EVENT_CATEGORY)
                 events = Event.objects.filter(published=True)
-                if search_point:
-                    # TODO: reorder events based on distance to associated destination?
-                    pass
-                elif text is not None:
+                if text is not None:
                     events = events.filter(name__icontains=text)
             destinations = destinations.filter(categories__name__in=categories)
         else:
