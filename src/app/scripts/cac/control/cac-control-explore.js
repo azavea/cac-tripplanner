@@ -78,8 +78,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
 
         // update isochrone on slider move
         $(options.selectors.isochroneSlider).change(setOptions);
-
-        showPlacesContent();
     }
 
     var fetchIsochrone = _.debounce(_fetchIsochrone, ISOCHRONE_DEBOUNCE_MILLIS);
@@ -92,6 +90,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Routing, Use
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences,
         getNearbyPlaces: getNearbyPlaces,
+        showPlacesContent: showPlacesContent,
         showSpinner: showSpinner
     };
 

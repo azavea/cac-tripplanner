@@ -268,6 +268,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             if (method === 'directions') {
                 directionsControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
+                exploreControl.showPlacesContent(); // hide spinner
             } else if (method === 'explore') {
                 exploreControl.showSpinner();
                 exploreControl.setFromUserPreferences();
@@ -276,6 +277,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
+            exploreControl.showPlacesContent(); // hide spinner
         }
     }
 
@@ -312,6 +314,8 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
      * Updates destination filter when filter selection changed.
      */
      function toggledFilter(event, filter) {
+        // getNearbyPlaces is called with a debounce, so show spinner first
+        exploreControl.showSpinner();
         // Do not trigger destination list requery unless filter actually changed.
         // Avoids possible infinite update loop with map page select control.
         var currentFilter = UserPreferences.getPreference('destinationFilter');
