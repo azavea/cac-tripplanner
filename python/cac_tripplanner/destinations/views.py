@@ -40,8 +40,8 @@ def home(request):
     # Load one random article
     article = Article.objects.random()
     # Show all destinations
-    destinations = list(Destination.objects.published().all())
-    events = list(Event.objects.published().all())
+    destinations = list(Destination.objects.published().all().order_by('priority'))
+    events = list(Event.objects.published().all().order_by('priority'))
     context = {
         'tab': 'home',
         'article': article,
@@ -251,7 +251,7 @@ class FindReachableDestinations(View):
                 geom = GEOSGeometry(geom_str)
                 matched_objects = (Destination.objects.filter(published=True, point__within=geom)
                                                       .distance(geom)
-                                                      .order_by('distance'))
+                                                      .order_by('distance', 'priority'))
         else:
             matched_objects = []
 
@@ -306,18 +306,19 @@ class SearchDestinations(View):
                             .distance(search_point)
                             .order_by('distance', 'priority'))
         elif text is not None:
-            destinations = Destination.objects.filter(published=True, name__icontains=text)
+            destinations = Destination.objects.filter(published=True,
+                                                      name__icontains=text).order_by('priority')
 
         if categories:
             categories = categories.split(',')
             if EVENT_CATEGORY in categories:
                 categories.remove(EVENT_CATEGORY)
-                events = Event.objects.filter(published=True)
+                events = Event.objects.filter(published=True).order_by('priority')
                 if text is not None:
                     events = events.filter(name__icontains=text)
             destinations = destinations.filter(categories__name__in=categories)
         else:
-            events = Event.objects.filter(published=True)
+            events = Event.objects.filter(published=True).order_by('priority')
 
         if limit:
             try:
