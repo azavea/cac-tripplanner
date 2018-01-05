@@ -359,8 +359,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
-            showPlaces(true);
-            exploreControl.getNearbyPlaces();
+            // only load destinations list in directions mode when destination field empty
+            if (key === 'destination') {
+                showPlaces(true);
+                exploreControl.getNearbyPlaces();
+            }
         }
     }
 
@@ -415,6 +418,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         } else {
             $(options.selectors.directions).show();
             $(options.selectors.places).hide();
+            exploreControl.showPlacesContent(); // hide spinner
         }
     }
 

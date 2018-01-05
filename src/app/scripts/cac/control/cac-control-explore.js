@@ -19,7 +19,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             isochroneSlider: '#isochrone-slider',
             isochroneOutput: '#output-directions-within',
             placesContent: '.places-content',
-            spinner: '.places > .sk-spinner',
+            spinner: '.sk-spinner',
             placeCard: 'li.place-card',
             noOriginClass: 'no-origin',
             placeAttrX: 'data-destination-x',
