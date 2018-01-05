@@ -1,3 +1,4 @@
+{% load tz %}
 <article class="info-article">
     <header class="info-article-header">
         <div class="info-place-image-hero"
@@ -24,7 +25,7 @@
                 </div>
             </div>
             <div class="info-event-meta">
-                {% if event.start_date.date == event.end_date.date %}
+                {% if event.start_date|localtime|date:"D N j" == event.end_date|localtime|date:"D N j" %}
                 <!-- same-day event -->
                 <div class="info-event-date">
                     {{ event.start_date|date:"D N j" }}
@@ -37,10 +38,10 @@
                 {% else %}
                 <!-- event ends on different day than it starts -->
                 <div class="info-event-date info-event-time">
-                    starts: {{ event.start_date|date:"D N j" }} {{ event.start_date|time:"P" }}
+                    {{ event.start_date|date:"D N j" }} {{ event.start_date|time:"P" }}&ndash;
                 </div>
                 <div class="info-event-date info-event-time">
-                    ends: {{ event.end_date|date:"D N j" }} {{ event.end_date|time:"P" }}
+                    {{ event.end_date|date:"D N j" }} {{ event.end_date|time:"P" }}
                 </div>
                 {% endif %}
             </div>
