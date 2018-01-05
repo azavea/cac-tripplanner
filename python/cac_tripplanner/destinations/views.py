@@ -41,11 +41,11 @@ def home(request):
     article = Article.objects.random()
     # Show all destinations
     destinations = list(Destination.objects.published().all().order_by('priority'))
-    events = list(Event.objects.current().all().order_by('priority', 'start_date'))
+    events = list(Event.objects.current().all().order_by('priority', 'start_date'))[:2]
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': destinations + events
+        'destinations': events + destinations
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
