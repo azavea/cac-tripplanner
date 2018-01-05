@@ -41,7 +41,7 @@ def home(request):
     article = Article.objects.random()
     # Show all destinations
     destinations = list(Destination.objects.published().all().order_by('priority'))
-    events = list(Event.objects.published().all().order_by('priority'))
+    events = list(Event.objects.current().all().order_by('priority', 'start_date'))
     context = {
         'tab': 'home',
         'article': article,
@@ -114,7 +114,7 @@ def place_detail(request, pk):
 
 def event_detail(request, pk):
     event = get_object_or_404(Event.objects.published(), pk=pk)
-    more_events = Event.objects.published().exclude(pk=event.pk)[:3]
+    more_events = Event.objects.current().exclude(pk=event.pk)[:3]
     context = dict(tab='explore', event=event, more_events=more_events,
                    **DEFAULT_CONTEXT)
     return base_view(request, 'event-detail.html', context=context)
@@ -314,10 +314,12 @@ class SearchDestinations(View):
             categories = categories.split(',')
             if EVENT_CATEGORY in categories:
                 categories.remove(EVENT_CATEGORY)
-                events = Event.objects.filter(published=True).order_by('priority')
+                events = (Event.objects.current()
+                          .order_by('priority', 'start_date'))
             destinations = destinations.filter(categories__name__in=categories)
         else:
-            events = Event.objects.filter(published=True).order_by('priority')
+            events = (Event.objects.current()
+                      .order_by('priority', 'start_date'))
 
         if text is not None:
                 events = events.filter(name__icontains=text)

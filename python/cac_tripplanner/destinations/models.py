@@ -21,10 +21,10 @@ class EventManager(DestinationManager):
     """Custom manager for Events that allows filtering on published or currently ongoing"""
 
     def current(self):
-        return self.get_queryset().filter(end_date__gte=now(), start_date__lte=now())
+        return self.get_queryset().filter(published=True, end_date__gte=now())
 
     def upcoming(self):
-        return self.get_queryset().filter(start_date__gt=now())
+        return self.get_queryset().filter(published=True, start_date__gt=now())
 
 
 class DestinationCategory(models.Model):
