@@ -35,6 +35,7 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-trip-options.js',
       'app/scripts/cac/routing/cac-routing-itinerary.js',
       'app/scripts/cac/routing/cac-routing-plans.js',
+      'app/scripts/cac/places/cac-places.js',
       'app/scripts/cac/urlrouting/cac-urlrouting.js',
       'app/scripts/cac/map/cac-map-control.js',
       'app/scripts/cac/map/cac-map-isochrone.js',
