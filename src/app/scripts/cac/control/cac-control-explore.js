@@ -332,24 +332,28 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         var isTransit = UserPreferences.getPreference('mode').indexOf('TRANSIT') > -1;
         var isMax = (exploreMinutes === $(options.selectors.isochroneSlider).prop('max'));
 
+        // If filter set to only display events, say "events" in the user messages
+        var filter = UserPreferences.getPreference('destinationFilter');
+        var placeString =  filter === 'Events' ? 'events' : 'destinations';
+
         // alternate text string to display if there are no destinations found
         var text = null;
         if (!destinations || !destinations.length) {
             if (exploreMinutes === '-1') {
                 // not in travel mode; if none found, none match destination category filter
-                text = 'No featured destinations found.';
+                text = 'No featured ' + placeString + ' found.';
             } else if (!isTransit && !isMax) {
-                text = 'No featured destinations within ' + exploreMinutes +
+                text = 'No featured ' + placeString + ' within ' + exploreMinutes +
                     ' minutes. Try including transit or allowing for more time.';
             } else if (!isTransit && isMax) {
-                text = 'No featured destinations within ' + exploreMinutes +
+                text = 'No featured ' + placeString + ' within ' + exploreMinutes +
                     ' minutes. Try including transit, or removing the travel time limit ' +
                     '(click \"within\" above).';
             } else if (isTransit && !isMax) {
-                text = 'No featured destinations within ' + exploreMinutes +
+                text = 'No featured ' + placeString + ' within ' + exploreMinutes +
                     ' minutes. Try allowing for more time.';
             } else {
-                text = 'No featured destinations within ' + exploreMinutes +
+                text = 'No featured ' + placeString + ' within ' + exploreMinutes +
                     ' minutes. Try removing the travel time limit (click \"within\" above).';
             }
         }
