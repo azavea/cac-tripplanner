@@ -290,8 +290,8 @@ class SearchDestinations(View):
         limit = params.get('limit', None)
         categories = params.get('categories', None)
 
-        destinations = []
-        events = []
+        destinations = Destination.objects.none()
+        events = Event.objects.none()
 
         if lat and lon:
             try:
@@ -309,16 +309,18 @@ class SearchDestinations(View):
             destinations = Destination.objects.filter(published=True,
                                                       name__icontains=text).order_by('priority')
 
+        # get events and filter both events and destinations by category
         if categories:
             categories = categories.split(',')
             if EVENT_CATEGORY in categories:
                 categories.remove(EVENT_CATEGORY)
                 events = Event.objects.filter(published=True).order_by('priority')
-                if text is not None:
-                    events = events.filter(name__icontains=text)
             destinations = destinations.filter(categories__name__in=categories)
         else:
             events = Event.objects.filter(published=True).order_by('priority')
+
+        if text is not None:
+                events = events.filter(name__icontains=text)
 
         if limit:
             try:
