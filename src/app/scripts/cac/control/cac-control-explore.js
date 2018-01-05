@@ -324,11 +324,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
      * Helper to build and show templated place cards
      *
      * @param destinations {Array} Detination objects to load into template cards
-     * @Param exploreMinutes {String} String representation of integer number of travel minutes
-                                     the travelshed encompasses; -1 if not in travelshed mode
      */
-    function displayPlaces(destinations, exploreMinutes) {
-        exploreMinutes = exploreMinutes || '-1';
+    function displayPlaces(destinations) {
+        var exploreMinutes = $(options.selectors.isochroneSlider).val();
         var isTransit = UserPreferences.getPreference('mode').indexOf('TRANSIT') > -1;
         var isMax = (exploreMinutes === $(options.selectors.isochroneSlider).prop('max'));
 
@@ -339,7 +337,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // alternate text string to display if there are no destinations found
         var text = null;
         if (!destinations || !destinations.length) {
-            if (exploreMinutes === '-1') {
+            if (!isochroneDestinationIds) {
                 // not in travel mode; if none found, none match destination category filter
                 text = 'No featured ' + placeString + ' found.';
             } else if (!isTransit && !isMax) {
@@ -396,15 +394,14 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
         // use cached results for all destinations and events, if present
         var filter = UserPreferences.getPreference('destinationFilter');
-        var isochroneSize = $(options.selectors.isochroneSlider).val();
         if (allDestinations.length > 0) {
-            displayPlaces(filterPlaces(allDestinations, filter), isochroneSize);
+            displayPlaces(filterPlaces(allDestinations, filter));
             return;
         }
 
         Places.getAllPlaces(exploreLatLng).then(function(data) {
             setDestinationsEvents(data);
-            displayPlaces(filterPlaces(allDestinations, filter), isochroneSize);
+            displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
@@ -459,13 +456,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
         // use cached results
         if (allDestinations.length > 0) {
-            displayPlaces(filterPlaces(allDestinations, filter), '-1');
+            displayPlaces(filterPlaces(allDestinations, filter));
             return;
         }
 
         Places.getAllPlaces(exploreLatLng).then(function(data) {
             setDestinationsEvents(data);
-            displayPlaces(filterPlaces(allDestinations, filter), '-1');
+            displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
