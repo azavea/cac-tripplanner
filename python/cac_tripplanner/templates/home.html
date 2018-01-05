@@ -115,15 +115,17 @@
                             {% if destination.start_date %}
                                 {% if destination.start_date|localtime|date:"D N j" == destination.end_date|localtime|date:"D N j" %}
                                 <!-- same-day event -->
-                                <div class="event-date">
+                                <div class="event-date event-time">
                                     {{ destination.start_date|date:"D N j" }}
-                                    &middot;{{ destination.start_date|time:"P" }}
+                                    &middot; {{ destination.start_date|time:"P" }}
                                 </div>
                                 {% else %}
                                 <!-- event ends on different day than it starts -->
                                 <div class="event-date event-time">
                                     {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
                                     &mdash;
+                                </div>
+                                <div class="event-date event-time">
                                     {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
                                 </div>
                                 {% endif %}
