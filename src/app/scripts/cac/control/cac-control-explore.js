@@ -36,6 +36,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     var fetchingIsochrone = false;
 
     var allDestinations = []; // cache full list of destinations
+    var twoEvents = []; // track the first two events, to use when displaying all
     var isochroneDestinationIds = null; // cache IDs of destinations within isochrone
 
     var events = $({});
@@ -439,7 +440,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     function filterPlacesCategory(places) {
         var filter = UserPreferences.getPreference('destinationFilter');
         if (!filter || filter === 'All') {
-            return places;
+            // include only first two events
+            var noEvents = _.reject(places, function(place) {
+                return _.indexOf(place.categories, 'Events') > -1;
+            });
+            return twoEvents.concat(noEvents);
         }
 
         return _.filter(places, function(place) {
@@ -481,9 +486,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     function setDestinationsEvents(data) {
         if (!data) {
             allDestinations = [];
+            twoEvents = [];
             return;
         }
         allDestinations = data.destinations.concat(data.events);
+        // grab the first two events, to use when displaying 'All'
+        twoEvents = data.events.slice(0, 2);
     }
 
 })(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Places.Places, CAC.Routing.Plans,
