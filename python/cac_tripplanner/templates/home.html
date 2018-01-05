@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load destination_extras %}
+{% load tz %}
 {% block content %}
     {% include "partials/header.html" %}
 
@@ -112,23 +113,18 @@
                             <div class="event-date-time">
                             <!-- show date/time if an event -->
                             {% if destination.start_date %}
-                                {% if destination.start_date.date == destination.end_date.date %}
+                                {% if destination.start_date|localtime|date:"D N j" == destination.end_date|localtime|date:"D N j" %}
                                 <!-- same-day event -->
                                 <div class="event-date">
                                     {{ destination.start_date|date:"D N j" }}
-                                </div>
-                                <div class="event-time">
-                                    <span class="start-time">{{ destination.start_date|time:"P" }}</span>
-                                    &ndash;
-                                    <span class="end-time">{{ destination.end_date|time:"P" }}</span>
+                                    &middot;{{ destination.start_date|time:"P" }}
                                 </div>
                                 {% else %}
                                 <!-- event ends on different day than it starts -->
                                 <div class="event-date event-time">
-                                    starts: {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
-                                </div>
-                                <div class="event-date event-time">
-                                    ends: {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
+                                    {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
+                                    &mdash;
+                                    {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
                                 </div>
                                 {% endif %}
                             {% endif %}
