@@ -75,12 +75,7 @@ class Attraction(models.Model):
 
     def has_activity(self, activity_name):
         """Helper to check if an activity of a given name is available at a destination"""
-        try:
-            if self.activities.get(name=activity_name):
-                return True
-        except Activity.DoesNotExist:
-            pass
-        return False
+        return self.activities.filter(name=activity_name).exists()
 
 
 class Destination(Attraction):
