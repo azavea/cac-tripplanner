@@ -73,6 +73,11 @@ class Attraction(models.Model):
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
 
+    @property
+    def is_event(self):
+        """Helper to check which sub-class this Attraction belongs to"""
+        return isinstance(self, Event)
+
     def has_activity(self, activity_name):
         """Helper to check if an activity of a given name is available at a destination"""
         return self.activities.filter(name=activity_name).exists()

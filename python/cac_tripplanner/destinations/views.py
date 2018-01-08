@@ -170,6 +170,7 @@ def set_destination_properties(destination):
     obj['activities'] = [a.name for a in obj['activities']]
     # add convenience property for whether destination has cycling
     obj['cycling'] = destination.has_activity('cycling')
+    obj['is_event'] = False
 
     obj = set_location_properties(obj, destination)
     return obj
@@ -191,6 +192,7 @@ def set_event_properties(event):
     obj['end_date'] = event.end_date.isoformat()
     # add convenience property for whether event has cycling
     obj['cycling'] = event.has_activity('cycling')
+    obj['is_event'] = True
 
     # add properties of related destination, if any
     obj = set_location_properties(obj, event.destination)

@@ -87,7 +87,7 @@
             </header>
             <ul class="place-list">
                 {% for destination in destinations %}
-                <li class="place-card {% if destination.start_date %}event-card {% endif %} no-origin"
+                <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
                     data-destination-id="{{ destination.id }}"
                     data-destination-x="{{ destination.point.x }}"
                     data-destination-y="{{ destination.point.y }}">
@@ -112,7 +112,7 @@
                             </div>
                             <div class="event-date-time">
                             <!-- show date/time if an event -->
-                            {% if destination.start_date %}
+                            {% if destination.is_event %}
                                 {% if destination.start_date|localtime|date:"D N j" == destination.end_date|localtime|date:"D N j" %}
                                 <!-- same-day event -->
                                 <div class="event-date event-time">
@@ -143,7 +143,7 @@
                                 href="#">Directions</a>
                             {% endif %}
                             <a class="place-card-action place-action-details"
-                               {% if destination.start_date %}
+                               {% if destination.is_event %}
                                href="{% url 'event-detail' pk=destination.pk %}"
                                {% else %}
                                href="{% url 'place-detail' pk=destination.pk %}"
