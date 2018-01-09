@@ -40,8 +40,8 @@ def home(request):
     # Load one random article
     article = Article.objects.random()
     # Show all destinations
-    destinations = list(Destination.objects.published().all().order_by('priority'))
-    events = list(Event.objects.current().all().order_by('priority', 'start_date'))[:2]
+    destinations = list(Destination.objects.published().order_by('priority'))
+    events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
     context = {
         'tab': 'home',
         'article': article,
