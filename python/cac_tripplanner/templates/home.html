@@ -88,9 +88,15 @@
             <ul class="place-list">
                 {% for destination in destinations %}
                 <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
-                    data-destination-id="{{ destination.id }}"
-                    data-destination-x="{{ destination.point.x }}"
-                    data-destination-y="{{ destination.point.y }}">
+                    {% get_directions_id destination as directions_id %}
+                    data-destination-id="{{ directions_id }}"
+                    {% if destination.is_event and directions_id %}
+                        data-destination-x="{{ destination.destination.point.x }}"
+                        data-destination-y="{{ destination.destination.point.y }}"
+                    {% elif not destination.is_event %}
+                        data-destination-x="{{ destination.point.x }}"
+                        data-destination-y="{{ destination.point.y }}"
+                    {% endif %}>
                     <div class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
