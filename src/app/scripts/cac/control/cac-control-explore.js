@@ -440,11 +440,18 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     function filterPlacesCategory(places) {
         var filter = UserPreferences.getPreference('destinationFilter');
         if (!filter || filter === 'All') {
-            // include only first two events
-            var noEvents = _.reject(places, function(place) {
-                return _.indexOf(place.categories, 'Events') > -1;
-            });
-            return twoEvents.concat(noEvents);
+            // handle events display with 'All' filter
+            if (isochroneDestinationIds) {
+                // isochrone filter in place; show all events matching filter, in order
+                // with the matching destinations (not up top)
+                return places;
+            } else {
+                // no isochrone filter in place; show only the first two events, up top
+                var noEvents = _.reject(places, function(place) {
+                    return _.indexOf(place.categories, 'Events') > -1;
+                });
+                return twoEvents.concat(noEvents);
+            }
         }
 
         return _.filter(places, function(place) {
