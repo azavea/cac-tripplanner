@@ -158,11 +158,14 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
             remote: {
                 url: '/api/destinations/search?text=%QUERY',
                 filter: function (response) {
-                    if (response && response.destinations.length) {
-                        return response.destinations;
-                    } else {
-                        return [];
+                    if (response) {
+                        var destinations = response.destinations;
+                        var events = _.reject(response.events, ['placeID', null]);
+                        if (destinations.length || events.length) {
+                            return destinations.concat(events);
+                        }
                     }
+                    return [];
                 }
             }
         });

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load destination_extras %}
+{% load tz %}
 {% block content %}
     {% include "partials/header.html" %}
 
@@ -60,7 +62,7 @@
     <div class="sidebar-banner trip-options-banner hidden"></div>
 
     <div class="places">
-        <div class="places-content">
+        <div class="places-content hidden">
             <header class="places-header">
                 <h1>Places we love</h1>
                 <a href="#" class="map-view-btn">Map View</a>
@@ -85,9 +87,16 @@
             </header>
             <ul class="place-list">
                 {% for destination in destinations %}
-                <li class="place-card no-origin" data-destination-id="{{ destination.id }}"
-                    data-destination-x="{{ destination.point.x }}"
-                    data-destination-y="{{ destination.point.y }}">
+                <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
+                    {% get_directions_id destination as directions_id %}
+                    data-destination-id="{{ directions_id }}"
+                    {% if destination.is_event and directions_id %}
+                        data-destination-x="{{ destination.destination.point.x }}"
+                        data-destination-y="{{ destination.destination.point.y }}"
+                    {% elif not destination.is_event %}
+                        data-destination-x="{{ destination.point.x }}"
+                        data-destination-y="{{ destination.point.y }}"
+                    {% endif %}>
                     <div class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
@@ -108,25 +117,55 @@
                                 Upcoming Event
                             </div>
                             <div class="event-date-time">
-                                <span class="event-date"></span>
-                                · <span class="event-time"></span>
+                            <!-- show date/time if an event -->
+                            {% if destination.is_event %}
+                                {% if destination.start_date|localtime|date:"D N j" == destination.end_date|localtime|date:"D N j" %}
+                                <!-- same-day event -->
+                                <div class="event-date event-time">
+                                    {{ destination.start_date|date:"D N j" }}
+                                    &middot; {{ destination.start_date|time:"P" }}
+                                </div>
+                                {% else %}
+                                <!-- event ends on different day than it starts -->
+                                <div class="event-date event-time">
+                                    {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
+                                    &mdash;
+                                </div>
+                                <div class="event-date event-time">
+                                    {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
+                                </div>
+                                {% endif %}
+                            {% endif %}
                             </div>
                         </div>
                         <h2 class="place-card-name">{{ destination.name }}</h2>
                     </div>
                     <div class="place-card-footer">
                         <div class="place-card-actions">
+                            {% get_directions_id destination as directions_id %}
+                            {% if directions_id %}
                             <a class="place-card-action place-action-go"
-                                data-destination-id="{{ destination.id }}" href="#">Directions</a>
+                                data-destination-id="{{ directions_id }}"
+                                href="#">Directions</a>
+                            {% endif %}
                             <a class="place-card-action place-action-details"
-                               href="{% url 'place-detail' pk=destination.pk %}">More info</a>
+                               {% if destination.is_event %}
+                               href="{% url 'event-detail' pk=destination.pk %}"
+                               {% else %}
+                               href="{% url 'place-detail' pk=destination.pk %}"
+                               {% endif %}
+                               >More info</a>
                         </div>
                         <div class="place-card-badges">
+                            {% has_activity destination 'cycling' as has_cycling %}
+                            {% if has_cycling %}
                             <span class="badge activity" title="Biking trails">
                                 <i class="icon-cycling"></i>
                             </span>
+                            {% endif %}
+                            {% if destination.watershed_alliance %}
                             <a class="badge link"
-                                href=""
+                                href="https://www.watershedalliance.org/"
                                 title="Alliance for Watershed Education"
                                 target="_blank">
                                 <img class="image"
@@ -134,6 +173,7 @@
                                     srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
                                     height="20"
                                     alt="Alliance for Watershed Education"></a>
+                            {% endif %}
                         </div>
                     </div>
                 </li>

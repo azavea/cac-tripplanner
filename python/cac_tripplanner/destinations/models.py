@@ -21,10 +21,10 @@ class EventManager(DestinationManager):
     """Custom manager for Events that allows filtering on published or currently ongoing"""
 
     def current(self):
-        return self.get_queryset().filter(end_date__gte=now(), start_date__lte=now())
+        return self.get_queryset().filter(published=True, end_date__gte=now())
 
     def upcoming(self):
-        return self.get_queryset().filter(start_date__gt=now())
+        return self.get_queryset().filter(published=True, start_date__gt=now())
 
 
 class DestinationCategory(models.Model):
@@ -72,6 +72,15 @@ class Attraction(models.Model):
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
+
+    @property
+    def is_event(self):
+        """Helper to check which sub-class this Attraction belongs to"""
+        return isinstance(self, Event)
+
+    def has_activity(self, activity_name):
+        """Helper to check if an activity of a given name is available at a destination"""
+        return self.activities.filter(name=activity_name).exists()
 
 
 class Destination(Attraction):

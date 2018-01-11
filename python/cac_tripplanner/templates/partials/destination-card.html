@@ -3,7 +3,7 @@
         <img class="preview-photo" src="{{ destination.image.url }}" width="310" alt="{{ destination.name }}" />
         <div class="preview-details">
             <h2>{{ destination.name }}</h2>
-            <p class="lede">{{ destination.description|striptags|truncatewords:20 }}</p>
+            <p class="lede">{{ destination.description|striptags|truncatewords:20|safe }}</p>
         </div>
     </a>
 </div>

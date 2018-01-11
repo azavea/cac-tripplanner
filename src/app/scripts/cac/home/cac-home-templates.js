@@ -1,4 +1,4 @@
-CAC.Home.Templates = (function (Handlebars) {
+CAC.Home.Templates = (function (Handlebars, moment) {
     'use strict';
 
     // precompiled HTML snippets
@@ -87,6 +87,24 @@ CAC.Home.Templates = (function (Handlebars) {
         Handlebars.registerPartial('filterButtonBar', filterButtonBarTemplate);
         Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
         Handlebars.registerHelper('filterPartial', filterPartial);
+
+        // date/time formatting helpers for events
+        Handlebars.registerHelper('eventDate', function(dateTime) {
+            var dt = moment(dateTime); // get ISO string
+            // format date portion like: Tue Dec 26
+            return new Handlebars.SafeString(dt.format('ddd MMM D'));
+        });
+
+         Handlebars.registerHelper('eventTime', function(dateTime) {
+            var dt = moment(dateTime); // get ISO string
+            // format time portion like: 10:19 am
+            return new Handlebars.SafeString(dt.format('h:mm a'));
+        });
+
+         // Helper to check if event starts and ends on the same day
+         Handlebars.registerHelper('sameDay', function(dt1, dt2) {
+            return(moment(dt1).isSame(dt2, 'day'));
+        });
     }
 
     function compileDestinationListTemplate() {
@@ -95,7 +113,9 @@ CAC.Home.Templates = (function (Handlebars) {
             '{{#unless alternateMessage}}',
             '<ul class="place-list">',
                 '{{#each destinations}}',
-                '<li class="place-card no-origin" data-destination-id="{{ this.id }}" ',
+                '<li class="place-card {{#unless this.formattedDuration}}no-origin{{/unless}} ',
+                    '{{#if this.is_event}}event-card{{/if}}" ',
+                    'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
                     'data-destination-x="{{ this.location.x }}" ',
                     'data-destination-y="{{ this.location.y }}">',
                     '<div class="place-card-photo-container">',
@@ -111,39 +131,59 @@ CAC.Home.Templates = (function (Handlebars) {
                     '<div class="place-card-info">',
                         '<div class="place-card-meta">',
                             '<div class="travel-logistics">',
-                                '<span class="travel-logistics-duration"></span> ',
-                                'from <span class="travel-logistics-origin">origin</span>',
+                                '<span class="travel-logistics-duration">{{ this.formattedDuration }}</span> ',
+                                'from <span class="travel-logistics-origin">{{ this.originLabel }}</span>',
                             '</div>',
                             '<div class="event-label">',
                                 'Upcoming Event',
                             '</div>',
                             '<div class="event-date-time">',
-                                '<span class="event-date"></span>',
-                                '· <span class="event-time"></span>',
+                            '{{#if this.is_event }}',
+                                '{{#if (sameDay this.start_date this.end_date) }}',
+                                '<div class="event-date event-time">',
+                                    '{{eventDate this.start_date }} ',
+                                    '&middot; {{eventTime this.start_date }}',
+                                '</div>',
+                                '{{else}}',
+                                '<div class="event-date event-time">',
+                                    '{{eventDate this.start_date }} {{eventTime this.start_date }}&mdash;',
+                                '</div>',
+                                '<div class="event-date event-time">',
+                                    '{{eventDate this.end_date }} {{eventTime this.end_date }}',
+                                '</div>',
+                                '{{/if}}',
+                            '{{/if}}',
                             '</div>',
                         '</div>',
                         '<h2 class="place-card-name">{{ this.name }}</h2>',
                     '</div>',
                     '<div class="place-card-footer">',
                         '<div class="place-card-actions">',
-                            '<a class="place-card-action place-action-go"',
-                                'data-destination-id="{{ this.id }}" href="#">Directions</a>',
-                            '<a class="place-card-action place-action-details"',
-                               'href="/place/{{ this.id }}/">More info</a>',
+                            '{{#if this.placeID}}',
+                            '<a class="place-card-action place-action-go" ',
+                                'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
+                                'href="#">Directions</a>',
+                            '{{/if}}',
+                            '<a class="place-card-action place-action-details" href=',
+                            '"/{{#if this.is_event }}event{{else}}place{{/if}}/{{ this.id }}/"',
+                               '>More info</a>',
                         '</div>',
                         '<div class="place-card-badges">',
+                            '{{#if this.cycling}}',
                             '<span class="badge activity" title="Biking trails">',
                                 '<i class="icon-cycling"></i>',
                             '</span>',
-                            '<a class="badge link"',
-                                'href=""',
-                                'title="Alliance for Watershed Education"',
-                                'target="_blank">',
-                                '<img class="image"',
+                            '{{/if}}',
+                            '{{#if this.watershed_alliance}}',
+                            '<a class="badge link" href="https://www.watershedalliance.org/"',
+                                'title="Alliance for Watershed Education" target="_blank">',
+                                '<img class="image" ',
                                     'src="/static/images/awe-icon.png"',
-                                    'srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"',
-                                    'height="20"',
+                                    'srcset="/static/images/awe-icon.png 1x, ',
+                                    '/static/images/awe-icon@2x.png 2x" ',
+                                    'height="20" ',
                                     'alt="Alliance for Watershed Education"></a>',
+                            '{{/if}}',
                         '</div>',
                     '</div>',
                 '</li>',
@@ -177,4 +217,4 @@ CAC.Home.Templates = (function (Handlebars) {
                                        {data: {level: Handlebars.logger.WARN}});
     }
 
-})(Handlebars);
+})(Handlebars, moment);

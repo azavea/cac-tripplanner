@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
-from .models import Destination
+from .models import Destination, Event
 from cms.models import Article
 
 
@@ -18,6 +18,8 @@ DEFAULT_CONTEXT = {
     'isochrone_url': settings.ISOCHRONE_URL,
     'routing_url': settings.ROUTING_URL
 }
+
+EVENT_CATEGORY = 'Events'
 
 
 def base_view(request, page, context):
@@ -38,11 +40,12 @@ def home(request):
     # Load one random article
     article = Article.objects.random()
     # Show all destinations
-    destinations = Destination.objects.published().all()
+    destinations = list(Destination.objects.published().order_by('priority'))
+    events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': destinations
+        'destinations': events + destinations
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
@@ -109,6 +112,14 @@ def place_detail(request, pk):
     return base_view(request, 'place-detail.html', context=context)
 
 
+def event_detail(request, pk):
+    event = get_object_or_404(Event.objects.published(), pk=pk)
+    more_events = Event.objects.current().exclude(pk=event.pk)[:3]
+    context = dict(tab='explore', event=event, more_events=more_events,
+                   **DEFAULT_CONTEXT)
+    return base_view(request, 'event-detail.html', context=context)
+
+
 def image_to_url(dest_dict, field_name):
     """Helper for converting an image object to a url for a json response
 
@@ -118,6 +129,31 @@ def image_to_url(dest_dict, field_name):
     """
     image = dest_dict.get(field_name)
     return image.url if image else ''
+
+
+def set_location_properties(obj, location):
+    """Helper to set location-related properties on either destinations or events.
+
+    Events have optional related destination, which is the event location.
+
+    :param obj: Dictionary representation of object to which to add location properties
+    :param location: Destination object from which to extract location properties
+    :returns: passed obj dictionary, with added properties
+    """
+    obj['placeID'] = location.pk if location else None
+    obj['point'] = json.loads(location.point.json) if location else None
+    obj['attributes'] = {
+        'City': location.city if location else None,
+        'Postal': location.zipcode if location else None,
+        'Region': location.state if location else None,
+        'StAddr': location.address if location else None
+    }
+    # convert to format like properties on ESRI geocoder results
+    x = obj['point']['coordinates'][0] if location else None
+    y = obj['point']['coordinates'][1] if location else None
+    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
+    obj['location'] = {'x': x, 'y': y}
+    return obj
 
 
 def set_destination_properties(destination):
@@ -130,20 +166,39 @@ def set_destination_properties(destination):
     obj['address'] = obj['name']
     obj['image'] = image_to_url(obj, 'image')
     obj['wide_image'] = image_to_url(obj, 'wide_image')
-    obj['point'] = json.loads(obj['point'].json)
-    # convert to format like properties on ESRI geocoder results
-    x = obj['point']['coordinates'][0]
-    y = obj['point']['coordinates'][1]
-    obj['extent'] = {'xmax': x, 'xmin': x, 'ymax': y, 'ymin': y}
-    obj['location'] = {'x': x, 'y': y}
-    obj['attributes'] = {
-        'City': obj['city'],
-        'Postal': obj['zipcode'],
-        'Region': obj['state'],
-        'StAddr': obj['address']
-    }
     obj['categories'] = [c.name for c in obj['categories']]
     obj['activities'] = [a.name for a in obj['activities']]
+    # add convenience property for whether destination has cycling
+    obj['cycling'] = destination.has_activity('cycling')
+    obj['is_event'] = False
+
+    obj = set_location_properties(obj, destination)
+    return obj
+
+
+def set_event_properties(event):
+    """Helper for adding and converting properties in serializing events as JSON
+
+    :param event: Event model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(event)
+    obj['address'] = event.name
+    obj['image'] = image_to_url(obj, 'image')
+    obj['wide_image'] = image_to_url(obj, 'wide_image')
+    obj['activities'] = [a.name for a in obj['activities']]
+    obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
+    obj['start_date'] = event.start_date.isoformat()
+    obj['end_date'] = event.end_date.isoformat()
+    # add convenience property for whether event has cycling
+    obj['cycling'] = event.has_activity('cycling')
+    obj['is_event'] = True
+
+    # add properties of related destination, if any
+    obj = set_location_properties(obj, event.destination)
+
+    # if related destination belongs to Watershed Alliance, so does this event
+    obj['watershed_alliance'] = event.destination.watershed_alliance if event.destination else False
     return obj
 
 
@@ -198,7 +253,7 @@ class FindReachableDestinations(View):
                 geom = GEOSGeometry(geom_str)
                 matched_objects = (Destination.objects.filter(published=True, point__within=geom)
                                                       .distance(geom)
-                                                      .order_by('distance'))
+                                                      .order_by('distance', 'priority'))
         else:
             matched_objects = []
 
@@ -226,8 +281,8 @@ class SearchDestinations(View):
           - limit param: maximum number of results to return (integer)
           - categories param: comma-separated list of destination category names to filter to
 
-        A search via text will return destinations that match the destination name
-        A search via lat/lon will return destinations that are closest to the search point
+        A search via text returns destinations and events that match the destination name
+        A search via lat/lon returns destinations and events that are closest to the search point
 
         """
         params = request.GET
@@ -237,7 +292,9 @@ class SearchDestinations(View):
         limit = params.get('limit', None)
         categories = params.get('categories', None)
 
-        results = []
+        destinations = Destination.objects.none()
+        events = Event.objects.none()
+
         if lat and lon:
             try:
                 search_point = Point(float(lon), float(lat))
@@ -247,14 +304,27 @@ class SearchDestinations(View):
                     'error': str(e),
                 })
                 return HttpResponse(error, 'application/json')
-            results = (Destination.objects.filter(published=True)
-                       .distance(search_point)
-                       .order_by('distance', 'priority'))
+            destinations = (Destination.objects.filter(published=True)
+                            .distance(search_point)
+                            .order_by('distance', 'priority'))
         elif text is not None:
-            results = Destination.objects.filter(published=True, name__icontains=text)
+            destinations = Destination.objects.filter(published=True,
+                                                      name__icontains=text).order_by('priority')
 
+        # get events and filter both events and destinations by category
         if categories:
-            results = results.filter(categories__name__in=categories.split(','))
+            categories = categories.split(',')
+            if EVENT_CATEGORY in categories:
+                categories.remove(EVENT_CATEGORY)
+                events = (Event.objects.current()
+                          .order_by('priority', 'start_date'))
+            destinations = destinations.filter(categories__name__in=categories)
+        else:
+            events = (Event.objects.current()
+                      .order_by('priority', 'start_date'))
+
+        if text is not None:
+                events = events.filter(name__icontains=text)
 
         if limit:
             try:
@@ -265,9 +335,11 @@ class SearchDestinations(View):
                     'error': str(e),
                 })
                 return HttpResponse(error, 'application/json')
-            results = results[:limit_int]
+            destinations = destinations[:limit_int]
+            events = events[:limit_int]
 
-        data = [set_destination_properties(x) for x in results]
+        destinations = [set_destination_properties(x) for x in destinations]
+        events = [set_event_properties(x) for x in events]
 
-        response = {'destinations': data}
+        response = {'destinations': destinations, 'events': events}
         return HttpResponse(json.dumps(response), 'application/json')
