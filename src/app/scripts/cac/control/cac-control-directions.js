@@ -89,7 +89,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     }
 
     DirectionsControl.prototype = {
-        clearDirections: clearDirections,
         setDirections: setDirections,
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
@@ -176,14 +175,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             UserPreferences.setPreference('method', 'directions');
             setFromUserPreferences();
         } else {
-            clearDirections();
+            clearItineraries();
             showPlaces(true);
         }
-    }
-
-    function clearDirections() {
-        mapControl.setDirectionsMarkers(null, null);
-        clearItineraries();
     }
 
     function clearItineraries() {
