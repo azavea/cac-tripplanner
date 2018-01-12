@@ -81,8 +81,9 @@
     .event-date-time {
         display: none;
         flex: none;
-        color: $lt-gray;
+        color: $font-color;
         font-size: 1.1rem;
+        font-weight: $font-weight-semibold;
         text-align: right;
         text-transform: uppercase;
         white-space: nowrap;
