@@ -170,7 +170,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                         '</div>',
                         '<div class="place-card-badges">',
                             '{{#if this.cycling}}',
-                            '<span class="badge activity" title="Biking trails">',
+                            '<span class="badge activity" title="Cycling">',
                                 '<i class="icon-cycling"></i>',
                             '</span>',
                             '{{/if}}',
