@@ -27,6 +27,8 @@
 .icon-rail:before { content: '\e81b'; } /* '' */
 .icon-train:before { content: '\e81c'; } /* '' */
 .icon-cycling:before { content: '\e820'; } /* '' */
+.icon-hiking:before { content: '\e826'; } /* '' */
+.icon-water:before { content: '\e827'; } /* '' */
 .icon-twitter:before { content: '\f099'; } /* '' */
 .icon-gplus:before { content: '\f0d5'; } /* '' */
 .icon-email:before { content: '\f0e0'; } /* '' */
