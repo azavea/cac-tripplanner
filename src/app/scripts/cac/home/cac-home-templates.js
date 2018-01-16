@@ -98,7 +98,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
          Handlebars.registerHelper('eventTime', function(dateTime) {
             var dt = moment(dateTime); // get ISO string
             // format time portion like: 10:19 am
-            return new Handlebars.SafeString(dt.format('h:mm a'));
+            return new Handlebars.SafeString(dt.format('h:mmA'));
         });
 
          // Helper to check if event starts and ends on the same day
@@ -141,15 +141,15 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                             '{{#if this.is_event }}',
                                 '{{#if (sameDay this.start_date this.end_date) }}',
                                 '<div class="event-date event-time">',
-                                    '{{eventDate this.start_date }} ',
-                                    '&middot; {{eventTime this.start_date }}',
+                                    '{{eventDate this.start_date }}',
+                                    ' &middot; ',
+                                    '{{eventTime this.start_date }}',
                                 '</div>',
                                 '{{else}}',
                                 '<div class="event-date event-time">',
-                                    '{{eventDate this.start_date }} {{eventTime this.start_date }}&mdash;',
-                                '</div>',
-                                '<div class="event-date event-time">',
-                                    '{{eventDate this.end_date }} {{eventTime this.end_date }}',
+                                    '{{eventDate this.start_date }}',
+                                    ' &ndash; ',
+                                    '{{eventDate this.end_date }}',
                                 '</div>',
                                 '{{/if}}',
                             '{{/if}}',
@@ -170,7 +170,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                         '</div>',
                         '<div class="place-card-badges">',
                             '{{#if this.cycling}}',
-                            '<span class="badge activity" title="Biking trails">',
+                            '<span class="badge activity" title="Cycling">',
                                 '<i class="icon-cycling"></i>',
                             '</span>',
                             '{{/if}}',

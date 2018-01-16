@@ -122,17 +122,16 @@
                                 {% if destination.start_date|localtime|date:"D N j" == destination.end_date|localtime|date:"D N j" %}
                                 <!-- same-day event -->
                                 <div class="event-date event-time">
-                                    {{ destination.start_date|date:"D N j" }}
-                                    &middot; {{ destination.start_date|time:"P" }}
+                                    {{ destination.start_date|date:"D M j" }}
+                                    &middot;
+                                    {{ destination.start_date|time:"fA" }}
                                 </div>
                                 {% else %}
                                 <!-- event ends on different day than it starts -->
                                 <div class="event-date event-time">
-                                    {{ destination.start_date|date:"D N j" }} {{ destination.start_date|time:"P" }}
-                                    &mdash;
-                                </div>
-                                <div class="event-date event-time">
-                                    {{ destination.end_date|date:"D N j" }} {{ destination.end_date|time:"P" }}
+                                    {{ destination.start_date|date:"D M j" }}
+                                    &ndash;
+                                    {{ destination.end_date|date:"D M j" }}
                                 </div>
                                 {% endif %}
                             {% endif %}
@@ -159,7 +158,7 @@
                         <div class="place-card-badges">
                             {% has_activity destination 'cycling' as has_cycling %}
                             {% if has_cycling %}
-                            <span class="badge activity" title="Biking trails">
+                            <span class="badge activity" title="Cycling">
                                 <i class="icon-cycling"></i>
                             </span>
                             {% endif %}

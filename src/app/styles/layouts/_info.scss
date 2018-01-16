@@ -112,7 +112,7 @@
         margin: 24px 0;
 
         @include respond-to('xs') {
-            flex-direction: column;
+            flex-direction: column-reverse;
             align-items: stretch;
         }
     }
@@ -129,7 +129,7 @@
         @include respond-to('xs') {
             flex-direction: row;
             align-items: center;
-            margin: 3.2rem 0 0;
+            margin: -.8rem 0 .8rem;
         }
     }
 
@@ -141,7 +141,7 @@
         margin: 1rem 0 0;
         padding: 0;
         color: $gophillygo-green;
-        font-size: 1.4rem;
+        font-size: 1.6rem;
         list-style: none;
 
         @include respond-to('xs') {
@@ -151,7 +151,7 @@
         }
 
         .category {
-            margin-bottom: 1em;
+            margin-bottom: .8rem;
             line-height: 1.2;
 
             @include respond-to('xs') {
@@ -204,6 +204,38 @@
         font-size: 3rem;
         font-weight: $font-weight-medium;
         line-height: 1.5;
+    }
+
+    .info-event-destination {
+        margin: .8rem 0;
+        font-size: 1.8rem;
+        font-weight: $font-weight-medium;
+        line-height: 1.5;
+    }
+
+    .info-event-destination-link {
+        @include delinkify($gophillygo-blue);
+    }
+
+    .info-event-meta {
+        flex: none;
+        margin-left: 30px;
+        font-size: 1.8rem;
+        font-weight: $font-weight-bold;
+        line-height: 2;
+
+        @include respond-to('xs') {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: flex-start;
+            margin: -12px 0 8px;
+            align-items: stretch;
+
+            .info-event-time::before {
+                content: ' · ';
+            }
+        }
     }
 
     .info-article-aside {
@@ -267,7 +299,7 @@
         text-transform: uppercase;
 
         @include respond-to('xxs') {
-            justify-content: space-between;
+            margin-top: 2rem;
             font-size: 1.4rem;
             line-height: 2.6;
         }
@@ -278,11 +310,6 @@
             padding: 0 1em;
             background-color: $gophillygo-blue;
             cursor: pointer;
-
-            @include respond-to('xxs') {
-                margin-right: .4rem;
-                padding: 0 .6em;
-            }
         }
 
         .place-website-link {
@@ -291,11 +318,6 @@
             padding: 0 1em;
             background-color: $gophillygo-purple;
             cursor: pointer;
-
-            @include respond-to('xxs') {
-                margin-right: 0;
-                padding: 0 .6em;
-            }
         }
 
         .place-awe-link {
