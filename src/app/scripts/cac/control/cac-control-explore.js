@@ -252,6 +252,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (key === 'origin') {
             showSpinner();
             exploreLatLng = null;
+            mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
             // get all places in sidebar when no origin set
             getNearbyPlaces();
