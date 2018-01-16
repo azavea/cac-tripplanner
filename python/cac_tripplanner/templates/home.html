@@ -85,7 +85,7 @@
                     <input type="hidden" name="destination-filter" value="All">
                 </div>
             </header>
-            <ul class="place-list">
+            <ul class="place-list" data-filter="All">
                 {% for destination in destinations %}
                 <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
                     {% get_directions_id destination as directions_id %}

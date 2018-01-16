@@ -111,7 +111,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
         var source = [
             '{{> (filterPartial isHome) }}',
             '{{#unless alternateMessage}}',
-            '<ul class="place-list">',
+            '<ul class="place-list" data-filter="{{currentFilter}}">',
                 '{{#each destinations}}',
                 '<li class="place-card {{#unless this.formattedDuration}}no-origin{{/unless}} ',
                     '{{#if this.is_event}}event-card{{/if}}" ',
@@ -206,13 +206,15 @@ CAC.Home.Templates = (function (Handlebars, moment) {
      *
      * @param useDestinations {Array} Collection of JSON destinations from /api/destinations/search
      * @param alternateMessage {String} Text to display if there are no destinations
+     * @param currentFilter {String} Currently applied list filter; one of `filterOptions`
      * @param isHome {Boolean} True if currently on home page (and not map page)
      * @return html {String} Snippets for boxes to display on home page for each destination
      */
-    function destinations(useDestinations, alternateMessage, isHome) {
+    function destinations(useDestinations, alternateMessage, currentFilter, isHome) {
         return destinationListTemplate({destinations: useDestinations,
                                        alternateMessage: alternateMessage,
                                        filterOptions: filterOptions,
+                                       currentFilter: currentFilter,
                                        isHome: isHome},
                                        {data: {level: Handlebars.logger.WARN}});
     }
