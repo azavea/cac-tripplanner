@@ -367,6 +367,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             destinations = _.sortBy(destinations, ['duration']);
             var places = HomeTemplates.destinations(destinations,
                                                     text,
+                                                    filter,
                                                     tabControl.isTabShowing(tabControl.TABS.HOME));
             $(options.selectors.placesContent).html(places);
             // send event that places content changed
