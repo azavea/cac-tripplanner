@@ -116,7 +116,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
             distance: 900,  // radius, in meters, to search within; defaults to 100m
             returnIntersection: true,
             f: 'pjson',
-            cache: true
+            cache: false  // otherwise might get 304s
         };
 
         $.ajax(reverseUrl, {
