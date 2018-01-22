@@ -360,7 +360,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
         // Now places list has been updated, go fetch the travel time to each
         // from the new origin to each place.
-        var promises = Places.getTimesToPlaces(destinations);
+        var promises = Places.getTimesToPlaces(destinations, exploreLatLng);
         $.when.apply($, promises).always(function() {
 
             // order the destinations by travel time
