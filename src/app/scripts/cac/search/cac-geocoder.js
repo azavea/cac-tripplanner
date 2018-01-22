@@ -42,8 +42,8 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
         var dfd = $.Deferred();
         $.ajax(url, {
             data: getParams(text, magicKey),
-            dataType: 'json',
-            cache: true,
+            cache: false,
+            crossDomain: true,
             success: function (data) {
                 if (data && data.candidates && data.candidates.length &&
                         data.candidates[0].attributes.StAddr.length) {
@@ -64,8 +64,8 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
                             // try searching again without the POI name part
                             $.ajax(url, {
                                 data: getParams(newText, magicKey),
-                                dataType: 'json',
-                                cache: true,
+                                crossDomain: true,
+                                cache: false,
                                 success: function (data) {
                                     returnLocation(data, dfd);
                                 }, error: function (error) {
@@ -93,6 +93,7 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
     // Helper function to encapsulate the "return whatever location we have, if we have one"
     // logic, since it's needed repeatedly
     function returnLocation(data, dfd) {
+        data = JSON.parse(data);
         if (data && data.candidates && data.candidates.length) {
             dfd.resolve(data.candidates[0]);
         } else {
@@ -115,12 +116,13 @@ CAC.Search.Geocoder = (function ($, SearchParams) {
             location: [lng, lat].join(','),
             distance: 900,  // radius, in meters, to search within; defaults to 100m
             returnIntersection: true,
-            f: 'pjson',
-            cache: false  // otherwise might get 304s
+            f: 'pjson'
         };
 
         $.ajax(reverseUrl, {
             data: params,
+            cache: false,  // otherwise might get 304s
+            crossDomain: true,
             success: function (data) {
                 dfd.resolve(JSON.parse(data));
             },
