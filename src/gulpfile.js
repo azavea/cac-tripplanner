@@ -64,6 +64,7 @@ var scriptOrder = [
     '**/cac/user/*.js',
     '**/cac/search/*.js',
     '**/cac/routing/*.js',
+    '**/cac/places/*.js',
     '**/cac/urlrouting/*.js',
     '**/cac/control/cac-control-mode-options.js',
     '**/cac/control/*.js',
@@ -263,7 +264,9 @@ gulp.task('test:production', ['test:copy-jquery',
             new KarmaServer({
                 configFile: __dirname + '/karma/karma.conf.js',
                 singleRun: true
-            }, done).start();
+            }, function() {
+                done();
+            }).start();
         }, 6000);
     }
 );

@@ -6,6 +6,7 @@ CAC = (function () {
         Home: {},
         Map: {},
         Pages: {},
+        Places: {},
         Routing: {},
         Search: {},
         Share: {},

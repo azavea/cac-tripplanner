@@ -1,5 +1,5 @@
-CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchParams, TabControl,
-                            UserPreferences, UrlRouter, Utils) {
+CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOptions, SearchParams,
+                            TabControl, UserPreferences, UrlRouter, Utils) {
     'use strict';
 
     // this needs to match the value in styles/utils/_breakpoints.scss
@@ -39,6 +39,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     };
 
     var options = {};
+    var filterOptionsControl = null;
     var modeOptionsControl = null;
     var mapControl = null;
     var tabControl = null;
@@ -46,6 +47,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     var directionsFormControl = null;
     var directionsControl = null;
     var exploreControl = null;
+    var tripOptionsTemplate = null;
 
     function Home(params) {
         options = $.extend({}, defaults, params);
@@ -83,9 +85,21 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             urlRouter: urlRouter
         });
 
+        // Precompile trip options template. Do before `showHideNeedWheelsBanner` called.
+        var tripOptions = [
+            '<div class="banner-message">',
+            '{{modeText}}&ensp;&middot;&ensp;',
+            '{{#if rideTypeOrAccessibility}}',
+                '{{rideTypeOrAccessibility}}&ensp;&middot;&ensp;',
+            '{{/if}}',
+            '{{timingText}}',
+            '</div>'
+        ].join('');
+        tripOptionsTemplate = Handlebars.compile(tripOptions);
 
         Utils.initializeMoment();
         showHideNeedWheelsBanner();
+        _setupFilterControl();
         _setupEvents();
         setupServiceWorker();
     };
@@ -119,6 +133,10 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
                                         $.proxy(onTypeaheadSelected, this));
 
         urlRouter.events.on(urlRouter.eventNames.changed, onUrlChanged);
+
+        // re-initialize filter control after templated HTML rewritten
+        exploreControl.events.on(exploreControl.eventNames.destinationsLoaded,
+                                 _setupFilterControl);
 
         if ($(options.selectors.map).is(':visible')) {
             // Map is visible on load
@@ -230,6 +248,18 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         $(document).ready(setActiveTab);
     }
 
+    // Destinations filter is templated with the destinations list, so must be
+    // re-initialized after destinations list changes. Initialize it with this method.
+    function _setupFilterControl() {
+        if (filterOptionsControl) {
+            filterOptionsControl.events.off();
+            filterOptionsControl.destroy();
+        }
+        filterOptionsControl = new FilterOptions();
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
+        filterOptionsControl.events.on(filterOptionsControl.eventNames.toggle, toggledFilter);
+    }
+
     // Sets the active tab based on the 'method' user preference. The controllers listen for the
     // resulting "tab shown" event and do their thing if they're being activated (or hidden).
     function setActiveTab() {
@@ -238,6 +268,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             if (method === 'directions') {
                 directionsControl.setFromUserPreferences();
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
+                exploreControl.showPlacesContent(); // hide spinner
             } else if (method === 'explore') {
                 exploreControl.showSpinner();
                 exploreControl.setFromUserPreferences();
@@ -246,11 +277,12 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             }
         } else {
             tabControl.setTab(tabControl.TABS.HOME);
+            exploreControl.showPlacesContent(); // hide spinner
         }
     }
 
-    // Returning to the Home tab resets everything as though it were loaded fresh
     function onTabShown(event, tabId) {
+        // Returning to the Home tab resets everything as though it were loaded fresh
         if (tabId === tabControl.TABS.HOME) {
             UserPreferences.setPreference('method', undefined);
             clearUserSettings();
@@ -277,6 +309,22 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         event.preventDefault();
         directionsFormControl.moveOriginDestination('destination', position);
     }
+
+    /**
+     * Updates destination filter when filter selection changed.
+     */
+     function toggledFilter(event, filter) {
+        // getNearbyPlaces is called with a debounce, so show spinner first
+        exploreControl.showSpinner();
+        // Do not trigger destination list requery unless filter actually changed.
+        // Avoids possible infinite update loop with map page select control.
+        var currentFilter = UserPreferences.getPreference('destinationFilter');
+        if (currentFilter === filter) {
+            return;
+        }
+        UserPreferences.setPreference('destinationFilter', filter);
+        exploreControl.getNearbyPlaces();
+     }
 
     /**
      * Updates mode user preference when mode button toggled and triggers trip re-query.
@@ -311,6 +359,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
     // Note that components are responsible for doing the right thing based on whether they're
     // active or not.
     function onUrlChanged() {
+        filterOptionsControl.setFilter(UserPreferences.getPreference('destinationFilter'));
         modeOptionsControl.setMode(UserPreferences.getPreference('mode'));
         directionsFormControl.setFromUserPreferences();
         showHideNeedWheelsBanner();
@@ -404,16 +453,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
      * Sets the HTML in the trip options sidebar banner, based on user preferences.
      */
     function updateTripOptionsBanner() {
-        var source = [
-            '<div class="banner-message">',
-            '{{modeText}}&ensp;&middot;&ensp;',
-            '{{#if rideTypeOrAccessibility}}',
-                '{{rideTypeOrAccessibility}}&ensp;&middot;&ensp;',
-            '{{/if}}',
-            '{{timingText}}',
-            '</div>'
-        ].join('');
-
         var isDefault = true;
 
         var mode = UserPreferences.getPreference('mode');
@@ -457,8 +496,7 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
             return;
         }
 
-        var template = Handlebars.compile(source);
-        var html = template({
+        var html = tripOptionsTemplate({
             modeText: modeText,
             rideTypeOrAccessibility: rideTypeOrAccessibility,
             timingText: timingText
@@ -521,5 +559,6 @@ CAC.Pages.Home = (function ($, ModeOptions,  MapControl, TripOptions, SearchPara
         return iOS && webkit && !(/CriOS/i.test(ua)) && !(/OPiOS/i.test(ua));
     }
 
-})(jQuery, CAC.Control.ModeOptions, CAC.Map.Control, CAC.Control.TripOptions, CAC.Search.SearchParams,
-    CAC.Control.Tab, CAC.User.Preferences, CAC.UrlRouting.UrlRouter, CAC.Utils);
+})(jQuery, CAC.Control.FilterOptions, CAC.Control.ModeOptions, CAC.Map.Control,
+    CAC.Control.TripOptions, CAC.Search.SearchParams, CAC.Control.Tab, CAC.User.Preferences,
+    CAC.UrlRouting.UrlRouter, CAC.Utils);

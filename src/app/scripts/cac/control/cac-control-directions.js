@@ -2,8 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Templates, Typeahead,
-                                    UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences, Utils) {
 
     'use strict';
 
@@ -90,7 +89,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
     }
 
     DirectionsControl.prototype = {
-        clearDirections: clearDirections,
         setDirections: setDirections,
         setOptions: setOptions,
         setFromUserPreferences: setFromUserPreferences
@@ -177,14 +175,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
             UserPreferences.setPreference('method', 'directions');
             setFromUserPreferences();
         } else {
-            clearDirections();
+            clearItineraries();
             showPlaces(true);
         }
-    }
-
-    function clearDirections() {
-        mapControl.setDirectionsMarkers(null, null);
-        clearItineraries();
     }
 
     function clearItineraries() {
@@ -360,8 +353,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);
-            showPlaces(true);
-            exploreControl.getNearbyPlaces();
+            // only load destinations list in directions mode when destination field empty
+            if (key === 'destination') {
+                showPlaces(true);
+                exploreControl.getNearbyPlaces();
+            }
         }
     }
 
@@ -416,6 +412,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         } else {
             $(options.selectors.directions).show();
             $(options.selectors.places).hide();
+            exploreControl.showPlacesContent(); // hide spinner
         }
     }
 
@@ -449,5 +446,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Geocoder, Routing, Te
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Search.Geocoder,
-    CAC.Routing.Plans, CAC.Home.Templates, CAC.Search.Typeahead, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);

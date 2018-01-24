@@ -32,7 +32,7 @@
 
     h1 {
         flex: auto;
-        margin: 5rem auto;
+        margin: 3rem auto;
         font-size: 2.5rem;
         font-weight: $font-weight-bold;
         line-height: 1.5;
@@ -74,15 +74,23 @@
     }
 
     .info-article-header {
-        text-align: center;
+        padding: 0 4rem;
+
+        @include respond-to('xxs') {
+            padding: 0 1rem;
+        }
     }
 
     .info-article-image-hero {
         height: 200px;
+        margin-right: -4rem;
+        margin-left: -4rem;
     }
 
     .info-place-image-hero {
         height: 400px;
+        margin-right: -4rem;
+        margin-left: -4rem;
 
         @include respond-to('xxs') {
             height: 60vw; // Honor destination image aspect ratio
@@ -96,27 +104,137 @@
         background-size: cover;
     }
 
+    .info-article-header-info {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin: 24px 0;
+
+        @include respond-to('xs') {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+    }
+
+    .info-place-meta {
+        display: flex;
+        flex: none;
+        flex-flow: column nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        min-width: 9.6rem;
+        margin-left: 3.2rem;
+
+        @include respond-to('xs') {
+            flex-direction: row;
+            align-items: center;
+            margin: -.8rem 0 .8rem;
+        }
+    }
+
+    .info-place-categories {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        margin: 1rem 0 0;
+        padding: 0;
+        color: $gophillygo-green;
+        font-size: 1.6rem;
+        list-style: none;
+
+        @include respond-to('xs') {
+            flex-direction: row;
+            margin: 0 .8rem 0 0;
+            font-size: 1.5rem;
+        }
+
+        .category {
+            margin-bottom: .8rem;
+            line-height: 1.2;
+
+            @include respond-to('xs') {
+                margin: 0 1.6rem 0 0;
+            }
+
+            @include respond-to('xxs') {
+                margin-right: .8rem;
+            }
+        }
+    }
+
+    .info-place-activities {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        margin: 0;
+        padding: 0;
+        color: $gray;
+        font-size: 2.4rem;
+        line-height: 1.4;
+        list-style: none;
+
+        @include respond-to('xxs') {
+            font-size: 2rem;
+        }
+
+        .activity:not(:last-of-type) {
+            margin-right: .8rem;
+        }
+
+        .activity {
+            @include respond-to('xxs') {
+                margin-right: .1rem;
+            }
+        }
+    }
+
     .info-article-category {
-        margin: 20px 60px 0;
+        margin-bottom: 20px;
         color: $gophillygo-red;
         font-size: 1.4rem;
         line-height: 1;
         text-transform: uppercase;
-
-        @include respond-to('xs') {
-            margin: 20px;
-        }
     }
 
     .info-article-title {
-        margin: 20px 60px;
+        margin: 0;
         font-size: 3rem;
-        font-style: italic;
+        font-weight: $font-weight-medium;
         line-height: 1.5;
+    }
+
+    .info-event-destination {
+        margin: .8rem 0;
+        font-size: 1.8rem;
+        font-weight: $font-weight-medium;
+        line-height: 1.5;
+    }
+
+    .info-event-destination-link {
+        @include delinkify($gophillygo-blue);
+    }
+
+    .info-event-meta {
+        flex: none;
+        margin-left: 30px;
+        font-size: 1.8rem;
+        font-weight: $font-weight-bold;
+        line-height: 2;
 
         @include respond-to('xs') {
-            margin: 20px;
-            font-size: 2.5rem;
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: flex-start;
+            margin: -12px 0 8px;
+            align-items: stretch;
+
+            .info-event-time::before {
+                content: ' · ';
+            }
         }
     }
 
@@ -126,7 +244,7 @@
         padding: 0 4rem 0 2rem;
         float: right;
         border-left: 2px solid $gophillygo-green;
-        color: #555;
+        color: $gray;
         font-size: 1.3rem;
         font-style: italic;
         line-height: 1.8;
@@ -142,17 +260,13 @@
         @include respond-to('xs') {
             display: none;
         }
-
-        // @include respond-to('xxs') {
-        //     width: 36%;
-        // }
     }
 
     .info-article-section {
         padding: 0 4rem;
 
         @include respond-to('xxs') {
-            padding: 0 2rem;
+            padding: 0 1rem;
         }
 
         p {
@@ -167,35 +281,60 @@
             font-weight: $font-weight-bold;
         }
 
+        iframe {
+            max-width: 100%;
+        }
     }
 
     .info-place-actions {
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
-        justify-content: center;
-        margin: 2rem 0;
+        justify-content: flex-start;
+        margin-top: 30px;
         font-size: 1.6rem;
-        font-style: italic;
         font-weight: $font-weight-semibold;
         line-height: 2.4;
         text-align: center;
         text-transform: uppercase;
 
-        .place-website-link {
-            @include delinkify($white);
-            background-color: $gophillygo-purple;
-            margin: 0 1em;
-            padding: 0 1em;
-            cursor: pointer;
+        @include respond-to('xxs') {
+            margin-top: 2rem;
+            font-size: 1.4rem;
+            line-height: 2.6;
         }
 
         .place-action-go {
             @include delinkify($white);
-            background-color: $gophillygo-blue;
-            margin: 0 1em;
+            margin-right: 2.4rem;
             padding: 0 1em;
+            background-color: $gophillygo-blue;
             cursor: pointer;
+        }
+
+        .place-website-link {
+            @include delinkify($white);
+            margin-right: 2.4rem;
+            padding: 0 1em;
+            background-color: $gophillygo-purple;
+            cursor: pointer;
+        }
+
+        .place-awe-link {
+            @include delinkify($white);
+            height: 38px;
+            background-color: $white;
+            cursor: pointer;
+
+            @include respond-to('xxs') {
+                height: 36px;
+                margin-left: .4rem;
+
+                .image {
+                    height: 36px;
+                }
+            }
+
         }
     }
 

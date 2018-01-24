@@ -1,11 +1,17 @@
 .sk-spinner {
     display: flex;
     position: absolute;
+    left: 0;
+    right: 0;
     flex-flow: row nowrap;
     justify-content: center;
     width: 100%;
 
     &.hidden {
         display: none;
+    }
+
+    &.sk-three-bounce .sk-child {
+        background-color: $gophillygo-blue;
     }
 }
