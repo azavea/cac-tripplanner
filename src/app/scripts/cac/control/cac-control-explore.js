@@ -133,6 +133,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
     // Helper to hide places list and show loading spinner in its place
     function showSpinner() {
+        // Directions tab shows its own spinner, with slightly different placement.
+        // When explore tab content (places list) displays within the directions tab,
+        // the directions tab handles showing/hiding its own spinner around it.
+        if (!tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+            return;
+        }
         $(options.selectors.placesContent).addClass('hidden');
         $(options.selectors.spinner).removeClass('hidden');
     }
