@@ -164,7 +164,12 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
                 // prevent typeahead dropdown from opening by removing focus
                 clearFocus();
 
+                // use the exact location marker is at, rather than reverse geocode location
+                data.location.x = position.lng;
+                data.location.y = position.lat;
+
                 var location = Utils.convertReverseGeocodeToLocation(data);
+
                 UserPreferences.setPreference(key, location);
                 /*jshint camelcase: false */
                 var fullAddress = data.address.Match_addr;
