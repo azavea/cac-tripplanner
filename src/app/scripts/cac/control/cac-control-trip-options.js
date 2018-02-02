@@ -1,7 +1,7 @@
 /**
  * Manage modals used to set and display trip planning options.
  */
-CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferences) {
+CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferences, Utils) {
     'use strict';
 
     var defaults = {
@@ -11,7 +11,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         defaultMenuText: {
             bikeShare: 'Indego bike sharing',
             timing: 'Arrive or Depart at…',
-            bikeTriangle: 'Ride quality',
+            bikeOptimize: 'Ride quality',
             accessibility: 'Accessibility'
         },
         selectors: {
@@ -62,15 +62,15 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 'noWheelchair': {name: 'wheelchair', value: undefined},
                 'noBikeShare': {name: 'bikeShare', value: undefined},
                 'useBikeShare': {name: 'bikeShare', value: true},
-                'bikeTriangleAny': {name: 'bikeTriangle', value: undefined},
-                'bikeTriangleFast': {name: 'bikeTriangle', value: 'fast'},
-                'bikeTriangleFlat': {name: 'bikeTriangle', value: 'flat'},
-                'bikeTriangleSafe': {name: 'bikeTriangle', value: 'safe'},
+                'bikeOptimizeAny': {name: 'bikeOptimize', value: 'ANY'},
+                'bikeOptimizeFast': {name: 'bikeOptimize', value: 'QUICK'},
+                'bikeOptimizeFlat': {name: 'bikeOptimize', value: 'FLAT'},
+                'bikeOptimizeSafe': {name: 'bikeOptimize', value: 'GREENWAYS'},
                 'arriveBy': {name: 'arriveBy', value: true},
                 'departAt': {name: 'arriveBy', value: false}
             },
             // distinct 'name' in optionPreferences above
-            preferences: ['wheelchair', 'bikeShare', 'bikeTriangle', 'arriveBy']
+            preferences: ['wheelchair', 'bikeShare', 'bikeOptimize', 'arriveBy']
         }
     };
     var events = $({});
@@ -291,6 +291,9 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                     if (selectedOptionId === 'useBikeShare') {
                         UserPreferences.setPreference('arriveBy', false);
                         UserPreferences.setPreference('dateTime', undefined);
+                    } else  if (selectedOptionId === 'bikeOptimizeSafe') {
+                        // safe mode is default for bike optimization
+                        UserPreferences.setPreference(setting.name, undefined);
                     }
                 } else {
                     console.error('selected unrecognized option with ID: ' + selectedOptionId);
@@ -333,7 +336,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         var source = [
             '<li class="modal-list-indego {{#if setBikeShare}} selected{{/if}}">{{bikeShare}}</li>',
             '<li class="modal-list-timing {{#if setTiming}} selected{{/if}}">{{timing}}</li>',
-            '<li class="modal-list-ride {{#if setTriangle}} selected{{/if}}">{{bikeTriangle}}</li>'
+            '<li class="modal-list-ride {{#if setBikeOptimize}} selected{{/if}}">{{bikeOptimize}}</li>'
         ].join('');
 
         var bikeShare = options.defaultMenuText.bikeShare;
@@ -347,16 +350,12 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             }
         }
 
-        var bikeTriangle = options.defaultMenuText.bikeTriangle;
-        var setTriangle = false;
-        if (!UserPreferences.isDefault('bikeTriangle')) {
-            setTriangle = true;
-            var bikePreference = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = [
-                bikePreference.charAt(0).toUpperCase(),
-                bikePreference.slice(1),
-                ' ride'
-            ].join('');
+        var bikeOptimize = options.defaultMenuText.bikeOptimize;
+        var setBikeOptimize = false;
+        if (!UserPreferences.isDefault('bikeOptimize')) {
+            setBikeOptimize = true;
+            var bikePreference = UserPreferences.getPreference('bikeOptimize');
+            bikeOptimize = Utils.getBikeOptimizeLabel(bikePreference);
         }
 
         var timing = getTimingText();
@@ -371,8 +370,8 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
             setBikeShare: setBikeShare,
             timing: timing,
             setTiming: setTiming,
-            bikeTriangle: bikeTriangle,
-            setTriangle: setTriangle
+            bikeOptimize: bikeOptimize,
+            setBikeOptimize: setBikeOptimize
         });
 
         return html;
@@ -623,4 +622,4 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         UserPreferences.setPreference('dateTime', undefined);
     }
 
-})(jQuery, Handlebars, moment, CAC.Control.Modal, CAC.User.Preferences);
+})(jQuery, Handlebars, moment, CAC.Control.Modal, CAC.User.Preferences, CAC.Utils);

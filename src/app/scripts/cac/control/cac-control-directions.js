@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences) {
 
     'use strict';
 
@@ -227,13 +227,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
-            if (bikeTriangle) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
+            var bikeOptimize = UserPreferences.getPreference('bikeOptimize');
+            if (bikeOptimize !== 'ANY') {
+                $.extend(otpOptions, {optimize: bikeOptimize});
             }
         } else {
-            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair'),
+                                   optimize: 'GREENWAYS' });
         }
 
         $.extend(otpOptions, {
@@ -446,4 +446,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences);

@@ -33,7 +33,7 @@ CAC.User.Preferences = (function(Storages, _) {
     var defaults = {
         arriveBy: false, // depart at set time, by default
         bikeShare: false,
-        bikeTriangle: 'any',
+        bikeOptimize: 'GREENWAYS',
         dateTime: undefined, // explicitly list here for isDefault check
         destinationFilter: 'All',
         exploreMinutes: 15,
