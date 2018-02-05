@@ -68,17 +68,41 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     };
 
     /**
-     * Get geoJSON for an itinerary
+     * Get geoJSON for an itinerary. Also updates `from` and `to` points while building geoJSON.
+     *
+     * Use intermediate leg polyline objects to find start and end of actual route.
+     * `from` and `to` as returned from OTP are the requested start and end points;
+     * find the actually routable start and end to trip from the polyline(s).
      *
      * @param {array} legs set of legs for an OTP itinerary
      * @return {array} array of geojson features
      */
     Itinerary.prototype.getFeatures = function(legs) {
-        return _.map(legs, function(leg) {
-            var linestringGeoJson = L.Polyline.fromEncoded(leg.legGeometry.points).toGeoJSON();
+        var self = this;
+        var lastIndex = legs.length - 1;
+        var linestrings = _.map(legs, function(leg, index) {
+            var linestring = L.Polyline.fromEncoded(leg.legGeometry.points);
+            if (index === 0 || index === lastIndex) {
+                var coords = linestring.getLatLngs();
+                if (!coords.length) {
+                    return;
+                }
+                if (index === 0) {
+                    self.from.lat = coords[0].lat;
+                    self.from.lon = coords[0].lng;
+                }
+                if (index === lastIndex) {
+                    var end = _.last(coords);
+                    self.to.lat = end.lat;
+                    self.to.lon = end.lng;
+                }
+            }
+            var linestringGeoJson = linestring.toGeoJSON();
             linestringGeoJson.properties = leg;
             return linestringGeoJson;
         });
+
+        return linestrings;
     };
 
     // cache of geocoded OSM nodes (node name mapped to reverse geocode name)

@@ -156,8 +156,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             // (in case one or both markers is someplace unroutable, like in a river)
             directions.origin = [currentItinerary.from.lat, currentItinerary.from.lon];
             directions.destination = [currentItinerary.to.lat, currentItinerary.to.lon];
-            updateLocationPreference('origin');
-            updateLocationPreference('destination');
+            updateLocationPreferenceWithDirections('origin');
+            updateLocationPreferenceWithDirections('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
@@ -429,10 +429,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
     /** Helper to save current directions origin or destination to user preferences.
      *
-     * @param location {String} Either 'origin' or 'destination'
+     * @param key {String} Either 'origin' or 'destination'
      */
-    function updateLocationPreference(location) {
-        var preferenceLocation = UserPreferences.getPreference(location);
+    function updateLocationPreferenceWithDirections(key) {
+        var preferenceLocation = UserPreferences.getPreference(key);
+
+        if (!directions[location] || directions[location].length < 2) {
+            return;
+        }
+
         var newLocationY = directions[location][0];
         var newLocationX = directions[location][1];
 
