@@ -33,9 +33,21 @@
                 </ul>
                 <ul class="info-place-activities">
                     {% has_activity destination 'cycling' as has_cycling %}
+                    {% has_activity destination 'hiking' as has_hiking %}
+                    {% has_activity destination 'water recreation' as has_water_rec %}
                     {% if has_cycling %}
                     <li class="activity" title="Cycling">
                         <i class="icon-cycling"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_hiking %}
+                    <li class="activity" title="Hiking">
+                        <i class="icon-hiking"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_water_rec %}
+                    <li class="activity" title="Water recreation">
+                        <i class="icon-water"></i>
                     </li>
                     {% endif %}
                     {% if destination.accessible %}
