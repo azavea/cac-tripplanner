@@ -152,6 +152,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
+            // snap start and end points to where first itinerary starts and ends
+            // (in case one or both markers is someplace unroutable, like in a river)
+            directions.origin = [currentItinerary.from.lat, currentItinerary.from.lon];
+            directions.destination = [currentItinerary.to.lat, currentItinerary.to.lon];
+            updateLocationPreference('origin');
+            updateLocationPreference('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
@@ -419,6 +425,31 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     // Updates the URL to match the currently-selected options
     function updateUrl() {
         urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
+    }
+
+    /** Helper to save current directions origin or destination to user preferences.
+     *
+     * @param location {String} Either 'origin' or 'destination'
+     */
+    function updateLocationPreference(location) {
+        var preferenceLocation = UserPreferences.getPreference(location);
+        var newLocationY = directions[location][0];
+        var newLocationX = directions[location][1];
+
+        preferenceLocation.location = {
+            x: newLocationX,
+            y: newLocationY
+        };
+
+        preferenceLocation.extent = {
+            xmax: newLocationX,
+            xmin: newLocationX,
+            ymax: newLocationY,
+            ymin: newLocationY
+        };
+
+        // update location in user preferences, but not the string for it
+        UserPreferences.setPreference(location, preferenceLocation);
     }
 
     /**
