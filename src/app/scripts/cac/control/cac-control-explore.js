@@ -255,7 +255,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     }
 
     function onTypeaheadCleared(event, key) {
-        if (key === 'origin') {
+        if (key === 'origin' && exploreLatLng) {
             showSpinner();
             exploreLatLng = null;
             mapControl.clearDirectionsMarker('origin');
@@ -266,7 +266,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     }
 
     function onTypeaheadSelected(event, key, location) {
-        if (key === 'origin') {
+        if (key === 'origin' && location) {
             setAddress(location);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
