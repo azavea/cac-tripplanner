@@ -1,3 +1,4 @@
+{% load destination_extras %}
 {% load tz %}
 <article class="info-article">
     <header class="info-article-header">
@@ -45,6 +46,31 @@
                     {{ event.end_date|date:"D M j" }} &middot; {{ event.end_date|time:"fA"|lower }}
                 </div>
                 {% endif %}
+                <ul class="info-event-activities">
+                    {% has_activity event 'cycling' as has_cycling %}
+                    {% has_activity event 'hiking' as has_hiking %}
+                    {% has_activity event 'water recreation' as has_water_rec %}
+                    {% if has_cycling %}
+                    <li class="activity" title="Cycling">
+                        <i class="icon-cycling"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_hiking %}
+                    <li class="activity" title="Hiking">
+                        <i class="icon-hiking"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_water_rec %}
+                    <li class="activity" title="Water recreation">
+                        <i class="icon-water"></i>
+                    </li>
+                    {% endif %}
+                    {% if destination.accessible %}
+                    <li class="activity" title="Wheelchair accessible">
+                        <i class="icon-wheelchair"></i>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </header>
