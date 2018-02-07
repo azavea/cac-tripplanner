@@ -162,10 +162,9 @@ CAC.Utils = (function (_, moment) {
     // Return user-facing label for a bike ride type selection
     function getBikeOptimizeLabel(optimizeSelection) {
         var bikeOptimizeStrings = {
-            'ANY': 'Any ride',
             'FLAT': 'Flat ride',
             'QUICK': 'Fast ride',
-            'GREENWAYS': 'Safe ride'
+            'GREENWAYS': 'Safe ride (default)'
         };
 
         return _.has(bikeOptimizeStrings, optimizeSelection) ?

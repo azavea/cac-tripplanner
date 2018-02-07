@@ -234,7 +234,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
             var bikeOptimize = UserPreferences.getPreference('bikeOptimize');
-            if (bikeOptimize !== 'ANY') {
+            if (bikeOptimize) {
                 $.extend(otpOptions, {optimize: bikeOptimize});
             }
         } else {

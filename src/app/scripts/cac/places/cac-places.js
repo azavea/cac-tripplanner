@@ -68,7 +68,7 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
             var bikeOptimize = UserPreferences.getPreference('bikeOptimize');
-            if (bikeOptimize !== 'ANY') {
+            if (bikeOptimize) {
                 $.extend(otpOptions, {optimize: bikeOptimize});
             }
         } else {

@@ -62,7 +62,6 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
                 'noWheelchair': {name: 'wheelchair', value: undefined},
                 'noBikeShare': {name: 'bikeShare', value: undefined},
                 'useBikeShare': {name: 'bikeShare', value: true},
-                'bikeOptimizeAny': {name: 'bikeOptimize', value: 'ANY'},
                 'bikeOptimizeFast': {name: 'bikeOptimize', value: 'QUICK'},
                 'bikeOptimizeFlat': {name: 'bikeOptimize', value: 'FLAT'},
                 'bikeOptimizeSafe': {name: 'bikeOptimize', value: 'GREENWAYS'},
