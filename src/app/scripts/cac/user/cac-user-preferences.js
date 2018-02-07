@@ -78,6 +78,14 @@ CAC.User.Preferences = (function(Storages, _) {
             val = _.has(defaults, preference) ? defaults[preference] : undefined;
         } else {
             val = JSON.parse(val);
+
+            // ensure bike optimization parameter is allowed
+            if (preference === 'bikeOptimize') {
+                if (!['GREENWAYS', 'FLAT', 'QUICK'].includes(val)) {
+                    val = 'GREENWAYS';
+                    setPreference(preference, val, true);
+                }
+            }
         }
         return val;
     }
