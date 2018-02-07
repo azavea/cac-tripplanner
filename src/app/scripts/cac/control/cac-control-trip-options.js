@@ -11,7 +11,7 @@ CAC.Control.TripOptions = (function ($, Handlebars, moment, Modal, UserPreferenc
         defaultMenuText: {
             bikeShare: 'Indego bike sharing',
             timing: 'Arrive or Depart at…',
-            bikeOptimize: 'Ride quality',
+            bikeOptimize: 'Safe ride',
             accessibility: 'Accessibility'
         },
         selectors: {

@@ -164,7 +164,7 @@ CAC.Utils = (function (_, moment) {
         var bikeOptimizeStrings = {
             'FLAT': 'Flat ride',
             'QUICK': 'Fast ride',
-            'GREENWAYS': 'Safe ride (default)'
+            'GREENWAYS': 'Safe ride (Default)'
         };
 
         return _.has(bikeOptimizeStrings, optimizeSelection) ?
