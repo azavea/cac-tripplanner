@@ -246,7 +246,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                      'href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">Visit website</a>',
                                      '<a class="destination-directions-link" ',
-                                     'id="{{geojson.properties.placeID}}">Get Directions</a></p>'
+                                     'id="{{geojson.properties.id}}_{{geojson.properties.placeID}}"',
+                                     '>Get Directions</a></p>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
@@ -259,9 +260,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
                 destinationMarkers[markerId] = {
                     marker: marker,
-                    destination: destinations[geojson.properties.id +
-                                              '_' +
-                                              geojson.properties.placeID]
+                    destination: destinations[markerId]
                 };
 
                 // wait to bind popup click handlers until popup is in the DOM
