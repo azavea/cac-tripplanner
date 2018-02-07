@@ -143,6 +143,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
             toPlace: coordsTo.join(','),
             time: when.format('hh:mma'),
             date: when.format('MM-DD-YYYY'),
+            locale: 'en'
         };
 
         var params = $.param($.extend(formattedOpts, extraOptions));

@@ -15,7 +15,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                          'mode',
                          'maxWalk',
                          'wheelchair',
-                         'bikeTriangle',
+                         'bikeOptimize',
                          'arriveBy',
                          'dateTime'];
 

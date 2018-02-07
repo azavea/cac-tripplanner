@@ -470,9 +470,9 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             }
             isDefault = UserPreferences.isDefault('bikeShare') && isDefault;
 
-            var rideType = UserPreferences.getPreference('bikeTriangle');
-            isDefault = UserPreferences.isDefault('bikeTriangle') && isDefault;
-            rideTypeOrAccessibility = rideType.charAt(0).toUpperCase() + rideType.slice(1) + ' ride';
+            var rideType = UserPreferences.getPreference('bikeOptimize');
+            isDefault = UserPreferences.isDefault('bikeOptimize') && isDefault;
+            rideTypeOrAccessibility = Utils.getBikeOptimizeLabel(rideType);
         } else {
             var wheelchair = UserPreferences.getPreference('wheelchair');
             isDefault = UserPreferences.isDefault('wheelchair') && isDefault;
