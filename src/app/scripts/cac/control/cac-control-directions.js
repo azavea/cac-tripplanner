@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences, Utils) {
+CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences) {
 
     'use strict';
 
@@ -152,6 +152,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
+            // snap start and end points to where first itinerary starts and ends
+            // (in case one or both markers is someplace unroutable, like in a river)
+            directions.origin = [currentItinerary.from.lat, currentItinerary.from.lon];
+            directions.destination = [currentItinerary.to.lat, currentItinerary.to.lon];
+            updateLocationPreferenceWithDirections('origin');
+            updateLocationPreferenceWithDirections('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
@@ -227,13 +233,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
-            if (bikeTriangle) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
+            var bikeOptimize = UserPreferences.getPreference('bikeOptimize');
+            if (bikeOptimize) {
+                $.extend(otpOptions, {optimize: bikeOptimize});
             }
         } else {
-            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair'),
+                                   optimize: 'GREENWAYS' });
         }
 
         $.extend(otpOptions, {
@@ -421,6 +427,36 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         urlRouter.updateUrl(urlRouter.buildDirectionsUrlFromPrefs());
     }
 
+    /** Helper to save current directions origin or destination to user preferences.
+     *
+     * @param key {String} Either 'origin' or 'destination'
+     */
+    function updateLocationPreferenceWithDirections(key) {
+        var preferenceLocation = UserPreferences.getPreference(key);
+
+        if (!directions[location] || directions[location].length < 2) {
+            return;
+        }
+
+        var newLocationY = directions[location][0];
+        var newLocationX = directions[location][1];
+
+        preferenceLocation.location = {
+            x: newLocationX,
+            y: newLocationY
+        };
+
+        preferenceLocation.extent = {
+            xmax: newLocationX,
+            xmin: newLocationX,
+            ymax: newLocationY,
+            ymin: newLocationY
+        };
+
+        // update location in user preferences, but not the string for it
+        UserPreferences.setPreference(location, preferenceLocation);
+    }
+
     /**
      * When first navigating to the page, check if origin and destination already set.
      * Go directly to trip plan if so.
@@ -446,4 +482,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences);

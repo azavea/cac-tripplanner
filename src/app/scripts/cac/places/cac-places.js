@@ -1,4 +1,4 @@
-CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences, Utils) {
+CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
     'use strict';
 
     var module = {
@@ -67,13 +67,13 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences, Utils) {
 
         if (mode.indexOf('BICYCLE') > -1) {
             // set bike trip optimization option
-            var bikeTriangle = UserPreferences.getPreference('bikeTriangle');
-            bikeTriangle = Utils.getBikeTriangle(bikeTriangle);
-            if (bikeTriangle) {
-                $.extend(otpOptions, {optimize: 'TRIANGLE'}, bikeTriangle);
+            var bikeOptimize = UserPreferences.getPreference('bikeOptimize');
+            if (bikeOptimize) {
+                $.extend(otpOptions, {optimize: bikeOptimize});
             }
         } else {
-            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair') });
+            $.extend(otpOptions, { wheelchair: UserPreferences.getPreference('wheelchair'),
+                                   optimize: 'GREENWAYS' });
         }
 
         return otpOptions;
@@ -152,4 +152,4 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences, Utils) {
         return promises;
     }
 
-})(_, jQuery, moment, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);
+})(_, jQuery, moment, CAC.Routing.Plans, CAC.User.Preferences);

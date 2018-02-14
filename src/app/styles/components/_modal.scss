@@ -182,7 +182,7 @@
     padding: 0;
 
     &.modal-list-narrow li {
-        padding-left: 100px;
+        padding-left: 80px;
     }
 
     li {
@@ -195,6 +195,14 @@
 
         .modal-share & {
             height: 5rem;
+        }
+
+        .btw {
+            margin-left: .8rem;
+            color: $lt-gray;
+            font-size: 1.2rem;
+            font-weight: $font-weight-medium;
+            text-transform: uppercase;
         }
 
         &:hover {
