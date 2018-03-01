@@ -127,7 +127,7 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
             if (xCoord && yCoord) {
                 var placeCoords = [yCoord, xCoord];
                 // get travel time to destination and update place card
-                Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions)
+                Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions, false)
                 .then(function (itineraries) {
                     if (itineraries && itineraries.length) {
                         var itinerary = itineraries[0];
