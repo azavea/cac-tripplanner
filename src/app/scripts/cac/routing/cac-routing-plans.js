@@ -15,11 +15,14 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
      * @param {array} coordsTo The coords in lat-lng which we would like to travel to
      * @param {Object} when moment.js date/time object for when the trip should be
      * @param {String} extraOptions Modes of travel to use for this trip, other options
+     * @param {boolean} returnDeferred If true, return mutable jQuery deferred object, rather than
+     *                                 immutable promise. Allows cancelling request.
      *
-     * @return {promise} The promise object which - if successful - resolves to a
-     *                   an object with itineraries
+     * @return {Promise or Deferred} The promise/deferred which - if successful - resolves to a
+     *                               an object with itineraries. Returns promise unless
+     *                               `returnDeferred` is `true`.
      */
-    function planTrip(coordsFrom, coordsTo, when, extraOptions) {
+    function planTrip(coordsFrom, coordsTo, when, extraOptions, returnDeferred) {
         var deferred = $.Deferred();
         var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
 
@@ -67,7 +70,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
         }).fail(function (error) {
             deferred.reject(error);
         });
-        return deferred.promise();
+        return returnDeferred ? deferred : deferred.promise();
     }
 
     /**

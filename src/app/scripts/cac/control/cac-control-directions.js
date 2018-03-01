@@ -22,6 +22,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     };
     var options = {};
 
+    var planTripRequest = null;
+    var OUTDATED_REQUEST_ERROR = 'outdated request';
+
     var currentItinerary = null;
 
     var directions = {
@@ -98,7 +101,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
      * Set user preferences before planning trip.
      * Throttled to cut down on requests.
      */
-    var planTrip = _.throttle(function() {  // jshint ignore:line
+    var planTrip = _.debounce(function() {  // jshint ignore:line
         showPlaces(false);
         if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
@@ -128,8 +131,20 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
-        Routing.planTrip(directions.origin, directions.destination, date, otpOptions)
-        .then(function (itineraries) {
+        // If a previous request is in progress, cancel it before issuing the new one.
+        // Prevents callbacks being executed out of order.
+        if (planTripRequest) {
+            planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
+        }
+
+        planTripRequest = Routing.planTrip(directions.origin,
+                                           directions.destination,
+                                           date,
+                                           otpOptions,
+                                           true);
+
+
+        planTripRequest.then(function (itineraries) {
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
@@ -165,6 +180,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
         }, function (error) {
+            // Cancelled requests are expected; do not display an error message to user.
+            // Just keep showing the loading animation until a subsequent request completes.
+            if (error && error.message === OUTDATED_REQUEST_ERROR) {
+                return;
+            }
+
             console.error('failed to plan trip');
             console.error(error);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
@@ -172,7 +193,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             itineraryListControl.setItinerariesError(error);
             itineraryListControl.show();
         });
-    }, DIRECTION_THROTTLE_MILLIS);
+    }, DIRECTION_THROTTLE_MILLIS, {leading: true, trailing: true});
 
     return DirectionsControl;
 
