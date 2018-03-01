@@ -22,7 +22,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     };
     var options = {};
 
-    // cancel previous trip request when issuing a new one
     var planTripRequest = null;
     var OUTDATED_REQUEST_ERROR = 'outdated request';
 
@@ -180,9 +179,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             itineraryListControl.show();
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
-            planTripRequest = null;
         }, function (error) {
-            planTripRequest = null;
             // Cancelled requests are expected; do not display an error message to user.
             // Just keep showing the loading animation until a subsequent request completes.
             if (error && error.message === OUTDATED_REQUEST_ERROR) {
@@ -196,7 +193,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             itineraryListControl.setItinerariesError(error);
             itineraryListControl.show();
         });
-    }, DIRECTION_THROTTLE_MILLIS);
+    }, DIRECTION_THROTTLE_MILLIS, {leading: true, trailing: true});
 
     return DirectionsControl;
 
