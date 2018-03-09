@@ -168,7 +168,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             }
             return {distance: dist,
                     duration: time,
-                    formattedDistance: getFormattedDistance(dist),
+                    formattedDistance: Utils.getFormattedDistance(dist),
                     formattedDuration: getFormattedDuration(time)
             };
         }).pickBy(function(summary) {
@@ -184,25 +184,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      *                 if less than .2 mile, in feet (rounded to nearest foot); includes unit.
      */
     function getFormattedItineraryDistance(legs) {
-        return getFormattedDistance(_.sumBy(legs, 'distance'));
-    }
-
-    /**
-     * Helper function to get formatted string in feet or miles for a given distance in meters
-     *
-     * @param {double} distanceMeters Distance to format
-     * @return {string} distance in miles or feet, rounded, with unit
-     */
-    function getFormattedDistance(distanceMeters) {
-        // less than ~0.2 miles
-        if (distanceMeters < 322) {
-            var feet = Math.round(distanceMeters * 3.28084).toString();
-            return feet === '1' ? feet + ' foot' : feet + ' feet';
-        }
-
-        // return miles
-        var miles = (Math.round(((distanceMeters / 1000) * 0.621371) * 10) / 10).toString();
-        return miles === '1' ? miles + ' mile' : miles + ' miles';
+        return Utils.getFormattedDistance(_.sumBy(legs, 'distance'));
     }
 
     /**
@@ -302,10 +284,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         // Add some derived data to be used in the template:
         // - Format duration on leg and distance on leg and its steps
         _.forEach(newLegs, function (leg) {
-            leg.formattedDistance = getFormattedDistance(leg.distance);
+            leg.formattedDistance = Utils.getFormattedDistance(leg.distance);
             leg.formattedDuration = getFormattedDuration(leg.duration);
             _.forEach(leg.steps, function(step) {
-                step.formattedDistance = getFormattedDistance(step.distance);
+                step.formattedDistance = Utils.getFormattedDistance(step.distance);
             });
         });
         // - Set a flag on the last leg, so we can avoid diplaying arriving there right above

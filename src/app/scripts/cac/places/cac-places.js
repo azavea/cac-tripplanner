@@ -1,4 +1,4 @@
-CAC.Places.Places = (function(_, $, UserPreferences) {
+CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
     'use strict';
 
     var module = {
@@ -124,15 +124,12 @@ CAC.Places.Places = (function(_, $, UserPreferences) {
                 var to = turf.point([xCoord, yCoord]);
                 // get travel distance to destination
                 // set properties for travel distnace to place and the origin label
-                destination.distance = turf.distance(from, to, {units: 'miles'});
-                // format to number with maximum of 2 decimal places
-                var miles = (Math.round(destination.distance * 100) / 100).toString();
-                destination.formattedDistance = miles === '1' ?
-                    miles + ' mile' : miles + ' miles';
+                destination.distance = turf.distance(from, to, {units: 'meters'});
+                destination.formattedDistance = Utils.getFormattedDistance(destination.distance);
                 destination.originLabel = originLabel;
             }
         });
         return destinations;
     }
 
-})(_, jQuery, CAC.User.Preferences);
+})(_, jQuery, CAC.User.Preferences, CAC.Utils);
