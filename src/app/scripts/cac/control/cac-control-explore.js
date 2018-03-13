@@ -240,6 +240,18 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         );
     }
 
+    function enableSlider(doEnable) {
+        if (doEnable) {
+            $(options.selectors.isochroneSliderContainer).removeClass('disabled');
+            $(options.selectors.isochroneSlider).removeClass('disabled');
+        } else {
+            $(options.selectors.isochroneSliderContainer).addClass('disabled');
+            $(options.selectors.isochroneSlider).addClass('disabled');
+        }
+        $(options.selectors.isochroneSliderContainer).prop('disabled', !doEnable);
+        $(options.selectors.isochroneSlider).prop('disabled', !doEnable);
+    }
+
     function setError(message) {
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
             var $alert = $(MapTemplates.alert(message, 'Cannot show travelshed', 'danger'));
@@ -258,6 +270,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (key === 'origin' && exploreLatLng) {
             showSpinner();
             exploreLatLng = null;
+            enableSlider(false);
             mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
             // get all places in sidebar when no origin set
@@ -297,8 +310,10 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 mapControl.setDirectionsMarkers(exploreLatLng);
             }
+            enableSlider(true);
         } else {
             exploreLatLng = null;
+            enableSlider(false);
             clearIsochrone();
         }
     }
@@ -325,6 +340,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             setAddress(exploreOrigin);
         } else {
             exploreLatLng = null;
+            enableSlider(false);
         }
     }
 
