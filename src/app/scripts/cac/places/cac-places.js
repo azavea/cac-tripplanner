@@ -1,10 +1,10 @@
-CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
+CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
     'use strict';
 
     var module = {
         getAllPlaces: getAllPlaces,
         getOtpOptions: getOtpOptions,
-        getTimesToPlaces: getTimesToPlaces
+        getDistancesToPlaces: getDistancesToPlaces
     };
 
     return module;
@@ -79,45 +79,41 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
         return otpOptions;
     }
 
-    /** Get travel times from the orign to each destination.
+    /** Get distance (as the crow flies) from the orign to each destination.
      *  Should be called before displaying place list.
      *
      * @param destinations {Array} Destination and event objects that will be changed in-place
-     * @param exploreLatLng {Array} Coordinates of origin point to query with; may be unset
-     * @returns {Array} Collection of promises, each of which resolve to a destination
+     * @param exploreLatLng {Array} Coordinates of origin point to start from; may be unset
+     * @returns {Array} Destinations with distance and orign label set
      */
-    function getTimesToPlaces(destinations, exploreLatLng) {
-        // if origin not set, simply clear the travel times from the destinations
-        if (!exploreLatLng) {
-            _.each(destinations, function(destination) {
-                destination.duration = undefined;
-                destination.formattedDuration = undefined;
-                destination.originLabel = undefined;
-            });
-            return;
-        }
-
-        // make ajax requests to get the travel times to each destination
-        var otpOptions = getOtpOptions();
-        // only using the first itinerary; let OTP know to not bother finding other options
-        $.extend(otpOptions, {numItineraries: 1});
-
-        var date = UserPreferences.getPreference('dateTime');
-        date = date ? moment.unix(date) : moment(); // default to now
-
+    function getDistancesToPlaces(destinations, exploreLatLng) {
         // prefer to label with just the street address, and fall back to full address
         // for featured places, use the label in the 'name' attribute instead of the address
         var origin = UserPreferences.getPreference('origin');
-        var originLabel = origin.name ? origin.name :
-            (origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
-            UserPreferences.getPreference('originText'));
+        var originLabel;
 
-        var promises = _.map(destinations, function(destination) {
-            var dfd = $.Deferred();
+        if (origin) {
+            originLabel = origin.name ? origin.name :
+                (origin.attributes && origin.attributes.StAddr ? origin.attributes.StAddr :
+                UserPreferences.getPreference('originText'));
+        }
+
+        if (exploreLatLng) {
+            var from = turf.point([exploreLatLng[1], exploreLatLng[0]]);
+        }
+
+        _.each(destinations, function(destination) {
+            // if origin not set, simply clear the travel times from the destinations
+            if (!from) {
+                destination.distance = undefined;
+                destination.formattedDistance = undefined;
+                destination.originLabel = undefined;
+                return;
+            }
+
             // if already have travel time to destination, skip requerying for it
             if (destination.originLabel === originLabel) {
-                dfd.resolve(destination);
-                return dfd.promise();
+                return;
             }
 
             // read out the location of the destination
@@ -125,31 +121,15 @@ CAC.Places.Places = (function(_, $, moment, Routing, UserPreferences) {
             var yCoord = destination.location.y;
 
             if (xCoord && yCoord) {
-                var placeCoords = [yCoord, xCoord];
-                // get travel time to destination and update place card
-                Routing.planTrip(exploreLatLng, placeCoords, date, otpOptions, false)
-                .then(function (itineraries) {
-                    if (itineraries && itineraries.length) {
-                        var itinerary = itineraries[0];
-                        // set properties for travel time to place and the origin label
-                        destination.duration = itinerary.duration;
-                        destination.formattedDuration = itinerary.formattedDuration;
-                        destination.originLabel = originLabel;
-                        dfd.resolve(destination);
-                    }
-                }).fail(function(error) {
-                    console.error('error finding travel time to ' + destination.name);
-                    console.error(error);
-                    dfd.reject(error);
-                });
-            } else {
-                // event without a location
-                dfd.resolve(destination);
+                var to = turf.point([xCoord, yCoord]);
+                // get travel distance to destination
+                // set properties for travel distnace to place and the origin label
+                destination.distance = turf.distance(from, to, {units: 'meters'});
+                destination.formattedDistance = Utils.getFormattedDistance(destination.distance);
+                destination.originLabel = originLabel;
             }
-            return dfd.promise();
         });
-
-        return promises;
+        return destinations;
     }
 
-})(_, jQuery, moment, CAC.Routing.Plans, CAC.User.Preferences);
+})(_, jQuery, CAC.User.Preferences, CAC.Utils);

@@ -380,31 +380,27 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             }
         }
 
-        // Now places list has been updated, go fetch the travel time to each
-        // from the new origin to each place.
-        var promises = Places.getTimesToPlaces(destinations, exploreLatLng);
-        $.when.apply($, promises).always(function() {
+        // get distance from origin to each place
+        destinations = Places.getDistancesToPlaces(destinations, exploreLatLng);
+        // order the destinations by distance
+        destinations = _.sortBy(destinations, ['distance']);
 
-            // order the destinations by travel time
-            destinations = _.sortBy(destinations, ['duration']);
-            var places = HomeTemplates.destinations(destinations,
-                                                    text,
-                                                    filter,
-                                                    tabControl.isTabShowing(tabControl.TABS.HOME));
-            $(options.selectors.placesContent).html(places);
-            // send event that places content changed
-            events.trigger(eventNames.destinationsLoaded);
+        var places = HomeTemplates.destinations(destinations,
+                                                text,
+                                                filter,
+                                                tabControl.isTabShowing(tabControl.TABS.HOME));
+        $(options.selectors.placesContent).html(places);
+        // send event that places content changed
+        events.trigger(eventNames.destinationsLoaded);
 
-            // also draw all destinations on explore map that match the category filter
-            // (not just those in the isochrone)
-            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
-                // allDestinations has been loaded by now
-                mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                             destinations);
-            }
-
-            showPlacesContent();
-        });
+        // also draw all destinations on explore map that match the category filter
+        // (not just those in the isochrone)
+        if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
+            // allDestinations has been loaded by now
+            mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
+                                                         destinations);
+        }
+        showPlacesContent();
     }
 
     // Given desintations from the FindReachableDestinations app endpoint,
