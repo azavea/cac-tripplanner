@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_version ">= 1.5"
+Vagrant.require_version ">= 2.0"
 require "yaml"
 
 CAC_SHARED_FOLDER_TYPE = ENV.fetch("CAC_SHARED_FOLDER_TYPE", "nfs")
@@ -111,6 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     database.ssh.forward_x11 = true
 
     database.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/database.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
@@ -148,6 +149,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.ssh.forward_x11 = true
 
     app.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/app.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
@@ -177,6 +179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     otp.ssh.forward_x11 = true
 
     otp.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/otp.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
