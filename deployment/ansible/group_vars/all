@@ -10,7 +10,7 @@ virtualenv_version: 15.1.0
 otp_router: "default"
 
 # used by nginx and gunicorn to set timeouts; OTP defaults to 30s
-otp_session_timeout_s: 30
+otp_session_timeout_s: 90
 
 s3_otp_data: cleanair-otp-data
 
