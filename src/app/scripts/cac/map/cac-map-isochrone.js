@@ -132,6 +132,10 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
      * @return {Object} Promise resolving to JSON with destinations
      */
     function getIsochrone(deferred, params, zoomToFit) {
+
+        // remove optimization parameter, if set; causes excessively long isochrone query times
+        delete params.optimize;
+
         // Check if there's already an active request. If there is one,
         // then we can't make a query yet -- store it as pending.
         // If there was already a pending query, immediately resolve it.
