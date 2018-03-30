@@ -1,7 +1,7 @@
 ---
 app_username: "vagrant"
 
-packer_version: "1.0.2"
+packer_version: "0.7.5"
 
 nodejs_version: 8.10.0
 

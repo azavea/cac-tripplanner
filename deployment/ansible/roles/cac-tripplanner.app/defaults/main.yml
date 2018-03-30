@@ -28,7 +28,6 @@ cac_python_dependencies:
     - { name: 'psycopg2', version: '2.7.4' }
     - { name: 'pytz', version: '2018.3' }
     - { name: 'pyyaml', version: '3.12' }
-    - { name: 'troposphere', version: '1.8.1' }
-    - { name: 'majorkirby', version: '0.2.1' }
+    - { name: 'troposphere', version: '0.7.2'}
     # Note: django-wpadmin is installed manually to work around the fact that ansible-pip
     # ignores editable=False

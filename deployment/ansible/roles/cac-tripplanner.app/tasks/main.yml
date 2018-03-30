@@ -21,6 +21,15 @@
 - name: Install django-wpadmin manually to work around ansible bug
   command: pip install --upgrade 'git+https://github.com/azavea/django-wpadmin@v1.11#egg=django-wpadmin'
 
+# TODO: #914 replace major kirby
+# TODO: peg this to a version, rather than a commit, when released
+# ansible pip module installs this in /tmp/src for some reason, so we use the
+# command instead
+- name: Install majorkirby
+  command: pip install "git+https://github.com/azavea/majorkirby@7688e19e61bf9d218c03a2af6d469d0626b86918#egg=majorkirby"
+           creates=/usr/local/lib/python2.7/dist-packages/majorkirby/__init__.py
+  when: develop
+
 - name: Touch log file and set permissions
   file: path={{ app_log }} state=touch owner={{ app_username }} group={{ app_username }} mode=0664
 
@@ -72,6 +81,6 @@
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
   notify: Restart nginx
 
-- { import_tasks: jslibs.yml }
+- { include: jslibs.yml }
 
-- { import_tasks: dev-test-dependencies.yml, when: develop or test }
+- { include: dev-test-dependencies.yml, when: develop or test }

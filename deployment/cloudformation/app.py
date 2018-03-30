@@ -370,17 +370,15 @@ class AppServerStack(StackNode):
             LoadBalancerNames=[Ref(app_server_load_balancer)],
             MaxSize=Ref(self.param_max_size),
             MinSize=Ref(self.param_min_size),
-            NotificationConfigurations=[
-                asg.NotificationConfigurations(
-                    TopicARN=Ref(self.param_notification_arn),
-                    NotificationTypes=[
-                        asg.EC2_INSTANCE_LAUNCH,
-                        asg.EC2_INSTANCE_LAUNCH_ERROR,
-                        asg.EC2_INSTANCE_TERMINATE,
-                        asg.EC2_INSTANCE_TERMINATE_ERROR
-                    ]
-                )
-            ],
+            NotificationConfiguration=asg.NotificationConfiguration(
+                TopicARN=Ref(self.param_notification_arn),
+                NotificationTypes=[
+                    asg.EC2_INSTANCE_LAUNCH,
+                    asg.EC2_INSTANCE_LAUNCH_ERROR,
+                    asg.EC2_INSTANCE_TERMINATE,
+                    asg.EC2_INSTANCE_TERMINATE_ERROR
+                ]
+            ),
             VPCZoneIdentifier=Ref(self.param_private_subnets),
             Tags=[
                 asg.Tag('Name', '{}Server'.format(self.STACK_NAME_PREFIX), True),
