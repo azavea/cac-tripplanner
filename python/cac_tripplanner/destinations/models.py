@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
+from image_cropping import ImageCropField, ImageRatioField
 
 from cac_tripplanner.image_utils import generate_image_filename
 
@@ -64,14 +65,22 @@ class Attraction(models.Model):
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
     description = RichTextField()
-    image = models.ImageField(upload_to=generate_filename, null=True,
-                              help_text='The small image. Will be displayed at 310x155.')
-    wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The large image. Will be displayed at 680x400.')
+    image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='image file')
+    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='wide image file')
+    image = ImageRatioField('image_raw', '310x155',
+                            help_text='The small image. Will be displayed at 310x155.')
+    wide_image = ImageRatioField('wide_image_raw', '680x400',
+                                 help_text='The large image. Will be displayed at 680x400.')
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
+
+    def get_image_as_list(self):
+        return list(map(int, self.image.split(','))) if self.image else []
+
+    def get_wide_image_as_list(self):
+        return list(map(int, self.wide_image.split(','))) if self.wide_image else []
 
     @property
     def is_event(self):

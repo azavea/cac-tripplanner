@@ -1,5 +1,5 @@
-
 {% extends "base.html" %}
+{% load cropping %}
 {% load staticfiles %}
 
 {% block pagetitle %}
@@ -14,15 +14,15 @@
 <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
 <meta property="og:description" content="{{ event.description|striptags }}" />
-<meta property="og:image" content="{{ event.image.url }}" />
-<meta property="og:image:width" content="400" />
-<meta property="og:image:height" content="400" />
+<meta property="og:image" content="{% cropped_thumbnail event 'image' %}" />
+<meta property="og:image:width" content="310" />
+<meta property="og:image:height" content="155" />
 <meta property="og:site_name" content="GoPhillyGo" />
 <meta property="og:locale" content="en_US" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@go_philly_go" />
 <meta name="twitter:description" content="{{ event.description|striptags }}" />
-<meta name="twitter:image" content="{{ event.image.url }}" />
+<meta name="twitter:image" content="{% cropped_thumbnail event 'image' %}" />
 {% endblock %}
 
 {% block content %}

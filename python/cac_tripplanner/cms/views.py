@@ -37,8 +37,8 @@ class AllArticles(View):
 
     def serialize_article(self, request, article):
         return {
-            'wide_image': article.wide_image.url,
-            'narrow_image': article.narrow_image.url,
+            'wide_image': article.wide_image,
+            'narrow_image': article.narrow_image,
             'title': article.title,
             'url': request.build_absolute_uri(reverse(learn_detail, args=[article.slug]))
         }

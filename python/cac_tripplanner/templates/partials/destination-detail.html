@@ -1,8 +1,9 @@
+{% load cropping %}
 {% load destination_extras %}
 <article class="info-article">
     <header class="info-article-header">
         <div class="info-place-image-hero"
-             style="background-image: url('{{ destination.wide_image.url }}');"></div>
+             style="background-image: url('{% cropped_thumbnail destination 'wide_image' %}');"></div>
         <div class="info-article-header-info">
             <div class="info-article-header-main">
                 <h2 class="info-article-title">{{ destination.name }}</h2>

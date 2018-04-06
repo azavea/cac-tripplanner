@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib import admin, gis
 
+from image_cropping import ImageCroppingMixin
+
 from .forms import DestinationForm, EventForm
 from .models import Destination, Event
 
 
-class DestinationAdmin(gis.admin.OSMGeoAdmin):
+class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
 
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
@@ -14,7 +16,8 @@ class DestinationAdmin(gis.admin.OSMGeoAdmin):
     # To change field display order, define them all here.
     # Default is order defined in model, but due to inheritance, cannot reorder across
     # relationship with model field ordering alone.
-    fields = ('name', 'website_url', 'description', 'image', 'wide_image', 'published',
+    fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
+              'wide_image_raw', 'published',
               'priority', 'accessible', 'categories', 'activities', 'city', 'state', 'zipcode',
               'address', 'point', 'watershed_alliance')
 
@@ -50,7 +53,7 @@ class DestinationAdmin(gis.admin.OSMGeoAdmin):
     make_unpublished.short_description = 'Unpublish selected destinations'
 
 
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     form = EventForm
 
     list_display = ('name', 'published', 'priority', )

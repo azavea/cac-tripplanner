@@ -8,6 +8,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
+from image_cropping.utils import get_backend
+
 from .models import Destination, Event
 from cms.models import Article
 
@@ -120,15 +122,20 @@ def event_detail(request, pk):
     return base_view(request, 'event-detail.html', context=context)
 
 
-def image_to_url(dest_dict, field_name):
+def image_to_url(attraction, field_name, size):
     """Helper for converting an image object to a url for a json response
 
-    :param dict_obj: Dictionary representation of a Destination object
+    :param attraction: Attraction object
     :param field_name: String identifier for the image field
     :returns: URL of the image, or an empty string if there is no image
     """
-    image = dest_dict.get(field_name)
-    return image.url if image else ''
+
+    raw_field_name = field_name + '_raw'
+    return get_backend().get_thumbnail_url(getattr(attraction, raw_field_name), {
+                                           'box': getattr(attraction, field_name),
+                                           'size': size,
+                                           'crop': True,
+                                           'detail': True})
 
 
 def set_location_properties(obj, location):
@@ -164,8 +171,12 @@ def set_destination_properties(destination):
     """
     obj = model_to_dict(destination)
     obj['address'] = obj['name']
-    obj['image'] = image_to_url(obj, 'image')
-    obj['wide_image'] = image_to_url(obj, 'wide_image')
+
+    obj['image'] = image_to_url(destination, 'image', (310, 155))
+    obj['wide_image'] = image_to_url(destination, 'wide_image', (680, 400))
+    del obj['image_raw']
+    del obj['wide_image_raw']
+
     obj['categories'] = [c.name for c in obj['categories']]
     obj['activities'] = [a.name for a in obj['activities']]
     # add convenience property for whether destination has cycling
@@ -184,8 +195,12 @@ def set_event_properties(event):
     """
     obj = model_to_dict(event)
     obj['address'] = event.name
-    obj['image'] = image_to_url(obj, 'image')
-    obj['wide_image'] = image_to_url(obj, 'wide_image')
+
+    obj['image'] = image_to_url(obj, 'image', (310, 155))
+    obj['wide_image'] = image_to_url(obj, 'wide_image', (680, 400))
+    del obj['image_raw']
+    del obj['wide_image_raw']
+
     obj['activities'] = [a.name for a in obj['activities']]
     obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
     obj['start_date'] = event.start_date.isoformat()

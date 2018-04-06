@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
+from image_cropping import ImageCropField, ImageRatioField
 
 from cac_tripplanner.image_utils import generate_image_filename
 
@@ -86,10 +87,14 @@ class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
-    wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The large image. Will be displayed at 680x200.')
-    narrow_image = models.ImageField(upload_to=generate_filename, null=True,
-                                     help_text='The small image. Will be displayed at 310x218.')
+    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True,
+                                    verbose_name='wide image file')
+    wide_image = ImageRatioField('wide_image_raw', '680x200',
+                                 help_text='The large image. Will be displayed at 680x200.')
+    narrow_image_raw = ImageCropField(upload_to=generate_filename, null=True,
+                                      verbose_name='narrow image file')
+    narrow_image = ImageRatioField('narrow_image', '310x218',
+                                   help_text='The small image. Will be displayed at 310x218.')
 
     @property
     def published(self):

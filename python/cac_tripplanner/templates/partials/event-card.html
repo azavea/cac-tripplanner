@@ -1,6 +1,8 @@
+{% load cropping %}
 <div class="preview-card">
     <a class="preview-card-link" href="{% url 'event-detail' pk=event.pk %}">
-        <img class="preview-photo" src="{{ event.image.url }}" width="310" alt="{{ event.name }}" />
+        <img class="preview-photo" src="{% cropped_thumbnail event 'image' %}"
+             width="310" alt="{{ event.name }}" />
         <div class="preview-details">
             <h2>{{ event.name }}</h2>
             <p class="lede">{{ event.description|striptags|truncatewords:20|safe }}</p>
