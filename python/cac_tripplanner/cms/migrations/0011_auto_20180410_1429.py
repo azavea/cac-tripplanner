@@ -6,6 +6,13 @@ import cms.models
 from django.db import migrations
 import image_cropping.fields
 
+def set_new_images(apps, schema_editor):
+    Article = apps.get_model('CMS', 'Article')
+    for article in Article.objects.all():
+        article.narrow_image = article.narrow_image_raw
+        article.wide_image = article.wide_image_raw
+        article.save()
+
 
 class Migration(migrations.Migration):
 
@@ -34,4 +41,6 @@ class Migration(migrations.Migration):
             name='wide_image',
             field=image_cropping.fields.ImageRatioField(b'wide_image_raw', '680x200', adapt_rotation=False, allow_fullsize=False, free_crop=False, help_text=b'The large image. Will be displayed at 680x200.', hide_image_field=False, size_warning=True, verbose_name='wide image'),
         ),
+
+        migrations.RunPython(set_new_images, migrations.RunPython.noop),
     ]

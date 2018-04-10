@@ -6,6 +6,18 @@ import destinations.models
 from django.db import migrations
 import image_cropping.fields
 
+def set_new_images(apps, schema_editor):
+    Destination = apps.get_model('destinations', 'Destination')
+    Event = apps.get_model('destinations', 'Event')
+    for place in Destination.objects.all():
+        place.image_raw = place.image
+        place.wide_image_raw = place.wide_image
+        place.save()
+    for event in Event.objects.all():
+        event.image_raw = event.image
+        event.wide_image_raw = event.wide_image
+        event.save()
+
 
 class Migration(migrations.Migration):
 
@@ -54,4 +66,6 @@ class Migration(migrations.Migration):
             name='wide_image',
             field=image_cropping.fields.ImageRatioField(b'wide_image_raw', '680x400', adapt_rotation=False, allow_fullsize=False, free_crop=False, help_text=b'The large image. Will be displayed at 680x400.', hide_image_field=False, size_warning=True, verbose_name='wide image'),
         ),
+
+        migrations.RunPython(set_new_images, migrations.RunPython.noop),
     ]
