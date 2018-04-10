@@ -16,23 +16,27 @@
     <meta property="og:title" content="GoPhillyGo" />
     <meta name="twitter:title" content="GoPhillyGo" />
     <meta name="apple-mobile-web-app-title" content="GoPhillyGo">
+    <meta property="og:type" content="place" />
+    <meta property="og:rich_attachment" content="true" />
     {% endblock %}
 
     {% block extrametatags %}
     <meta property="fb:app_id" content="{{ fb_app_id }}" />
+    <meta property="fb:pages" content="299797223477237" />
+    <meta property="fb:profile_id" content="gophillygo" />
     <meta property="og:url"
     content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
     <meta property="og:description"
         content="GoPhillyGo from the Clean Air Council, for planning transit, walking, and biking trips around the Delaware Valley region.  Features parks and other destinations." />
-    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
-    <meta property="og:image:width" content="332" />
-    <meta property="og:image:height" content="314" />
     <meta property="og:site_name" content="GoPhillyGo" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@go_philly_go" />
     <meta name="twitter:description" content="Helping you get around greater Philly" />
-    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo_blue.png" />
+    <meta property="og:image:width" content="360" />
+    <meta property="og:image:height" content="360" />
+    <meta property="og:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo@2x.png" />
+    <meta name="twitter:image" content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/static/images/logo@2x.png" />
     {% endblock %}
 
     {% include "partials/ios-weblinks.html" %}
