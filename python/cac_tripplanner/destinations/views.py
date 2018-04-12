@@ -10,7 +10,12 @@ from django.views.generic import View
 
 from image_cropping.utils import get_backend
 
-from .models import Destination, Event, NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS
+from .models import (Destination,
+                     Event,
+                     ExtraDestinationPicture,
+                     ExtraEventPicture,
+                     NARROW_IMAGE_DIMENSIONS,
+                     WIDE_IMAGE_DIMENSIONS)
 from cms.models import Article
 
 
@@ -122,17 +127,17 @@ def event_detail(request, pk):
     return base_view(request, 'event-detail.html', context=context)
 
 
-def image_to_url(attraction, field_name, size):
-    """Helper for converting an image object to a url for a json response
+def image_to_url(obj, field_name, size):
+    """Helper for converting an image object property to a url for a json response
 
-    :param attraction: Attraction object
+    :param obj: Model object with {image} and {image}_raw fields
     :param field_name: String identifier for the image field
     :returns: URL of the image, or an empty string if there is no image
     """
 
     raw_field_name = field_name + '_raw'
-    return get_backend().get_thumbnail_url(getattr(attraction, raw_field_name), {
-                                           'box': getattr(attraction, field_name),
+    return get_backend().get_thumbnail_url(getattr(obj, raw_field_name), {
+                                           'box': getattr(obj, field_name),
                                            'size': size,
                                            'crop': True,
                                            'detail': True})
@@ -177,6 +182,12 @@ def set_destination_properties(destination):
     del obj['image_raw']
     del obj['wide_image_raw']
 
+    extras_list = []
+    extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
+    for extra in extra_images:
+        extras_list.append(image_to_url(extra, 'image', WIDE_IMAGE_DIMENSIONS))
+    obj['extra_images'] = extras_list
+
     obj['categories'] = [c.name for c in obj['categories']]
     obj['activities'] = [a.name for a in obj['activities']]
     # add convenience property for whether destination has cycling
@@ -196,10 +207,16 @@ def set_event_properties(event):
     obj = model_to_dict(event)
     obj['address'] = event.name
 
-    obj['image'] = image_to_url(obj, 'image', NARROW_IMAGE_DIMENSIONS)
-    obj['wide_image'] = image_to_url(obj, 'wide_image', WIDE_IMAGE_DIMENSIONS)
+    obj['image'] = image_to_url(event, 'image', NARROW_IMAGE_DIMENSIONS)
+    obj['wide_image'] = image_to_url(event, 'wide_image', WIDE_IMAGE_DIMENSIONS)
     del obj['image_raw']
     del obj['wide_image_raw']
+
+    extras_list = []
+    extra_images = ExtraEventPicture.objects.filter(event=event)
+    for extra in extra_images:
+        extras_list.append(image_to_url(extra, 'image', WIDE_IMAGE_DIMENSIONS))
+    obj['extra_images'] = extras_list
 
     obj['activities'] = [a.name for a in obj['activities']]
     obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
