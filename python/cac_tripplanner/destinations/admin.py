@@ -4,8 +4,21 @@ from django.contrib import admin, gis
 from image_cropping import ImageCroppingMixin
 
 from .forms import DestinationForm, EventForm
-from .models import Destination, Event
+from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPicture
 
+
+class ExtraDestinationImagesInline(ImageCroppingMixin, admin.TabularInline):
+
+    list_display = ('image', 'image_raw')
+    model = ExtraDestinationPicture
+    extra = 0
+
+
+class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
+
+    list_display = ('image', 'image_raw')
+    model = ExtraEventPicture
+    extra = 0
 
 class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
@@ -23,6 +36,8 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
 
     default_lon, default_lat = -8370000.00, 4860000.00  # 3857
     default_zoom = 12
+
+    inlines = [ExtraDestinationImagesInline]
 
     # Override map_template for custom address geocoding behavior
     map_template = 'admin/cac-geocoding-map.html'
@@ -59,6 +74,8 @@ class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     list_display = ('name', 'published', 'priority', )
     actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )
+
+    inlines = [ExtraEventImagesInline]
 
     def make_published(self, request, queryset):
         queryset.update(published=True)
