@@ -151,7 +151,7 @@ class ExtraImage(models.Model):
     class Meta:
         abstract = True
 
-    image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='image file')
+    image_raw = ImageCropField(upload_to=generate_filename, null=False, verbose_name='image file')
     image = ImageRatioField('image_raw', '680x400',
                             help_text='Image will be displayed at 680x400.')
 

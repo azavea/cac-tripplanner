@@ -7,6 +7,11 @@ from image_cropping import ImageCropField, ImageRatioField
 
 from cac_tripplanner.image_utils import generate_image_filename
 
+ARTICLE_NARROW_IMAGE_DIMENSIONS = (310, 218)
+ARTICLE_WIDE_IMAGE_DIMENSIONS = (680, 200)
+ARTICLE_NARROW_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in ARTICLE_NARROW_IMAGE_DIMENSIONS])
+ARTICLE_WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in ARTICLE_WIDE_IMAGE_DIMENSIONS])
+
 
 def generate_filename(instance, filename):
     """Helper for generating image filenames"""
@@ -89,12 +94,14 @@ class Article(models.Model):
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
     wide_image_raw = ImageCropField(upload_to=generate_filename, null=True,
                                     verbose_name='wide image file')
-    wide_image = ImageRatioField('wide_image_raw', '680x200',
-                                 help_text='The large image. Will be displayed at 680x200.')
+    wide_image = ImageRatioField('wide_image_raw', ARTICLE_WIDE_IMAGE_DIMENSION_STRING,
+                                 help_text='The large image. Will be displayed at ' +
+                                 ARTICLE_WIDE_IMAGE_DIMENSION_STRING)
     narrow_image_raw = ImageCropField(upload_to=generate_filename, null=True,
                                       verbose_name='narrow image file')
-    narrow_image = ImageRatioField('narrow_image', '310x218',
-                                   help_text='The small image. Will be displayed at 310x218.')
+    narrow_image = ImageRatioField('narrow_image', ARTICLE_NARROW_IMAGE_DIMENSION_STRING,
+                                   help_text='The small image. Will be displayed at ' +
+                                   ARTICLE_NARROW_IMAGE_DIMENSION_STRING)
 
     @property
     def published(self):

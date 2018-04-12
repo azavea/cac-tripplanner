@@ -1,6 +1,14 @@
 from django.forms import ModelForm, ValidationError
 
-from .models import Destination, Event
+from cac_tripplanner.image_utils import validate_image
+
+from .models import Destination, Event, NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS
+
+
+class ExtraImagesForm(ModelForm):
+    def clean_image_raw(self):
+        """Custom validator for image field"""
+        return validate_image(self.cleaned_data.get('image_raw', False), WIDE_IMAGE_DIMENSIONS)
 
 
 class DestinationForm(ModelForm):
@@ -9,8 +17,17 @@ class DestinationForm(ModelForm):
         model = Destination
         exclude = []
 
+    def clean_image_raw(self):
+        """Custom validator for image field"""
+        return validate_image(self.cleaned_data.get('image_raw', False), NARROW_IMAGE_DIMENSIONS)
 
-class EventForm(ModelForm):
+    def clean_wide_image_raw(self):
+        """Custom validator for wide_image field"""
+        return validate_image(self.cleaned_data.get('wide_image_raw', False), WIDE_IMAGE_DIMENSIONS)
+
+
+class EventForm(DestinationForm):
+    """Subclass DestinationForm for image validation."""
 
     class Meta:
         model = Event

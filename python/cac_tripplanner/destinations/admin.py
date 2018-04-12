@@ -3,12 +3,13 @@ from django.contrib import admin, gis
 
 from image_cropping import ImageCroppingMixin
 
-from .forms import DestinationForm, EventForm
+from .forms import DestinationForm, EventForm, ExtraImagesForm
 from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPicture
 
 
-class ExtraDestinationImagesInline(ImageCroppingMixin, admin.TabularInline):
+class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
 
+    form = ExtraImagesForm
     list_display = ('image', 'image_raw')
     model = ExtraDestinationPicture
     extra = 0
@@ -16,9 +17,11 @@ class ExtraDestinationImagesInline(ImageCroppingMixin, admin.TabularInline):
 
 class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
 
+    form = ExtraImagesForm
     list_display = ('image', 'image_raw')
     model = ExtraEventPicture
     extra = 0
+
 
 class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
