@@ -10,7 +10,7 @@ from django.views.generic import View
 
 from image_cropping.utils import get_backend
 
-from .models import Destination, Event
+from .models import Destination, Event, NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS
 from cms.models import Article
 
 
@@ -172,8 +172,8 @@ def set_destination_properties(destination):
     obj = model_to_dict(destination)
     obj['address'] = obj['name']
 
-    obj['image'] = image_to_url(destination, 'image', (310, 155))
-    obj['wide_image'] = image_to_url(destination, 'wide_image', (680, 400))
+    obj['image'] = image_to_url(destination, 'image', NARROW_IMAGE_DIMENSIONS)
+    obj['wide_image'] = image_to_url(destination, 'wide_image', WIDE_IMAGE_DIMENSIONS)
     del obj['image_raw']
     del obj['wide_image_raw']
 
@@ -196,8 +196,8 @@ def set_event_properties(event):
     obj = model_to_dict(event)
     obj['address'] = event.name
 
-    obj['image'] = image_to_url(obj, 'image', (310, 155))
-    obj['wide_image'] = image_to_url(obj, 'wide_image', (680, 400))
+    obj['image'] = image_to_url(obj, 'image', NARROW_IMAGE_DIMENSIONS)
+    obj['wide_image'] = image_to_url(obj, 'wide_image', WIDE_IMAGE_DIMENSIONS)
     del obj['image_raw']
     del obj['wide_image_raw']
 

@@ -6,6 +6,11 @@ from image_cropping import ImageCropField, ImageRatioField
 
 from cac_tripplanner.image_utils import generate_image_filename
 
+NARROW_IMAGE_DIMENSIONS = (310, 155)
+WIDE_IMAGE_DIMENSIONS = (680, 400)
+NARROW_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in NARROW_IMAGE_DIMENSIONS])
+WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in WIDE_IMAGE_DIMENSIONS])
+
 
 def generate_filename(instance, filename):
     """Helper for generating image filenames"""
@@ -66,11 +71,14 @@ class Attraction(models.Model):
     website_url = models.URLField(blank=True, null=True)
     description = RichTextField()
     image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='image file')
-    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='wide image file')
-    image = ImageRatioField('image_raw', '310x155',
-                            help_text='The small image. Will be displayed at 310x155.')
-    wide_image = ImageRatioField('wide_image_raw', '680x400',
-                                 help_text='The large image. Will be displayed at 680x400.')
+    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True,
+                                    verbose_name='wide image file')
+    image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
+                            help_text='The small image. Will be displayed at ' +
+                                      NARROW_IMAGE_DIMENSION_STRING)
+    wide_image = ImageRatioField('wide_image_raw', WIDE_IMAGE_DIMENSION_STRING,
+                                 help_text='The large image. Will be displayed at ' +
+                                           WIDE_IMAGE_DIMENSION_STRING)
     published = models.BooleanField(default=False)
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
