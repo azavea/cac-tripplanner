@@ -232,6 +232,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'image_cropping.thumbnail_processors': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     }
 }
 
