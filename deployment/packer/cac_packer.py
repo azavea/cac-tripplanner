@@ -63,7 +63,7 @@ def run_packer(machine_type, region, creds):
     env = os.environ.copy()
     env['AWS_ACCESS_KEY_ID'] = creds['aws_access_key_id']
     env['AWS_SECRET_ACCESS_KEY'] = creds['aws_secret_access_key']
-    env['AWS_SECURITY_TOKEN'] = creds['aws_security_token']
+    env['AWS_SESSION_TOKEN'] = creds['aws_security_token']
 
     packer_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cac.json')
     packer_command = ['packer', 'build',
