@@ -79,6 +79,11 @@
         @include respond-to('xxs') {
             padding: 0 1rem;
         }
+
+        .detail-image-carousel {
+            margin-left: -4rem;
+            margin-right: -4rem;
+        }
     }
 
     .info-article-image-hero {

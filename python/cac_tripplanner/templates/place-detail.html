@@ -48,3 +48,20 @@
     </div>
     {% include "partials/footer.html" %}
 {% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+jQuery(document).ready(function ($) {
+    $('.detail-image-carousel').slick({
+        arrows: false,
+        dots: true,
+        autoplay: true,
+        fade: true,
+        cssEase: 'linear',
+        mobileFirst: true,
+        lazyLoad: 'ondemand',
+        slidesToShow: 1,
+    });
+});
+</script>
+{% endblock %}
