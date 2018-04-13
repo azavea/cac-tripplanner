@@ -127,7 +127,7 @@ def event_detail(request, pk):
     return base_view(request, 'event-detail.html', context=context)
 
 
-def image_to_url(obj, field_name, size):
+def image_to_url(obj, field_name, size, raw_field_name=''):
     """Helper for converting an image object property to a url for a json response
 
     :param obj: Model object with {image} and {image}_raw fields
@@ -135,7 +135,8 @@ def image_to_url(obj, field_name, size):
     :returns: URL of the image, or an empty string if there is no image
     """
 
-    raw_field_name = field_name + '_raw'
+    if not raw_field_name:
+        raw_field_name = field_name + '_raw'
     return get_backend().get_thumbnail_url(getattr(obj, raw_field_name), {
                                            'box': getattr(obj, field_name),
                                            'size': size,
@@ -168,6 +169,37 @@ def set_location_properties(obj, location):
     return obj
 
 
+def set_attraction_properties(obj, model, extra_images):
+    """Helper to set serialized properties common to destinations and events.
+
+    :param obj: Dictionary representation of object
+    :param model: Django model object with the expected properties of an Attraction
+    :param extra_images: Filtered queryset of `ExtraImage` related objects to the Attraction
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj['image'] = image_to_url(model, 'image', NARROW_IMAGE_DIMENSIONS)
+    obj['wide_image'] = image_to_url(model, 'wide_image', WIDE_IMAGE_DIMENSIONS)
+    del obj['image_raw']
+    del obj['wide_image_raw']
+
+    # return URLs for extra images, in both narrow and wide formats
+    extras_list = []
+    wide_extras_list = []
+    for extra in extra_images:
+        extras_list.append(image_to_url(extra, 'image', NARROW_IMAGE_DIMENSIONS))
+        wide_extras_list.append(image_to_url(extra,
+                                             'wide_image',
+                                             WIDE_IMAGE_DIMENSIONS,
+                                             'image_raw'))
+    obj['extra_images'] = extras_list
+    obj['extra_wide_images'] = wide_extras_list
+
+    obj['activities'] = [a.name for a in obj['activities']]
+    # add convenience property for whether destination has cycling
+    obj['cycling'] = model.has_activity('cycling')
+
+    return obj
+
 def set_destination_properties(destination):
     """Helper for adding and converting properties in serializing destinations as JSON
 
@@ -176,24 +208,11 @@ def set_destination_properties(destination):
     """
     obj = model_to_dict(destination)
     obj['address'] = obj['name']
-
-    obj['image'] = image_to_url(destination, 'image', NARROW_IMAGE_DIMENSIONS)
-    obj['wide_image'] = image_to_url(destination, 'wide_image', WIDE_IMAGE_DIMENSIONS)
-    del obj['image_raw']
-    del obj['wide_image_raw']
-
-    extras_list = []
-    extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
-    for extra in extra_images:
-        extras_list.append(image_to_url(extra, 'image', WIDE_IMAGE_DIMENSIONS))
-    obj['extra_images'] = extras_list
-
     obj['categories'] = [c.name for c in obj['categories']]
-    obj['activities'] = [a.name for a in obj['activities']]
-    # add convenience property for whether destination has cycling
-    obj['cycling'] = destination.has_activity('cycling')
     obj['is_event'] = False
 
+    extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
+    obj = set_attraction_properties(obj, destination, extra_images)
     obj = set_location_properties(obj, destination)
     return obj
 
@@ -207,25 +226,13 @@ def set_event_properties(event):
     obj = model_to_dict(event)
     obj['address'] = event.name
 
-    obj['image'] = image_to_url(event, 'image', NARROW_IMAGE_DIMENSIONS)
-    obj['wide_image'] = image_to_url(event, 'wide_image', WIDE_IMAGE_DIMENSIONS)
-    del obj['image_raw']
-    del obj['wide_image_raw']
-
-    extras_list = []
-    extra_images = ExtraEventPicture.objects.filter(event=event)
-    for extra in extra_images:
-        extras_list.append(image_to_url(extra, 'image', WIDE_IMAGE_DIMENSIONS))
-    obj['extra_images'] = extras_list
-
-    obj['activities'] = [a.name for a in obj['activities']]
     obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
     obj['start_date'] = event.start_date.isoformat()
     obj['end_date'] = event.end_date.isoformat()
-    # add convenience property for whether event has cycling
-    obj['cycling'] = event.has_activity('cycling')
     obj['is_event'] = True
 
+    extra_images = ExtraEventPicture.objects.filter(event=event)
+    obj = set_attraction_properties(obj, event, extra_images)
     # add properties of related destination, if any
     obj = set_location_properties(obj, event.destination)
 

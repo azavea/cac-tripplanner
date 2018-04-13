@@ -10,7 +10,7 @@ from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPictu
 class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
 
     form = ExtraImagesForm
-    list_display = ('image', 'image_raw')
+    list_display = ('image', 'wide_image', 'image_raw')
     model = ExtraDestinationPicture
     extra = 0
 
@@ -18,7 +18,7 @@ class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
 class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
 
     form = ExtraImagesForm
-    list_display = ('image', 'image_raw')
+    list_display = ('image', 'wide_image', 'image_raw')
     model = ExtraEventPicture
     extra = 0
 
@@ -74,6 +74,9 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
 class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     form = EventForm
 
+    fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
+              'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
+              'start_date', 'end_date', 'destination')
     list_display = ('name', 'published', 'priority', )
     actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )

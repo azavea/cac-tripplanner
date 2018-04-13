@@ -70,9 +70,8 @@ class Attraction(models.Model):
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
     description = RichTextField()
-    image_raw = ImageCropField(upload_to=generate_filename, null=True, verbose_name='image file')
-    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True,
-                                    verbose_name='wide image file')
+    image_raw = ImageCropField(upload_to=generate_filename, verbose_name='image file')
+    wide_image_raw = ImageCropField(upload_to=generate_filename, verbose_name='wide image file')
     image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
                             help_text='The small image. Will be displayed at ' +
                                       NARROW_IMAGE_DIMENSION_STRING)
@@ -152,8 +151,11 @@ class ExtraImage(models.Model):
         abstract = True
 
     image_raw = ImageCropField(upload_to=generate_filename, null=False, verbose_name='image file')
-    image = ImageRatioField('image_raw', '680x400',
-                            help_text='Image will be displayed at 680x400.')
+    image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
+                            help_text='Image will be displayed at ' + NARROW_IMAGE_DIMENSION_STRING)
+    wide_image = ImageRatioField('image_raw', WIDE_IMAGE_DIMENSION_STRING,
+                                 help_text='Image will be displayed at ' +
+                                 WIDE_IMAGE_DIMENSION_STRING)
 
 
 class ExtraDestinationPicture(ExtraImage):
