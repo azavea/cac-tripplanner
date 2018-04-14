@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import View
 
+from easy_thumbnails.exceptions import InvalidImageFormatError
 from image_cropping.utils import get_backend
 
 from .models import (Destination,
@@ -137,11 +138,19 @@ def image_to_url(obj, field_name, size, raw_field_name=''):
 
     if not raw_field_name:
         raw_field_name = field_name + '_raw'
-    return get_backend().get_thumbnail_url(getattr(obj, raw_field_name), {
-                                           'box': getattr(obj, field_name),
-                                           'size': size,
-                                           'crop': True,
-                                           'detail': True})
+    options = {
+        'size': size,
+        'crop': True,
+        'detail': True
+    }
+    box = getattr(obj, field_name)
+    if box:
+        options['box'] = box
+
+    try:
+        return get_backend().get_thumbnail_url(getattr(obj, raw_field_name), options)
+    except InvalidImageFormatError:
+        return ''
 
 
 def set_location_properties(obj, location):
