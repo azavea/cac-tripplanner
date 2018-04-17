@@ -157,12 +157,12 @@ class ExtraImage(models.Model):
                                  help_text='Image will be displayed at ' +
                                  WIDE_IMAGE_DIMENSION_STRING)
 
+    def __unicode__(self):
+        return self.image_raw.url if self.image_raw else ''
+
 
 class ExtraDestinationPicture(ExtraImage):
     destination = models.ForeignKey('Destination')
-
-    def __unicode__(self):
-        return self.image_raw.url if self.image_raw else ''
 
 
 class ExtraEventPicture(ExtraImage):
