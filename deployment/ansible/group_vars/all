@@ -1,4 +1,7 @@
 ---
+java_version: "8u*"
+java_major_version: "8"
+
 app_username: "vagrant"
 
 packer_version: "1.0.2"
