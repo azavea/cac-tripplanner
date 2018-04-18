@@ -143,6 +143,9 @@ THUMBNAIL_PROCESSORS = (
     'image_cropping.thumbnail_processors.crop_corners',
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
+IMAGE_CROPPER_HELP_TEXT = """Save and return to editing this record to see an uploaded image and
+to change how the image is cropped."""
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

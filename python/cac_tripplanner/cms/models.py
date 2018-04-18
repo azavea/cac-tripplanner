@@ -1,5 +1,6 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
@@ -92,13 +93,17 @@ class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
-    wide_image_raw = ImageCropField(upload_to=generate_filename, null=True,
-                                    verbose_name='wide image file')
+    wide_image_raw = ImageCropField(upload_to=generate_filename,
+                                    null=True,
+                                    verbose_name='wide image file',
+                                    help_text=settings.IMAGE_CROPPER_HELP_TEXT)
     wide_image = ImageRatioField('wide_image_raw', ARTICLE_WIDE_IMAGE_DIMENSION_STRING,
                                  help_text='The large image. Will be displayed at ' +
                                  ARTICLE_WIDE_IMAGE_DIMENSION_STRING)
-    narrow_image_raw = ImageCropField(upload_to=generate_filename, null=True,
-                                      verbose_name='narrow image file')
+    narrow_image_raw = ImageCropField(upload_to=generate_filename,
+                                      null=True,
+                                      verbose_name='narrow image file',
+                                      help_text=settings.IMAGE_CROPPER_HELP_TEXT)
     narrow_image = ImageRatioField('narrow_image', ARTICLE_NARROW_IMAGE_DIMENSION_STRING,
                                    help_text='The small image. Will be displayed at ' +
                                    ARTICLE_NARROW_IMAGE_DIMENSION_STRING)

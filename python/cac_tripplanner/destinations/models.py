@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.utils.timezone import now
 
@@ -70,8 +71,10 @@ class Attraction(models.Model):
     name = models.CharField(max_length=50)
     website_url = models.URLField(blank=True, null=True)
     description = RichTextField()
-    image_raw = ImageCropField(upload_to=generate_filename, verbose_name='image file')
-    wide_image_raw = ImageCropField(upload_to=generate_filename, verbose_name='wide image file')
+    image_raw = ImageCropField(upload_to=generate_filename, verbose_name='image file',
+                               help_text=settings.IMAGE_CROPPER_HELP_TEXT)
+    wide_image_raw = ImageCropField(upload_to=generate_filename, verbose_name='wide image file',
+                                    help_text=settings.IMAGE_CROPPER_HELP_TEXT)
     image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
                             help_text='The small image. Will be displayed at ' +
                                       NARROW_IMAGE_DIMENSION_STRING)
@@ -150,7 +153,8 @@ class ExtraImage(models.Model):
     class Meta:
         abstract = True
 
-    image_raw = ImageCropField(upload_to=generate_filename, null=False, verbose_name='image file')
+    image_raw = ImageCropField(upload_to=generate_filename, null=False, verbose_name='image file',
+                               help_text=settings.IMAGE_CROPPER_HELP_TEXT)
     image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
                             help_text='Image will be displayed at ' + NARROW_IMAGE_DIMENSION_STRING)
     wide_image = ImageRatioField('image_raw', WIDE_IMAGE_DIMENSION_STRING,
