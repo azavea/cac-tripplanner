@@ -1,9 +1,20 @@
+{% load cropping %}
 {% load destination_extras %}
 {% load tz %}
 <article class="info-article">
     <header class="info-article-header">
+
+        {% if event.extraeventpicture_set.exists %}
+        <div class="detail-image-carousel">
+            <img data-lazy="{% cropped_thumbnail event "wide_image" %}">
+            {% for extra_image in event.extraeventpicture_set.all %}
+            <img data-lazy="{% cropped_thumbnail extra_image 'wide_image' %}">
+            {% endfor %}
+        </div>
+        {% else %}
         <div class="info-place-image-hero"
-             style="background-image: url('{{ event.wide_image.url }}');"></div>
+             style="background-image: url('{% cropped_thumbnail event "wide_image" %}');"></div>
+        {% endif %}
         <div class="info-article-header-info">
             <div class="info-article-header-main">
                 <h2 class="info-article-title">{{ event.name }}</h2>

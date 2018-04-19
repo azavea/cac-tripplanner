@@ -20,7 +20,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             itineraryList: '.routes-list',
             itineraryItem: '.route-summary'
         },
-        // Settings for 'slick' carousel for swiping itineraries on mobile
+        // Settings for 'slick' carousel for swiping itineraries on mobile and in detail views
         slick: {
             arrows: false,
             dots: true,

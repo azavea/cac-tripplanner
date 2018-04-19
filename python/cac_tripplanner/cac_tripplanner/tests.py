@@ -31,7 +31,9 @@ class CACTripPlannerIsochroneTestCase(TestCase):
             city='Gotham',
             state='Euphoria',
             zipcode='12345',
-            published=True
+            published=True,
+            image_raw='default_media/square/JohnHeinzNationalWildlifeRefuge.jpg',
+            wide_image_raw='default_media/half-square/JohnHeinzNationalWildlifeRefuge.jpg'
         )
         Destination.objects.create(
             name='testWithout',
@@ -41,7 +43,9 @@ class CACTripPlannerIsochroneTestCase(TestCase):
             city='Thangorodrim',
             state='Angband',
             zipcode='12349',
-            published=True
+            published=True,
+            image_raw='default_media/square/JohnHeinzNationalWildlifeRefuge.jpg',
+            wide_image_raw='default_media/half-square/JohnHeinzNationalWildlifeRefuge.jpg'
         )
 
     def test_points_exists(self):

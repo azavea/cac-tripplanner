@@ -1,10 +1,17 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
+from image_cropping import ImageCropField, ImageRatioField
 
 from cac_tripplanner.image_utils import generate_image_filename
+
+ARTICLE_NARROW_IMAGE_DIMENSIONS = (310, 218)
+ARTICLE_WIDE_IMAGE_DIMENSIONS = (680, 200)
+ARTICLE_NARROW_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in ARTICLE_NARROW_IMAGE_DIMENSIONS])
+ARTICLE_WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in ARTICLE_WIDE_IMAGE_DIMENSIONS])
 
 
 def generate_filename(instance, filename):
@@ -86,10 +93,20 @@ class Article(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     content_type = models.CharField(max_length=4, choices=ArticleTypes.CHOICES)
-    wide_image = models.ImageField(upload_to=generate_filename, null=True,
-                                   help_text='The large image. Will be displayed at 680x200.')
-    narrow_image = models.ImageField(upload_to=generate_filename, null=True,
-                                     help_text='The small image. Will be displayed at 310x218.')
+    wide_image_raw = ImageCropField(upload_to=generate_filename,
+                                    null=True,
+                                    verbose_name='wide image file',
+                                    help_text=settings.IMAGE_CROPPER_HELP_TEXT)
+    wide_image = ImageRatioField('wide_image_raw', ARTICLE_WIDE_IMAGE_DIMENSION_STRING,
+                                 help_text='The large image. Will be displayed at ' +
+                                 ARTICLE_WIDE_IMAGE_DIMENSION_STRING)
+    narrow_image_raw = ImageCropField(upload_to=generate_filename,
+                                      null=True,
+                                      verbose_name='narrow image file',
+                                      help_text=settings.IMAGE_CROPPER_HELP_TEXT)
+    narrow_image = ImageRatioField('narrow_image', ARTICLE_NARROW_IMAGE_DIMENSION_STRING,
+                                   help_text='The small image. Will be displayed at ' +
+                                   ARTICLE_NARROW_IMAGE_DIMENSION_STRING)
 
     @property
     def published(self):

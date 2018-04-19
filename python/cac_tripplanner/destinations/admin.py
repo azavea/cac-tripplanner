@@ -1,11 +1,29 @@
 from django.conf import settings
 from django.contrib import admin, gis
 
-from .forms import DestinationForm, EventForm
-from .models import Destination, Event
+from image_cropping import ImageCroppingMixin
+
+from .forms import DestinationForm, EventForm, ExtraImagesForm
+from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPicture
 
 
-class DestinationAdmin(gis.admin.OSMGeoAdmin):
+class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
+
+    form = ExtraImagesForm
+    list_display = ('image', 'wide_image', 'image_raw')
+    model = ExtraDestinationPicture
+    extra = 0
+
+
+class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
+
+    form = ExtraImagesForm
+    list_display = ('image', 'wide_image', 'image_raw')
+    model = ExtraEventPicture
+    extra = 0
+
+
+class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
 
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
@@ -14,12 +32,15 @@ class DestinationAdmin(gis.admin.OSMGeoAdmin):
     # To change field display order, define them all here.
     # Default is order defined in model, but due to inheritance, cannot reorder across
     # relationship with model field ordering alone.
-    fields = ('name', 'website_url', 'description', 'image', 'wide_image', 'published',
+    fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
+              'wide_image_raw', 'published',
               'priority', 'accessible', 'categories', 'activities', 'city', 'state', 'zipcode',
               'address', 'point', 'watershed_alliance')
 
     default_lon, default_lat = -8370000.00, 4860000.00  # 3857
     default_zoom = 12
+
+    inlines = [ExtraDestinationImagesInline]
 
     # Override map_template for custom address geocoding behavior
     map_template = 'admin/cac-geocoding-map.html'
@@ -50,12 +71,17 @@ class DestinationAdmin(gis.admin.OSMGeoAdmin):
     make_unpublished.short_description = 'Unpublish selected destinations'
 
 
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     form = EventForm
 
+    fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
+              'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
+              'start_date', 'end_date', 'destination')
     list_display = ('name', 'published', 'priority', )
     actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )
+
+    inlines = [ExtraEventImagesInline]
 
     def make_published(self, request, queryset):
         queryset.update(published=True)
