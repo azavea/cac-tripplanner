@@ -22,8 +22,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreMinutes']);
 
     var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
-                                                 'destinationText',
-                                                 'waypoints']);
+                                                  'destinationText',
+                                                  'waypoints']);
 
     var events = $({});
     var eventNames = {
