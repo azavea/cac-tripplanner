@@ -5,7 +5,7 @@
  * enables some URL navigation and facilitates the interaction between that and UserPreferences.
  */
 
-CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
+CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
 
     'use strict';
 
@@ -30,25 +30,22 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         changed: 'cac:control:urlrouting:changed'
     };
 
-    var router = null;
     var updatingUrl = false;
 
     function UrlRouter() {
-        router = new Navigo('/');
-        router.on('explore', loadExplore);
-        router.on('*', setPrefsFromUrl, {
-            before: function (done) {
-                if (updatingUrl) {
-                    // If we're updating the URL from the directions or explore controllers, we
-                    // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
-                    updatingUrl = false;
-                    done(false);
-                } else {
-                    done();
-                }
+        route.base('/');
+        route('explore..', loadExplore);
+        route('..', function () {
+            if (updatingUrl) {
+                // If we're updating the URL from the directions or explore controllers, we
+                // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
+                updatingUrl = false;
+                return;
+            } else {
+                setPrefsFromUrl();
             }
         });
-        router.resolve();
+        route.start(true);
     }
 
     UrlRouter.prototype.updateUrl = updateUrl;
@@ -70,11 +67,11 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * 2. Setting `updatingUrl`, which gets read by the routing handler as a signal to cancel.
      */
     function updateUrl(url) {
-        if (decodeURI(location.search) === decodeURI(url.slice(1))) {
+        if (decodeURI(location.pathname + location.search) === decodeURI(url)) {
             return;
         }
         updatingUrl = true;
-        router.navigate(url, true);
+        route(url, undefined /* Title */, false /* replace state */);
     }
 
     function clearUrl() {
@@ -93,9 +90,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      */
     function loadExplore() {
         UserPreferences.setPreference('method', 'explore');
-        router.pause();
-        router.navigate('/', true);
-        router.resume();
+        updatingUrl = true;
+        route('/', undefined /* Title */, true /* replace state */);
     }
 
     /* Read URL parameters into user preferences
@@ -229,4 +225,4 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         };
     }
 
-})(_, jQuery, CAC.User.Preferences, CAC.Utils, Navigo);
+})(_, jQuery, CAC.User.Preferences, CAC.Utils, route);
