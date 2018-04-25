@@ -38,14 +38,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
 
     function bikeRoutesOverlay(map) {
         var layerGroup = cartodb.L.featureGroup([]);
-        var url = 'https://cac-tripplanner.cartodb.com/api/v2/viz/501dbdc8-f4ea-11e4-8c9e-0e018d66dc29/viz.json';
-        // TODO: fix attribution
-        // cartodb.js does not allow for changing the layer attribution, and has lso somehow
-        // broken the setAttribute method on the layer object.
-        //var attribution = ['Bike routes data:',
-        //                   '<a href="http://www.dvrpc.org/mapping/data.htm">DVRPC</a>,',
-        //                   '<a href="https://www.opendataphilly.org/dataset/bike-network">City of Philadelphia</a>'
-        //                   ].join(' ');
+        var url = 'https://cac-tripplanner.cartodb.com/api/v2/viz/77aa8a63-fd35-4f6e-b5d5-361cbbdb45cb/viz.json';
         cartodb.createLayer(map, url).on('done', function(layer) {
             layerGroup.addLayer(layer);
             // Wait until layer has loaded to bring it to front.  Otherwise, it loads behind
