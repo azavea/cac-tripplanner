@@ -1,16 +1,19 @@
 ---
+java_version: "8u*"
+java_major_version: "8"
+
 app_username: "vagrant"
 
-packer_version: "0.7.5"
+packer_version: "1.0.2"
 
-nodejs_version: 6.11.4
+nodejs_version: 8.10.0
 
 virtualenv_version: 15.1.0
 
 otp_router: "default"
 
 # used by nginx and gunicorn to set timeouts; OTP defaults to 30s
-otp_session_timeout_s: 30
+otp_session_timeout_s: 90
 
 s3_otp_data: cleanair-otp-data
 

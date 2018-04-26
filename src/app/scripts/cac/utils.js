@@ -81,6 +81,7 @@ CAC.Utils = (function (_, moment) {
         defaultBackgroundLineColor: defaultBackgroundLineColor,
         defaultModeColor: defaultModeColor,
         getImageUrl: getImageUrl,
+        getFormattedDistance: getFormattedDistance,
         abbrevStreetName: abbrevStreetName,
         getBikeOptimizeLabel: getBikeOptimizeLabel,
         getUrlParams: getUrlParams,
@@ -170,6 +171,24 @@ CAC.Utils = (function (_, moment) {
         return _.has(bikeOptimizeStrings, optimizeSelection) ?
             bikeOptimizeStrings[optimizeSelection] :
             bikeOptimizeStrings.GREENWAYS;
+    }
+
+    /**
+     * Helper function to get formatted string in feet or miles for a given distance in meters
+     *
+     * @param {double} distanceMeters Distance to format
+     * @return {string} distance in miles or feet, rounded, with unit
+     */
+    function getFormattedDistance(distanceMeters) {
+        // less than ~0.2 miles
+        if (distanceMeters < 322) {
+            var feet = Math.round(distanceMeters * 3.28084).toString();
+            return feet === '1' ? feet + ' foot' : feet + ' feet';
+        }
+
+        // return miles
+        var miles = (Math.round(((distanceMeters / 1000) * 0.621371) * 10) / 10).toString();
+        return miles === '1' ? miles + ' mile' : miles + ' miles';
     }
 
     // Use with images in the app/images folder

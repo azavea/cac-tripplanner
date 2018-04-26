@@ -225,7 +225,7 @@ class FindReachableDestinations(View):
         try:
             # get a feature collection
             json_poly = json.loads(isochrone_response.content)
-        except:
+        except:  # noqa: E722
             # No isochrone found.  Is GTFS loaded?  Is origin within the graph bounds?
             json_poly = json.loads("{}")
         return json_poly

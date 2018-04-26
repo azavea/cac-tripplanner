@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_version ">= 1.5"
+Vagrant.require_version ">= 2.0"
 require "yaml"
 
 CAC_SHARED_FOLDER_TYPE = ENV.fetch("CAC_SHARED_FOLDER_TYPE", "nfs")
@@ -57,7 +57,7 @@ def install_dependent_roles
   ansible_roles_spec = File.join(ansible_directory, "roles.yml")
 
   YAML.load_file(ansible_roles_spec).each do |role|
-    role_name = role["src"]
+    role_name = role["name"] ? role["name"] : role["src"]
     role_version = role["version"]
     role_path = File.join(ansible_directory, "roles", role_name)
     galaxy_metadata = galaxy_install_info(role_name)
@@ -111,6 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     database.ssh.forward_x11 = true
 
     database.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/database.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
@@ -148,6 +149,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.ssh.forward_x11 = true
 
     app.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/app.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]
@@ -177,6 +179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     otp.ssh.forward_x11 = true
 
     otp.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
       ansible.playbook = "deployment/ansible/otp.yml"
       ansible.inventory_path = ANSIBLE_INVENTORY_PATH
       ansible.raw_arguments = ["--timeout=60"]

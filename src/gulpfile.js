@@ -107,16 +107,32 @@ var buildTurfPointOnLine = function() {
             'turf-helpers': turfRoot + 'helpers',
             'turf-distance': turfRoot + 'distance',
             'turf-bearing': turfRoot + 'bearing',
-            'turf-destination': turfRoot + 'destination'
+            'turf-destination': turfRoot + 'destination',
+            'turf-invariant': turfRoot + 'invariant',
+            'turf-line-intersect': turfRoot + 'line-intersect',
+            'turf-meta': turfRoot + 'meta'
         }})
         .bundle()
         .pipe(vinylSourceStream('turf-point-on-line.js'));
 };
 
+var buildTurfDistance = function() {
+    return browserify(turfRoot + 'distance', {
+        standalone: 'turf.distance',
+        exclude: [turfRoot + 'helpers']
+    })
+    .transform(aliasify, {aliases: {
+        'turf-helpers': turfRoot + 'helpers',
+        'turf-invariant': turfRoot + 'invariant'
+    }})
+    .bundle()
+    .pipe(vinylSourceStream('turf-distance.js'));
+};
+
 // combine streams from turf and the other vendor dependencies
 var copyVendorJS = function(filter, extraFiles) {
     var bowerStream = copyBowerFiles(filter, extraFiles);
-    var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine());
+    var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine(), buildTurfDistance());
     vendorStream.add(bowerStream);
     // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
     // running jQuery in noConflict mode for JotForms.
