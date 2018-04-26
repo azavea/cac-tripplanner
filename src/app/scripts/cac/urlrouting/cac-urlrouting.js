@@ -52,6 +52,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
     UrlRouter.prototype.clearUrl = clearUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
+    UrlRouter.prototype.directionsPrefsMissingFromUrl = directionsPrefsMissingFromUrl;
     UrlRouter.prototype.events = events;
     UrlRouter.prototype.eventNames = eventNames;
 
@@ -66,12 +67,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
      *    can be checked inside the controllers, so handle it here.
      * 2. Setting `updatingUrl`, which gets read by the routing handler as a signal to cancel.
      */
-    function updateUrl(url) {
+    function updateUrl(url, replaceState) {
         if (decodeURI(location.pathname + location.search) === decodeURI(url)) {
             return;
         }
         updatingUrl = true;
-        route(url, undefined /* Title */, false /* replace state */);
+        route(url, undefined /* Title */, replaceState);
     }
 
     function clearUrl() {
@@ -181,9 +182,28 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
      * encoded as empty string.
      */
     function buildUrlParamsFromPrefs(fields) {
+        return Utils.encodeUrlParams(getPreferencesWithDefaults(fields));
+    }
+
+    function directionsPrefsMissingFromUrl(url) {
+        return prefsMissingFromUrl(DIRECTIONS_ENCODE, url);
+    }
+
+    function prefsMissingFromUrl(fields, url) {
+        var params = Utils.getUrlParams();
+        var prefs = getPreferencesWithDefaults(fields);
+        if (Object.keys(params).length === 0) {
+            return false;
+        }
+
+        return _.some(fields, function(field) {
+            return _.isUndefined(params[field]) != _.isUndefined(prefs[field]);
+        });
+    }
+
+    function getPreferencesWithDefaults(fields){
         // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
         var COORDINATE_ROUND = 7;
-
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {
@@ -212,7 +232,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
                 }
             }
         });
-        return Utils.encodeUrlParams(opts);
+        return opts;
     }
 
     function makeLocation(coords, name) {
