@@ -39,7 +39,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
             var path = location.pathname;
             if (updatingUrl) {
                 // If we're updating the URL from the directions or explore controllers, we
-                // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
+                // don't want to run setPrefsFromUrl again.
                 updatingUrl = false;
                 return;
             } else if (path !== '/') {
