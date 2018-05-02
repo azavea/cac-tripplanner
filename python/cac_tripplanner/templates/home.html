@@ -149,7 +149,6 @@
                                 href="#">Directions</a>
                             {% endif %}
                             <a class="place-card-action place-action-details"
-                               target="_top"
                                {% if destination.is_event %}
                                href="{% url 'event-detail' pk=destination.pk %}"
                                {% else %}

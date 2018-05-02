@@ -36,11 +36,20 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
         route.base('/');
         route('explore..', loadExplore);
         route('..', function () {
+            var path = location.pathname;
             if (updatingUrl) {
                 // If we're updating the URL from the directions or explore controllers, we
                 // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
                 updatingUrl = false;
                 return;
+            } else if (path !== '/') {
+                // We actually only want to do client-side routing for `/` and
+                // `/explore`, but Riot will hijack clicks on any anchor tag
+                // that matches our base of `/`.
+                //
+                // To work-around that behaviour, we force a refesh of the page
+                // after the URL changes to something other than `/` or `/explore`
+                location.reload();
             } else {
                 setPrefsFromUrl();
             }
