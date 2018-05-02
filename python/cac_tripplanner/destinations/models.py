@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.utils.timezone import now
 
@@ -171,3 +173,33 @@ class ExtraDestinationPicture(ExtraImage):
 
 class ExtraEventPicture(ExtraImage):
     event = models.ForeignKey('Event')
+
+
+class UserFlag(models.Model):
+    class UserFlags(object):
+        been = 'been'
+        want_to_go = 'want_to_go'
+        not_interested = 'not_interested'
+        liked = 'liked'
+        none = ''
+
+        CHOICES = (
+            (been, 'Been'),
+            (want_to_go, 'Want to go'),
+            (not_interested, 'Not interested'),
+            (liked, 'Liked'),
+            (none, '')
+        )
+
+    # generic foreign key to abstract Attraction model
+    # see: https://docs.djangoproject.com/en/1.11/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    attraction = GenericForeignKey('content_type', 'object_id')
+    is_event = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(default=now, editable=False)
+    user_uuid = models.UUIDField(editable=False)
+    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32)
+
+    def __unicode__(self):
+        return "{0} flagged: {1}".format(self.attraction.name, self.flag)
