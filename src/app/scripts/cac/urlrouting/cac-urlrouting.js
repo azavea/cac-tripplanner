@@ -5,7 +5,7 @@
  * enables some URL navigation and facilitates the interaction between that and UserPreferences.
  */
 
-CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
+CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
 
     'use strict';
 
@@ -22,39 +22,48 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
     var EXPLORE_ENCODE = SHARED_ENCODE.concat(['placeId', 'exploreMinutes']);
 
     var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
-                                                 'destinationText',
-                                                 'waypoints']);
+                                                  'destinationText',
+                                                  'waypoints']);
 
     var events = $({});
     var eventNames = {
         changed: 'cac:control:urlrouting:changed'
     };
 
-    var router = null;
     var updatingUrl = false;
 
     function UrlRouter() {
-        router = new Navigo('/');
-        router.on('explore', loadExplore);
-        router.on('*', setPrefsFromUrl, {
-            before: function (done) {
-                if (updatingUrl) {
-                    // If we're updating the URL from the directions or explore controllers, we
-                    // don't want to run setPrefsFromUrl again. Calling `done(false)` cancels it.
-                    updatingUrl = false;
-                    done(false);
-                } else {
-                    done();
-                }
+        route.base('/');
+        route('explore..', loadExplore);
+        route('..', function () {
+            var path = location.pathname;
+            if (updatingUrl) {
+                // If we're updating the URL from the directions or explore controllers, we
+                // don't want to run setPrefsFromUrl again.
+                updatingUrl = false;
+                return;
+            } else if (path !== '/' && path !== '/context.html') {
+                // We actually only want to do client-side routing for `/` and
+                // `/explore`, but Riot will hijack clicks on any anchor tag
+                // that matches our base of `/`.
+                //
+                // To work-around that behaviour, we force a refesh of the page
+                // after the URL changes to something other than `/` or `/explore`
+                // Note: We treat `/context.html` the same as `/`. This URL
+                // isn't used by the application, but is used by the JS test runner
+                location.reload();
+            } else {
+                setPrefsFromUrl();
             }
         });
-        router.resolve();
+        route.start(true);
     }
 
     UrlRouter.prototype.updateUrl = updateUrl;
     UrlRouter.prototype.clearUrl = clearUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
+    UrlRouter.prototype.directionsPrefsMissingFromUrl = directionsPrefsMissingFromUrl;
     UrlRouter.prototype.events = events;
     UrlRouter.prototype.eventNames = eventNames;
 
@@ -69,12 +78,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      *    can be checked inside the controllers, so handle it here.
      * 2. Setting `updatingUrl`, which gets read by the routing handler as a signal to cancel.
      */
-    function updateUrl(url) {
-        if (decodeURI(location.search) === decodeURI(url.slice(1))) {
+    function updateUrl(url, replaceState) {
+        if (decodeURI(location.pathname + location.search) === decodeURI(url)) {
             return;
         }
         updatingUrl = true;
-        router.navigate(url, true);
+        route(url, undefined /* Title */, replaceState);
     }
 
     function clearUrl() {
@@ -93,9 +102,8 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      */
     function loadExplore() {
         UserPreferences.setPreference('method', 'explore');
-        router.pause();
-        router.navigate('/', true);
-        router.resume();
+        updatingUrl = true;
+        route('/', undefined /* Title */, true /* replace state */);
     }
 
     /* Read URL parameters into user preferences
@@ -185,9 +193,28 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
      * encoded as empty string.
      */
     function buildUrlParamsFromPrefs(fields) {
+        return Utils.encodeUrlParams(getPreferencesWithDefaults(fields));
+    }
+
+    function directionsPrefsMissingFromUrl(url) {
+        return prefsMissingFromUrl(DIRECTIONS_ENCODE, url);
+    }
+
+    function prefsMissingFromUrl(fields, url) {
+        var params = Utils.getUrlParams();
+        var prefs = getPreferencesWithDefaults(fields);
+        if (Object.keys(params).length === 0) {
+            return false;
+        }
+
+        return _.some(fields, function(field) {
+            return _.isUndefined(params[field]) != _.isUndefined(prefs[field]);
+        });
+    }
+
+    function getPreferencesWithDefaults(fields){
         // Write lat/lon with ~1cm precision. should be sufficient and makes URLs nicer.
         var COORDINATE_ROUND = 7;
-
         var opts = {};
         _.forEach(fields, function(field) {
             if (field === 'origin' || field === 'destination') {
@@ -216,7 +243,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
                 }
             }
         });
-        return Utils.encodeUrlParams(opts);
+        return opts;
     }
 
     function makeLocation(coords, name) {
@@ -229,4 +256,4 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, Navigo) {
         };
     }
 
-})(_, jQuery, CAC.User.Preferences, CAC.Utils, Navigo);
+})(_, jQuery, CAC.User.Preferences, CAC.Utils, route);
