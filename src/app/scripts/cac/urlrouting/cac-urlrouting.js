@@ -42,13 +42,15 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
                 // don't want to run setPrefsFromUrl again.
                 updatingUrl = false;
                 return;
-            } else if (path !== '/') {
+            } else if (path !== '/' && path !== '/context.html') {
                 // We actually only want to do client-side routing for `/` and
                 // `/explore`, but Riot will hijack clicks on any anchor tag
                 // that matches our base of `/`.
                 //
                 // To work-around that behaviour, we force a refesh of the page
                 // after the URL changes to something other than `/` or `/explore`
+                // Note: We treat `/context.html` the same as `/`. This URL
+                // isn't used by the application, but is used by the JS test runner
                 location.reload();
             } else {
                 setPrefsFromUrl();
