@@ -6,6 +6,8 @@ from django.contrib.gis.geos import GEOSGeometry, Point
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from easy_thumbnails.exceptions import InvalidImageFormatError
@@ -15,6 +17,7 @@ from .models import (Destination,
                      Event,
                      ExtraDestinationPicture,
                      ExtraEventPicture,
+                     UserFlag,
                      NARROW_IMAGE_DIMENSIONS,
                      WIDE_IMAGE_DIMENSIONS)
 from cms.models import Article
@@ -391,3 +394,71 @@ class SearchDestinations(View):
 
         response = {'destinations': destinations, 'events': events}
         return HttpResponse(json.dumps(response), 'application/json')
+
+
+def return_400(message, error):
+    # Helper to return JSON error messages in a consistent format
+    error = json.dumps({
+        'msg': message,
+        'error': error
+    })
+    return HttpResponse(error, 'application/json', status=400)
+
+
+class UserFlagView(View):
+    """POST-only endpoint for recording anonymous user flags on destinations from mobile app.
+
+    Expects POST as JSON with the following fields:
+     - attraction: ID of the destination or event to flag
+     - is_event: true if attraction is an event
+     - user_uuid: UUID to anonymously identify user (not associated with anything else)
+     - flag: how user has flagged the attraction; must be one of `UserFlag.UserFlags` keys
+             (or empty, if unset)
+    """
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UserFlagView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # decode posted body for python 3 support
+        try:
+            json_data = json.loads(request.body.decode('utf-8'))
+        except ValueError as e:
+            return return_400('Could not parse JSON', str(e))
+
+        expected_fields = ('attraction', 'is_event', 'user_uuid', 'flag')
+        user_flag_data = {}  # build an object of the cleaned values to use to create flag
+        missing_fields_msg = 'Missing expected value(s): '
+        missing = False  # flag to check if any of the required fields are missing
+        for fld in expected_fields:
+            val = json_data.get(fld, None)
+            if val:
+                user_flag_data[fld] = val
+            else:
+                missing = True
+                missing_fields_msg += fld + ', '
+        if missing:
+            return return_400(missing_fields_msg, 'Missing required value')
+
+        # parse string JSON value to boolean
+        user_flag_data['is_event'] = user_flag_data['is_event'] == 'true'
+
+        try:
+            attraction_id = user_flag_data.pop('attraction')
+            if user_flag_data['is_event']:
+                attraction = Event.objects.get(pk=attraction_id)
+            else:
+                attraction = Destination.objects.get(pk=attraction_id)
+
+            if not attraction:
+                return return_400('No attraction found that matches given ID ' + str(attraction_id),
+                                  'Attraction not found')
+
+            user_flag = UserFlag(attraction=attraction, **user_flag_data)
+            # clean model to enforce validation, in particular for the flag choices
+            user_flag.full_clean()
+            user_flag.save()
+        except Exception as e:
+            return return_400('Failed to create user flag', str(e))
+
+        return HttpResponse(json.dumps({'ok': True}), 'application/json')

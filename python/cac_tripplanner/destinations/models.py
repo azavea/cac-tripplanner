@@ -194,7 +194,7 @@ class UserFlag(models.Model):
     # generic foreign key to abstract Attraction model
     # see: https://docs.djangoproject.com/en/1.11/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(null=False)
     attraction = GenericForeignKey('content_type', 'object_id')
     is_event = models.BooleanField(default=False)
     timestamp = models.DateTimeField(default=now, editable=False)
