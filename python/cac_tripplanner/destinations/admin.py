@@ -7,7 +7,7 @@ from .forms import DestinationForm, EventForm, ExtraImagesForm
 from .models import (Destination,
                      DestinationUserFlags,
                      Event,
-                     #EventUserFlags,
+                     EventUserFlags,
                      ExtraDestinationPicture,
                      ExtraEventPicture)
 
@@ -97,9 +97,8 @@ class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     make_unpublished.short_description = 'Unpublish selected events'
 
 
-class DestinationUserFlagsAdmin(admin.ModelAdmin):
+class AttractionUserFlagsAdmin(admin.ModelAdmin):
 
-    ordering = ('name',)
     list_display = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
     readonly_fields = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
 
@@ -117,4 +116,5 @@ class DestinationUserFlagsAdmin(admin.ModelAdmin):
 admin.site.register(Destination, DestinationAdmin)
 admin.site.register(Event, EventAdmin)
 
-admin.site.register(DestinationUserFlags, DestinationUserFlagsAdmin)
+admin.site.register(DestinationUserFlags, AttractionUserFlagsAdmin)
+admin.site.register(EventUserFlags, AttractionUserFlagsAdmin)

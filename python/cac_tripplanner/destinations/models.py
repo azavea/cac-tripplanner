@@ -245,20 +245,42 @@ class DestinationUserFlags(Destination):
 
     def been(self):
         return self.been
+    been.admin_order_field = 'been'
 
     def want_to_go(self):
         return self.want_to_go
+    want_to_go.admin_order_field = 'want_to_go'
 
     def liked(self):
         return self.liked
+    liked.admin_order_field = 'liked'
 
     def not_interested(self):
         return self.not_interested
+    not_interested.admin_order_field = 'not_interested'
 
 
-# class EventUserFlags(Event):
-#     """Proxy class to annotate events with user flag summary data."""
-#     class Meta:
-#         proxy = True
-#         verbose_name = 'Event User Flag Summary'
-#         verbose_name_plural = 'Event User Flags Summary'
+class EventUserFlags(Event):
+    """Proxy class to annotate events with user flag summary data."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Event User Flag Summary'
+        verbose_name_plural = 'Event User Flags Summary'
+
+    objects = UserFlagSummaryManager()
+
+    def been(self):
+        return self.been
+    been.admin_order_field = 'been'
+
+    def want_to_go(self):
+        return self.want_to_go
+    want_to_go.admin_order_field = 'want_to_go'
+
+    def liked(self):
+        return self.liked
+    liked.admin_order_field = 'liked'
+
+    def not_interested(self):
+        return self.not_interested
+    not_interested.admin_order_field = 'not_interested'
