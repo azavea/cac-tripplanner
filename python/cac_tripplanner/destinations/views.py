@@ -3,6 +3,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
+from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -457,7 +458,13 @@ class UserFlagView(View):
             user_flag = UserFlag(attraction=attraction, **user_flag_data)
             # clean model to enforce validation, in particular for the flag choices
             user_flag.full_clean()
-            user_flag.save()
+
+            # mark any previous flags from this user for this attraction as 'historic'
+            # as a convenience for finding the most recent flag
+            with transaction.atomic():
+                UserFlag.objects.filter(user_uuid=user_flag_data.get('user_uuid'),
+                                        flag_attraction=attraction).update(historic=True)
+                user_flag.save()
         except Exception as e:
             return return_400('Failed to create user flag', str(e))
 

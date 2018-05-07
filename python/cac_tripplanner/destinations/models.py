@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.utils.timezone import now
@@ -60,6 +60,47 @@ class Activity(models.Model):
         return self.name
 
 
+class UserFlag(models.Model):
+    """Track flags set by mobile app users."""
+    class UserFlags(object):
+        been = 'been'
+        want_to_go = 'want_to_go'
+        not_interested = 'not_interested'
+        liked = 'liked'
+        none = ''
+
+        CHOICES = (
+            (been, 'Been'),
+            (want_to_go, 'Want to go'),
+            (not_interested, 'Not interested'),
+            (liked, 'Liked'),
+            (none, '')
+        )
+
+    # generic foreign key to abstract Attraction model
+    # see: https://docs.djangoproject.com/en/1.11/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField(null=False, db_index=True)
+    attraction = GenericForeignKey('content_type', 'object_id')
+    is_event = models.BooleanField(default=False, db_index=True)
+    timestamp = models.DateTimeField(default=now, editable=False, db_index=True)
+    user_uuid = models.UUIDField(editable=False, db_index=True)
+    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32, db_index=True)
+    historic = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        indexes = [
+            # index generic foreign key, as they aren't by default
+            # see https://code.djangoproject.com/ticket/23435
+            models.Index(fields=['content_type', 'object_id']),
+            # index together for finding most recent flag from a user for attraction
+            models.Index(fields=['user_uuid', 'historic', 'object_id', 'is_event']),
+        ]
+
+    def __unicode__(self):
+        return "{0} flagged: {1}".format(self.attraction.name, self.flag)
+
+
 class Attraction(models.Model):
     """Shared properties of destinations and events.
 
@@ -87,6 +128,8 @@ class Attraction(models.Model):
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
+    # support filtering user flags by attraction
+    user_flags = GenericRelation(UserFlag, related_query_name='flag_attraction')
 
     def get_image_as_list(self):
         return list(map(int, self.image.split(','))) if self.image else []
@@ -175,31 +218,17 @@ class ExtraEventPicture(ExtraImage):
     event = models.ForeignKey('Event')
 
 
-class UserFlag(models.Model):
-    class UserFlags(object):
-        been = 'been'
-        want_to_go = 'want_to_go'
-        not_interested = 'not_interested'
-        liked = 'liked'
-        none = ''
+class DestinationUserFlags(Destination):
+    """Proxy class to annotate destinations with user flag summary data."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Destination User Flag Summary'
+        verbose_name_plural = 'Destination User Flags Summary'
 
-        CHOICES = (
-            (been, 'Been'),
-            (want_to_go, 'Want to go'),
-            (not_interested, 'Not interested'),
-            (liked, 'Liked'),
-            (none, '')
-        )
 
-    # generic foreign key to abstract Attraction model
-    # see: https://docs.djangoproject.com/en/1.11/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField(null=False)
-    attraction = GenericForeignKey('content_type', 'object_id')
-    is_event = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(default=now, editable=False)
-    user_uuid = models.UUIDField(editable=False)
-    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32)
-
-    def __unicode__(self):
-        return "{0} flagged: {1}".format(self.attraction.name, self.flag)
+class EventUserFlags(Destination):
+    """Proxy class to annotate events with user flag summary data."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Event User Flag Summary'
+        verbose_name_plural = 'Event User Flags Summary'
