@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
+from django.db.models import Count, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
@@ -218,17 +220,45 @@ class ExtraEventPicture(ExtraImage):
     event = models.ForeignKey('Event')
 
 
+class UserFlagSummaryManager(models.Manager):
+    """Annotate queryset of attractions to add user flag count summaries."""
+    def get_queryset(self):
+        queryset = super(UserFlagSummaryManager, self).get_queryset()
+        for flag, label in UserFlag.UserFlags.CHOICES:
+            queryset = queryset.annotate(**{flag: Coalesce(Subquery(
+                UserFlag.objects.filter(historic=False, is_event=False, flag=flag,
+                                        object_id=OuterRef('pk')).values('flag').annotate(
+                                            total=Count('pk')).values('total'),
+                output_field=models.IntegerField()), 0)})
+        return queryset
+
+
 class DestinationUserFlags(Destination):
     """Proxy class to annotate destinations with user flag summary data."""
+
     class Meta:
         proxy = True
         verbose_name = 'Destination User Flag Summary'
         verbose_name_plural = 'Destination User Flags Summary'
 
+    objects = UserFlagSummaryManager()
 
-class EventUserFlags(Destination):
-    """Proxy class to annotate events with user flag summary data."""
-    class Meta:
-        proxy = True
-        verbose_name = 'Event User Flag Summary'
-        verbose_name_plural = 'Event User Flags Summary'
+    def been(self):
+        return self.been
+
+    def want_to_go(self):
+        return self.want_to_go
+
+    def liked(self):
+        return self.liked
+
+    def not_interested(self):
+        return self.not_interested
+
+
+# class EventUserFlags(Event):
+#     """Proxy class to annotate events with user flag summary data."""
+#     class Meta:
+#         proxy = True
+#         verbose_name = 'Event User Flag Summary'
+#         verbose_name_plural = 'Event User Flags Summary'

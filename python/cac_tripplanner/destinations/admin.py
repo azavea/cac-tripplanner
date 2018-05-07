@@ -4,7 +4,12 @@ from django.contrib import admin, gis
 from image_cropping import ImageCroppingMixin
 
 from .forms import DestinationForm, EventForm, ExtraImagesForm
-from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPicture
+from .models import (Destination,
+                     DestinationUserFlags,
+                     Event,
+                     #EventUserFlags,
+                     ExtraDestinationPicture,
+                     ExtraEventPicture)
 
 
 class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
@@ -92,5 +97,24 @@ class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     make_unpublished.short_description = 'Unpublish selected events'
 
 
+class DestinationUserFlagsAdmin(admin.ModelAdmin):
+
+    ordering = ('name',)
+    list_display = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
+    readonly_fields = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # FIXME: hide 'change' button, but if set this, whole row disappears
+    #def has_change_permission(self, request):
+    #    return False
+
+
 admin.site.register(Destination, DestinationAdmin)
 admin.site.register(Event, EventAdmin)
+
+admin.site.register(DestinationUserFlags, DestinationUserFlagsAdmin)
