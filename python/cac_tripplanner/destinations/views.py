@@ -410,6 +410,7 @@ class UserFlagView(View):
     """POST-only endpoint for recording anonymous user flags on destinations from mobile app.
 
     Expects POST as JSON with the following fields:
+     - api_key: String key that must match setting from server secrets file
      - attraction: ID of the destination or event to flag
      - is_event: true if attraction is an event
      - user_uuid: UUID to anonymously identify user (not associated with anything else)
@@ -426,6 +427,9 @@ class UserFlagView(View):
             json_data = json.loads(request.body.decode('utf-8'))
         except ValueError as e:
             return return_400('Could not parse JSON', str(e))
+
+        if json_data.get('api_key') != settings.USER_FLAG_API_KEY:
+            return return_400('api_key required', 'API key missing or incorrect')
 
         expected_fields = ('attraction', 'is_event', 'user_uuid', 'flag')
         user_flag_data = {}  # build an object of the cleaned values to use to create flag
@@ -463,7 +467,8 @@ class UserFlagView(View):
             # as a convenience for finding the most recent flag
             with transaction.atomic():
                 UserFlag.objects.filter(user_uuid=user_flag_data.get('user_uuid'),
-                                        flag_attraction=attraction).update(historic=True)
+                                        is_event=user_flag_data.get('is_event'),
+                                        flag_attraction__pk=attraction.pk).update(historic=True)
                 user_flag.save()
         except Exception as e:
             return return_400('Failed to create user flag', str(e))
