@@ -117,6 +117,7 @@
       "playbook_file": "{{user `local_project_directory`}}/deployment/ansible/otp.yml",
       "inventory_file": "{{user `local_project_directory`}}/deployment/ansible/hosts/hosts.otp",
       "group_vars": "{{user `local_project_directory`}}/deployment/ansible/group_vars/",
+      "staging_directory": "{{user `ansible_staging_directory`}}",
       "extra_arguments": [
           "--user 'ubuntu'"
       ],
