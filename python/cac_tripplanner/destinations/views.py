@@ -436,9 +436,8 @@ class UserFlagView(View):
         missing_fields_msg = 'Missing expected value(s): '
         missing = False  # flag to check if any of the required fields are missing
         for fld in expected_fields:
-            val = json_data.get(fld, None)
-            if val:
-                user_flag_data[fld] = val
+            if fld in json_data:
+                user_flag_data[fld] = json_data.get(fld, None)
             else:
                 missing = True
                 missing_fields_msg += fld + ', '
