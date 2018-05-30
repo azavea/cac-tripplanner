@@ -220,17 +220,25 @@ class ExtraEventPicture(ExtraImage):
     event = models.ForeignKey('Event')
 
 
-class UserFlagSummaryManager(models.Manager):
-    """Annotate queryset of attractions to add user flag count summaries."""
-    def get_queryset(self):
-        queryset = super(UserFlagSummaryManager, self).get_queryset()
-        for flag, label in UserFlag.UserFlags.CHOICES:
-            queryset = queryset.annotate(**{flag: Coalesce(Subquery(
-                UserFlag.objects.filter(historic=False, is_event=False, flag=flag,
-                                        object_id=OuterRef('pk')).values('flag').annotate(
-                                            total=Count('pk')).values('total'),
-                output_field=models.IntegerField()), 0)})
-        return queryset
+def user_flag_summary_manger_factory(manager_for_events=False):
+    """Wrap the object manager for user flag summary counts in a factory.
+
+    Allows for easy support of both destinations and events."""
+
+    class UserFlagSummaryManager(models.Manager):
+        """Annotate queryset of attractions to add user flag count summaries."""
+
+        def get_queryset(self):
+            queryset = super(UserFlagSummaryManager, self).get_queryset()
+            for flag, label in UserFlag.UserFlags.CHOICES:
+                queryset = queryset.annotate(**{flag: Coalesce(Subquery(
+                    UserFlag.objects.filter(historic=False, is_event=manager_for_events, flag=flag,
+                                            object_id=OuterRef('pk')).values('flag').annotate(
+                                                total=Count('pk')).values('total'),
+                    output_field=models.IntegerField()), 0)})
+            return queryset
+
+    return UserFlagSummaryManager()
 
 
 class DestinationUserFlags(Destination):
@@ -241,7 +249,7 @@ class DestinationUserFlags(Destination):
         verbose_name = 'Destination User Flag Summary'
         verbose_name_plural = 'Destination User Flags Summary'
 
-    objects = UserFlagSummaryManager()
+    objects = user_flag_summary_manger_factory(False)
 
     def been(self):
         return self.been
@@ -267,7 +275,7 @@ class EventUserFlags(Event):
         verbose_name = 'Event User Flag Summary'
         verbose_name_plural = 'Event User Flags Summary'
 
-    objects = UserFlagSummaryManager()
+    objects = user_flag_summary_manger_factory(True)
 
     def been(self):
         return self.been
