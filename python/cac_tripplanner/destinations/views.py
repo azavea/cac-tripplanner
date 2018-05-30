@@ -3,9 +3,13 @@ import requests
 
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
+from django.core.exceptions import MultipleObjectsReturned
+from django.db import transaction
 from django.forms.models import model_to_dict
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from easy_thumbnails.exceptions import InvalidImageFormatError
@@ -15,6 +19,7 @@ from .models import (Destination,
                      Event,
                      ExtraDestinationPicture,
                      ExtraEventPicture,
+                     UserFlag,
                      NARROW_IMAGE_DIMENSIONS,
                      WIDE_IMAGE_DIMENSIONS)
 from cms.models import Article
@@ -288,8 +293,8 @@ class FindReachableDestinations(View):
         # allow a max travelshed size of 60 minutes in a query
         cutoff_sec = int(params.get('cutoffSec', -1))
         if not cutoff_sec or cutoff_sec < 0 or cutoff_sec > 3600:
-            return HttpResponse(status=400,
-                                reason='cutoffSec must be greater than 0 and less than 360')
+            return return_400('cutoffSec out of range',
+                              'cutoffSec must be greater than 0 and less than 360')
 
         json_poly = self.isochrone(params)
 
@@ -313,7 +318,7 @@ class FindReachableDestinations(View):
         matched_objects = [set_destination_properties(x) for x in matched_objects]
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
-        return HttpResponse(json.dumps(response), 'application/json')
+        return JsonResponse(response)
 
 
 class SearchDestinations(View):
@@ -347,11 +352,7 @@ class SearchDestinations(View):
             try:
                 search_point = Point(float(lon), float(lat))
             except ValueError as e:
-                error = json.dumps({
-                    'msg': 'Invalid latitude/longitude pair',
-                    'error': str(e),
-                })
-                return HttpResponse(error, 'application/json')
+                return return_400('Invalid latitude/longitude pair', str(e))
             destinations = (Destination.objects.filter(published=True)
                             .distance(search_point)
                             .order_by('distance', 'priority'))
@@ -378,11 +379,7 @@ class SearchDestinations(View):
             try:
                 limit_int = int(limit)
             except ValueError as e:
-                error = json.dumps({
-                    'msg': 'Invalid limit, must be an integer',
-                    'error': str(e),
-                })
-                return HttpResponse(error, 'application/json')
+                return return_400('Invalid limit, must be an integer', str(e))
             destinations = destinations[:limit_int]
             events = events[:limit_int]
 
@@ -390,4 +387,79 @@ class SearchDestinations(View):
         events = [set_event_properties(x) for x in events]
 
         response = {'destinations': destinations, 'events': events}
-        return HttpResponse(json.dumps(response), 'application/json')
+        return JsonResponse(response)
+
+
+def return_400(message, error):
+    # Helper to return JSON error messages in a consistent format
+    error = json.dumps({
+        'msg': message,
+        'error': error
+    })
+    return JsonResponse(error, status=400)
+
+
+class UserFlagView(View):
+    """POST-only endpoint for recording anonymous user flags on destinations from mobile app.
+
+    Expects POST as JSON with the following fields:
+     - api_key: String key that must match setting from server secrets file
+     - attraction: ID of the destination or event to flag
+     - is_event: true if attraction is an event
+     - user_uuid: UUID to anonymously identify user (not associated with anything else)
+     - flag: how user has flagged the attraction; must be one of `UserFlag.UserFlags` keys
+             (or empty, if unset)
+    """
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UserFlagView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # decode posted body for python 3 support
+        try:
+            json_data = json.loads(request.body.decode('utf-8'))
+        except ValueError as e:
+            return return_400('Could not parse JSON', str(e))
+
+        if json_data.get('api_key') != settings.USER_FLAG_API_KEY:
+            return return_400('api_key required', 'API key missing or incorrect')
+
+        expected_fields = ('attraction', 'is_event', 'user_uuid', 'flag')
+        user_flag_data = {}  # build an object of the cleaned values to use to create flag
+        missing_fields_msg = 'Missing expected value(s): '
+        missing = False  # flag to check if any of the required fields are missing
+        for fld in expected_fields:
+            if fld in json_data:
+                user_flag_data[fld] = json_data.get(fld, None)
+            else:
+                missing = True
+                missing_fields_msg += fld + ', '
+        if missing:
+            return return_400(missing_fields_msg, 'Missing required value')
+
+        # parse string JSON value to boolean
+        user_flag_data['is_event'] = user_flag_data['is_event'] == 'true'
+
+        try:
+            attraction_id = user_flag_data.pop('attraction')
+            if user_flag_data['is_event']:
+                attraction = Event.objects.get(pk=attraction_id)
+            else:
+                attraction = Destination.objects.get(pk=attraction_id)
+
+            user_flag = UserFlag(attraction=attraction, **user_flag_data)
+            # clean model to enforce validation, in particular for the flag choices
+            user_flag.full_clean()
+
+            # mark any previous flags from this user for this attraction as 'historic'
+            # as a convenience for finding the most recent flag
+            with transaction.atomic():
+                UserFlag.objects.filter(user_uuid=user_flag_data.get('user_uuid'),
+                                        is_event=user_flag_data.get('is_event'),
+                                        object_id=attraction.pk).update(historic=True)
+                user_flag.save()
+        except (Event.DoesNotExist, Destination.DoesNotExist, MultipleObjectsReturned):
+            return return_400('No attraction found that matches given ID ' + str(attraction_id),
+                              'Attraction not found')
+
+        return JsonResponse({'ok': True})

@@ -53,6 +53,9 @@ except (IOError, NameError):
         # Facebook app ID
         'fb_app_id': '',
 
+        # API key for posting user flag events
+        'user_flag_api_key': '',
+
         'default_admin_username': 'admin',
         'default_admin_password': 'admin',
         'default_admin_email': 'systems+cac@azavea.com'
@@ -67,6 +70,9 @@ SECRET_KEY = secrets['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not secrets['production']
+
+# String that must be passed to post user flags for destinations or events (liked, been, etc.)
+USER_FLAG_API_KEY = secrets['user_flag_api_key']
 
 ALLOWED_HOSTS = [
     '.gophillygo.org',

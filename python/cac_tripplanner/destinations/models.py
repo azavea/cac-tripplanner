@@ -1,5 +1,9 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
+from django.db.models import Count, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
 from ckeditor.fields import RichTextField
@@ -58,6 +62,47 @@ class Activity(models.Model):
         return self.name
 
 
+class UserFlag(models.Model):
+    """Track flags set by mobile app users."""
+    class UserFlags(object):
+        been = 'been'
+        want_to_go = 'want_to_go'
+        not_interested = 'not_interested'
+        liked = 'liked'
+        none = ''
+
+        CHOICES = (
+            (been, 'Been'),
+            (want_to_go, 'Want to go'),
+            (not_interested, 'Not interested'),
+            (liked, 'Liked'),
+            (none, '')
+        )
+
+    # generic foreign key to abstract Attraction model
+    # see: https://docs.djangoproject.com/en/1.11/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField(null=False, db_index=True)
+    attraction = GenericForeignKey('content_type', 'object_id')
+    is_event = models.BooleanField(default=False, db_index=True)
+    timestamp = models.DateTimeField(default=now, editable=False, db_index=True)
+    user_uuid = models.UUIDField(editable=False, db_index=True)
+    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32, db_index=True)
+    historic = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        indexes = [
+            # index generic foreign key, as they aren't by default
+            # see https://code.djangoproject.com/ticket/23435
+            models.Index(fields=['content_type', 'object_id']),
+            # index together for finding most recent flag from a user for attraction
+            models.Index(fields=['user_uuid', 'historic', 'object_id', 'is_event']),
+        ]
+
+    def __unicode__(self):
+        return "{0} flagged: {1}".format(self.attraction.name, self.flag)
+
+
 class Attraction(models.Model):
     """Shared properties of destinations and events.
 
@@ -85,6 +130,8 @@ class Attraction(models.Model):
     priority = models.IntegerField(default=9999, null=False)
     accessible = models.BooleanField(default=False, help_text='Is it ADA accessible?')
     activities = models.ManyToManyField('Activity', blank=True)
+    # support filtering user flags by attraction
+    user_flags = GenericRelation(UserFlag, related_query_name='flag_attraction')
 
     def get_image_as_list(self):
         return list(map(int, self.image.split(','))) if self.image else []
@@ -171,3 +218,77 @@ class ExtraDestinationPicture(ExtraImage):
 
 class ExtraEventPicture(ExtraImage):
     event = models.ForeignKey('Event')
+
+
+def user_flag_summary_manger_factory(manager_for_events=False):
+    """Wrap the object manager for user flag summary counts in a factory.
+
+    Allows for easy support of both destinations and events."""
+
+    class UserFlagSummaryManager(models.Manager):
+        """Annotate queryset of attractions to add user flag count summaries."""
+
+        def get_queryset(self):
+            queryset = super(UserFlagSummaryManager, self).get_queryset()
+            for flag, label in UserFlag.UserFlags.CHOICES:
+                queryset = queryset.annotate(**{flag: Coalesce(Subquery(
+                    UserFlag.objects.filter(historic=False, is_event=manager_for_events, flag=flag,
+                                            object_id=OuterRef('pk')).values('flag').annotate(
+                                                total=Count('pk')).values('total'),
+                    output_field=models.IntegerField()), 0)})
+            return queryset
+
+    return UserFlagSummaryManager()
+
+
+class DestinationUserFlags(Destination):
+    """Proxy class to annotate destinations with user flag summary data."""
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Destination User Flag Summary'
+        verbose_name_plural = 'Destination User Flags Summary'
+
+    objects = user_flag_summary_manger_factory(False)
+
+    def been(self):
+        return self.been
+    been.admin_order_field = 'been'
+
+    def want_to_go(self):
+        return self.want_to_go
+    want_to_go.admin_order_field = 'want_to_go'
+
+    def liked(self):
+        return self.liked
+    liked.admin_order_field = 'liked'
+
+    def not_interested(self):
+        return self.not_interested
+    not_interested.admin_order_field = 'not_interested'
+
+
+class EventUserFlags(Event):
+    """Proxy class to annotate events with user flag summary data."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Event User Flag Summary'
+        verbose_name_plural = 'Event User Flags Summary'
+
+    objects = user_flag_summary_manger_factory(True)
+
+    def been(self):
+        return self.been
+    been.admin_order_field = 'been'
+
+    def want_to_go(self):
+        return self.want_to_go
+    want_to_go.admin_order_field = 'want_to_go'
+
+    def liked(self):
+        return self.liked
+    liked.admin_order_field = 'liked'
+
+    def not_interested(self):
+        return self.not_interested
+    not_interested.admin_order_field = 'not_interested'

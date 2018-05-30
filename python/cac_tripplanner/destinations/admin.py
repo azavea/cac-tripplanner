@@ -4,7 +4,12 @@ from django.contrib import admin, gis
 from image_cropping import ImageCroppingMixin
 
 from .forms import DestinationForm, EventForm, ExtraImagesForm
-from .models import Destination, Event, ExtraDestinationPicture, ExtraEventPicture
+from .models import (Destination,
+                     DestinationUserFlags,
+                     Event,
+                     EventUserFlags,
+                     ExtraDestinationPicture,
+                     ExtraEventPicture)
 
 
 class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
@@ -38,6 +43,7 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
               'address', 'point', 'watershed_alliance')
 
     default_lon, default_lat = -8370000.00, 4860000.00  # 3857
+
     default_zoom = 12
 
     inlines = [ExtraDestinationImagesInline]
@@ -92,5 +98,22 @@ class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
     make_unpublished.short_description = 'Unpublish selected events'
 
 
+class AttractionUserFlagsAdmin(admin.ModelAdmin):
+
+    list_display = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
+    readonly_fields = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
+    ordering = ('name',)
+    list_display_links = None
+
+    def has_add_permission(self, request):
+        return False  # hide 'add' button
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # hide 'delete' button
+
+
 admin.site.register(Destination, DestinationAdmin)
 admin.site.register(Event, EventAdmin)
+
+admin.site.register(DestinationUserFlags, AttractionUserFlagsAdmin)
+admin.site.register(EventUserFlags, AttractionUserFlagsAdmin)
