@@ -43,6 +43,7 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
               'address', 'point', 'watershed_alliance')
 
     default_lon, default_lat = -8370000.00, 4860000.00  # 3857
+
     default_zoom = 12
 
     inlines = [ExtraDestinationImagesInline]
@@ -101,16 +102,13 @@ class AttractionUserFlagsAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
     readonly_fields = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
+    list_display_links = None  # hides the 'change' button that does not apply here
 
     def has_add_permission(self, request):
-        return False
+        return False  # hide 'add' button
 
     def has_delete_permission(self, request, obj=None):
-        return False
-
-    # FIXME: hide 'change' button, but if set this, whole row disappears
-    #def has_change_permission(self, request):
-    #    return False
+        return False  # hide 'delete' button
 
 
 admin.site.register(Destination, DestinationAdmin)
