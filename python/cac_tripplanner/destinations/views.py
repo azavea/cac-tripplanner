@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.db import transaction
 from django.forms.models import model_to_dict
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -292,8 +292,8 @@ class FindReachableDestinations(View):
         # allow a max travelshed size of 60 minutes in a query
         cutoff_sec = int(params.get('cutoffSec', -1))
         if not cutoff_sec or cutoff_sec < 0 or cutoff_sec > 3600:
-            return HttpResponse(status=400,
-                                reason='cutoffSec must be greater than 0 and less than 360')
+            return return_400('cutoffSec out of range',
+                              'cutoffSec must be greater than 0 and less than 360')
 
         json_poly = self.isochrone(params)
 
@@ -317,7 +317,7 @@ class FindReachableDestinations(View):
         matched_objects = [set_destination_properties(x) for x in matched_objects]
 
         response = {'matched': matched_objects, 'isochrone': json_poly}
-        return HttpResponse(json.dumps(response), 'application/json')
+        return JsonResponse(response)
 
 
 class SearchDestinations(View):
@@ -351,11 +351,7 @@ class SearchDestinations(View):
             try:
                 search_point = Point(float(lon), float(lat))
             except ValueError as e:
-                error = json.dumps({
-                    'msg': 'Invalid latitude/longitude pair',
-                    'error': str(e),
-                })
-                return HttpResponse(error, 'application/json')
+                return return_400('Invalid latitude/longitude pair', str(e))
             destinations = (Destination.objects.filter(published=True)
                             .distance(search_point)
                             .order_by('distance', 'priority'))
@@ -382,11 +378,7 @@ class SearchDestinations(View):
             try:
                 limit_int = int(limit)
             except ValueError as e:
-                error = json.dumps({
-                    'msg': 'Invalid limit, must be an integer',
-                    'error': str(e),
-                })
-                return HttpResponse(error, 'application/json')
+                return return_400('Invalid limit, must be an integer', str(e))
             destinations = destinations[:limit_int]
             events = events[:limit_int]
 
@@ -394,7 +386,7 @@ class SearchDestinations(View):
         events = [set_event_properties(x) for x in events]
 
         response = {'destinations': destinations, 'events': events}
-        return HttpResponse(json.dumps(response), 'application/json')
+        return JsonResponse(response)
 
 
 def return_400(message, error):
@@ -403,7 +395,7 @@ def return_400(message, error):
         'msg': message,
         'error': error
     })
-    return HttpResponse(error, 'application/json', status=400)
+    return JsonResponse(error, status=400)
 
 
 class UserFlagView(View):
@@ -472,4 +464,4 @@ class UserFlagView(View):
         except Exception as e:
             return return_400('Failed to create user flag', str(e))
 
-        return HttpResponse(json.dumps({'ok': True}), 'application/json')
+        return JsonResponse({'ok': True})
