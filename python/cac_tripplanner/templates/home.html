@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load cropping %}
 {% load staticfiles %}
 {% load destination_extras %}
 {% load tz %}
@@ -100,7 +101,7 @@
                     <div class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
-                                src="{{ destination.image.url }}"
+                                src="{% cropped_thumbnail destination 'image' %}"
                             {% else %}
                                 src="https://placehold.it/310x155.jpg"
                             {% endif %}

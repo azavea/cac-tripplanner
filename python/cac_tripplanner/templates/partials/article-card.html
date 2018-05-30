@@ -1,6 +1,8 @@
+{% load cropping %}
 <div class="preview-card">
     <a href="{% url 'learn-detail' slug=article.slug %}" class="preview-card-link">
-        <img class="preview-photo" src="{{ article.narrow_image.url }}" width="310"
+        <img class="preview-photo" src="{% cropped_thumbnail article 'narrow_image' %}"
+             width="310"
              alt="{{ article.title }}" />
         <div class="preview-details">
             <div class="category-heading">

@@ -21,8 +21,10 @@ cac_python_dependencies:
     - { name: 'boto', version: '2.48.0' }
     - { name: 'django', version: '1.11.12' }
     - { name: 'django-ckeditor', version: '5.3.1' }
+    - { name: 'django-image-cropping', version: '1.1.0' }
     - { name: 'django-extensions', version: '1.9.9' }
     - { name: 'django-storages', version: '1.6.5' }
+    - { name: 'easy-thumbnails', version: '2.5.0' }
     - { name: 'gunicorn', version: '19.7.1' }
     - { name: 'Pillow', version: '5.1.0' }
     - { name: 'psycopg2', version: '2.7.4' }

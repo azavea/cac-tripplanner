@@ -7,14 +7,16 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
+import os
+import yaml
+
 import django
 
 from boto.utils import get_instance_metadata
 from django.core.exceptions import ImproperlyConfigured
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
-import yaml
+from easy_thumbnails.conf import Settings as thumbnail_settings
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 try:
@@ -103,6 +105,8 @@ INSTALLED_APPS = (
     'ckeditor',
     'django_extensions',
     'storages',
+    'easy_thumbnails',
+    'image_cropping',
 
     # Project Apps
     'cms',
@@ -131,6 +135,17 @@ WSGI_APPLICATION = 'cac_tripplanner.wsgi.application'
 DATABASES = {
     'default': secrets['database']
 }
+
+# Image processing configuration
+IMAGE_CROPPING_SIZE_WARNING = True
+
+THUMBNAIL_PROCESSORS = (
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+IMAGE_CROPPER_HELP_TEXT = """Save and return to editing this record to see an uploaded image and
+to change how the image is cropped."""
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
@@ -220,6 +235,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'image_cropping.thumbnail_processors': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     }
 }
 
