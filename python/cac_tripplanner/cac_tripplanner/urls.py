@@ -19,7 +19,7 @@ urlpatterns = [
     url('^service-worker.js$', dest_views.service_worker),
 
     # User destination flags
-    url(r'^user_flag/', dest_views.UserFlagView.as_view()),
+    url(r'^api/user_flag/', dest_views.UserFlagView.as_view()),
 
     # Map
     url(r'^api/destinations/search$', dest_views.SearchDestinations.as_view(),
