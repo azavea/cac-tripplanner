@@ -77,7 +77,8 @@ USER_FLAG_API_KEY = secrets['user_flag_api_key']
 ALLOWED_HOSTS = [
     '.gophillygo.org',
     '.elb.amazonaws.com',
-    'localhost'
+    'localhost',
+    '.ngrok.io',
 ]
 
 if secrets['production']:

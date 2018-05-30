@@ -3,6 +3,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry, Point
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
@@ -436,8 +437,9 @@ class UserFlagView(View):
         if missing:
             return return_400(missing_fields_msg, 'Missing required value')
 
-        # parse string JSON value to boolean
-        user_flag_data['is_event'] = user_flag_data['is_event'] == 'true'
+        # parse JSON value to boolean if passed as string
+        if type(user_flag_data['is_event']) == 'str':
+            user_flag_data['is_event'] = user_flag_data['is_event'] == 'true'
 
         try:
             attraction_id = user_flag_data.pop('attraction')
@@ -445,10 +447,6 @@ class UserFlagView(View):
                 attraction = Event.objects.get(pk=attraction_id)
             else:
                 attraction = Destination.objects.get(pk=attraction_id)
-
-            if not attraction:
-                return return_400('No attraction found that matches given ID ' + str(attraction_id),
-                                  'Attraction not found')
 
             user_flag = UserFlag(attraction=attraction, **user_flag_data)
             # clean model to enforce validation, in particular for the flag choices
@@ -461,7 +459,8 @@ class UserFlagView(View):
                                         is_event=user_flag_data.get('is_event'),
                                         object_id=attraction.pk).update(historic=True)
                 user_flag.save()
-        except Exception as e:
-            return return_400('Failed to create user flag', str(e))
+        except (Event.DoesNotExist, Destination.DoesNotExist, MultipleObjectsReturned):
+            return return_400('No attraction found that matches given ID ' + str(attraction_id),
+                              'Attraction not found')
 
         return JsonResponse({'ok': True})

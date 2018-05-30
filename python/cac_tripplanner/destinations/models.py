@@ -87,7 +87,7 @@ class UserFlag(models.Model):
     is_event = models.BooleanField(default=False, db_index=True)
     timestamp = models.DateTimeField(default=now, editable=False, db_index=True)
     user_uuid = models.UUIDField(editable=False, db_index=True)
-    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32, db_index=True)
+    flag = models.CharField(choices=UserFlags.CHOICES, max_length=32, db_index=True, blank=True)
     historic = models.BooleanField(default=False, db_index=True)
 
     class Meta:

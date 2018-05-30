@@ -102,7 +102,9 @@ class AttractionUserFlagsAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
     readonly_fields = ('name', 'been', 'want_to_go', 'liked', 'not_interested',)
-    list_display_links = None  # hides the 'change' button that does not apply here
+    ordering = ('name',)
+    list_display_links = None
+    actions = None
 
     def has_add_permission(self, request):
         return False  # hide 'add' button
