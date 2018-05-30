@@ -467,7 +467,7 @@ class UserFlagView(View):
             with transaction.atomic():
                 UserFlag.objects.filter(user_uuid=user_flag_data.get('user_uuid'),
                                         is_event=user_flag_data.get('is_event'),
-                                        flag_attraction__pk=attraction.pk).update(historic=True)
+                                        object_id=attraction.pk).update(historic=True)
                 user_flag.save()
         except Exception as e:
             return return_400('Failed to create user flag', str(e))
