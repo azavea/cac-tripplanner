@@ -9,9 +9,9 @@ CAC_NFS_VERSION =  ENV.fetch("CAC_NFS_VERSION_3", true) ? 'vers=3': 'vers=4'
 
 if CAC_SHARED_FOLDER_TYPE == "nfs"
   if Vagrant::Util::Platform.linux? then
-    CAC_MOUNT_OPTIONS = ['rw', CAC_NFS_VERSION, 'tcp', 'nolock']
+    CAC_MOUNT_OPTIONS = ['rw', CAC_NFS_VERSION, 'tcp', 'nolock', 'actimeo=1']
   else
-    CAC_MOUNT_OPTIONS = [CAC_NFS_VERSION, 'udp']
+    CAC_MOUNT_OPTIONS = [CAC_NFS_VERSION, 'udp', 'actimeo=1']
   end
 else
   if ENV.has_key?("CAC_MOUNT_OPTIONS")
