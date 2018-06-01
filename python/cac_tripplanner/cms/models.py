@@ -104,7 +104,7 @@ class Article(models.Model):
                                       null=True,
                                       verbose_name='narrow image file',
                                       help_text=settings.IMAGE_CROPPER_HELP_TEXT)
-    narrow_image = ImageRatioField('narrow_image', ARTICLE_NARROW_IMAGE_DIMENSION_STRING,
+    narrow_image = ImageRatioField('narrow_image_raw', ARTICLE_NARROW_IMAGE_DIMENSION_STRING,
                                    help_text='The small image. Will be displayed at ' +
                                    ARTICLE_NARROW_IMAGE_DIMENSION_STRING)
 
