@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.contrib import admin
 from django.utils.timezone import now
 
+from image_cropping import ImageCroppingMixin
+
 from .forms import AboutFaqForm, ArticleForm
 from .models import AboutFaq, Article
 
@@ -33,7 +35,7 @@ class AboutFaq(admin.ModelAdmin):
 
 
 @admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(ImageCroppingMixin, admin.ModelAdmin):
     form = ArticleForm
 
     list_display = ('title', 'author', 'published', 'created', 'modified')
