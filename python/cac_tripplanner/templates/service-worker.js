@@ -1,7 +1,7 @@
 // Service Worker to support functioning as a PWA
 // https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
-var CACHE_NAME = 'cac_tripplanner_v10';
+var CACHE_NAME = 'cac_tripplanner_v11';
 
 var cacheFiles = {{ cache_files | safe }};
 
@@ -13,13 +13,6 @@ self.addEventListener('install', function(event) {
         caches.open(CACHE_NAME).then(function(cache) {
             return cache.addAll(cacheFiles);
     }));
-});
-
-self.addEventListener('fetch', function(event) {
-    if (event.request.cache === 'only-if-cache') {
-        event.request.mode = 'same-origin';
-    }
-    return fetch(event.request); // do not use cache
 });
 
 self.addEventListener('activate', function(e) {
