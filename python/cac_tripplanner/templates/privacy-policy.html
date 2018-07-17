@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load cropping %}
+{% load staticfiles %}
+
+{% block pagetitle %}
+<title>{% block title %}GoPhillyGo | Privacy Policy{% endblock %}</title>
+
+<meta property="og:title" content="Privacy Policy" />
+<meta name="twitter:title" content="Privacy Policy" />
+<meta name="apple-mobile-web-app-title" content="{{ event.name }}">
+{% endblock %}
+
+{% block extrametatags %}
+<meta property="fb:app_id" content="{{ fb_app_id }}" />
+<meta property="fb:pages" content="299797223477237" />
+<meta property="fb:profile_id" content="gophillygo" />
+<meta property="og:url"
+    content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}/" />
+<meta property="og:site_name" content="GoPhillyGo" />
+<meta property="og:locale" content="en_US" />
+{% endblock %}
+
+{% block content %}
+    {% include "partials/header.html" %}
+    <div class="main">
+        <h1><a href="{% url 'home' %}">Privacy Policy</a></h1>
+    </div>
+    {% include "partials/footer.html" %}
+{% endblock %}
