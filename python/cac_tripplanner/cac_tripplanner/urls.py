@@ -18,6 +18,10 @@ urlpatterns = [
     url('^manifest.json$', dest_views.manifest),
     url('^service-worker.js$', dest_views.service_worker),
 
+    # Privacy policy and ToS
+    url(r'^privacy_policy$', dest_views.privacy_policy, name='privacy_policy'),
+    url(r'^terms_of_service$', dest_views.terms_of_service, name='terms_of_service'),
+
     # User destination flags
     url(r'^api/user_flag/', dest_views.UserFlagView.as_view()),
 

@@ -1,7 +1,7 @@
 // Service Worker to support functioning as a PWA
 // https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
-var CACHE_NAME = 'cac_tripplanner_v11';
+var CACHE_NAME = 'cac_tripplanner_v12';
 
 var cacheFiles = {{ cache_files | safe }};
 
