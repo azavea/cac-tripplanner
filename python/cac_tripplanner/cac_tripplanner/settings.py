@@ -362,7 +362,7 @@ DEFAULT_ADMIN_EMAIL = secrets['default_admin_email']
 
 # Application settings
 #
-MAX_IMAGE_SIZE_MB = 1
+MAX_IMAGE_SIZE_MB = 2
 
 # limit the number of featured destinations/articles returned by "view all" to this amount
 # TODO: paginate instead?
