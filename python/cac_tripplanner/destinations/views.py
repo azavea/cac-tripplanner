@@ -79,6 +79,14 @@ def explore(request):
     context = {'tab': 'map-explore'}
     return base_view(request, 'home.html', context=context)
 
+def privacy_policy(request):
+    context = {'tab': 'home'}
+    return base_view(request, 'privacy-policy.html', context=context)
+
+
+def terms_of_service(request):
+    context = {'tab': 'home'}
+    return base_view(request, 'terms-of-service.html', context)
 
 def manifest(request):
     """Render the app manifest for a PWA app that can install to homescreen
