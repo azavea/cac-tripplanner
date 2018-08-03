@@ -16,8 +16,7 @@
 <meta property="fb:app_id" content="{{ fb_app_id }}" />
 <meta property="fb:pages" content="299797223477237" />
 <meta property="fb:profile_id" content="gophillygo" />
-<meta property="og:url"
-    content="{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.META.HTTP_HOST }}" />
+<meta property="og:url" content="{{ request.build_absolute_uri }}" />
 <meta property="og:description" content="{{ article.teaser|striptags }}" />
 <meta property="og:image" content="{{ article.image.url }}" />
 <meta property="og:image:width" content="400" />
