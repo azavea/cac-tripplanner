@@ -9,6 +9,7 @@ from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
@@ -249,8 +250,8 @@ def set_event_properties(event):
     obj['address'] = event.name
 
     obj['categories'] = (EVENT_CATEGORY,)  # events are a special category
-    obj['start_date'] = event.start_date.isoformat()
-    obj['end_date'] = event.end_date.isoformat()
+    obj['start_date'] = timezone.localtime(event.start_date).isoformat()
+    obj['end_date'] = timezone.localtime(event.end_date).isoformat()
     obj['is_event'] = True
 
     extra_images = ExtraEventPicture.objects.filter(event=event)
