@@ -110,6 +110,7 @@
 }
 
 .primary-nav {
+    position: relative;
     display: flex;
     flex: 0 0 60px;
     flex-flow: row nowrap;
@@ -158,5 +159,28 @@
             border-bottom-color: $primary-nav-link-color;
             font-weight: $font-weight-bold;
         }
+    }
+
+    .android-link {
+        @include delinkify();
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        height: 60px;  // dimensions hard-coded bc otherwise some browsers
+        width: 155px;  // don't position it properly ¯\_(ツ)_/¯
+
+        @include respond-to('xxs') {
+            display: none;
+        }
+
+        .image {
+            height: 100%;
+            width: auto;
+        }
+    }
+
+    .slogan-start {
+        text-align: right;
     }
 }
