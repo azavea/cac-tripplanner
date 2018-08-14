@@ -94,7 +94,7 @@ def manifest(request):
 
     https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/?utm_source=devtools
     """
-    return render(request, 'manifest.json', {})
+    return render(request, 'manifest.json', {}, content_type='application/json')
 
 
 def service_worker(request):
