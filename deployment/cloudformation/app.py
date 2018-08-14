@@ -452,7 +452,7 @@ class AppServerStack(StackNode):
                 AlarmActions=[Ref(autoscaling_policy_remove)],
                 Statistic='Average',
                 Period=300,
-                Threshold='500000',
+                Threshold='2000000',
                 EvaluationPeriods=3,
                 ComparisonOperator='LessThanThreshold',
                 MetricName='NetworkOut',
