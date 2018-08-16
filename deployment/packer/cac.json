@@ -3,7 +3,7 @@
     "aws_region": "",
     "ubuntu_ami": "",
     "local_project_directory": ".",
-    "instance_type": "m3.medium",
+    "instance_type": "m4.large",
     "intermediate_directory": "/home/ubuntu/cac",
     "destination_directory": "/opt/app",
     "ansible_staging_directory": "/tmp/packer-provisioner-ansible-local"
