@@ -3,4 +3,14 @@ test: true
 develop: false
 production: false
 
+postgis_version: [2, 1, 8]
+
+postgresql_version: "9.4"
+postgresql_package_version: "9.4.*.pgdg14.04+1"
+
+postgresql_listen_addresses: "*"
+postgresql_hba_mapping:
+  - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+  - { type: "host", database: "all", user: "all", address: "127.0.0.1/32", method: "md5" }
+
 otp_process_mem: 3G

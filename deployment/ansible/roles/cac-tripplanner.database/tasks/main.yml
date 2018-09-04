@@ -1,9 +1,6 @@
 ---
-- name: Install packages
-  apt: name={{ item }} state=present
-  with_items:
-    - postgresql-9.3
-    - postgresql-9.3-postgis-2.1
+- name: Install PostGIS extension from source
+  import_tasks: install-postgis-from-source.yml
 
 - name: Create postgres database
   postgresql_db: name={{ postgres_db }}
@@ -23,16 +20,3 @@
   failed_when: >
     psql_result.rc != 0 and ("already exists" not in psql_result.stderr)
   changed_when: "psql_result.rc == 0"
-
-- name: Listen on all addresses
-  lineinfile: dest=/etc/postgresql/9.3/main/postgresql.conf
-              regexp='(^|^\#)listen_addresses'
-              line="listen_addresses = '*'"
-              state=present
-  notify: Restart Postgres
-
-- name: Open up IPv4 Connections
-  lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf
-              regexp='host\s+all\s+all\s+(127\.0\.0\.1\/32|0\.0\.0\.0\/0)\s+md5'
-              line="host all all 0.0.0.0/0 md5"
-  notify: Restart Postgres

@@ -4,6 +4,11 @@ java_major_version: "8"
 
 app_username: "vagrant"
 
+postgres_db: "cac_tripplanner"
+postgres_user: "cac_tripplanner"
+postgres_password: "cac_tripplanner"
+postgres_host: "192.168.8.25"
+
 packer_version: "1.0.2"
 
 nodejs_version: 8.10.0
