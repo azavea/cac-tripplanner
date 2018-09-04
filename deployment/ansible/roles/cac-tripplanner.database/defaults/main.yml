@@ -1,4 +1,0 @@
----
-postgres_db: "cac_tripplanner"
-postgres_user: "cac_tripplanner"
-postgres_password: "cac_tripplanner"
