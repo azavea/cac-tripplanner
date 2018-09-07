@@ -1,0 +1,33 @@
+---
+- name: Install PostGIS build dependencies
+  apt: pkg="{{ item }}" state=present
+  with_items: 
+    - build-essential
+    - libgeos-dev
+    - libgdal-dev
+    - libproj-dev
+    - libjson0-dev
+    - libxml2-dev
+    - libxml2-utils
+    - xsltproc
+    - docbook-xsl
+    - docbook-mathml
+
+- name: Download PostGIS source tarball
+  unarchive: |
+    src="http://download.osgeo.org/postgis/source/postgis-{{ postgis_version | join('.') }}.tar.gz"
+    dest=/tmp
+    creates="/tmp/postgis-{{ postgis_version | join('.') }}"
+    remote_src=yes
+  register: postgis_downloaded
+
+- name: Build and install PostGIS
+  command: "{{ item }}"
+  args:
+    chdir: "/tmp/postgis-{{ postgis_version | join('.') }}"
+  with_items:
+    - ./configure
+    - make
+    - make install
+    - ldconfig
+  when: postgis_downloaded.changed

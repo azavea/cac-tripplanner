@@ -27,6 +27,3 @@
 
 - src: azavea.postgresql
   version: 0.5.0
-  
-- src: azavea.postgis
-  version: 0.3.0

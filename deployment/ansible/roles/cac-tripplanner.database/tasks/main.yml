@@ -1,4 +1,7 @@
 ---
+- name: Install PostGIS extension from source
+  import_tasks: install-postgis-from-source.yml
+
 - name: Create postgres database
   postgresql_db: name={{ postgres_db }}
   become_user: postgres
