@@ -43,6 +43,7 @@
   when: test or (develop and not graph.stat.exists)
 
 - name: Copy Built OTP Graph to Host (develop)
+  when: develop and graph_build|changed
   synchronize:
     mode: pull
     src: "{{ otp_data_dir }}/Graph.obj"
