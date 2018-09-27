@@ -9,7 +9,7 @@ otp_process_mem: 5G
 # for cac_secrets
 allowed_hosts: ['127.0.0.1', 'localhost']
 internal_ips: ['0.0.0.0', '127.0.0.1']
-postgis_version: [2, 1, 5]
+postgis_version: [2, 1, 8]
 aws_access_key_id: ''
 aws_secret_access_key: ''
 aws_storage_bucket_name: ''
@@ -25,3 +25,11 @@ use_s3_storage: false
 default_admin_username: 'admin'
 default_admin_password: 'admin'
 default_admin_email: 'systems+cac@azavea.com'
+
+postgresql_version: "9.4"
+postgresql_package_version: "9.4.*.pgdg14.04+1"
+
+postgresql_listen_addresses: "*"
+postgresql_hba_mapping:
+  - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+  - { type: "host", database: "all", user: "all", address: "127.0.0.1/32", method: "md5" }

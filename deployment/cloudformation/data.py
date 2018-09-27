@@ -164,7 +164,7 @@ class RDSFactory(BaseFactory):
             AllocatedStorage=Ref(db_storage),
             DBInstanceClass=Ref(db_instance_class),
             Engine='postgres',
-            EngineVersion='9.3',
+            EngineVersion='9.4',
             MasterUsername=Ref(db_user),
             MasterUserPassword=Ref(db_password),
             DBSubnetGroupName=Ref(subnet_group),

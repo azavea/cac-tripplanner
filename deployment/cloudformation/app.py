@@ -364,7 +364,7 @@ class AppServerStack(StackNode):
             AvailabilityZones=self.get_input('AppServerAvailabilityZones').split(','),
             Cooldown=300,
             DesiredCapacity=Ref(self.param_desired_capacity),
-            HealthCheckGracePeriod=600,
+            HealthCheckGracePeriod=1000,
             HealthCheckType='ELB',
             LaunchConfigurationName=Ref(app_server_launch_config),
             LoadBalancerNames=[Ref(app_server_load_balancer)],
