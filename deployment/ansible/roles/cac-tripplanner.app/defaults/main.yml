@@ -13,18 +13,18 @@ root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
 
 cac_python_dependencies:
-    - { name: 'base58', version: '1.0.0' }
+    - { name: 'base58', version: '1.0.2' }
     - { name: 'boto', version: '2.49.0' }
-    - { name: 'django', version: '1.11.15' }
-    - { name: 'django-ckeditor', version: '5.3.1' }
-    - { name: 'django-image-cropping', version: '1.1.0' }
+    - { name: 'django', version: '1.11.16' }
+    - { name: 'django-ckeditor', version: '5.6.1' }
+    - { name: 'django-image-cropping', version: '1.2.0' }
     - { name: 'django-extensions', version: '1.9.9' }
-    - { name: 'django-storages', version: '1.6.6' }
+    - { name: 'django-storages', version: '1.7.1' }
     - { name: 'easy-thumbnails', version: '2.5.0' }
     - { name: 'gunicorn', version: '19.9.0' }
-    - { name: 'Pillow', version: '5.2.0' }
-    - { name: 'psycopg2-binary', version: '2.7.5' }
-    - { name: 'pytz', version: '2018.5' }
+    - { name: 'Pillow', version: '5.3.0' }
+    - { name: 'psycopg2-binary', version: '2.7.6.1' }
+    - { name: 'pytz', version: '2018.7' }
     - { name: 'pyyaml', version: '3.13' }
     - { name: 'troposphere', version: '1.8.1' }
     - { name: 'majorkirby', version: '0.2.1' }
