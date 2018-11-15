@@ -75,9 +75,14 @@ var scriptOrder = [
 
 // Helper for copying over bower files
 var copyBowerFiles = function(filter, extraFiles) {
-    return gulp.src(mainBower())
-        .pipe(gulpFilter(filter))
-        .pipe(addsrc(extraFiles));
+    var result = gulp.src(mainBower())
+        .pipe(gulpFilter(filter));
+
+    if (extraFiles && extraFiles.length > 0) {
+        result = result.pipe(addsrc(extraFiles));
+    }
+
+    return result;
 };
 
 gulp.task('collectstatic', function () {

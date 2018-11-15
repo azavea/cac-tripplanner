@@ -124,7 +124,7 @@ CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
                 var to = turf.point([xCoord, yCoord]);
                 // get travel distance to destination
                 // set properties for travel distnace to place and the origin label
-                destination.distance = turf.distance(from, to, {units: 'meters'});
+                destination.distance = turf.distance.default(from, to, {units: 'meters'});
                 destination.formattedDistance = Utils.getFormattedDistance(destination.distance);
                 destination.originLabel = originLabel;
             }
