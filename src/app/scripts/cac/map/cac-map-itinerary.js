@@ -245,11 +245,11 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                                       'geometry.coordinates'));
         // Figure out how far the new point is along that linestring. Index is fine since we
         // just need to do comparisons.
-        var newPointDist = turf.pointOnLine(combinedRoute, startDragPoint).properties.index;
+        var newPointDist = turf.pointOnLine.default(combinedRoute, startDragPoint).properties.index;
 
         // Find the first waypoint that's after the new point
         var insertBefore = _.find(waypoints, function (pt) {
-            return turf.pointOnLine(combinedRoute, pt).properties.index > newPointDist;
+            return turf.pointOnLine.default(combinedRoute, pt).properties.index > newPointDist;
         });
         // And return its index or, if no later waypoint was found, add the new one to the end
         if (insertBefore) {
