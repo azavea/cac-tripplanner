@@ -79,8 +79,8 @@
         "mkdir -p {{user `intermediate_directory`}}",
         "sudo apt-get -y install build-essential python-dev python-pip git",
         "sudo pip install --upgrade pip",
-        "sudo pip install paramiko==1.16.0",
-        "sudo pip install ansible==2.4.2.0"
+        "sudo pip install paramiko==2.4.2",
+        "sudo pip install ansible==2.7.6"
       ]
     },
     {
