@@ -1,5 +1,16 @@
 ## NOTICE: This file is written by ansible, and any changes made here will be overwritten on next provision.
 #          Modify cac-tripplanner.otp-data/templates/otp.conf.j2 to make changes stick.
+
+### BEGIN INIT INFO
+# Provides:          otp
+# Required-Start:    $network $local_fs $remote_fs
+# Required-Stop:     $network $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OpenTripPlanner server daemon
+# Description:       Enable OpenTripPlanner server
+### END INIT INFO
+
 description "OpenTripPlanner"
 
 start on {{ otp_upstart_start_on }}

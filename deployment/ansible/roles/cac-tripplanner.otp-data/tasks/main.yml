@@ -16,6 +16,13 @@
 
 - name: Overwrite upstart service
   template: src=otp.conf.j2 dest=/etc/init/otp.conf
+  register: otpconf
+
+- name: Reload systemd
+  shell: systemctl daemon-reload
+  when: otpconf.changed
+  notify:
+    - Restart OpenTripPlanner
 
 - name: Create data directory (test)
   file: path=./otp_data/ owner={{ansible_user_id}} group={{ansible_user_id}} mode=0664 state=directory
