@@ -34,7 +34,7 @@ def launch_stacks(cac_config, creds, stack_type, stack_color, **kwargs):
         delete_creds()
 
 
-def create_ami(machine_type, aws_region, creds, **kwargs):
+def create_ami(machine_type, aws_region, creds, aws_config, **kwargs):
     """Creates the specified AMI(s)
 
     Args:
@@ -42,7 +42,7 @@ def create_ami(machine_type, aws_region, creds, **kwargs):
       aws_region (str): AWS region id
       creds (Dict): Dictionary containing AWS credentials
     """
-    run_packer(machine_type, aws_region, creds)
+    run_packer(machine_type, aws_region, creds, aws_config)
 
 
 def main():
@@ -97,8 +97,10 @@ def main():
     args = parser.parse_args()
     creds = get_creds(args.aws_access_key_id, args.aws_secret_access_key,
                       args.aws_role_arn)
+    aws_config = {'aws_access_key_id': args.aws_access_key_id,
+                  "aws_secret_access_key": args.aws_secret_access_key}
     cac_config = get_config(args.cac_config_path, args.cac_profile)
-    args.func(cac_config=cac_config, creds=creds, **vars(args))
+    args.func(cac_config=cac_config, creds=creds, aws_config=aws_config, **vars(args))
 
 if __name__ == '__main__':
     main()

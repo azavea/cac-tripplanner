@@ -1,46 +1,42 @@
 """Helper stuff to deal with packer"""
 
-import csv
 import os
 import subprocess
-import urllib2
 import shutil
+
+from boto import ec2
+
+CANONICAL_ACCOUNT_ID = '099720109477'
 
 
 class CacStackException(Exception):
     pass
 
 
-def get_ubuntu_ami(region):
+def get_ubuntu_ami(region, creds):
     """Gets AMI ID for current release in region
 
     Args:
       region (str): AWS region id
+      creds (Dict): Dictionary containing AWS credentials
     """
 
-    response = urllib2.urlopen('http://cloud-images.ubuntu.com/query/trusty/'
-                               'server/released.current.txt').readlines()
-    fieldnames = ['version', 'version_type', 'release_status', 'date',
-                  'storage', 'arch', 'region', 'id', 'kernel',
-                  'unknown_col', 'virtualization_type']
-    reader = csv.DictReader(response, fieldnames=fieldnames, delimiter='\t')
+    conn = ec2.connect_to_region(region, **creds)
+    amis = conn.get_all_images(owners=[CANONICAL_ACCOUNT_ID], filters={
+        'name': 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*',
+        'architecture': 'x86_64',
+        'root-device-type': 'ebs',
+        'virtualization-type': 'hvm',
+    })
 
-    def ami_filter(ami):
-        """Helper function to filter AMIs"""
-        return (ami['region'] == region and
-                ami['arch'] == 'amd64' and
-                ami['storage'] == 'ebs-ssd' and
-                ami['virtualization_type'] == 'hvm')
+    amis = sorted(amis, key=lambda ami: ami.creationDate, reverse=True)
 
-    amis = [row for row in reader if ami_filter(row)]
     if len(amis) == 0:
         raise CacStackException('Did not find any ubuntu AMIs to use')
-    elif len(amis) > 1:
-        raise CacStackException('Found multiple ubuntu AMIs to use, should only be one')
-    return amis[0]['id']
+    return amis[0].id
 
 
-def run_packer(machine_type, region, creds):
+def run_packer(machine_type, region, creds, aws_config):
     """Runs packer command to build the desired AMI(s)
 
     Args:
@@ -58,12 +54,12 @@ def run_packer(machine_type, region, creds):
             print('Removing {}'.format(examples_path))
             shutil.rmtree(examples_path)
 
-    aws_ubuntu_ami = get_ubuntu_ami(region)
-
     env = os.environ.copy()
     env['AWS_ACCESS_KEY_ID'] = creds['aws_access_key_id']
     env['AWS_SECRET_ACCESS_KEY'] = creds['aws_secret_access_key']
     env['AWS_SESSION_TOKEN'] = creds['aws_security_token']
+
+    aws_ubuntu_ami = get_ubuntu_ami(region, aws_config)
 
     packer_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cac.json')
     packer_command = ['packer', 'build',
