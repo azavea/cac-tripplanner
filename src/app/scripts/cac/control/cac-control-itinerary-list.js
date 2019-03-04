@@ -26,7 +26,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             dots: true,
             infinite: false,
             mobileFirst: true,
-            variableWidth: true,
+            variableWidth: false,
             adaptiveHeight: true,
             responsive : [
                 {
