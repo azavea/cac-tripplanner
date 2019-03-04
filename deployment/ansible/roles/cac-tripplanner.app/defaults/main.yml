@@ -20,7 +20,7 @@ cac_python_dependencies:
     - { name: 'django-image-cropping', version: '1.2.0' }
     - { name: 'django-extensions', version: '1.9.9' }
     - { name: 'django-storages', version: '1.7.1' }
-    - { name: 'easy-thumbnails', version: '2.6.0' }
+    - { name: 'easy-thumbnails', version: '2.5.0' }
     - { name: 'gunicorn', version: '19.9.0' }
     - { name: 'Pillow', version: '5.4.1' }
     - { name: 'psycopg2-binary', version: '2.7.7' }
