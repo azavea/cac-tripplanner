@@ -52,7 +52,7 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     map_template = 'admin/cac-geocoding-map.html'
 
     # Include geocoder dependencies
-    jquery = 'https://code.jquery.com/jquery-3.2.1.min.js'
+    jquery = 'https://code.jquery.com/jquery-3.3.1.min.js'
     if settings.DEBUG:
         extra_js = [
             jquery,

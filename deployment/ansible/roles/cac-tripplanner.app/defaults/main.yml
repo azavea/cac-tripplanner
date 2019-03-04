@@ -13,9 +13,9 @@ root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
 
 cac_python_dependencies:
-    - { name: 'base58', version: '1.0.2' }
+    - { name: 'base58', version: '1.0.3' }
     - { name: 'boto', version: '2.49.0' }
-    - { name: 'django', version: '1.11.18' }
+    - { name: 'django', version: '1.11.20' }
     - { name: 'django-ckeditor', version: '5.6.1' }
     - { name: 'django-image-cropping', version: '1.2.0' }
     - { name: 'django-extensions', version: '1.9.9' }
