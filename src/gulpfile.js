@@ -7,6 +7,7 @@ var browserify = require('browserify');
 var concat = require('gulp-concat');
 var debug = require('gulp-debug');
 var del = require('del');
+var exec = require('child_process').exec;
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
 var merge = require('merge-stream');
@@ -19,8 +20,6 @@ var order = require('gulp-order');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
-var sequence = require('gulp-sequence');
-var shell = require('gulp-shell');
 var vinylBuffer = require('vinyl-buffer');
 var vinylSourceStream = require('vinyl-source-stream');
 
@@ -85,8 +84,17 @@ var copyBowerFiles = function(filter, extraFiles) {
     return result;
 };
 
-gulp.task('collectstatic', function () {
-    return shell.task(['python ' + pythonRoot + '/manage.py collectstatic --noinput -v0']);
+gulp.task('collectstatic', function (done) {
+    exec('python ' + pythonRoot + '/manage.py collectstatic --noinput -v0',
+        function(err, stdout, stderr) {
+            if (stdout) {
+                console.log(stdout);
+            }
+            if (stderr) {
+                console.log(stderr);
+            }
+            done(err);
+        });
 });
 
 // turf module needs to be run through browserify to pack it with its dependencies
@@ -147,8 +155,7 @@ var copyVendorJS = function(filter, extraFiles) {
 };
 
 gulp.task('clean', function() {
-    // This must be done synchronously to prevent sporadic failures
-    return del.sync([
+    return del([
         stat.fonts,
         stat.scripts,
         stat.styles,
@@ -276,10 +283,10 @@ gulp.task('test:copy-cartodb', function() {
         .pipe(gulp.dest(stat.scripts));
 });
 
-gulp.task('test:production', ['test:copy-jquery',
+gulp.task('test:production', gulp.series(gulp.series('test:copy-jquery',
                               'test:copy-cartodb',
                               'minify:vendor-scripts',
-                              'minify:scripts'],
+                              'minify:scripts'),
     function(done) {
         setTimeout(function() {
             new KarmaServer({
@@ -289,10 +296,11 @@ gulp.task('test:production', ['test:copy-jquery',
                 done();
             }).start();
         }, 6000);
-    }
+    })
 );
 
-gulp.task('test:coverage', ['test:copy-cartodb', 'copy:vendor-scripts', 'copy:scripts'],
+gulp.task('test:coverage', gulp.series(
+    gulp.series('test:copy-cartodb', 'copy:vendor-scripts', 'copy:scripts'),
     function(done) {
         setTimeout(function() {
             new KarmaServer({
@@ -300,40 +308,40 @@ gulp.task('test:coverage', ['test:copy-cartodb', 'copy:vendor-scripts', 'copy:sc
                 singleRun: true
             }, done).start();
         }, 6000);
-    }
+    })
 );
 
-gulp.task('test:development', ['copy:vendor-scripts', 'copy:scripts'],
+gulp.task('test:development', gulp.series(gulp.series('copy:vendor-scripts', 'copy:scripts'),
     function(done) {
         new KarmaServer({
             configFile: __dirname + '/karma/karma-dev.conf.js',
             singleRun: true
         }, done).start();
-    }
+    })
 );
 
-gulp.task('common:build', ['clean'], sequence([
-        'copy:fontello-fonts',
-        'copy:vendor-css',
-        'copy:vendor-images',
-        'copy:marker-images',
-        'copy:app-images',
-        'sass',
-        'collectstatic'])
+gulp.task('common:build', gulp.series('clean',
+    'copy:fontello-fonts',
+    'copy:vendor-css',
+    'copy:vendor-images',
+    'copy:marker-images',
+    'copy:app-images',
+    'sass',
+    'collectstatic')
 );
 
-gulp.task('test', sequence([
-            'test:copy-jquery',
-            'test:copy-cartodb',
-            'production',
-            'test:production',
-            'development',
-            'test:coverage'])
+gulp.task('development', gulp.series('common:build', 'copy:vendor-scripts', 'copy:scripts'));
+
+gulp.task('production', gulp.series('common:build', 'minify:scripts', 'minify:vendor-scripts'));
+
+gulp.task('test', gulp.series(
+    'test:copy-jquery',
+    'test:copy-cartodb',
+    'production',
+    'test:production',
+    'development',
+    'test:coverage')
 );
-
-gulp.task('development', ['common:build', 'copy:vendor-scripts', 'copy:scripts']);
-
-gulp.task('production', ['common:build', 'minify:scripts', 'minify:vendor-scripts']);
 
 gulp.task('watch', function () {
     return gulp.watch([
@@ -343,4 +351,4 @@ gulp.task('watch', function () {
     ], ['development']);
 });
 
-gulp.task('default', ['production']);
+gulp.task('default', gulp.series('production'));
