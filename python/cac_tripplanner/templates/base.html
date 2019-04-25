@@ -84,11 +84,6 @@
 
     {% block jsimports %}
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
-    <script type="text/javascript">
-        jQuery.noConflict(); // because JotForms.
-    </script>
-
     {% if debug %}
 
     {% if fb_app_id %}
@@ -103,7 +98,8 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
     {% endif %}
-
+    <script src="{% static 'scripts/vendor/index.js' %}"></script>
+    <script src="{% static 'scripts/vendor/jquery.js' %}"></script>
     <script src="{% static 'scripts/vendor/cartodb.uncompressed.js' %}"></script>
     <script src="{% static 'scripts/vendor/leaflet.awesome-markers.js' %}"></script>
     <script src="{% static 'scripts/vendor/js.storage.js' %}"></script>
@@ -170,6 +166,10 @@
     {% endif %}
 
     {% endblock %}
+
+    <script type="text/javascript">
+        jQuery.noConflict(); // because JotForms.
+    </script>
 
     {% block jspage %}
     {% endblock %}

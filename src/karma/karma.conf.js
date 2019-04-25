@@ -15,8 +15,6 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      '/srv/cac/scripts/vendor/jquery.js',
-      '/srv/cac/scripts/vendor/cartodb.uncompressed.js',
       '/srv/cac/scripts/vendor.js',
       '/srv/cac/scripts/main.js',
       'test/spec/*.js',
