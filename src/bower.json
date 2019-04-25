@@ -3,8 +3,8 @@
   "private": true,
   "dependencies": {
     "console-polyfill": "~0.3.0",
-    "handlebars": "~4.1.0",
-    "jquery": "~3.3.1",
+    "handlebars": "~4.1.2",
+    "jquery": "~3.4.0",
     "leaflet": "~0.7.7",
     "cartodb.js": "~3.15.17",
     "js-storage": "~1.0.4",
