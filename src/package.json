@@ -52,7 +52,7 @@
     "main-bower-files": "~2.13.1",
     "merge-stream": "~1.0.1",
     "mocha": "~6.1.4",
-    "opn": "~6.0.0",
+    "open": "~6.2.0",
     "phantomjs-prebuilt": "~2.1.16",
     "pump": "~3.0.0",
     "requirejs": "~2.3.6",
