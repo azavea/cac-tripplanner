@@ -18,18 +18,19 @@ WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in WIDE_IMAGE_DIMENSIONS])
 
 
 def generate_filename(instance, filename):
-    """Helper for generating image filenames"""
+    """Helper for generating image filenames."""
     return generate_image_filename('destinations', instance, filename)
 
 
 class DestinationManager(models.GeoManager):
-    """Custom manager for Destinations that allows filtering on published"""
+    """Custom manager for Destinations that allows filtering on published."""
 
     def published(self):
         return self.get_queryset().filter(published=True)
 
+
 class EventManager(DestinationManager):
-    """Custom manager for Events that allows filtering on published or currently ongoing"""
+    """Custom manager for Events that allows filtering on published or currently ongoing."""
 
     def current(self):
         return self.get_queryset().filter(published=True, end_date__gte=now())
@@ -39,7 +40,7 @@ class EventManager(DestinationManager):
 
 
 class DestinationCategory(models.Model):
-    """Categories for filtering destinations"""
+    """Categories for filtering destinations."""
 
     class Meta:
         ordering = ['name', ]
@@ -51,7 +52,7 @@ class DestinationCategory(models.Model):
 
 
 class Activity(models.Model):
-    """Possible things to do at an Attraction"""
+    """Possible things to do at an Attraction."""
 
     class Meta:
         ordering = ['name', ]
@@ -64,6 +65,7 @@ class Activity(models.Model):
 
 class UserFlag(models.Model):
     """Track flags set by mobile app users."""
+
     class UserFlags(object):
         been = 'been'
         want_to_go = 'want_to_go'
@@ -122,7 +124,7 @@ class Attraction(models.Model):
                                     help_text=settings.IMAGE_CROPPER_HELP_TEXT)
     image = ImageRatioField('image_raw', NARROW_IMAGE_DIMENSION_STRING,
                             help_text='The small image. Will be displayed at ' +
-                                      NARROW_IMAGE_DIMENSION_STRING)
+                            NARROW_IMAGE_DIMENSION_STRING)
     wide_image = ImageRatioField('wide_image_raw', WIDE_IMAGE_DIMENSION_STRING,
                                  help_text='The large image. Will be displayed at ' +
                                            WIDE_IMAGE_DIMENSION_STRING)
@@ -141,11 +143,11 @@ class Attraction(models.Model):
 
     @property
     def is_event(self):
-        """Helper to check which sub-class this Attraction belongs to"""
+        """Helper to check which sub-class this Attraction belongs to."""
         return isinstance(self, Event)
 
     def has_activity(self, activity_name):
-        """Helper to check if an activity of a given name is available at a destination"""
+        """Helper to check if an activity of a given name is available at a destination."""
         return self.activities.filter(name=activity_name).exists()
 
 
@@ -178,8 +180,9 @@ class Destination(Attraction):
     def __unicode__(self):
         return self.name
 
+
 class Event(Attraction):
-    """Represents an event, which has a start and end date"""
+    """Represents an event, which has a start and end date."""
 
     class Meta:
         ordering = ['priority', '-start_date']
@@ -223,8 +226,8 @@ class ExtraEventPicture(ExtraImage):
 def user_flag_summary_manger_factory(manager_for_events=False):
     """Wrap the object manager for user flag summary counts in a factory.
 
-    Allows for easy support of both destinations and events."""
-
+    Allows for easy support of both destinations and events.
+    """
     class UserFlagSummaryManager(models.Manager):
         """Annotate queryset of attractions to add user flag count summaries."""
 
@@ -270,6 +273,7 @@ class DestinationUserFlags(Destination):
 
 class EventUserFlags(Event):
     """Proxy class to annotate events with user flag summary data."""
+
     class Meta:
         proxy = True
         verbose_name = 'Event User Flag Summary'

@@ -15,15 +15,18 @@ DEFAULT_CONTEXT = {
     'routing_url': settings.ROUTING_URL
 }
 
+
 def about_faq(request, slug):
     page = get_object_or_404(AboutFaq.objects.all(), slug=slug)
     context = dict(tab='about', page=page, **DEFAULT_CONTEXT)
     return render(request, 'about-faq.html', context=context)
 
+
 def learn_list(request):
     articles = Article.objects.published().order_by('-publish_date')
     context = dict(tab='info', articles=articles, **DEFAULT_CONTEXT)
     return render(request, 'learn-list.html', context=context)
+
 
 def learn_detail(request, slug):
     article = get_object_or_404(Article.objects.published(), slug=slug)
@@ -33,7 +36,7 @@ def learn_detail(request, slug):
 
 
 class AllArticles(View):
-    """ API endpoint for the Articles model """
+    """API endpoint for the Articles model."""
 
     def serialize_article(self, request, article):
         return {
@@ -44,7 +47,7 @@ class AllArticles(View):
         }
 
     def get(self, request, *args, **kwargs):
-        """ GET title, URL, and images for published articles """
+        """GET title, URL, and images for published articles."""
         try:
             limit = int(request.GET.get('limit'))
         except (ValueError, TypeError):
