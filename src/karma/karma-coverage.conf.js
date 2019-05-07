@@ -15,13 +15,24 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      // console polyfills
+      '/srv/cac/scripts/vendor/index.js',
       '/srv/cac/scripts/vendor/jquery.js',
+      '/srv/cac/scripts/vendor/lodash.js',
       // load moment before other vendor scripts; is requirement for bootstrap datetime picker
       '/srv/cac/scripts/vendor/moment.js',
       '/srv/cac/scripts/vendor/moment-duration-format.js',
       '/srv/cac/scripts/vendor/cartodb.uncompressed.js',
       '/srv/cac/scripts/vendor/Polyline.encoded.js',
-      '/srv/cac/scripts/vendor/!(cartodb|Polyline|moment).js',
+      '/srv/cac/scripts/vendor/leaflet.awesome-markers.js',
+      '/srv/cac/scripts/vendor/handlebars.js',
+      '/srv/cac/scripts/vendor/route.js',
+      '/srv/cac/scripts/vendor/slick.js',
+      '/srv/cac/scripts/vendor/turf-helpers.js',
+      '/srv/cac/scripts/vendor/turf-distance.js',
+      '/srv/cac/scripts/vendor/turf-point-on-line.js',
+      '/srv/cac/scripts/vendor/js.storage.js',
+      '/srv/cac/scripts/vendor/typeahead.bundle.js',
 
       // should match order listed in base.html Django template
       'app/scripts/cac/cac.js',

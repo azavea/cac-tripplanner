@@ -15,7 +15,7 @@ var pump = require('pump');
 var sass = require('gulp-sass');
 var jshintXMLReporter = require('gulp-jshint-xml-file-reporter');
 var KarmaServer = require('karma').Server;
-var mainBower = require('main-bower-files');
+var mainNPM = require('npmfiles');
 var order = require('gulp-order');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
@@ -46,8 +46,6 @@ var stat = {
     images: staticRoot + '/images'
 };
 
-var cartoDbJs = 'bower_components/cartodb.js/cartodb.uncompressed.js';
-
 // Define the minification order for our js files
 var scriptOrder = [
     // We aren't using an automatic dependency management system,
@@ -72,16 +70,11 @@ var scriptOrder = [
     '**/*.js',
 ];
 
-// Helper for copying over bower files
-var copyBowerFiles = function(filter, extraFiles) {
-    var result = gulp.src(mainBower())
-        .pipe(gulpFilter(filter));
-
-    if (extraFiles && extraFiles.length > 0) {
-        result = result.pipe(addsrc(extraFiles));
-    }
-
-    return result;
+// Helper for copying over dependency files
+var copyNpmFiles = function() {
+    return gulp.src(mainNPM({
+        showWarnings: true
+    }), {allowEmpty: true, ignore: '**/*gulpfile*'});
 };
 
 gulp.task('collectstatic', function (done) {
@@ -143,10 +136,10 @@ var buildTurfDistance = function() {
 };
 
 // combine streams from turf and the other vendor dependencies
-var copyVendorJS = function(filter, extraFiles) {
-    var bowerStream = copyBowerFiles(filter, extraFiles);
+var copyVendorJS = function() {
+    var npmFilesStream = copyNpmFiles();
     var vendorStream = merge(buildTurfHelpers(), buildTurfPointOnLine(), buildTurfDistance());
-    vendorStream.add(bowerStream);
+    vendorStream.add(npmFilesStream);
     // do a global search-and-replace for jQuery's ajax in vendor scripts, to fix
     // running jQuery in noConflict mode for JotForms.
     // (Breaks loading Carto layers when it tries to reference $.ajax.)
@@ -176,13 +169,7 @@ gulp.task('minify:scripts', function(cb) {
 
 gulp.task('minify:vendor-scripts', function(cb) {
     pump([
-         copyVendorJS(['**/*.js',
-                        // Exclude minified vendor scripts that also have a non-minified version.
-                        // We run our own minifier, and want to include each script only once.
-                        '!**/*.min.js',
-                        // exclude leaflet and jquery (loaded over CDN)
-                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/jquery.js', '!**/jquery.min.js'],
-                        []),
+         copyVendorJS(),
         vinylBuffer(),
         concat('vendor.js'),
         uglify(),
@@ -197,10 +184,10 @@ gulp.task('copy:scripts', function() {
 });
 
 gulp.task('copy:vendor-css', function() {
-    return copyBowerFiles(['**/*.css',
-                          '!**/*.min.css',
-                          // leaflet loaded over CDN
-                          '!**/leaflet.css'], [])
+    return gulp.src(['node_modules/leaflet/dist/leaflet.css',
+                     'node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css',
+                     'node_modules/cartodb.js/dist/cartodb.css',
+                     'node_modules/cartodb.js/dist/cartodb.ie.css'])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],
@@ -210,12 +197,12 @@ gulp.task('copy:vendor-css', function() {
 });
 
 gulp.task('copy:vendor-images', function() {
-    return copyBowerFiles(['**/*.png'], [])
+    return gulp.src(['**/*.png'], [])
         .pipe(gulp.dest(stat.images + '/vendor'));
 });
 
 gulp.task('copy:marker-images', function() {
-    return gulp.src(['bower_components/*eaflet*/dist/images/*.png'])
+    return gulp.src(['node_modules/*eaflet*/dist/images/*.png'])
         .pipe(rename({dirname: ''}))
         .pipe(gulp.dest(stat.styles + '/images'));
 });
@@ -231,14 +218,7 @@ gulp.task('copy:app-images', function() {
 });
 
 gulp.task('copy:vendor-scripts', function() {
-    return copyVendorJS(['**/*.js',
-                        // exclude minified versions
-                        '!**/*.min.js',
-                        // exclude leaflet
-                        '!**/leaflet.js', '!**/leaflet-src.js', '!**/cartodb**'],
-                        // load the uncompressed version of CartoDB in development,
-                        // for easier debugging
-                        [cartoDbJs])
+    return copyVendorJS()
         .pipe(gulp.dest(stat.scripts + '/vendor'));
 });
 
@@ -271,52 +251,39 @@ gulp.task('sass', function () {
         .pipe(gulp.dest(stat.styles));
 });
 
-// Since jQuery is loaded from a CDN, we need to pull it in manually here.
-gulp.task('test:copy-jquery', function() {
-    return copyBowerFiles('jquery.js', [])
-        .pipe(gulp.dest(stat.scripts));
-});
-
-// Since cartodb.js is loaded from a CDN, we need to pull it in manually here.
-gulp.task('test:copy-cartodb', function() {
-    return copyBowerFiles('cartodb.js', [cartoDbJs])
-        .pipe(gulp.dest(stat.scripts));
-});
-
-gulp.task('test:production', gulp.series(gulp.series('test:copy-jquery',
-                              'test:copy-cartodb',
+gulp.task('test:production', gulp.series(gulp.series(
                               'minify:vendor-scripts',
                               'minify:scripts'),
     function(done) {
-        setTimeout(function() {
-            new KarmaServer({
-                configFile: __dirname + '/karma/karma.conf.js',
-                singleRun: true
-            }, function() {
-                done();
-            }).start();
-        }, 6000);
+        KarmaServer.start({
+            configFile: __dirname + '/karma/karma.conf.js',
+            singleRun: true
+        }, function() {
+            done();
+        });
     })
 );
 
 gulp.task('test:coverage', gulp.series(
-    gulp.series('test:copy-cartodb', 'copy:vendor-scripts', 'copy:scripts'),
+    gulp.series('copy:vendor-scripts', 'copy:scripts'),
     function(done) {
-        setTimeout(function() {
-            new KarmaServer({
-                configFile: __dirname + '/karma/karma-coverage.conf.js',
-                singleRun: true
-            }, done).start();
-        }, 6000);
+        KarmaServer.start({
+            configFile: __dirname + '/karma/karma-coverage.conf.js',
+            singleRun: true
+        }, function() {
+            done();
+        });
     })
 );
 
 gulp.task('test:development', gulp.series(gulp.series('copy:vendor-scripts', 'copy:scripts'),
     function(done) {
-        new KarmaServer({
+        KarmaServer.start({
             configFile: __dirname + '/karma/karma-dev.conf.js',
             singleRun: true
-        }, done).start();
+        }, function() {
+            done();
+        });
     })
 );
 
@@ -335,8 +302,6 @@ gulp.task('development', gulp.series('common:build', 'copy:vendor-scripts', 'cop
 gulp.task('production', gulp.series('common:build', 'minify:scripts', 'minify:vendor-scripts'));
 
 gulp.task('test', gulp.series(
-    'test:copy-jquery',
-    'test:copy-cartodb',
     'production',
     'test:production',
     'development',
@@ -348,7 +313,7 @@ gulp.task('watch', function () {
         'app/scripts/**/*.js',
         'app/styles/**/*.css',
         'app/styles/**/*.scss'
-    ], ['development']);
+    ], gulp.series('development'));
 });
 
 gulp.task('default', gulp.series('production'));

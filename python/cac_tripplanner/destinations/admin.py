@@ -34,9 +34,9 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
     actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
-    # To change field display order, define them all here.
-    # Default is order defined in model, but due to inheritance, cannot reorder across
-    # relationship with model field ordering alone.
+    """To change field display order, define them all here.
+    Default is order defined in model, but due to inheritance, cannot reorder across
+    relationship with model field ordering alone."""
     fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
               'wide_image_raw', 'published',
               'priority', 'accessible', 'categories', 'activities', 'city', 'state', 'zipcode',

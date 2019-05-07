@@ -38,7 +38,7 @@ EVENT_CATEGORY = 'Events'
 
 def base_view(request, page, context):
     """
-    Base view that sets some variables for JS settings
+    Base view that sets some variables for JS settings.
 
     :param request: Request object
     :param page: String representation of the HTML template
@@ -72,13 +72,14 @@ def home(request):
 
 
 def explore(request):
-    """
-    Enables loading the explore view via URL.
+    """Enable loading the explore view via URL.
+
     Explore is still a javascript-defined sub-view of Home, but this enables us to send the message
     to the javascript that it should start on that view even though there's no origin.
     """
     context = {'tab': 'map-explore'}
     return base_view(request, 'home.html', context=context)
+
 
 def privacy_policy(request):
     context = {'tab': 'home'}
@@ -89,8 +90,9 @@ def terms_of_service(request):
     context = {'tab': 'home'}
     return base_view(request, 'terms-of-service.html', context)
 
+
 def manifest(request):
-    """Render the app manifest for a PWA app that can install to homescreen
+    """Render the app manifest for a PWA app that can install to homescreen.
 
     https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/?utm_source=devtools
     """
@@ -98,11 +100,10 @@ def manifest(request):
 
 
 def service_worker(request):
-    """Render the service worker for a PWA app that can install to homescreen
+    """Render the service worker for a PWA app that can install to homescreen.
 
     https://developers.google.com/web/fundamentals/getting-started/primers/service-workers
     """
-
     # files to cache in either development or production
     cache_files = [
         '/',
@@ -143,13 +144,12 @@ def event_detail(request, pk):
 
 
 def image_to_url(obj, field_name, size, raw_field_name=''):
-    """Helper for converting an image object property to a url for a json response
+    """Helper for converting an image object property to a url for a json response.
 
     :param obj: Model object with {image} and {image}_raw fields
     :param field_name: String identifier for the image field
     :returns: URL of the image, or an empty string if there is no image
     """
-
     if not raw_field_name:
         raw_field_name = field_name + '_raw'
     options = {
@@ -223,8 +223,9 @@ def set_attraction_properties(obj, model, extra_images):
 
     return obj
 
+
 def set_destination_properties(destination):
-    """Helper for adding and converting properties in serializing destinations as JSON
+    """Helper for adding and converting properties in serializing destinations as JSON.
 
     :param destination: Destination model object
     :returns: Dictionary representation of object, with added properties
@@ -241,7 +242,7 @@ def set_destination_properties(destination):
 
 
 def set_event_properties(event):
-    """Helper for adding and converting properties in serializing events as JSON
+    """Helper for adding and converting properties in serializing events as JSON.
 
     :param event: Event model object
     :returns: Dictionary representation of object, with added properties
@@ -265,16 +266,17 @@ def set_event_properties(event):
 
 
 class FindReachableDestinations(View):
-    """Class based view for fetching isochrone and finding destinations of interest within it"""
+    """Class based view for fetching isochrone and finding destinations of interest within it."""
 
     otp_router = 'default'
     isochrone_url = settings.ISOCHRONE_URL
     algorithm = 'accSampling'
 
     def isochrone(self, payload):
-        """Make request to Open Trip Planner for isochrone geometry with the provided args
-        and return OTP JSON"""
+        """Make request to Open Trip Planner for isochrone geometry.
 
+        Take the provided args and return OTP JSON.
+        """
         payload['routerId'] = self.otp_router
         payload['algorithm'] = self.algorithm
         headers = {'Accept': 'application/json'}
@@ -294,9 +296,10 @@ class FindReachableDestinations(View):
 
     def get(self, request, *args, **kwargs):
         """When a GET hits this endpoint, calculate an isochrone and find destinations within it.
-        Return both the isochrone GeoJSON and the list of matched destinations.
 
-        Can send optional comma-separated `categories` param to filter by destination category."""
+        Return both the isochrone GeoJSON and the list of matched destinations.
+        Can send optional comma-separated `categories` param to filter by destination category.
+        """
         params = request.GET.copy()  # make mutable
 
         # allow a max travelshed size of 60 minutes in a query
@@ -331,10 +334,10 @@ class FindReachableDestinations(View):
 
 
 class SearchDestinations(View):
-    """ View for searching destinations via an http endpoint """
+    """View for searching destinations via an http endpoint."""
 
     def get(self, request, *args, **kwargs):
-        """ GET destinations that match search queries
+        """Get destinations that match search queries.
 
         Must pass either:
           - lat + lon params
@@ -382,7 +385,7 @@ class SearchDestinations(View):
                       .order_by('priority', 'start_date'))
 
         if text is not None:
-                events = events.filter(name__icontains=text)
+            events = events.filter(name__icontains=text)
 
         if limit:
             try:
@@ -419,6 +422,7 @@ class UserFlagView(View):
      - flag: how user has flagged the attraction; must be one of `UserFlag.UserFlags` keys
              (or empty, if unset)
     """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(UserFlagView, self).dispatch(request, *args, **kwargs)
