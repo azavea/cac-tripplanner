@@ -37,7 +37,7 @@ var $ = require('gulp-load-plugins')();
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
 
-var filterCSS = gulpFilter(['**/*.css', '!**/leaflet.css'], {restore: true});
+var filterCSS = gulpFilter(['**/*.css'], {restore: true});
 
 var stat = {
     fonts: staticRoot + '/fontello',
@@ -187,7 +187,9 @@ gulp.task('copy:vendor-css', function() {
     return gulp.src(['node_modules/leaflet/dist/leaflet.css',
                      'node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css',
                      'node_modules/cartodb.js/dist/cartodb.css',
-                     'node_modules/cartodb.js/dist/cartodb.ie.css'])
+                     'node_modules/cartodb.js/dist/cartodb.ie.css',
+                     'node_modules/tiny-slider/dist/tiny-slider.css',
+                     'node_modules/spinkit/css/spinkit.css'])
         .pipe(concat('vendor.css'))
         .pipe($.autoprefixer({
             browsers: ['last 2 versions'],

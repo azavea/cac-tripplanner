@@ -53,15 +53,18 @@
 {%block jspage %}
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
-    $('.detail-image-carousel').slick({
-        arrows: false,
-        dots: true,
-        autoplay: true,
-        fade: true,
-        cssEase: 'linear',
-        mobileFirst: true,
-        lazyLoad: 'ondemand',
-        slidesToShow: 1,
+    tns({
+        container: '.detail-image-carousel',
+        autoplayButton: false,
+        autoplayButtonOutput: false,
+        autoplayPosition: 'top',
+        controls: false,
+        controlPosition: 'bottom',
+        items: 1,
+        nav: true,
+        navPosition: 'bottom',
+        slideBy: 'page',
+        autoplay: true
     });
 });
 </script>
