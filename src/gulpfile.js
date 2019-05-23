@@ -3,6 +3,7 @@
 
 var addsrc = require('gulp-add-src');
 var aliasify = require('aliasify');
+var autoprefixer = require('gulp-autoprefixer');
 var browserify = require('browserify');
 var concat = require('gulp-concat');
 var debug = require('gulp-debug');
@@ -10,6 +11,7 @@ var del = require('del');
 var exec = require('child_process').exec;
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
+var jshint = require('gulp-jshint');
 var merge = require('merge-stream');
 var pump = require('pump');
 var sass = require('gulp-sass');
@@ -31,8 +33,6 @@ var pkg = require('./package');
 var jshintConfig = pkg.jshintConfig;
 
 jshintConfig.lookup = false;
-
-var $ = require('gulp-load-plugins')();
 
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
@@ -191,7 +191,7 @@ gulp.task('copy:vendor-css', function() {
                      'node_modules/tiny-slider/dist/tiny-slider.css',
                      'node_modules/spinkit/css/spinkit.css'])
         .pipe(concat('vendor.css'))
-        .pipe($.autoprefixer({
+        .pipe(autoprefixer({
             browsers: ['last 2 versions'],
             cascade: false
         }))
@@ -226,21 +226,21 @@ gulp.task('copy:vendor-scripts', function() {
 
 gulp.task('jshint', function () {
     return gulp.src('app/scripts/cac/**/*.js')
-        .pipe($.jshint(jshintConfig))
-        .pipe($.jshint.reporter('jshint-stylish'))
-        .pipe($.jshint.reporter('fail'));
+        .pipe(jshint(jshintConfig))
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('jshint:jenkins', function () {
     return gulp.src('app/scripts/cac/**/*.js')
-        .pipe($.jshint(jshintConfig))
-        .pipe($.jshint.reporter(jshintXMLReporter))
+        .pipe(jshint(jshintConfig))
+        .pipe(jshint.reporter(jshintXMLReporter))
         .on('end', jshintXMLReporter.writeFile({
             alwaysReport: true,
             format: 'jslint',
             filePath: 'coverage/jshint-output.xml'
         }))
-        .pipe($.jshint.reporter('fail'));
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('sass', function () {
@@ -248,7 +248,7 @@ gulp.task('sass', function () {
         .pipe(plumber())
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
         .pipe(filterCSS)
-        .pipe($.autoprefixer({browsers: ['last 2 versions'], cascade: false}))
+        .pipe(autoprefixer({browsers: ['last 2 versions'], cascade: false}))
         .pipe(filterCSS.restore)
         .pipe(gulp.dest(stat.styles));
 });
