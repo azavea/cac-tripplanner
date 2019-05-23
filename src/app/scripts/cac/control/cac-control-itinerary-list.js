@@ -19,22 +19,6 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             hiddenClass: 'hidden',
             itineraryList: '.routes-list',
             itineraryItem: '.route-summary'
-        },
-        // Settings for 'slick' carousel for swiping itineraries on mobile and in detail views
-        slick: {
-            arrows: false,
-            dots: true,
-            infinite: false,
-            mobileFirst: true,
-            variableWidth: false,
-            adaptiveHeight: true,
-            responsive : [
-                {
-                    // Breakpoint must match 'xxs' in _breakpoints.scss
-                    breakpoint: 480,
-                    settings: 'unslick'
-                }
-            ]
         }
     };
     var options = {};
@@ -112,7 +96,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
     }
 
     /**
-     * Enable 'slick' carousel for swiping itineraries on mobile
+     * Enable carousel for swiping itineraries on mobile
      * @param {[object]} itineraries An open trip planner itinerary object, as returned from the plan endpoint
      */
     function enableCarousel(itineraries) {
@@ -120,11 +104,32 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             return;
         }
 
-        $(options.selectors.itineraryList)
-            .slick(options.slick)
-            .on('afterChange', function(event, slick, currentSlide) {
-                $(options.selectors.itineraryItem).eq(currentSlide).triggerHandler('mouseenter');
-            });
+        var slider = tns({
+            container: options.selectors.itineraryList,
+            autoplayButton: false,
+            autoplayButtonOutput: false,
+            autoplayPosition: 'top',
+            controls: false,
+            controlPosition: 'bottom',
+            items: 1,
+            nav: true,
+            navPosition: 'bottom',
+            slideBy: 'page',
+            autoplay: false,
+            autoHeight: true,
+            responsive: {
+                320: {disable: false, controls: false, nav: true, autoHeight: true},
+                481: {disable: true}
+            }
+        });
+
+        // Highlight route on map on itinerary carousel swipe
+        slider.events.on('indexChanged', function(info) {
+            var items = $(options.selectors.itineraryItem);
+            if (items && items.length > info.displayIndex) {
+                items.eq(info.displayIndex).triggerHandler('mouseenter');
+            }
+        });
     }
 
     function getItineraryById(id) {
@@ -151,15 +156,6 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
 
     function show() {
         $container.removeClass(options.selectors.hiddenClass);
-        layoutCarousel();
-    }
-
-    function layoutCarousel() {
-        // necessary hack for when first itinerary is single-mode
-        // but subsequent itineraries are multi-modal (hence taller).
-        if (itineraries.length > 1) {
-            $(options.selectors.itineraryList).slick('setPosition');
-        }
     }
 
     /**

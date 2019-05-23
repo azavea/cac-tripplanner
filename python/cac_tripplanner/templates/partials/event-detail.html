@@ -5,11 +5,13 @@
     <header class="info-article-header">
 
         {% if event.extraeventpicture_set.exists %}
-        <div class="detail-image-carousel">
-            <img data-lazy="{% cropped_thumbnail event "wide_image" %}">
-            {% for extra_image in event.extraeventpicture_set.all %}
-            <img data-lazy="{% cropped_thumbnail extra_image 'wide_image' %}">
-            {% endfor %}
+        <div class="detail-image-carousel-container">
+            <div class="detail-image-carousel">
+                <img src="{% cropped_thumbnail event "wide_image" %}">
+                {% for extra_image in event.extraeventpicture_set.all %}
+                <img src="{% cropped_thumbnail extra_image 'wide_image' %}">
+                {% endfor %}
+            </div>
         </div>
         {% else %}
         <div class="info-place-image-hero"
