@@ -27,7 +27,7 @@ module.exports = function(config) {
       '/srv/cac/scripts/vendor/Polyline.encoded.js',
       '/srv/cac/scripts/vendor/leaflet.awesome-markers.js',
       '/srv/cac/scripts/vendor/route.js',
-      '/srv/cac/scripts/vendor/slick.js',
+      '/srv/cac/scripts/vendor/tiny-slider.js',
       '/srv/cac/scripts/vendor/turf-helpers.js',
       '/srv/cac/scripts/vendor/turf-distance.js',
       '/srv/cac/scripts/vendor/turf-point-on-line.js',
