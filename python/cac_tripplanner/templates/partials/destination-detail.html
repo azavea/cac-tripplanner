@@ -7,7 +7,8 @@
             <div class="detail-image-carousel">
                 <img src="{% cropped_thumbnail destination 'wide_image' %}">
                 {% for extra_image in destination.extradestinationpicture_set.all %}
-                <img src="{% cropped_thumbnail extra_image 'wide_image' %}">
+                <img class="detail-image-carousel-extra-image hidden"
+                     src="{% cropped_thumbnail extra_image 'wide_image' %}">
                 {% endfor %}
             </div>
         </div>
