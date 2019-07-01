@@ -11,8 +11,8 @@ postgres_host: "192.168.8.25"
 
 packer_version: "1.0.2"
 
-nodejs_version: 10.15.3
-nodejs_npm_version: 6.4.1
+nodejs_version: 10.16.0
+nodejs_npm_version: 6.9.0
 
 pip_version: 19.1.*
 virtualenv_version: 16.5.0

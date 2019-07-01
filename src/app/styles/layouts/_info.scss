@@ -84,6 +84,12 @@
             margin-left: -4rem;
             margin-right: -4rem;
         }
+
+        .detail-image-carousel-extra-image {
+            &.hidden {
+                display: none;
+            }
+        }
     }
 
     .info-article-image-hero {
