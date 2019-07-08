@@ -5,7 +5,7 @@ Vagrant.require_version ">= 2.0"
 require "yaml"
 
 CAC_SHARED_FOLDER_TYPE = ENV.fetch("CAC_SHARED_FOLDER_TYPE", "nfs")
-CAC_NFS_VERSION =  ENV.fetch("CAC_NFS_VERSION_3", true) ? 'vers=3': 'vers=4'
+CAC_NFS_VERSION =  'vers=4'
 
 if CAC_SHARED_FOLDER_TYPE == "nfs"
   if Vagrant::Util::Platform.linux? then
