@@ -14,8 +14,8 @@
 - name: Change owner and mode of byport file
   file: path=/etc/authbind/byport/80 owner={{ otp_user }} mode=0755
 
-- name: Overwrite upstart service
-  template: src=otp.conf.j2 dest=/etc/init/otp.conf
+- name: Overwrite systemd service
+  template: src=otp.service.j2 dest=/etc/systemd/system/otp.service
   register: otpconf
 
 - name: Reload systemd

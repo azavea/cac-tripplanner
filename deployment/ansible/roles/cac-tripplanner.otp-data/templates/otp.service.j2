@@ -7,7 +7,7 @@ Description=Start OpenTripPlanner process
 After={{ otp_service_after }}
 
 [Service]
-Type=forking
+Type=simple
 User={{ otp_user }}
 WorkingDirectory={{ otp_bin_dir }}
 Restart=on-failure
