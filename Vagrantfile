@@ -88,7 +88,7 @@ VAGRANT_PROXYCONF_ENDPOINT = ENV["VAGRANT_PROXYCONF_ENDPOINT"]
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.box = "ubuntu/xenial64"
 
   # Wire up the proxy if:
   #
@@ -136,7 +136,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if testing?
         app.vm.synced_folder ".", "/opt/app"
     else
-      app.vm.synced_folder ".", "/opt/app", type: CAC_SHARED_FOLDER_TYPE, mount_options: CAC_MOUNT_OPTIONS
+      app.vm.synced_folder ".", "/opt/app",
+        type: CAC_SHARED_FOLDER_TYPE,
+        mount_options: CAC_MOUNT_OPTIONS
     end
 
     # Web
