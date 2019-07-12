@@ -11,23 +11,3 @@ root_conf_dir: "/etc/cac_tripplanner.d"
 root_src_dir: "/opt/app/src"
 root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
-
-cac_python_dependencies:
-    - { name: 'base58', version: '1.0.3' }
-    - { name: 'boto', version: '2.49.0' }
-    - { name: 'django', version: '1.11.21' }
-    - { name: 'django-ckeditor', version: '5.7.1' }
-    - { name: 'django-image-cropping', version: '1.2.0' }
-    - { name: 'django-extensions', version: '1.9.9' }
-    - { name: 'django-storages', version: '1.7.1' }
-    - { name: 'easy-thumbnails', version: '2.6.0' }
-    - { name: 'gunicorn', version: '19.9.0' }
-    - { name: 'Pillow', version: '6.1.0' }
-    - { name: 'psycopg2-binary', version: '2.8.3' }
-    - { name: 'pytz', version: '2019.1' }
-    - { name: 'PyYAML', version: '5.1.1' }
-    - { name: 'requests', version: '2.22.0' }
-    - { name: 'troposphere', version: '1.8.1' }
-    - { name: 'majorkirby', version: '0.2.1' }
-    # Note: django-wpadmin is installed manually to work around the fact that ansible-pip
-    # ignores editable=False
