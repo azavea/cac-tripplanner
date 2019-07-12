@@ -1,0 +1,20 @@
+[Unit]
+Description = {{ gunicorn_app_name }}
+After = network-online.target
+
+[Service]
+PermissionsStartOnly = true
+User = {{ app_username }}
+Group = {{ app_username }}
+WorkingDirectory = {{ root_app_dir }}
+ExecStart = /usr/bin/env gunicorn --config {{ root_conf_dir }}/gunicorn.py --timeout {{ otp_session_timeout_s }} cac_tripplanner.wsgi
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+PrivateTmp = true
+StandardOutput = syslog
+StandardError = syslog
+SyslogIdentifier = {{ gunicorn_app_name }}
+
+[Install]
+WantedBy = network-online.target
+

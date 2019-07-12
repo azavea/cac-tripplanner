@@ -2,15 +2,16 @@
 # # Note bzip2 only installed here as workaround for unresolved but closed phantomjs
 # install issue: https://github.com/Medium/phantomjs/issues/659
 - name: Install packages
-  apt: name={{ item }} state=present
-  with_items:
-    - binutils
-    - bzip2
-    - gdal-bin
-    - libpq-dev
-    - libproj-dev
-    - python-dev
-    - libjpeg-dev
+  apt:
+    state: present
+    pkg:
+      - binutils
+      - bzip2
+      - gdal-bin
+      - libpq-dev
+      - libproj-dev
+      - python-dev
+      - libjpeg-dev
 
 - name: Install pip packages
   pip: requirements={{ root_app_dir }}/requirements.txt
@@ -40,15 +41,22 @@
 - name: Write secrets file
   template: src=cac_secrets.j2 dest=/etc/cac_secrets
   when: develop or production
-  notify: Restart cac-tripplanner-app
+  notify: Restart {{ gunicorn_app_name }}
 
 - name: Configure Gunicorn settings
   template: src=gunicorn-cac-tripplanner.py.j2 dest={{ root_conf_dir }}/gunicorn.py
-  notify: Restart cac-tripplanner-app
+  notify: Restart {{ gunicorn_app_name }}
 
 - name: Configure service definition
-  template: src=upstart-cac-tripplanner-app.conf.j2 dest=/etc/init/cac-tripplanner-app.conf
-  notify: Restart cac-tripplanner-app
+  template: src=systemd-{{ gunicorn_app_name }}.conf.j2
+            dest=/etc/systemd/system/{{ gunicorn_app_name }}.service
+  notify: Restart {{ gunicorn_app_name }}
+
+- name: Enable gunicorn service
+  systemd:
+    name: "{{ gunicorn_app_name }}.service"
+    enabled: yes
+    daemon_reload: yes
 
 - name: Copy media assets
   copy: src=../../python/cac_tripplanner/default_media
@@ -60,7 +68,7 @@
 - name: Run migrations
   django_manage: command=migrate
                  app_path="{{ root_app_dir }}"
-  notify: Restart cac-tripplanner-app
+  notify: Restart {{ gunicorn_app_name }}
   when: develop or test
 
 - name: Run collectstatic

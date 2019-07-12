@@ -6,6 +6,7 @@ app_sass_version: "3.4.22"
 
 app_log: "/var/log/cac-tripplanner-app.log"
 
+gunicorn_app_name: "cac-tripplanner-app"
 root_app_dir: "/opt/app/python/cac_tripplanner"
 root_conf_dir: "/etc/cac_tripplanner.d"
 root_src_dir: "/opt/app/src"
