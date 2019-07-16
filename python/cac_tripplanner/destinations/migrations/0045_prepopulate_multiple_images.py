@@ -47,6 +47,10 @@ def copy_default_images():
 def add_sample_images(apps, schema_editor):
     """ Add sample images to default destinations, and copy the images to the media dir """
 
+    # Only run in development
+    if not settings.DEBUG:
+        return
+
     copy_default_images()
 
     Destination = apps.get_model('destinations', 'Destination')
@@ -63,6 +67,11 @@ def add_sample_images(apps, schema_editor):
 
 def delete_sample_images(apps, schema_editor):
     """ Delete default destination images and delete default image dir """
+
+    # Only run in development
+    if not settings.DEBUG:
+        return
+
     Destination = apps.get_model('destinations', 'Destination')
     for destination in get_sample_destinations():
         try:

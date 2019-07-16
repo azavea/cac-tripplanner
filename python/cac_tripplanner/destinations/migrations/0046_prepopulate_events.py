@@ -53,6 +53,10 @@ def copy_default_images():
 def add_sample_events(apps, schema_editor):
     """ Add sample images to default destinations, and copy the images to the media dir """
 
+    # Only run in development
+    if not settings.DEBUG:
+        return
+
     copy_default_images()
 
     Destination = apps.get_model('destinations', 'Destination')
@@ -81,6 +85,11 @@ def add_sample_events(apps, schema_editor):
 
 
 def delete_sample_events(apps, schema_editor):
+
+    # Only run in development
+    if not settings.DEBUG:
+        return
+
     Event = apps.get_model('destinations', 'Event')
     for event in get_sample_events():
         try:
