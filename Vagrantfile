@@ -4,23 +4,6 @@
 Vagrant.require_version ">= 2.0"
 require "yaml"
 
-CAC_SHARED_FOLDER_TYPE = ENV.fetch("CAC_SHARED_FOLDER_TYPE", "nfs")
-CAC_NFS_VERSION =  ENV.fetch("CAC_NFS_VERSION_3", true) ? 'vers=3': 'vers=4'
-
-if CAC_SHARED_FOLDER_TYPE == "nfs"
-  if Vagrant::Util::Platform.linux? then
-    CAC_MOUNT_OPTIONS = ['rw', CAC_NFS_VERSION, 'tcp', 'nolock', 'actimeo=1']
-  else
-    CAC_MOUNT_OPTIONS = [CAC_NFS_VERSION, 'udp', 'actimeo=1']
-  end
-else
-  if ENV.has_key?("CAC_MOUNT_OPTIONS")
-    CAC_MOUNT_OPTIONS = ENV.fetch("CAC_MOUNT_OPTIONS").split
-  else
-    CAC_MOUNT_OPTIONS = ["rw"]
-  end
-end
-
 if ENV['CAC_TRIPPLANNER_MEMORY'].nil?
   # OpenTripPlanner needs > 1GB to build and run
   CAC_MEMORY_MB = "8192"
@@ -132,14 +115,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app" do |app|
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
-
-    if testing?
-        app.vm.synced_folder ".", "/opt/app"
-    else
-      app.vm.synced_folder ".", "/opt/app",
-        type: CAC_SHARED_FOLDER_TYPE,
-        mount_options: CAC_MOUNT_OPTIONS
-    end
+    app.vm.synced_folder ".", "/opt/app"
 
     # Web
     app.vm.network "forwarded_port", guest: 443, host: 8024
