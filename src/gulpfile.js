@@ -192,7 +192,6 @@ gulp.task('copy:vendor-css', function() {
                      'node_modules/spinkit/css/spinkit.css'])
         .pipe(concat('vendor.css'))
         .pipe(autoprefixer({
-            browsers: ['last 2 versions'],
             cascade: false
         }))
         .pipe(gulp.dest(stat.styles));
@@ -248,7 +247,7 @@ gulp.task('sass', function () {
         .pipe(plumber())
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
         .pipe(filterCSS)
-        .pipe(autoprefixer({browsers: ['last 2 versions'], cascade: false}))
+        .pipe(autoprefixer({cascade: false}))
         .pipe(filterCSS.restore)
         .pipe(gulp.dest(stat.styles));
 });

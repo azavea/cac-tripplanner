@@ -22,7 +22,7 @@ cac_python_dependencies:
     - { name: 'django-storages', version: '1.7.1' }
     - { name: 'easy-thumbnails', version: '2.6.0' }
     - { name: 'gunicorn', version: '19.9.0' }
-    - { name: 'Pillow', version: '6.0.0' }
+    - { name: 'Pillow', version: '6.1.0' }
     - { name: 'psycopg2-binary', version: '2.8.3' }
     - { name: 'pytz', version: '2019.1' }
     - { name: 'troposphere', version: '1.8.1' }
