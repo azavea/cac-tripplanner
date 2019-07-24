@@ -51,6 +51,13 @@
   template: src=upstart-cac-tripplanner-app.conf.j2 dest=/etc/init/cac-tripplanner-app.conf
   notify: Restart cac-tripplanner-app
 
+- name: Copy media assets
+  copy: src=../../python/cac_tripplanner/default_media
+        dest=/media/cac
+        owner={{ app_username }}
+        group={{ app_username }}
+  when: develop or test
+
 - name: Run migrations
   django_manage: command=migrate
                  app_path=/opt/app/python/cac_tripplanner
@@ -60,13 +67,6 @@
 - name: Run collectstatic
   django_manage: command=collectstatic
                  app_path=/opt/app/python/cac_tripplanner
-
-- name: Copy media assets
-  copy: src=../../python/cac_tripplanner/default_media
-        dest=/media/cac
-        owner={{ app_username }}
-        group={{ app_username }}
-  when: develop or test
 
 - name: Copy nginx config
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
