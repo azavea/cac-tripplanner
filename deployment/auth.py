@@ -7,6 +7,7 @@ import boto
 class AuthException(Exception):
     pass
 
+
 BOTO_CONFIG_TEMPLATE = """
 [default]
 aws_access_key_id = {aws_access_key_id}
@@ -26,7 +27,7 @@ def get_creds(aws_access_key_id, aws_secret_access_key, aws_role_arn):
                   "aws_secret_access_key": aws_secret_access_key}
     iam_conn = boto.connect_iam(**aws_config)
     sts_conn = boto.connect_sts(**aws_config)
-    username = input('Please provide AWS username: ')
+    username = raw_input('Please provide AWS username: ')
     mfa_devices = (iam_conn.get_all_mfa_devices(username)
                    ['list_mfa_devices_response']
                    ['list_mfa_devices_result']
@@ -39,7 +40,7 @@ def get_creds(aws_access_key_id, aws_secret_access_key, aws_role_arn):
         raise AuthException('Must have MFA device to get temporary credentials')
 
     mfa_serial_number = mfa_devices[0]['serial_number']
-    mfa_token = input('Please enter your 6 digit MFA token: ')
+    mfa_token = raw_input('Please enter your 6 digit MFA token: ')
 
     assumed_role = sts_conn.assume_role(
         role_arn=aws_role_arn,

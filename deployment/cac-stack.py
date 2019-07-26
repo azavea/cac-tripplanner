@@ -5,10 +5,10 @@ import argparse
 import os
 import sys
 
-from .cloudformation.stacks import build_stacks
-from .cloudformation.template_utils import get_config
-from .packer.cac_packer import run_packer
-from .auth import get_creds, write_creds, delete_creds
+from cloudformation.stacks import build_stacks
+from cloudformation.template_utils import get_config
+from packer.cac_packer import run_packer
+from auth import get_creds, write_creds, delete_creds
 
 
 file_dir = os.path.dirname(os.path.realpath(__file__))
