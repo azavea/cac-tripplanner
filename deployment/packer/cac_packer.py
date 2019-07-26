@@ -21,7 +21,7 @@ def get_ubuntu_ami(region, creds):
       creds (Dict): Dictionary containing AWS credentials
     """
 
-    response = urllib2.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
+    response = urllib.request.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
                                'server/released.current.txt').readlines()
     fieldnames = ['version', 'version_type', 'release_status', 'date',
                   'storage', 'arch', 'region', 'id', 'kernel',
@@ -56,7 +56,7 @@ def run_packer(machine_type, region, creds, aws_config):
         examples_path = os.path.join(ansible_roles_path, role_path, 'examples')
 
         if role_path.startswith('azavea') and os.path.isdir(examples_path):
-            print('Removing {}'.format(examples_path))
+            print(('Removing {}'.format(examples_path)))
             shutil.rmtree(examples_path)
 
     env = os.environ.copy()
@@ -78,5 +78,5 @@ def run_packer(machine_type, region, creds, aws_config):
 
     packer_command.append(packer_template_path)
 
-    print 'Running Packer Command: {}'.format(' '.join(packer_command))
+    print('Running Packer Command: {}'.format(' '.join(packer_command)))
     subprocess.check_call(packer_command, env=env)
