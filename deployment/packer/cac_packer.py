@@ -21,16 +21,21 @@ def get_ubuntu_ami(region, creds):
       creds (Dict): Dictionary containing AWS credentials
     """
 
-    conn = ec2.connect_to_region(region, **creds)
-    amis = conn.get_all_images(owners=[CANONICAL_ACCOUNT_ID], filters={
-        'name': 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*',
-        'architecture': 'x86_64',
-        'root-device-type': 'ebs',
-        'virtualization-type': 'hvm',
-    })
+    response = urllib2.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
+                               'server/released.current.txt').readlines()
+    fieldnames = ['version', 'version_type', 'release_status', 'date',
+                  'storage', 'arch', 'region', 'id', 'kernel',
+                  'unknown_col', 'virtualization_type']
+    reader = csv.DictReader(response, fieldnames=fieldnames, delimiter='\t')
 
-    amis = sorted(amis, key=lambda ami: ami.creationDate, reverse=True)
+    def ami_filter(ami):
+        """Helper function to filter AMIs"""
+        return (ami['region'] == region and
+                ami['arch'] == 'amd64' and
+                ami['storage'] == 'ebs-ssd' and
+                ami['virtualization_type'] == 'hvm')
 
+    amis = [row for row in reader if ami_filter(row)]
     if len(amis) == 0:
         raise CacStackException('Did not find any ubuntu AMIs to use')
     return amis[0].id

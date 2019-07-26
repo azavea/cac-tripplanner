@@ -1,6 +1,10 @@
 ---
 - name: Install pytz
-  pip: name=pytz
+  pip:
+    name: pytz
+    executable: pip2
 
 - name: Install transitfeed
-  pip: name='git+https://github.com/google/transitfeed@1.2.15#egg=transitfeed'
+  pip:
+    name: 'git+https://github.com/google/transitfeed@1.2.15#egg=transitfeed'
+    executable: pip2

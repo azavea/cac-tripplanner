@@ -1,17 +1,18 @@
 ---
 - name: Install PostGIS build dependencies
-  apt: pkg="{{ item }}" state=present
-  with_items: 
-    - build-essential
-    - libgeos-dev
-    - libgdal-dev
-    - libproj-dev
-    - libjson0-dev
-    - libxml2-dev
-    - libxml2-utils
-    - xsltproc
-    - docbook-xsl
-    - docbook-mathml
+  apt:
+    state: present
+    pkg:
+      - build-essential
+      - libgeos-dev
+      - libgdal-dev
+      - libproj-dev
+      - libjson0-dev
+      - libxml2-dev
+      - libxml2-utils
+      - xsltproc
+      - docbook-xsl
+      - docbook-mathml
 
 - name: Download PostGIS source tarball
   unarchive: |
