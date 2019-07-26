@@ -15,8 +15,8 @@ import troposphere.autoscaling as asg
 import troposphere.elasticloadbalancing as elb
 import troposphere.cloudwatch as cw
 
-from utils.cfn import get_availability_zones
-from utils.constants import (
+from .utils.cfn import get_availability_zones
+from .utils.constants import (
     ALLOW_ALL_CIDR,
     EC2_INSTANCE_TYPES,
     VPC_CIDR,

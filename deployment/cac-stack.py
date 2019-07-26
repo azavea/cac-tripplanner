@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Commands for building AMIs and setting up CAC TripPlanner stacks on AWS"""
 import argparse

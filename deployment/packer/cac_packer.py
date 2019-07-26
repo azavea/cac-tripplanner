@@ -4,7 +4,7 @@ import csv
 import os
 import subprocess
 import shutil
-import urllib
+import urllib.request as urllib
 
 CANONICAL_ACCOUNT_ID = '099720109477'
 
@@ -21,8 +21,9 @@ def get_ubuntu_ami(region, creds):
       creds (Dict): Dictionary containing AWS credentials
     """
 
-    response = urllib.request.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
-                                      'server/released.current.txt').readlines()
+    response = urllib.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
+                              'server/released.current.txt').readlines()
+    response = [x.decode('utf-8') for x in response]
     fieldnames = ['version', 'version_type', 'release_status', 'date',
                   'storage', 'arch', 'region', 'id', 'kernel',
                   'unknown_col', 'virtualization_type']
@@ -38,7 +39,7 @@ def get_ubuntu_ami(region, creds):
     amis = [row for row in reader if ami_filter(row)]
     if len(amis) == 0:
         raise CacStackException('Did not find any ubuntu AMIs to use')
-    return amis[0].id
+    return amis[0]['id']
 
 
 def run_packer(machine_type, region, creds, aws_config):

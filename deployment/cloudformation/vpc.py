@@ -9,8 +9,8 @@ from troposphere import (
     Join
 )
 
-from utils.cfn import get_availability_zones
-from utils.constants import (
+from .utils.cfn import get_availability_zones
+from .utils.constants import (
     ALLOW_ALL_CIDR,
     EC2_INSTANCE_TYPES,
     GRAPHITE_PORT,
@@ -141,10 +141,10 @@ class VPC(StackNode):
                         Value=','.join(self.default_app_server_azs)))
         self.add_output(Output('DefaultAppServerPrivateSubnets',
                                Description='List of subnet ids for App Servers',
-                               Value=Join(',', map(Ref, self.default_app_server_private_subnets))))
+                               Value=Join(',', list(map(Ref, self.default_app_server_private_subnets)))))
         self.add_output(Output('DefaultAppServerPublicSubnets',
                                Description='List of Subnet Ids for App servers',
-                               Value=Join(',', map(Ref, self.default_app_server_public_subnets))))
+                               Value=Join(',', list(map(Ref, self.default_app_server_public_subnets)))))
 
     def create_vpc(self):
         """Creates a VPC template and returns the JSON string for that CloudFormation Template
@@ -228,7 +228,7 @@ class VPC(StackNode):
             public_subnet = self.create_resource(ec2.Subnet(
                 public_subnet_name,
                 VpcId=Ref(self.vpc),
-                CidrBlock=cidr_generator.next(),
+                CidrBlock=next(cidr_generator),
                 AvailabilityZone=availability_zone.name,
                 Tags=self.get_tags(Name=public_subnet_name)
             ), output=public_subnet_name)
@@ -243,7 +243,7 @@ class VPC(StackNode):
             private_subnet = self.create_resource(ec2.Subnet(
                 private_subnet_name,
                 VpcId=Ref(self.vpc),
-                CidrBlock=cidr_generator.next(),
+                CidrBlock=next(cidr_generator),
                 AvailabilityZone=availability_zone.name,
                 Tags=self.get_tags(Name=private_subnet_name)
                 ), output=private_subnet_name)
