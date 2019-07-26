@@ -58,6 +58,11 @@
     enabled: yes
     daemon_reload: yes
 
+- name: Enable nginx service
+  systemd:
+    name: "nginx.service"
+    enabled: yes
+
 - name: Copy media assets
   copy: src=../../python/cac_tripplanner/default_media
         dest=/media/cac
