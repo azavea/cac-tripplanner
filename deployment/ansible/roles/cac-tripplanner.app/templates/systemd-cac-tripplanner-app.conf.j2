@@ -16,5 +16,8 @@ StandardError = syslog
 SyslogIdentifier = {{ gunicorn_app_name }}
 
 [Install]
+{% if develop or test -%}
+WantedBy = opt-app.mount
+{% else %}
 WantedBy = network-online.target
-
+{% endif %}
