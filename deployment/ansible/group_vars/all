@@ -14,9 +14,9 @@ packer_version: "1.0.2"
 python_version: "2.7.*"
 
 nodejs_version: 10.16.0
-nodejs_npm_version: 6.9.0
+nodejs_npm_version: 6.10.2
 
-pip_version: 19.1.*
+pip_version: 19.2.*
 virtualenv_version: 16.5.0
 
 otp_router: "default"
