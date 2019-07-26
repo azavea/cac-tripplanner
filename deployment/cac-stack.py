@@ -5,10 +5,10 @@ import argparse
 import os
 import sys
 
-from cloudformation.stacks import build_stacks
-from cloudformation.template_utils import get_config
-from packer.cac_packer import run_packer
-from auth import get_creds, write_creds, delete_creds
+from .cloudformation.stacks import build_stacks
+from .cloudformation.template_utils import get_config
+from .packer.cac_packer import run_packer
+from .auth import get_creds, write_creds, delete_creds
 
 
 file_dir = os.path.dirname(os.path.realpath(__file__))
@@ -65,7 +65,7 @@ def main():
         # There is a bug in Packer that makes it so the only way to successfully build
         # an AMI using MFA tokens is to not have the ~/.aws/credentials file, and instead
         # specify the parameters via environment variables.
-        print "Please delete your ~/.aws/credentials and try again"
+        print("Please delete your ~/.aws/credentials and try again")
         sys.exit(1)
 
     parser = argparse.ArgumentParser()
