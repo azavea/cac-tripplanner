@@ -1,10 +1,10 @@
 """Helper stuff to deal with packer"""
 
+import csv
 import os
 import subprocess
 import shutil
-
-from boto import ec2
+import urllib
 
 CANONICAL_ACCOUNT_ID = '099720109477'
 
@@ -22,7 +22,7 @@ def get_ubuntu_ami(region, creds):
     """
 
     response = urllib.request.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
-                               'server/released.current.txt').readlines()
+                                      'server/released.current.txt').readlines()
     fieldnames = ['version', 'version_type', 'release_status', 'date',
                   'storage', 'arch', 'region', 'id', 'kernel',
                   'unknown_col', 'virtualization_type']
