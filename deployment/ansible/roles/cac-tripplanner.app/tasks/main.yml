@@ -14,16 +14,11 @@
       - python3-pip
       - libjpeg-dev
 
+- name: Install pip packages to python3 for deployment
+  pip: requirements={{ root_app_dir }}/deployment_requirements.txt executable=/usr/bin/pip3
+
 - name: Install pip packages
   pip: requirements={{ root_app_dir }}/requirements.txt
-
-- name: Install pip packages to python3 for deployment
-  pip: requirements={{ root_app_dir }}/requirements.txt executable=/usr/bin/pip3
-
-  # Putting 'editable: false' in the entry in cac_python_dependencies should make it install
-  # non-editable, but it's getting ignored
-- name: Install django-wpadmin manually to work around ansible bug
-  command: pip install --upgrade 'git+https://github.com/azavea/django-wpadmin@v1.11#egg=django-wpadmin'
 
 - name: Touch log file and set permissions
   file: path={{ app_log }} state=touch owner={{ app_username }} group={{ app_username }} mode=0664
