@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Commands for building AMIs and setting up CAC TripPlanner stacks on AWS"""
 import argparse
@@ -65,7 +65,7 @@ def main():
         # There is a bug in Packer that makes it so the only way to successfully build
         # an AMI using MFA tokens is to not have the ~/.aws/credentials file, and instead
         # specify the parameters via environment variables.
-        print "Please delete your ~/.aws/credentials and try again"
+        print("Please delete your ~/.aws/credentials and try again")
         sys.exit(1)
 
     parser = argparse.ArgumentParser()

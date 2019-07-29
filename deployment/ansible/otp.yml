@@ -7,4 +7,4 @@
       apt: update_cache=yes
 
   roles:
-    - { role: "cac-tripplanner.otp-data"}
+    - {role: "cac-tripplanner.otp-data"}
