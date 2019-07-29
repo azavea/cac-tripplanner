@@ -69,7 +69,7 @@ def write_creds(creds, force):
     if os.path.isfile(boto_config_path) and not force:
         raise AuthException('Must use --force option to replace existing boto config')
 
-    with open(boto_config_path, 'wb') as fh:
+    with open(boto_config_path, 'w') as fh:
         boto_config = BOTO_CONFIG_TEMPLATE.format(
             aws_access_key_id=creds['aws_access_key_id'],
             aws_secret_access_key=creds['aws_secret_access_key'],
