@@ -1,12 +1,12 @@
 from majorkirby import GlobalConfigNode
 
-from vpc import VPC
-from data import DataPlaneGenerator
-from app import (
+from .vpc import VPC
+from .data import DataPlaneGenerator
+from .app import (
     OtpServerStack,
     WebServerStack
 )
-from privatehostedzone import R53PrivateHostedZone
+from .privatehostedzone import R53PrivateHostedZone
 
 
 stack_types = {

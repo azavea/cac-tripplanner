@@ -11,7 +11,7 @@ from troposphere import (
     route53
 )
 
-from utils.constants import RDS_INSTANCE_TYPES
+from .utils.constants import RDS_INSTANCE_TYPES
 
 from majorkirby import StackNode
 

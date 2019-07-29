@@ -1,10 +1,10 @@
 """Helper stuff to deal with packer"""
 
+import csv
 import os
 import subprocess
 import shutil
-
-from boto import ec2
+import urllib.request as urllib
 
 CANONICAL_ACCOUNT_ID = '099720109477'
 
@@ -21,8 +21,9 @@ def get_ubuntu_ami(region, creds):
       creds (Dict): Dictionary containing AWS credentials
     """
 
-    response = urllib2.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
-                               'server/released.current.txt').readlines()
+    response = urllib.urlopen('http://cloud-images.ubuntu.com/query/xenial/'
+                              'server/released.current.txt').readlines()
+    response = [x.decode('utf-8') for x in response]
     fieldnames = ['version', 'version_type', 'release_status', 'date',
                   'storage', 'arch', 'region', 'id', 'kernel',
                   'unknown_col', 'virtualization_type']
@@ -38,7 +39,7 @@ def get_ubuntu_ami(region, creds):
     amis = [row for row in reader if ami_filter(row)]
     if len(amis) == 0:
         raise CacStackException('Did not find any ubuntu AMIs to use')
-    return amis[0].id
+    return amis[0]['id']
 
 
 def run_packer(machine_type, region, creds, aws_config):
@@ -56,7 +57,7 @@ def run_packer(machine_type, region, creds, aws_config):
         examples_path = os.path.join(ansible_roles_path, role_path, 'examples')
 
         if role_path.startswith('azavea') and os.path.isdir(examples_path):
-            print('Removing {}'.format(examples_path))
+            print(('Removing {}'.format(examples_path)))
             shutil.rmtree(examples_path)
 
     env = os.environ.copy()
@@ -78,5 +79,5 @@ def run_packer(machine_type, region, creds, aws_config):
 
     packer_command.append(packer_template_path)
 
-    print 'Running Packer Command: {}'.format(' '.join(packer_command))
+    print('Running Packer Command: {}'.format(' '.join(packer_command)))
     subprocess.check_call(packer_command, env=env)
