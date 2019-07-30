@@ -35,9 +35,9 @@ class EventForm(DestinationForm):
 
     def __init__(self, *args, **kwargs):
         super(EventForm, self).__init__(*args, **kwargs)
-        self.fields['destination'].widget.can_delete_related = False
-        self.fields['destination'].widget.can_add_related = False
-        self.fields['destination'].widget.can_change_related = False
+        self.fields['destinations'].widget.can_delete_related = False
+        self.fields['destinations'].widget.can_add_related = False
+        self.fields['destinations'].widget.can_change_related = False
 
     def clean(self):
         """Validate start date is less than end date"""
