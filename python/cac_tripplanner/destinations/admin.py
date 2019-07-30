@@ -82,7 +82,7 @@ class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
 
     fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
               'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
-              'start_date', 'end_date', 'destination')
+              'start_date', 'end_date', 'destinations')
     list_display = ('name', 'published', 'priority', )
     actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )
