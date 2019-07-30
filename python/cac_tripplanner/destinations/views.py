@@ -258,11 +258,13 @@ def set_event_properties(event):
 
     extra_images = ExtraEventPicture.objects.filter(event=event)
     obj = set_attraction_properties(obj, event, extra_images)
-    # add properties of related destination, if any
-    obj = set_location_properties(obj, event.destination)
+    # add properties of first related destination, if any
+    obj = set_location_properties(obj, event.destinations.first())
 
-    # if related destination belongs to Watershed Alliance, so does this event
-    obj['watershed_alliance'] = event.destination.watershed_alliance if event.destination else False
+    obj['destinations'] = [set_destination_properties(x) for x in event.destinations.all()]
+
+    # if the first related destination belongs to Watershed Alliance, so does this event
+    obj['watershed_alliance'] = event.destinations.first().watershed_alliance if event.destinations.count() else False
     return obj
 
 
