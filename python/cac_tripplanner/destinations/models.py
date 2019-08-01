@@ -163,8 +163,6 @@ class Destination(Attraction):
     city = models.CharField(max_length=40, default='Philadelphia')
     state = models.CharField(max_length=20, default='PA')
     zipcode = models.CharField(max_length=5, null=True)
-    event_only = models.BooleanField(default=False, help_text="""
-        Should this location only appear with its associated event(s)?""")
 
     # In the admin interface, display the address right above the map, since it triggers geocoding
     address = models.CharField(max_length=40, null=True,

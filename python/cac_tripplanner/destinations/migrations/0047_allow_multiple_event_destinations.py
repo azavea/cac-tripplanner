@@ -36,11 +36,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='destination',
-            name='event_only',
-            field=models.BooleanField(default=False, help_text=b'\n        Should this location only appear with its associated event(s)?'),
-        ),
-        migrations.AddField(
             model_name='event',
             name='destinations',
             field=models.ManyToManyField(blank=True, to='destinations.Destination'),
