@@ -1,8 +1,13 @@
+import logging
+
 from django.forms import ModelForm, ValidationError
 
 from cac_tripplanner.image_utils import validate_image
 
-from .models import Destination, Event, NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS
+from .models import (Destination, Event, Tour, TourDestination,
+                     NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS)
+
+logger = logging.getLogger(__name__)
 
 
 class ExtraImagesForm(ModelForm):
@@ -49,3 +54,17 @@ class EventForm(DestinationForm):
             self.add_error('start_date', ValidationError('Start date must be before end date.'))
 
         return cleaned_data
+
+
+class TourDestinationForm(ModelForm):
+
+    class Meta:
+        model = TourDestination
+        exclude = []
+
+
+class TourForm(ModelForm):
+
+    class Meta:
+        model = Tour
+        exclude = ['destinations']
