@@ -1,15 +1,21 @@
+import logging
+
 from django.conf import settings
 from django.contrib import admin, gis
 
 from image_cropping import ImageCroppingMixin
 
-from .forms import DestinationForm, EventForm, ExtraImagesForm
+from .forms import DestinationForm, EventForm, ExtraImagesForm, TourDestinationForm, TourForm
 from .models import (Destination,
                      DestinationUserFlags,
                      Event,
                      EventUserFlags,
                      ExtraDestinationPicture,
-                     ExtraEventPicture)
+                     ExtraEventPicture,
+                     TourDestination,
+                     Tour)
+
+logger = logging.getLogger(__name__)
 
 
 class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
@@ -26,6 +32,13 @@ class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
     list_display = ('image', 'wide_image', 'image_raw')
     model = ExtraEventPicture
     extra = 0
+
+
+class TourDestinationsInline(admin.StackedInline):
+
+    form = TourDestinationForm
+    model = TourDestination
+    extra = 1
 
 
 class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
@@ -113,8 +126,27 @@ class AttractionUserFlagsAdmin(admin.ModelAdmin):
         return False  # hide 'delete' button
 
 
+class TourAdmin(admin.ModelAdmin):
+
+    form = TourForm
+    inlines = [TourDestinationsInline]
+    list_display = ('name', 'start_date', 'end_date', 'published')
+    ordering = ('name',)
+    actions = ('make_published', 'make_unpublished', )
+
+    def make_published(self, request, queryset):
+        queryset.update(published=True)
+    make_published.short_description = 'Publish selected tours'
+
+    def make_unpublished(self, request, queryset):
+        queryset.update(published=False)
+    make_unpublished.short_description = 'Unpublish selected tours'
+
+
 admin.site.register(Destination, DestinationAdmin)
 admin.site.register(Event, EventAdmin)
 
 admin.site.register(DestinationUserFlags, AttractionUserFlagsAdmin)
 admin.site.register(EventUserFlags, AttractionUserFlagsAdmin)
+
+admin.site.register(Tour, TourAdmin)
