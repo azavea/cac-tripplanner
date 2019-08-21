@@ -296,3 +296,34 @@ class EventUserFlags(Event):
     def not_interested(self):
         return self.not_interested
     not_interested.admin_order_field = 'not_interested'
+
+
+class TourDestination(models.Model):
+
+    class Meta:
+        ordering = ['order', ]
+
+    destination = models.ForeignKey('Destination',
+                                    on_delete=models.CASCADE,
+                                    related_name='tour_destination')
+    related_tour = models.ForeignKey('Tour',
+                                     on_delete=models.CASCADE,
+                                     related_name='related_tour')
+    order = models.PositiveIntegerField(default=1, null=False, db_index=True)
+
+
+class Tour(models.Model):
+
+    class Meta:
+        ordering = ['-start_date', 'name']
+
+    name = models.CharField(max_length=50, unique=True)
+    destinations = models.ManyToManyField('TourDestination')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    published = models.BooleanField(default=False)
+
+    objects = DestinationManager()
+
+    def __unicode__(self):
+        return self.name
