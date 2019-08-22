@@ -132,7 +132,7 @@ class TourAdmin(admin.ModelAdmin):
     form = TourForm
     inlines = [TourDestinationsInline]
     list_display = ('name', 'start_date', 'end_date', 'published')
-    ordering = ('name',)
+    ordering = ('name', )
     actions = ('make_published', 'make_unpublished', )
 
     def make_published(self, request, queryset):

@@ -62,6 +62,17 @@ class TourDestinationForm(ModelForm):
         model = TourDestination
         exclude = []
 
+    def __init__(self, *args, **kwargs):
+        """Autoincrement the 'order' number for first new tour destination added."""
+        prefix = kwargs['prefix'][len(kwargs['prefix']) - 1:] if 'prefix' in kwargs else ''
+        order = int(prefix) + 1 if prefix.isnumeric() else 0
+
+        if 'instance' not in kwargs and order:
+            if 'initial' not in kwargs:
+                kwargs['initial'] = {}
+            kwargs['initial'].update({'order': order})
+        return super(TourDestinationForm, self).__init__(*args, **kwargs)
+
 
 class TourForm(ModelForm):
 
