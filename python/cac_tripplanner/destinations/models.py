@@ -301,27 +301,26 @@ class EventUserFlags(Event):
 class TourDestination(models.Model):
 
     class Meta:
-        ordering = ['order', ]
+        ordering = ['order', '-start_date']
 
-    destination = models.ForeignKey('Destination',
-                                    on_delete=models.CASCADE,
-                                    unique=True,
-                                    related_name='tour_destination')
+    destination = models.OneToOneField('Destination',
+                                       on_delete=models.CASCADE,
+                                       related_name='tour_destination')
     related_tour = models.ForeignKey('Tour',
                                      on_delete=models.CASCADE,
                                      related_name='related_tour')
     order = models.PositiveIntegerField(default=1, null=False, db_index=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
 
 
 class Tour(models.Model):
 
     class Meta:
-        ordering = ['-start_date', 'name']
+        ordering = ['name']
 
     name = models.CharField(max_length=50, unique=True)
     destinations = models.ManyToManyField('TourDestination')
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()

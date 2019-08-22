@@ -73,6 +73,17 @@ class TourDestinationForm(ModelForm):
             kwargs['initial'].update({'order': order})
         return super(TourDestinationForm, self).__init__(*args, **kwargs)
 
+    def clean(self):
+        """Validate start date is less than end date"""
+        cleaned_data = super(TourDestinationForm, self).clean()
+        start = self.cleaned_data.get('start_date')
+        end = self.cleaned_data.get('end_date')
+
+        if start and end and start >= end:
+            self.add_error('start_date', ValidationError('Start date must be before end date.'))
+
+        return cleaned_data
+
 
 class TourForm(ModelForm):
 
