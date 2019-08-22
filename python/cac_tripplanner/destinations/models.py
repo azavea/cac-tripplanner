@@ -302,10 +302,11 @@ class TourDestination(models.Model):
 
     class Meta:
         ordering = ['order', '-start_date']
+        unique_together = [['destination', 'related_tour'], ['related_tour', 'order']]
 
-    destination = models.OneToOneField('Destination',
-                                       on_delete=models.CASCADE,
-                                       related_name='tour_destination')
+    destination = models.ForeignKey('Destination',
+                                    on_delete=models.CASCADE,
+                                    related_name='tour_destination')
     related_tour = models.ForeignKey('Tour',
                                      on_delete=models.CASCADE,
                                      related_name='related_tour')
