@@ -305,6 +305,7 @@ class TourDestination(models.Model):
 
     destination = models.ForeignKey('Destination',
                                     on_delete=models.CASCADE,
+                                    unique=True,
                                     related_name='tour_destination')
     related_tour = models.ForeignKey('Tour',
                                      on_delete=models.CASCADE,
