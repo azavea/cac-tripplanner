@@ -13,3 +13,4 @@ pytz==2019.1
 PyYAML==5.1.2
 requests==2.22.0
 git+https://github.com/azavea/django-wpadmin@v1.11#egg=django-wpadmin
+virtualenv==16.7.4

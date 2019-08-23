@@ -5,4 +5,4 @@
     - { role: "azavea.nodejs" }
     - { role: "azavea.packer" }
     - { role: "cac-tripplanner.papertrail", when: production }
-    - { role: "azavea.virtualenv" }
+    - { role: "cac-tripplanner.python3" }

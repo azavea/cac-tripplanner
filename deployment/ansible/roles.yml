@@ -19,9 +19,6 @@
 - src: azavea.python
   version: 0.1.0
 
-- src: azavea.virtualenv
-  version: 0.1.0
-
 - src: azavea.postgresql-support
   version: 0.4.0
 
