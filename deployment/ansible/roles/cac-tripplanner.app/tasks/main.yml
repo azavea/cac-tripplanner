@@ -12,15 +12,13 @@
       - gdal-bin
       - libpq-dev
       - libproj-dev
-      - python-dev
-      - python3-pip
       - libjpeg-dev
 
-- name: Install pip packages to python3 for deployment
+- name: Install pip packages for deployment
   pip: requirements={{ root_app_dir }}/deployment_requirements.txt executable=/usr/bin/pip3
 
-- name: Install pip packages
-  pip: requirements={{ root_app_dir }}/requirements.txt
+- name: Install pip packages for app
+  pip: requirements={{ root_app_dir }}/requirements.txt executable=/usr/bin/pip3
 
 - name: Touch log file and set permissions
   file: path={{ app_log }} state=touch owner={{ app_username }} group={{ app_username }} mode=0664
