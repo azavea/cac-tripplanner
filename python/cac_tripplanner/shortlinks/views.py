@@ -8,7 +8,7 @@ from django.views.generic.base import RedirectView
 
 from .forms import ShortenedLinkForm
 from .models import ShortenedLink, ShortenedLinkHit
-from shortener import LinkShortener
+from .shortener import LinkShortener
 
 
 class ShortenedLinkRedirectView(RedirectView):
