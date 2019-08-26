@@ -47,7 +47,7 @@ class DestinationCategory(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -59,7 +59,7 @@ class Activity(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -101,7 +101,7 @@ class UserFlag(models.Model):
             models.Index(fields=['user_uuid', 'historic', 'object_id', 'is_event']),
         ]
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0} flagged: {1}".format(self.attraction.name, self.flag)
 
 
@@ -177,7 +177,7 @@ class Destination(Attraction):
 
     objects = DestinationManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -194,7 +194,7 @@ class Event(Attraction):
 
     objects = EventManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -211,7 +211,7 @@ class ExtraImage(models.Model):
                                  help_text='Image will be displayed at ' +
                                  WIDE_IMAGE_DIMENSION_STRING)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.image_raw.url if self.image_raw else ''
 
 
