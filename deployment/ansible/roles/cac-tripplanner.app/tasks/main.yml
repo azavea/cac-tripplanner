@@ -1,12 +1,9 @@
 ---
-# # Note bzip2 only installed here as workaround for unresolved but closed phantomjs
-# install issue: https://github.com/Medium/phantomjs/issues/659
 - name: Install packages
   apt:
     state: present
     pkg:
       - binutils
-      - bzip2
       - chromium-browser
       - g++
       - gdal-bin
