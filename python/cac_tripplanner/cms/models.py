@@ -69,7 +69,7 @@ class AboutFaq(models.Model):
         """About and FAQ pages are always published"""
         return True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -121,5 +121,5 @@ class Article(models.Model):
     profiles = CommunityProfileManager()
     tips = TipsAndTricksManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
