@@ -62,7 +62,7 @@ class ShortenedLinkFormTestCase(TestCase):
 
     def test_good_data(self):
         data = {'destination': self.goodLink,
-                'key': LinkShortener().generate_key(self.goodLink),
+                'key': str(LinkShortener().generate_key(self.goodLink)),
                 'is_public': 'false'}
         form = ShortenedLinkForm(data)
         self.assertTrue(form.is_valid())
@@ -144,7 +144,7 @@ class ShortenedLinkRedirectTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         # Make sure the long link location is the same one we shortened.
         scheme, netloc, path, params, query, fragment = urllib.parse.urlparse(response['Location'])
-        long_path = urllib.parse.urlunparse((None, None, path, params, query, fragment,))
+        long_path = urllib.parse.urlunparse(('', '', path, params, query, fragment,))
         # There are certain values of self.path for which this would not be
         # true, for example, if path is '/?', urlunparse will return '/'.
         self.assertEqual(long_path, self.path)
