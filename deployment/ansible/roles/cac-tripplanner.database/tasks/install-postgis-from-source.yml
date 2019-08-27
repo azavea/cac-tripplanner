@@ -7,7 +7,7 @@
       - libgeos-dev
       - libgdal-dev
       - libproj-dev
-      - libjson0-dev
+      - libjson-c-dev
       - libxml2-dev
       - libxml2-utils
       - xsltproc

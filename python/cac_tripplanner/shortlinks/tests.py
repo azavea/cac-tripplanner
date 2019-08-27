@@ -1,5 +1,5 @@
 import json
-import urlparse
+import urllib.parse
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client, override_settings
@@ -62,7 +62,7 @@ class ShortenedLinkFormTestCase(TestCase):
 
     def test_good_data(self):
         data = {'destination': self.goodLink,
-                'key': LinkShortener().generate_key(self.goodLink),
+                'key': str(LinkShortener().generate_key(self.goodLink)),
                 'is_public': 'false'}
         form = ShortenedLinkForm(data)
         self.assertTrue(form.is_valid())
@@ -109,7 +109,7 @@ class ShortenedLinkViewsTestCase(TestCase):
         # This will throw an error if it fails; this is to make sure that the
         # URL resolution is fully working since the redirect method will return a
         # 404 if it is given a bad key.
-        reverse('dereference-shortened', kwargs={'key': u'CMBOzqQbSPq25N29BTD54w'})
+        reverse('dereference-shortened', kwargs={'key': 'CMBOzqQbSPq25N29BTD54w'})
 
 
 class ShortenedLinkCreateTestCase(TestCase):
@@ -137,14 +137,14 @@ class ShortenedLinkRedirectTestCase(TestCase):
         data = json.loads(self.client.post('/link/shorten/',
                                            data=json.dumps({'destination': self.path}),
                                            content_type='application/json').content)
-        short_path = urlparse.urlparse(data['shortenedUrl']).path
+        short_path = urllib.parse.urlparse(data['shortenedUrl']).path
         # Navigate to the short link
         response = self.client.get(short_path)
         # Make sure it's found
         self.assertEqual(response.status_code, 302)
         # Make sure the long link location is the same one we shortened.
-        scheme, netloc, path, params, query, fragment = urlparse.urlparse(response['Location'])
-        long_path = urlparse.urlunparse((None, None, path, params, query, fragment,))
+        scheme, netloc, path, params, query, fragment = urllib.parse.urlparse(response['Location'])
+        long_path = urllib.parse.urlunparse(('', '', path, params, query, fragment,))
         # There are certain values of self.path for which this would not be
         # true, for example, if path is '/?', urlunparse will return '/'.
         self.assertEqual(long_path, self.path)

@@ -11,6 +11,7 @@ postgres_host: "192.168.8.25"
 
 packer_version: "1.0.2"
 
+# Python 2 version used where python 2 interpreter needed
 python_version: "2.7.*"
 
 nodejs_version: 10.16.0

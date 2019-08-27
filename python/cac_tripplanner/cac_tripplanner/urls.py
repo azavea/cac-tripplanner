@@ -7,7 +7,7 @@ from django.contrib.staticfiles import views as staticviews
 from cms import views as cms_views
 from destinations import views as dest_views
 
-import settings
+from django.conf import settings
 
 urlpatterns = [
     # Home view, which is also the directions and explore views

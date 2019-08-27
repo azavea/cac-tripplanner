@@ -2,9 +2,6 @@
 - name: Create Directory for OSM and GTFS
   file: path={{ otp_data_dir }} state=directory owner={{ otp_user }}
 
-- name: Copy Feed Validator
-  copy: src=validate_feed.py dest="{{ otp_data_dir }}"
-
 - name: Install AuthBind (for serving OTP on port 80)
   apt: pkg=authbind state=present
 

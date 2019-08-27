@@ -1,3 +1,6 @@
 ---
 bikeshare_update_interval_s: 120
 bikeshare_update_url: 'https://gbfs.bcycle.com/bcycle_indego/'
+
+# Use python 3 on OTP VM
+ansible_python_interpreter: "/usr/bin/python3"

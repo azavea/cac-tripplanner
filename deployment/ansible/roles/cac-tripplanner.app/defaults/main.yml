@@ -2,6 +2,9 @@
 django_workers: 5
 production: False
 
+# Use python 3 on app VM
+ansible_python_interpreter: "/usr/bin/python3"
+
 app_sass_version: "3.4.22"
 
 app_log: "/var/log/cac-tripplanner-app.log"
