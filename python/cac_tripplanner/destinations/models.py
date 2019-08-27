@@ -302,7 +302,7 @@ class TourDestination(models.Model):
 
     class Meta:
         ordering = ['order', '-start_date']
-        unique_together = [['destination', 'related_tour'], ['related_tour', 'order']]
+        unique_together = [['destination', 'related_tour']]
 
     destination = models.ForeignKey('Destination',
                                     on_delete=models.CASCADE,
