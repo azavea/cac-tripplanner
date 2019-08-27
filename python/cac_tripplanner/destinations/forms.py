@@ -67,7 +67,7 @@ class TourDestinationForm(ModelForm):
         prefix = kwargs['prefix'][len(kwargs['prefix']) - 1:] if 'prefix' in kwargs else ''
         order = int(prefix) + 1 if prefix.isnumeric() else 0
 
-        if 'instance' not in kwargs and order:
+        if 'instance' not in kwargs and order > 0:
             if 'initial' not in kwargs:
                 kwargs['initial'] = {}
             kwargs['initial'].update({'order': order})
