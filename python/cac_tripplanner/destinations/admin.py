@@ -6,6 +6,8 @@ from django.contrib import admin, gis
 
 from image_cropping import ImageCroppingMixin
 
+from cac_tripplanner.publish_utils import PublishableMixin
+
 from .forms import DestinationForm, EventForm, ExtraImagesForm, TourDestinationForm, TourForm
 from .models import (Destination,
                      DestinationUserFlags,
@@ -42,11 +44,10 @@ class TourDestinationsInline(admin.StackedInline):
     extra = 1
 
 
-class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
+class DestinationAdmin(ImageCroppingMixin, PublishableMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
 
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
-    actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
     """To change field display order, define them all here.
     Default is order defined in model, but due to inheritance, cannot reorder across
@@ -83,34 +84,17 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
             '/static/scripts/main.js'
         ]
 
-    def make_published(self, request, queryset):
-        queryset.update(published=True)
-    make_published.short_description = 'Publish selected destinations'
 
-    def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
-    make_unpublished.short_description = 'Unpublish selected destinations'
-
-
-class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
+class EventAdmin(ImageCroppingMixin, PublishableMixin, admin.ModelAdmin):
     form = EventForm
 
     fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
               'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
               'start_date', 'end_date', 'destinations')
     list_display = ('name', 'published', 'priority', )
-    actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )
 
     inlines = [ExtraEventImagesInline]
-
-    def make_published(self, request, queryset):
-        queryset.update(published=True)
-    make_published.short_description = 'Publish selected events'
-
-    def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
-    make_unpublished.short_description = 'Unpublish selected events'
 
 
 class AttractionUserFlagsAdmin(admin.ModelAdmin):
@@ -128,21 +112,12 @@ class AttractionUserFlagsAdmin(admin.ModelAdmin):
         return False  # hide 'delete' button
 
 
-class TourAdmin(admin.ModelAdmin):
+class TourAdmin(PublishableMixin, admin.ModelAdmin):
 
     form = TourForm
     inlines = [TourDestinationsInline]
     list_display = ('name', 'published')
     ordering = ('name', )
-    actions = ('make_published', 'make_unpublished', )
-
-    def make_published(self, request, queryset):
-        queryset.update(published=True)
-    make_published.short_description = 'Publish selected tours'
-
-    def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
-    make_unpublished.short_description = 'Unpublish selected tours'
 
     def save_formset(self, request, form, formset, change):
         # save without committing to be able to delete any removed TourDestinations
