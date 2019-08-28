@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -15,6 +17,8 @@ NARROW_IMAGE_DIMENSIONS = (310, 155)
 WIDE_IMAGE_DIMENSIONS = (680, 400)
 NARROW_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in NARROW_IMAGE_DIMENSIONS])
 WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in WIDE_IMAGE_DIMENSIONS])
+
+logger = logging.getLogger(__name__)
 
 
 def generate_filename(instance, filename):
@@ -313,6 +317,13 @@ class TourDestination(models.Model):
     order = models.PositiveIntegerField(default=1, null=False, db_index=True)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
+
+    def __unicode__(self):
+        if self.destination and self.destination.name and self.order:
+            return '{name}, order: {order}'.format(name=self.destination.name,
+                                                   order=self.order)
+        else:
+            return 'Tour Destination'
 
 
 class Tour(models.Model):
