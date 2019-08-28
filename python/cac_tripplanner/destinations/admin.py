@@ -1,4 +1,5 @@
 import logging
+from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import admin, gis
@@ -142,6 +143,46 @@ class TourAdmin(admin.ModelAdmin):
     def make_unpublished(self, request, queryset):
         queryset.update(published=False)
     make_unpublished.short_description = 'Unpublish selected tours'
+
+    def save_formset(self, request, form, formset, change):
+        # save without committing to be able to delete any removed TourDestinations
+        formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+
+        # commit save here to assign IDs to any newly added TourDestinations
+        instances = formset.save(commit=True)
+
+        # Normalize the ordering of the destinations
+        tour_id = form.instance.id
+        # get a list of dicts with TourDestination 'id' and 'order' properties
+        last_destinations = list(TourDestination.objects.filter(
+            related_tour_id=tour_id).values('id', 'order'))
+        # Retain the current formset order as a third dict property
+        for formset_order, dest in enumerate(last_destinations):
+            dest['formset_order'] = formset_order
+
+        # Update the order with any changed formset value
+        for instance in instances:
+            for d in last_destinations:
+                if d['id'] == instance.id:
+                    d['order'] = instance.order
+                    break
+
+        # Sort destinations by 1) newly assigned order then 2) last (formset) order.
+        # This means multiple destinations given the same order will be ordered
+        # secondarily based on their position in the inline formset, top to bottom.
+        resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
+
+        # Reassign order values so that they are normalized to
+        # start at 1, increment by 1, and not repeat or skip any integers.
+        for normalized_order, dest in enumerate(resorted):
+            new_order = normalized_order + 1
+            # update objects that need their order changed
+            if dest['order'] != new_order:
+                TourDestination.objects.filter(id=dest['id']).update(order=new_order)
+
+        form.save_m2m()
 
 
 admin.site.register(Destination, DestinationAdmin)
