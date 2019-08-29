@@ -1,7 +1,7 @@
 import json
 import urllib.parse
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, Client, override_settings
 from django.utils import timezone
 
