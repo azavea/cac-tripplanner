@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.conf.urls import url, include
 from django.views.generic import RedirectView
 from django.contrib.gis import admin
 
@@ -51,9 +51,9 @@ urlpatterns = [
     url(r'^learn/(?P<slug>[\w-]+)/$', cms_views.learn_detail, name='learn-detail'),
 
     # Link Shortening
-    url(r'^link/', include('shortlinks.urls')),
+    url(r'^link/', include('shortlinks.urls', namespace='shortlinks')),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:
