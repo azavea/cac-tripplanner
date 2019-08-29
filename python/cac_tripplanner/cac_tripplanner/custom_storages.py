@@ -1,5 +1,6 @@
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
 import urllib.parse
+import urllib.error
 
 from storages.backends.s3boto import S3BotoStorage
 
