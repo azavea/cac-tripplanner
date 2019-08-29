@@ -1,8 +1,10 @@
 from django.conf.urls import url
+from django.urls import include, path
 from shortlinks.test.views import stub_view
-from shortlinks import urls as shortlink_urls
+
+app_name = 'shortlinks'
 
 urlpatterns = [
-    url(r'^link/', shortlink_urls),
+    path('link/', include('shortlinks.urls')),
     url(r'^$', stub_view, name='test-home'),
 ]
