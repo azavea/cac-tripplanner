@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                 ('publish_date', models.DateTimeField(null=True, blank=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL,
+                                             on_delete=models.CASCADE)),
             ],
             options={
             },
