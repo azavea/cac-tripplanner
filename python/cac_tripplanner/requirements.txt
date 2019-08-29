@@ -9,7 +9,7 @@ easy-thumbnails==2.6.0
 gunicorn==19.9.0
 Pillow==6.1.0
 psycopg2-binary==2.8.3
-pytz==2019.1
+pytz==2019.2
 PyYAML==5.1.2
 requests==2.22.0
 git+https://github.com/flibbertigibbet/django-wpadmin.git@feature/kak/django-2x#egg=django-wpadmin
