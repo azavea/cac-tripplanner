@@ -216,11 +216,11 @@ class ExtraImage(models.Model):
 
 
 class ExtraDestinationPicture(ExtraImage):
-    destination = models.ForeignKey('Destination')
+    destination = models.ForeignKey('Destination', on_delete=models.SET_NULL)
 
 
 class ExtraEventPicture(ExtraImage):
-    event = models.ForeignKey('Event')
+    event = models.ForeignKey('Event', on_delete=models.SET_NULL)
 
 
 def user_flag_summary_manger_factory(manager_for_events=False):

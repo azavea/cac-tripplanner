@@ -55,7 +55,7 @@ class AboutFaq(models.Model):
     """User-editable About and FAQ pages"""
     title = models.CharField(max_length=80)
     slug = models.SlugField()
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = RichTextField(null=True, blank=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -86,7 +86,7 @@ class Article(models.Model):
 
     title = models.CharField(max_length=80)
     slug = models.SlugField()
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     teaser = RichTextField(config_name='teaser')  # above the fold
     content = RichTextField(null=True, blank=True)  # below the fold
     publish_date = models.DateTimeField(blank=True, null=True)
