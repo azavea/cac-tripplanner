@@ -42,7 +42,7 @@ class ShortenedLinkCreateView(View):
         if link_form.is_valid():
             shortened = link_form.save()
             # Generate a full derefencing URL
-            short_path = reverse('dereference-shortened',
+            short_path = reverse('shortlinks:dereference-shortened',
                                  kwargs={'key': shortened.key})
             short_url = request.build_absolute_uri(short_path)
             return HttpResponse(json.dumps({'shortenedUrl': short_url}), status=201)
