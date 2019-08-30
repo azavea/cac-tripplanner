@@ -10,7 +10,6 @@ var debug = require('gulp-debug');
 var del = require('del');
 var exec = require('child_process').exec;
 var gulp = require('gulp');
-var gulpFilter = require('gulp-filter');
 var jshint = require('gulp-jshint');
 var merge = require('merge-stream');
 var pump = require('pump');
@@ -36,8 +35,6 @@ jshintConfig.lookup = false;
 
 var staticRoot = '/srv/cac';
 var pythonRoot = '/opt/app/python/cac_tripplanner';
-
-var filterCSS = gulpFilter(['**/*.css'], {restore: true});
 
 var stat = {
     fonts: staticRoot + '/fontello',
@@ -263,9 +260,7 @@ gulp.task('sass', function (cb) {
         gulp.src('app/styles/main.scss'),
         plumber(),
         sass({outputStyle: 'expanded'}).on('error', sass.logError),
-        filterCSS,
         autoprefixer({cascade: false}),
-        filterCSS.restore,
         gulp.dest(stat.styles)
         ], cb);
 });
@@ -333,7 +328,7 @@ gulp.task('watch', function () {
         'app/scripts/**/*.js',
         'app/styles/**/*.css',
         'app/styles/**/*.scss'
-    ], { usePolling: true }, gulp.series('development'));
+    ], { usePolling: true }, gulp.parallel('development'));
 });
 
-gulp.task('default', gulp.series('watch'));
+gulp.task('default', gulp.series('development', 'watch'));
