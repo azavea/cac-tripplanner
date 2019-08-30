@@ -169,7 +169,7 @@ gulp.task('minify:scripts', function(cb) {
 
 gulp.task('minify:vendor-scripts', function(cb) {
     pump([
-         copyVendorJS(),
+        copyVendorJS(),
         vinylBuffer(),
         concat('vendor.js'),
         uglify(),
@@ -177,57 +177,73 @@ gulp.task('minify:vendor-scripts', function(cb) {
     ], cb);
 });
 
-gulp.task('copy:scripts', function() {
-    return gulp.src('app/scripts/**/*.js')
-        .pipe(order(scriptOrder))
-        .pipe(gulp.dest(stat.scripts + '/main'));
+gulp.task('copy:scripts', function(cb) {
+    pump([
+        gulp.src('app/scripts/**/*.js'),
+        order(scriptOrder),
+        gulp.dest(stat.scripts + '/main')
+        ], cb);
 });
 
-gulp.task('copy:vendor-css', function() {
-    return gulp.src(['node_modules/leaflet/dist/leaflet.css',
+gulp.task('copy:vendor-css', function(cb) {
+    pump([
+        gulp.src(['node_modules/leaflet/dist/leaflet.css',
                      'node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css',
                      'node_modules/cartodb.js/dist/cartodb.css',
                      'node_modules/cartodb.js/dist/cartodb.ie.css',
                      'node_modules/tiny-slider/dist/tiny-slider.css',
-                     'node_modules/spinkit/css/spinkit.css'])
-        .pipe(concat('vendor.css'))
-        .pipe(autoprefixer({
+                     'node_modules/spinkit/css/spinkit.css']),
+        concat('vendor.css'),
+        autoprefixer({
             cascade: false
-        }))
-        .pipe(gulp.dest(stat.styles));
+        }),
+        gulp.dest(stat.styles)
+        ], cb);
 });
 
-gulp.task('copy:vendor-images', function() {
-    return gulp.src(['**/*.png'], [])
-        .pipe(gulp.dest(stat.images + '/vendor'));
+gulp.task('copy:vendor-images', function(cb) {
+    pump([
+        gulp.src(['**/*.png'], []),
+        gulp.dest(stat.images + '/vendor')
+        ], cb);
 });
 
-gulp.task('copy:marker-images', function() {
-    return gulp.src(['node_modules/*eaflet*/dist/images/*.png'])
-        .pipe(rename({dirname: ''}))
-        .pipe(gulp.dest(stat.styles + '/images'));
+gulp.task('copy:marker-images', function(cb) {
+    pump([
+        gulp.src(['node_modules/*eaflet*/dist/images/*.png']),
+        rename({dirname: ''}),
+        gulp.dest(stat.styles + '/images')
+        ], cb);
 });
 
-gulp.task('copy:fontello-fonts', function() {
-    return gulp.src(['app/font/fontello/**'])
-        .pipe(gulp.dest(stat.fonts));
+gulp.task('copy:fontello-fonts', function(cb) {
+    pump([
+        gulp.src(['app/font/fontello/**']),
+        gulp.dest(stat.fonts)
+        ], cb);
 });
 
-gulp.task('copy:app-images', function() {
-    return gulp.src('app/images/**/*.*')
-        .pipe(gulp.dest(stat.images));
+gulp.task('copy:app-images', function(cb) {
+    pump([
+        gulp.src('app/images/**/*.*'),
+        gulp.dest(stat.images)
+        ], cb);
 });
 
-gulp.task('copy:vendor-scripts', function() {
-    return copyVendorJS()
-        .pipe(gulp.dest(stat.scripts + '/vendor'));
+gulp.task('copy:vendor-scripts', function(cb) {
+    pump([
+        copyVendorJS(),
+        gulp.dest(stat.scripts + '/vendor')
+        ], cb);
 });
 
-gulp.task('jshint', function () {
-    return gulp.src('app/scripts/cac/**/*.js')
-        .pipe(jshint(jshintConfig))
-        .pipe(jshint.reporter('jshint-stylish'))
-        .pipe(jshint.reporter('fail'));
+gulp.task('jshint', function (cb) {
+    pump([
+        gulp.src('app/scripts/cac/**/*.js'),
+        jshint(jshintConfig),
+        jshint.reporter('jshint-stylish'),
+        jshint.reporter('fail')
+        ], cb);
 });
 
 gulp.task('jshint:jenkins', function () {
@@ -242,14 +258,16 @@ gulp.task('jshint:jenkins', function () {
         .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('sass', function () {
-    return gulp.src('app/styles/main.scss')
-        .pipe(plumber())
-        .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
-        .pipe(filterCSS)
-        .pipe(autoprefixer({cascade: false}))
-        .pipe(filterCSS.restore)
-        .pipe(gulp.dest(stat.styles));
+gulp.task('sass', function (cb) {
+    pump([
+        gulp.src('app/styles/main.scss'),
+        plumber(),
+        sass({outputStyle: 'expanded'}).on('error', sass.logError),
+        filterCSS,
+        autoprefixer({cascade: false}),
+        filterCSS.restore,
+        gulp.dest(stat.styles)
+        ], cb);
 });
 
 gulp.task('test:production', gulp.series(gulp.series(
@@ -288,7 +306,8 @@ gulp.task('test:development', gulp.series(gulp.series('copy:vendor-scripts', 'co
     })
 );
 
-gulp.task('common:build', gulp.series('clean',
+gulp.task('common:build', gulp.series(
+    'clean',
     'copy:fontello-fonts',
     'copy:vendor-css',
     'copy:vendor-images',
