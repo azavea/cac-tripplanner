@@ -58,13 +58,15 @@ def base_view(request, page, context):
 def home(request):
     # Load one random article
     article = Article.objects.random()
-    # Show all destinations
+    # Show all destinations, events, and tours
     destinations = list(Destination.objects.published().order_by('priority'))
     events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
+    tours = list(Tour.objects.published().order_by('priority'))
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': events + destinations
+        'destinations': events + destinations,
+        'tours': tours
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
@@ -407,7 +409,7 @@ class SearchDestinations(View):
                       .order_by('priority', 'start_date'))
 
         # get tours
-        tours = Tour.objects.filter(published=True)
+        tours = Tour.objects.filter(published=True).order_by('priority')
 
         if text is not None:
             events = events.filter(name__icontains=text)
