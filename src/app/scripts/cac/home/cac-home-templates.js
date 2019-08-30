@@ -8,10 +8,11 @@ CAC.Home.Templates = (function (Handlebars, moment) {
 
     var filterOptions = [
         {'class': 'all', 'label': 'All', 'value': 'All'},
-        {'class': 'events', 'label': 'Events', 'value': 'Events'},
         {'class': 'nature', 'label': 'Nature', 'value': 'Nature'},
         {'class': 'exercise', 'label': 'Exercise', 'value': 'Exercise'},
         {'class': 'educational', 'label': 'Educational', 'value': 'Educational'},
+        {'class': 'tours', 'label': 'Tours', 'value': 'Tours', 'breakBefore': true},
+        {'class': 'events', 'label': 'Events', 'value': 'Events'}
     ];
 
     var module = {
@@ -61,6 +62,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                 '<a href="#" class="map-view-btn">Map View</a>',
                 '<div class="filter-toggle filter-toggle-tabs">',
                     '{{#each filterOptions}}',
+                    '{{#if breakBefore}}<div class="filter-divider">|</div>{{/if}}',
                     '<div class="{{class}} filter-option" ',
                         'data-filter="{{value}}">',
                         '{{label}}',
