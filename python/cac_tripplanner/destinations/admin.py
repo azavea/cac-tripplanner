@@ -115,8 +115,8 @@ class TourAdmin(PublishableMixin, admin.ModelAdmin):
 
     form = TourForm
     inlines = [TourDestinationsInline]
-    list_display = ('name', 'published')
-    ordering = ('name', )
+    list_display = ('name', 'published', 'priority')
+    ordering = ('name',)
 
     def save_formset(self, request, form, formset, change):
         # save without committing to be able to delete any removed TourDestinations
