@@ -1,4 +1,5 @@
 import json
+import logging
 import requests
 
 from django.conf import settings
@@ -21,10 +22,13 @@ from .models import (Destination,
                      Event,
                      ExtraDestinationPicture,
                      ExtraEventPicture,
+                     Tour,
                      UserFlag,
                      NARROW_IMAGE_DIMENSIONS,
                      WIDE_IMAGE_DIMENSIONS)
 from cms.models import Article
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_CONTEXT = {
@@ -260,11 +264,24 @@ def set_event_properties(event):
     obj = set_attraction_properties(obj, event, extra_images)
     # add properties of first related destination, if any
     obj = set_location_properties(obj, event.destinations.first())
-
-    obj['destinations'] = [set_destination_properties(x) for x in event.destinations.all()]
+    obj['destinations'] = [set_destination_properties(x)
+                           for x in event.destinations.all()]
 
     # if the first related destination belongs to Watershed Alliance, so does this event
-    obj['watershed_alliance'] = event.destinations.first().watershed_alliance if event.destinations.count() else False
+    obj['watershed_alliance'] = (event.destinations.first().watershed_alliance
+                                 if event.destinations.count() else False)
+    return obj
+
+
+def set_tour_properties(tour):
+    """Helper for adding and converting properties in serializing tours as JSON.
+
+    :param tour: Tour model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(tour)
+    obj['destinations'] = [set_destination_properties(x.destination)
+                           for x in tour.tour_destinations.all()]
     return obj
 
 
@@ -347,10 +364,11 @@ class SearchDestinations(View):
           - text param
         Optional:
           - limit param: maximum number of results to return (integer)
-          - categories param: comma-separated list of destination category names to filter to
+          - categories param: comma-separated list of category names to filter to
 
-        A search via text returns destinations and events that match the destination name
-        A search via lat/lon returns destinations and events that are closest to the search point
+        A search via text returns destinations, events, and tours that match the name
+        A search via lat/lon returns destinations, events, and tours that are
+        closest to the search point
 
         """
         params = request.GET
@@ -362,6 +380,7 @@ class SearchDestinations(View):
 
         destinations = Destination.objects.none()
         events = Event.objects.none()
+        tours = Tour.objects.none()
 
         if lat and lon:
             try:
@@ -387,8 +406,12 @@ class SearchDestinations(View):
             events = (Event.objects.current()
                       .order_by('priority', 'start_date'))
 
+        # get tours
+        tours = Tour.objects.filter(published=True)
+
         if text is not None:
             events = events.filter(name__icontains=text)
+            tours = tours.filter(name__icontains=text)
 
         if limit:
             try:
@@ -397,11 +420,13 @@ class SearchDestinations(View):
                 return return_400('Invalid limit, must be an integer', str(e))
             destinations = destinations[:limit_int]
             events = events[:limit_int]
+            tours = tours[:limit_int]
 
         destinations = [set_destination_properties(x) for x in destinations]
         events = [set_event_properties(x) for x in events]
+        tours = [set_tour_properties(x) for x in tours]
 
-        response = {'destinations': destinations, 'events': events}
+        response = {'destinations': destinations, 'events': events, 'tours': tours}
         return JsonResponse(response)
 
 
