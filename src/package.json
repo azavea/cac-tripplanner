@@ -76,6 +76,7 @@
     "vinyl-source-stream": "~2.0.0"
   },
   "scripts": {
+    "gulp": "gulp",
     "gulp-clean": "gulp clean",
     "gulp-development": "gulp development",
     "gulp-production": "gulp production",
