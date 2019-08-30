@@ -336,4 +336,4 @@ gulp.task('watch', function () {
     ], gulp.series('development'));
 });
 
-gulp.task('default', gulp.series('production'));
+gulp.task('default', gulp.series('development'));
