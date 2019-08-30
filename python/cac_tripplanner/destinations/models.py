@@ -310,10 +310,10 @@ class TourDestination(models.Model):
 
     destination = models.ForeignKey('Destination',
                                     on_delete=models.CASCADE,
-                                    related_name='tour_destination')
+                                    related_name='tours')
     related_tour = models.ForeignKey('Tour',
                                      on_delete=models.CASCADE,
-                                     related_name='related_tour')
+                                     related_name='tour_destinations')
     order = models.PositiveIntegerField(default=1, null=False, db_index=True)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
