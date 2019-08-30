@@ -329,9 +329,10 @@ class TourDestination(models.Model):
 class Tour(models.Model):
 
     class Meta:
-        ordering = ['name']
+        ordering = ['priority', '?']
 
     name = models.CharField(max_length=50, unique=True)
+    priority = models.IntegerField(default=9999, null=False)
     destinations = models.ManyToManyField('TourDestination')
     published = models.BooleanField(default=False)
 
