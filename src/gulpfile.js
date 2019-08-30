@@ -333,7 +333,7 @@ gulp.task('watch', function () {
         'app/scripts/**/*.js',
         'app/styles/**/*.css',
         'app/styles/**/*.scss'
-    ], gulp.series('development'));
+    ], { usePolling: true }, gulp.series('development'));
 });
 
-gulp.task('default', gulp.series('development'));
+gulp.task('default', gulp.series('watch'));
