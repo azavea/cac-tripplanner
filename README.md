@@ -16,7 +16,7 @@ Development Installation
 3. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
 4. Run `vagrant up`
 5. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
-6. Running `npm run gulp-watch` from `/opt/app/src` will automatically collect static files together when changes are detected for Django template consumption. Alternatively, `npm run gulp-development` can be run manually whenever changes are made to the static files.
+6. Running `npm run gulp` from `/opt/app/src` will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `npm run gulp-development` can be run manually whenever changes are made to the static files.
 
 Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisioning in development mode will not attempt to rebuild the graph, but will use the one already present.
 
