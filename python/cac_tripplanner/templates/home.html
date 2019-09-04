@@ -92,16 +92,13 @@
             </header>
             <ul class="place-list" data-filter="All">
                 {% for destination in destinations %}
-                <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
+                <li class="place-card {% if destination.is_event %}event-card {% endif %}{% if destination.is_tour %}tour-card {% endif %}no-origin"
                     {% get_directions_id destination as directions_id %}
+                    {% get_destination_x destination as destination_x %}
+                    {% get_destination_y destination as destination_y %}
                     data-destination-id="{{ directions_id }}"
-                    {% if destination.is_event and directions_id %}
-                        data-destination-x="{{ destination.destination.point.x }}"
-                        data-destination-y="{{ destination.destination.point.y }}"
-                    {% elif not destination.is_event %}
-                        data-destination-x="{{ destination.point.x }}"
-                        data-destination-y="{{ destination.point.y }}"
-                    {% endif %}>
+                    data-destination-x="{{ destination_x }}"
+                    data-destination-y="{{ destination_y }}">
                     <div class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
@@ -155,6 +152,8 @@
                             <a class="place-card-action place-action-details"
                                {% if destination.is_event %}
                                href="{% url 'event-detail' pk=destination.pk %}"
+                               {% elif destination.is_tour %}
+                               href="{% url 'tour-detail' pk=destination.pk %}"
                                {% else %}
                                href="{% url 'place-detail' pk=destination.pk %}"
                                {% endif %}

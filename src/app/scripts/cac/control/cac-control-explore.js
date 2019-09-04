@@ -356,7 +356,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
         // If filter set to only display events, say "events" in the user messages
         var filter = UserPreferences.getPreference('destinationFilter');
-        var placeString =  filter === 'Events' ? 'events' : 'destinations';
+        var placeString = 'destinations';
+        if (filter === 'Events') {
+            placeString = 'events';
+        } else if (filter === 'Tours') {
+            placeString = 'tours';
+        }
 
         // alternate text string to display if there are no destinations found
         var text = null;
@@ -516,7 +521,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             twoEvents = [];
             return;
         }
-        allDestinations = data.destinations.concat(data.events);
+        allDestinations = data.destinations.concat(data.events).concat(data.tours);
         // grab the first two events, to use when displaying 'All'
         twoEvents = data.events.slice(0, 2);
     }

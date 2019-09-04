@@ -116,7 +116,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
             '<ul class="place-list" data-filter="{{currentFilter}}">',
                 '{{#each destinations}}',
                 '<li class="place-card {{#unless this.formattedDistance}}no-origin{{/unless}} ',
-                    '{{#if this.is_event}}event-card{{/if}}" ',
+                    '{{#if this.is_event}}event-card{{/if}} {{#if this.is_tour}}tour-card{{/if}}" ',
                     'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
                     'data-destination-x="{{ this.location.x }}" ',
                     'data-destination-y="{{ this.location.y }}">',
