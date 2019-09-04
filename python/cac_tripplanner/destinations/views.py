@@ -282,8 +282,14 @@ def set_tour_properties(tour):
     :returns: Dictionary representation of object, with added properties
     """
     obj = model_to_dict(tour)
-    obj['destinations'] = [set_destination_properties(x.destination)
-                           for x in tour.tour_destinations.all()]
+    obj['destinations'] = []
+    for x in tour.tour_destinations.all():
+        dest = set_destination_properties(x.destination)
+        # tour destinations also have optional start/end date/times
+        dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
+        dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
+        obj['destinations'].append(dest)
+
     return obj
 
 
