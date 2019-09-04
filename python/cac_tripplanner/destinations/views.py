@@ -39,6 +39,7 @@ DEFAULT_CONTEXT = {
 }
 
 EVENT_CATEGORY = 'Events'
+TOUR_CATEGORY = 'Tours'
 
 
 def base_view(request, page, context):
@@ -65,8 +66,7 @@ def home(request):
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': events + destinations,
-        'tours': tours
+        'destinations': events + destinations + tours
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
@@ -148,6 +148,14 @@ def event_detail(request, pk):
     context = dict(tab='explore', event=event, more_events=more_events,
                    **DEFAULT_CONTEXT)
     return base_view(request, 'event-detail.html', context=context)
+
+
+def tour_detail(request, pk):
+    tour = get_object_or_404(Tour.objects.published(), pk=pk)
+    more_tours = Tour.objects.published().exclude(pk=tour.pk)[:3]
+    context = dict(tab='explore', tour=tour, more_tours=more_tours,
+                   **DEFAULT_CONTEXT)
+    return base_view(request, 'tour-detail.html', context=context)
 
 
 def image_to_url(obj, field_name, size, raw_field_name=''):
@@ -241,6 +249,7 @@ def set_destination_properties(destination):
     obj['address'] = obj['name']
     obj['categories'] = [c.name for c in obj['categories']]
     obj['is_event'] = False
+    obj['is_tour'] = False
 
     extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
     obj = set_attraction_properties(obj, destination, extra_images)
@@ -261,6 +270,7 @@ def set_event_properties(event):
     obj['start_date'] = timezone.localtime(event.start_date).isoformat()
     obj['end_date'] = timezone.localtime(event.end_date).isoformat()
     obj['is_event'] = True
+    obj['is_tour'] = False
 
     extra_images = ExtraEventPicture.objects.filter(event=event)
     obj = set_attraction_properties(obj, event, extra_images)
@@ -282,9 +292,11 @@ def set_tour_properties(tour):
     :returns: Dictionary representation of object, with added properties
     """
     obj = model_to_dict(tour)
+    obj['categories'] = (TOUR_CATEGORY,)  # tours are a special category
     obj['destinations'] = []
     for x in tour.tour_destinations.all():
         dest = set_destination_properties(x.destination)
+        dest['is_tour'] = True
         # tour destinations also have optional start/end date/times
         dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
         dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
@@ -409,13 +421,14 @@ class SearchDestinations(View):
                 categories.remove(EVENT_CATEGORY)
                 events = (Event.objects.current()
                           .order_by('priority', 'start_date'))
+            if TOUR_CATEGORY in categories:
+                categories.remove(TOUR_CATEGORY)
+                tours = (Tour.objects.filter(published=True).order_by('priority'))
             destinations = destinations.filter(categories__name__in=categories)
         else:
             events = (Event.objects.current()
                       .order_by('priority', 'start_date'))
-
-        # get tours
-        tours = Tour.objects.filter(published=True).order_by('priority')
+            tours = (Tour.objects.filter(published=True).order_by('priority'))
 
         if text is not None:
             events = events.filter(name__icontains=text)
