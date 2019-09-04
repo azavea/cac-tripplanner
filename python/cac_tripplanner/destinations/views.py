@@ -293,10 +293,14 @@ def set_tour_properties(tour):
     """
     obj = model_to_dict(tour)
     obj['categories'] = (TOUR_CATEGORY,)  # tours are a special category
+    # tour location is that of its first destination
+    obj = set_location_properties(obj, tour.first_destination)
+    obj['is_tour'] = True
+    obj['is_event'] = False
+
     obj['destinations'] = []
     for x in tour.tour_destinations.all():
         dest = set_destination_properties(x.destination)
-        dest['is_tour'] = True
         # tour destinations also have optional start/end date/times
         dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
         dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
