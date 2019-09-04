@@ -150,6 +150,10 @@ class Attraction(models.Model):
         """Helper to check which sub-class this Attraction belongs to."""
         return isinstance(self, Event)
 
+    @property
+    def is_tour(self):
+        return False
+
     def has_activity(self, activity_name):
         """Helper to check if an activity of a given name is available at a destination."""
         return self.activities.filter(name=activity_name).exists()
@@ -337,6 +341,28 @@ class Tour(models.Model):
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
+
+    def has_activity(self, activity_name):
+        """Helper to check if an activity of a given name is available at
+        any of this tour's destinations."""
+        for td in self.tour_destinations.all():
+            if td.destination.activities.filter(name=activity_name).exists():
+                return True
+        return False
+
+    @property
+    def first_destination(self):
+        if self.tour_destinations.count() > 0:
+            return self.tour_destinations.order_by('order').first().destination
+        return None
+
+    @property
+    def is_event(self):
+        return False
+
+    @property
+    def is_tour(self):
+        return True
 
     def __unicode__(self):
         return self.name
