@@ -1,0 +1,76 @@
+{% load cropping %}
+{% load destination_extras %}
+{% load tz %}
+<article class="info-article">
+    <header class="info-article-header">
+
+        {% if tour.tour_destinations.count > 1 %}
+        <div class="detail-image-carousel-container">
+            <div class="detail-image-carousel">
+                <img src="{% cropped_thumbnail tour.first_destination 'wide_image' %}">
+                {% for tour_dest in tour.tour_destinations.all %}
+                <img class="detail-image-carousel-extra-image hidden"
+                     src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}">
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="info-place-image-hero"
+             style="background-image: url('{% cropped_thumbnail tour.first_destination 'wide_image' %}');"></div>
+        {% endif %}
+        <div class="info-article-header-info">
+            <div class="info-article-header-main">
+                <h2 class="info-article-title">{{ tour.name }}</h2>
+                {% if tour.first_destination %}
+                <h3 class="info-tour-destination">
+                    at
+                    <a class="info-tour-destination-link"
+                        href="{% url 'place-detail' pk=tour.first_destination.pk %}">
+                        {{ tour.first_destination.name }}
+                    </a>
+                </h3>
+                {% endif %}
+                <div class="info-place-actions">
+                    {% if tour.first_destination %}
+                    <a class="place-action-go"
+                        data-destination-id="{{ tour.first_destination.id }}"
+                        href="/?destination={{ tour.first_destination.point.y }}%2C{{ tour.first_destination.point.x }}&destinationText={{ tour.first_destination.name|urlencode }}">Directions</a>
+                    {% endif %}
+                    <a class="place-website-link"
+                        href="{{ tour.first_destination.website_url }}"
+                        target="_blank">Details</a>
+                </div>
+            </div>
+            <div class="info-tour-meta">
+                <ul class="info-event-activities">
+                    {% has_activity event 'cycling' as has_cycling %}
+                    {% has_activity event 'hiking' as has_hiking %}
+                    {% has_activity event 'water recreation' as has_water_rec %}
+                    {% if has_cycling %}
+                    <li class="activity" title="Cycling">
+                        <i class="icon-cycling"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_hiking %}
+                    <li class="activity" title="Hiking">
+                        <i class="icon-hiking"></i>
+                    </li>
+                    {% endif %}
+                    {% if has_water_rec %}
+                    <li class="activity" title="Water recreation">
+                        <i class="icon-water"></i>
+                    </li>
+                    {% endif %}
+                    {% if destination.accessible %}
+                    <li class="activity" title="Wheelchair accessible">
+                        <i class="icon-wheelchair"></i>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </header>
+    <section class="info-article-section">
+        {{ tour.name|safe }}
+    </section>
+</article>
