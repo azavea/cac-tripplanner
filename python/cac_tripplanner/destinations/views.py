@@ -2,6 +2,7 @@ import json
 import requests
 
 from django.conf import settings
+from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
@@ -315,9 +316,9 @@ class FindReachableDestinations(View):
             matched_objects = []
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
-                geom = GEOSGeometry(geom_str)
+                geom = GEOSGeometry(geom_str, srid=4326)
                 matched_objects = (Destination.objects.filter(published=True, point__within=geom)
-                                                      .distance(geom)
+                                                      .annotate(distance=Distance('point', geom))
                                                       .order_by('distance', 'priority'))
         else:
             matched_objects = []
@@ -362,11 +363,11 @@ class SearchDestinations(View):
 
         if lat and lon:
             try:
-                search_point = Point(float(lon), float(lat))
+                search_point = Point(float(lon), float(lat), srid=4326)
             except ValueError as e:
                 return return_400('Invalid latitude/longitude pair', str(e))
             destinations = (Destination.objects.filter(published=True)
-                            .distance(search_point)
+                            .annotate(distance=Distance('point', search_point))
                             .order_by('distance', 'priority'))
         elif text is not None:
             destinations = Destination.objects.filter(published=True,

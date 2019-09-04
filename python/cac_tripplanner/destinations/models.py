@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
-from django.db.models import Count, OuterRef, Subquery
+from django.db.models import Count, Manager as GeoManager, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
@@ -22,7 +22,7 @@ def generate_filename(instance, filename):
     return generate_image_filename('destinations', instance, filename)
 
 
-class DestinationManager(models.GeoManager):
+class DestinationManager(GeoManager):
     """Custom manager for Destinations that allows filtering on published."""
 
     def published(self):
@@ -216,11 +216,11 @@ class ExtraImage(models.Model):
 
 
 class ExtraDestinationPicture(ExtraImage):
-    destination = models.ForeignKey('Destination')
+    destination = models.ForeignKey('Destination', on_delete=models.CASCADE)
 
 
 class ExtraEventPicture(ExtraImage):
-    event = models.ForeignKey('Event')
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
 
 
 def user_flag_summary_manger_factory(manager_for_events=False):

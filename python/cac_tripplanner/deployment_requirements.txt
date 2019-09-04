@@ -2,4 +2,4 @@ boto==2.49.0
 PyYAML==5.1.2
 majorkirby==1.0.0
 requests==2.22.0
-troposphere==2.5.0
+troposphere==2.5.1

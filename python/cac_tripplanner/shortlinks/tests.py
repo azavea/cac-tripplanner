@@ -1,7 +1,7 @@
 import json
 import urllib.parse
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, Client, override_settings
 from django.utils import timezone
 
@@ -109,7 +109,7 @@ class ShortenedLinkViewsTestCase(TestCase):
         # This will throw an error if it fails; this is to make sure that the
         # URL resolution is fully working since the redirect method will return a
         # 404 if it is given a bad key.
-        reverse('dereference-shortened', kwargs={'key': 'CMBOzqQbSPq25N29BTD54w'})
+        reverse('shortlinks:dereference-shortened', kwargs={'key': 'CMBOzqQbSPq25N29BTD54w'})
 
 
 class ShortenedLinkCreateTestCase(TestCase):
