@@ -3,7 +3,6 @@
 {% load tz %}
 <article class="info-article">
     <header class="info-article-header">
-
         {% if tour.tour_destinations.count > 1 %}
         <div class="detail-image-carousel-container">
             <div class="detail-image-carousel">
@@ -67,87 +66,13 @@
         <ul class="place-list">
             {% for d in tour.tour_destinations.all %}
             {% with destination=d.destination %}
-            <li class="place-card tour-card no-origin"
-                {% get_directions_id destination as directions_id %}
-                {% get_destination_x destination as destination_x %}
-                {% get_destination_y destination as destination_y %}
-                data-destination-id="{{ directions_id }}"
-                data-destination-x="{{ destination_x }}"
-                data-destination-y="{{ destination_y }}">
-                <div class="place-card-photo-container">
-                        <img class="place-card-photo"
-                            {% if destination.image %}
-                                src="{% cropped_thumbnail destination 'image' %}"
-                            {% else %}
-                                src="https://placehold.it/310x155.jpg"
-                            {% endif %}
-                            width="310" height="155"
-                            alt="{{ destination.name }}" />
-                </div>
-                <div class="place-card-info">
-                    <div class="place-card-meta">
-                        <div class="event-label">
-                            Order: {{ forloop.counter }}
-                        </div>
-                        <div class="event-date-time">
-                        <!-- show date/time, if any -->
-                        {% if d.start_date or d.end_date %}
-                            {% if d.start_date|localtime|date:"D N j" == d.end_date|localtime|date:"D N j" %}
-                            <!-- same-day event -->
-                            <div class="event-date event-time">
-                                {{ d.start_date|date:"D M j" }}
-                                &middot;
-                                {{ d.start_date|time:"fA" }}
-                            </div>
-                            {% else %}
-                            <!-- ends on different day than it starts -->
-                            <div class="event-date event-time">
-                                {{ d.start_date|date:"D M j" }}
-                                &ndash;
-                                {{ d.end_date|date:"D M j" }}
-                            </div>
-                            {% endif %}
-                        {% endif %}
-                        </div>
-                    </div>
-                    <h2 class="place-card-name">{{ destination.name }} Order: {{ forloop.counter }}</h2>
-                </div>
-                    <div class="place-card-footer">
-                        <div class="place-card-actions">
-                            {% get_directions_id destination as directions_id %}
-                            {% if directions_id %}
-                            <a class="place-card-action place-action-go"
-                                data-destination-id="{{ directions_id }}"
-                                href="#">Directions</a>
-                            {% endif %}
-                            <a class="place-card-action place-action-details"
-                               href="{% url 'tour-detail' pk=destination.pk %}"
-                               >More info</a>
-                        </div>
-                        <div class="place-card-badges">
-                            {% has_activity destination 'cycling' as has_cycling %}
-                            {% if has_cycling %}
-                            <span class="badge activity" title="Cycling">
-                                <i class="icon-cycling"></i>
-                            </span>
-                            {% endif %}
-                            {% if destination.watershed_alliance %}
-                            <a class="badge link"
-                                href="https://www.watershedalliance.org/"
-                                title="Alliance for Watershed Education"
-                                target="_blank">
-                                <img class="image"
-                                    src="/static/images/awe-icon.png"
-                                    srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
-                                    height="20"
-                                    alt="Alliance for Watershed Education"></a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </li>
+            <li>
+                <h2 class="place-card-name">
+                    {{ destination.name }} Order: {{ forloop.counter }}
+                </h2>
+            </li>
             {% endwith %}
             {% endfor %}
-            </ul>
-
+        </ul>
     </section>
 </article>
