@@ -8,9 +8,15 @@ from image_cropping import ImageCroppingMixin
 
 from cac_tripplanner.publish_utils import PublishableMixin
 
-from .forms import DestinationForm, EventForm, ExtraImagesForm, TourDestinationForm, TourForm
+from .forms import (DestinationForm,
+                    EventForm,
+                    EventDestinationForm,
+                    ExtraImagesForm,
+                    TourDestinationForm,
+                    TourForm)
 from .models import (Destination,
                      DestinationUserFlags,
+                     EventDestination,
                      Event,
                      EventUserFlags,
                      ExtraDestinationPicture,
@@ -35,6 +41,13 @@ class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
     list_display = ('image', 'wide_image', 'image_raw')
     model = ExtraEventPicture
     extra = 0
+
+
+class EventDestinationsInline(admin.StackedInline):
+
+    form = EventDestinationForm
+    model = EventDestination
+    extra = 1
 
 
 class TourDestinationsInline(admin.StackedInline):
@@ -90,11 +103,52 @@ class EventAdmin(ImageCroppingMixin, PublishableMixin, admin.ModelAdmin):
 
     fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
               'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
-              'start_date', 'end_date', 'destinations')
+              'start_date', 'end_date', )
     list_display = ('name', 'published', 'priority', )
     ordering = ('name', )
 
-    inlines = [ExtraEventImagesInline]
+    inlines = [ExtraEventImagesInline, EventDestinationsInline]
+
+    def save_formset(self, request, form, formset, change):
+
+        # save without committing to be able to delete any removed EventDestinations
+        formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+
+        # commit save here to assign IDs to any newly added EventDestinations
+        instances = formset.save(commit=True)
+
+        # Normalize the ordering of the destinations
+        event_id = form.instance.id
+        # get a list of dicts with EventDestination 'id' and 'order' properties
+        last_destinations = list(EventDestination.objects.filter(
+            related_event_id=event_id).values('id', 'order'))
+        # Retain the current formset order as a third dict property
+        for formset_order, dest in enumerate(last_destinations):
+            dest['formset_order'] = formset_order
+
+        # Update the order with any changed formset value
+        for instance in instances:
+            for d in last_destinations:
+                if d['id'] == instance.id:
+                    d['order'] = instance.order
+                    break
+
+        # Sort destinations by 1) newly assigned order then 2) last (formset) order.
+        # This means multiple destinations given the same order will be ordered
+        # secondarily based on their position in the inline formset, top to bottom.
+        resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
+
+        # Reassign order values so that they are normalized to
+        # start at 1, increment by 1, and not repeat or skip any integers.
+        for normalized_order, dest in enumerate(resorted):
+            new_order = normalized_order + 1
+            # update objects that need their order changed
+            if dest['order'] != new_order:
+                EventDestination.objects.filter(id=dest['id']).update(order=new_order)
+
+        form.save_m2m()
 
 
 class AttractionUserFlagsAdmin(admin.ModelAdmin):
