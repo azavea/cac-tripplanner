@@ -103,6 +103,8 @@
                         <img class="place-card-photo"
                             {% if destination.image %}
                                 src="{% cropped_thumbnail destination 'image' %}"
+                            {% elif destination.first_destination %}
+                                src="{% cropped_thumbnail destination.first_destination 'image' %}"
                             {% else %}
                                 src="https://placehold.it/310x155.jpg"
                             {% endif %}
