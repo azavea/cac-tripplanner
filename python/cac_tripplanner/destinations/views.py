@@ -306,6 +306,12 @@ def set_tour_properties(tour):
         dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
         obj['destinations'].append(dest)
 
+    # Use the images from the first destination for the tour
+    if tour.tour_destinations.count() > 0:
+        first_dest = obj['destinations'][0]
+        obj['image'] = first_dest['image']
+        obj['wide_image'] = first_dest['wide_image']
+
     return obj
 
 
