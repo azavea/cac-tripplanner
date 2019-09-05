@@ -343,13 +343,13 @@ class Tour(models.Model):
 
     objects = DestinationManager()
 
-    def has_activity(self, activity_name):
-        """Helper to check if an activity of a given name is available at
-        any of this tour's destinations."""
+    @property
+    def accessible(self):
+        """Returns true if all destinations in this tour are accessible."""
         for td in self.tour_destinations.all():
-            if td.destination.activities.filter(name=activity_name).exists():
-                return True
-        return False
+            if not td.destination.accessible:
+                return False
+        return True
 
     @property
     def first_destination(self):
@@ -364,6 +364,14 @@ class Tour(models.Model):
     @property
     def is_tour(self):
         return True
+
+    def has_activity(self, activity_name):
+        """Helper to check if an activity of a given name is available at
+        any of this tour's destinations."""
+        for td in self.tour_destinations.all():
+            if td.destination.activities.filter(name=activity_name).exists():
+                return True
+        return False
 
     def __unicode__(self):
         return self.name

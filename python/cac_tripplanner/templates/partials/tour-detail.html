@@ -61,7 +61,7 @@
                         <i class="icon-water"></i>
                     </li>
                     {% endif %}
-                    {% if destination.accessible %}
+                    {% if tour.accessible %}
                     <li class="activity" title="Wheelchair accessible">
                         <i class="icon-wheelchair"></i>
                     </li>
@@ -71,6 +71,6 @@
         </div>
     </header>
     <section class="info-article-section">
-        {{ tour.name|safe }}
+        {{ tour.description|safe }}
     </section>
 </article>
