@@ -189,6 +189,30 @@ class Destination(Attraction):
         return self.name
 
 
+class EventDestination(models.Model):
+
+    class Meta:
+        ordering = ['order', '-start_date']
+        unique_together = [['destination', 'related_event']]
+
+    destination = models.ForeignKey('Destination',
+                                    on_delete=models.CASCADE,
+                                    related_name='events')
+    related_event = models.ForeignKey('Event',
+                                      on_delete=models.CASCADE,
+                                      related_name='event_destinations')
+    order = models.PositiveIntegerField(default=1, null=False, db_index=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    def __unicode__(self):
+        if self.destination and self.destination.name and self.order:
+            return '{name}, order: {order}'.format(name=self.destination.name,
+                                                   order=self.order)
+        else:
+            return 'Event Destination'
+
+
 class Event(Attraction):
     """Represents an event, which has a start and end date."""
 
@@ -198,7 +222,7 @@ class Event(Attraction):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-    destinations = models.ManyToManyField('Destination', blank=True)
+    destinations = models.ManyToManyField('EventDestination', blank=True)
 
     objects = EventManager()
 
@@ -309,7 +333,7 @@ class EventUserFlags(Event):
 class TourDestination(models.Model):
 
     class Meta:
-        ordering = ['order', '-start_date']
+        ordering = ['order', ]
         unique_together = [['destination', 'related_tour']]
 
     destination = models.ForeignKey('Destination',
@@ -319,8 +343,6 @@ class TourDestination(models.Model):
                                      on_delete=models.CASCADE,
                                      related_name='tour_destinations')
     order = models.PositiveIntegerField(default=1, null=False, db_index=True)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         if self.destination and self.destination.name and self.order:
