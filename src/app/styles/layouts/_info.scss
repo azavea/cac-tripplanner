@@ -130,17 +130,24 @@
 
     .info-place-meta {
         display: flex;
-        flex: none;
-        flex-flow: column nowrap;
-        align-items: flex-start;
-        justify-content: flex-start;
+        flex-flow: row wrap;
+        align-items: stretch;
+        justify-content: space-between;
         min-width: 9.6rem;
         margin-left: 3.2rem;
+        align-items: center;
 
         @include respond-to('xs') {
             flex-direction: row;
             align-items: center;
             margin: -.8rem 0 .8rem;
+        }
+
+        .info-tour {
+            color: $gray;
+            font-size: 1.3rem;
+            font-style: italic;
+            line-height: 1.8;
         }
     }
 
