@@ -352,6 +352,14 @@ class Tour(models.Model):
         return True
 
     @property
+    def watershed_alliance(self):
+        """Returns true if all destinations in this tour are in the Watershed Alliance."""
+        for td in self.tour_destinations.all():
+            if not td.destination.watershed_alliance:
+                return False
+        return True
+
+    @property
     def first_destination(self):
         if self.tour_destinations.count() > 0:
             return self.tour_destinations.order_by('order').first().destination
