@@ -4,7 +4,7 @@ from django.forms import ModelForm, ValidationError
 
 from cac_tripplanner.image_utils import validate_image
 
-from .models import (Destination, Event, Tour, TourDestination,
+from .models import (Destination, Event, EventDestination, Tour, TourDestination,
                      NARROW_IMAGE_DIMENSIONS, WIDE_IMAGE_DIMENSIONS)
 
 logger = logging.getLogger(__name__)
@@ -36,13 +36,7 @@ class EventForm(DestinationForm):
 
     class Meta:
         model = Event
-        exclude = []
-
-    def __init__(self, *args, **kwargs):
-        super(EventForm, self).__init__(*args, **kwargs)
-        self.fields['destinations'].widget.can_delete_related = False
-        self.fields['destinations'].widget.can_add_related = False
-        self.fields['destinations'].widget.can_change_related = False
+        exclude = ['destinations']
 
     def clean(self):
         """Validate start date is less than end date"""
@@ -56,14 +50,10 @@ class EventForm(DestinationForm):
         return cleaned_data
 
 
-class TourDestinationForm(ModelForm):
-
-    class Meta:
-        model = TourDestination
-        exclude = []
+class OrderedDestinationForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
-        """Autoincrement the 'order' number for first new tour destination added."""
+        # Autoincrement the 'order' number for first new tour destination added.
         prefix = kwargs['prefix'][len(kwargs['prefix']) - 1:] if 'prefix' in kwargs else ''
         order = int(prefix) + 1 if prefix.isnumeric() else 0
 
@@ -71,11 +61,25 @@ class TourDestinationForm(ModelForm):
             if 'initial' not in kwargs:
                 kwargs['initial'] = {}
             kwargs['initial'].update({'order': order})
-        return super(TourDestinationForm, self).__init__(*args, **kwargs)
+        return super(OrderedDestinationForm, self).__init__(*args, **kwargs)
+
+
+class TourDestinationForm(OrderedDestinationForm):
+
+    class Meta:
+        model = TourDestination
+        exclude = []
+
+
+class EventDestinationForm(OrderedDestinationForm):
+
+    class Meta:
+        model = EventDestination
+        exclude = []
 
     def clean(self):
         """Validate start date is less than end date"""
-        cleaned_data = super(TourDestinationForm, self).clean()
+        cleaned_data = super(EventDestinationForm, self).clean()
         start = self.cleaned_data.get('start_date')
         end = self.cleaned_data.get('end_date')
 
