@@ -1,5 +1,6 @@
-import urllib
-import urlparse
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from storages.backends.s3boto import S3BotoStorage
 
@@ -22,9 +23,9 @@ class PublicS3BotoStorage(S3BotoStorage):
 
     def url(self, name):
         orig = super(PublicS3BotoStorage, self).url(name)
-        scheme, netloc, path, params, query, fragment = urlparse.urlparse(orig)
-        params = urlparse.parse_qs(query)
+        scheme, netloc, path, params, query, fragment = urllib.parse.urlparse(orig)
+        params = urllib.parse.parse_qs(query)
         if 'x-amz-security-token' in params:
             del params['x-amz-security-token']
-        query = urllib.urlencode(params)
-        return urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        query = urllib.parse.urlencode(params)
+        return urllib.parse.urlunparse((scheme, netloc, path, params, query, fragment))

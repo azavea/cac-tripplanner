@@ -1,4 +1,5 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
+from django.urls import include
 from django.views.generic import RedirectView
 from django.contrib.gis import admin
 
@@ -7,7 +8,7 @@ from django.contrib.staticfiles import views as staticviews
 from cms import views as cms_views
 from destinations import views as dest_views
 
-import settings
+from django.conf import settings
 
 urlpatterns = [
     # Home view, which is also the directions and explore views
@@ -51,9 +52,9 @@ urlpatterns = [
     url(r'^learn/(?P<slug>[\w-]+)/$', cms_views.learn_detail, name='learn-detail'),
 
     # Link Shortening
-    url(r'^link/', include('shortlinks.urls')),
+    url(r'^link/', include('shortlinks.urls', namespace='shortlinks')),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import os
 import re
 from shutil import copytree, rmtree
@@ -59,7 +59,7 @@ def copy_default_images():
         copytree(settings.DEFAULT_MEDIA_SRC_PATH, DEST_DIRECTORY)
     except OSError as e:
         # file exists error, rmtree is dumb and we can only copy to an empty directory
-        if e[0] != 17:
+        if e.errno != 17:
             raise
 
 

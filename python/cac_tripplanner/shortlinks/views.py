@@ -1,6 +1,6 @@
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
@@ -8,7 +8,7 @@ from django.views.generic.base import RedirectView
 
 from .forms import ShortenedLinkForm
 from .models import ShortenedLink, ShortenedLinkHit
-from shortener import LinkShortener
+from .shortener import LinkShortener
 
 
 class ShortenedLinkRedirectView(RedirectView):
@@ -42,7 +42,7 @@ class ShortenedLinkCreateView(View):
         if link_form.is_valid():
             shortened = link_form.save()
             # Generate a full derefencing URL
-            short_path = reverse('dereference-shortened',
+            short_path = reverse('shortlinks:dereference-shortened',
                                  kwargs={'key': shortened.key})
             short_url = request.build_absolute_uri(short_path)
             return HttpResponse(json.dumps({'shortenedUrl': short_url}), status=201)

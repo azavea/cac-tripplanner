@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
-from django.db.models import Count, OuterRef, Subquery
+from django.db.models import Count, Manager as GeoManager, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
@@ -22,7 +22,7 @@ def generate_filename(instance, filename):
     return generate_image_filename('destinations', instance, filename)
 
 
-class DestinationManager(models.GeoManager):
+class DestinationManager(GeoManager):
     """Custom manager for Destinations that allows filtering on published."""
 
     def published(self):
@@ -47,7 +47,7 @@ class DestinationCategory(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -59,7 +59,7 @@ class Activity(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -101,7 +101,7 @@ class UserFlag(models.Model):
             models.Index(fields=['user_uuid', 'historic', 'object_id', 'is_event']),
         ]
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0} flagged: {1}".format(self.attraction.name, self.flag)
 
 
@@ -177,7 +177,7 @@ class Destination(Attraction):
 
     objects = DestinationManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -194,7 +194,7 @@ class Event(Attraction):
 
     objects = EventManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -211,16 +211,16 @@ class ExtraImage(models.Model):
                                  help_text='Image will be displayed at ' +
                                  WIDE_IMAGE_DIMENSION_STRING)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.image_raw.url if self.image_raw else ''
 
 
 class ExtraDestinationPicture(ExtraImage):
-    destination = models.ForeignKey('Destination')
+    destination = models.ForeignKey('Destination', on_delete=models.CASCADE)
 
 
 class ExtraEventPicture(ExtraImage):
-    event = models.ForeignKey('Event')
+    event = models.ForeignKey('Event', on_delete=models.CASCADE)
 
 
 def user_flag_summary_manger_factory(manager_for_events=False):

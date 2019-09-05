@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib.gis.geos import Point
 from django.core.files import File
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import Client, TestCase
 from django.utils.timezone import now
 

@@ -7,4 +7,4 @@ class LinkShortener(object):
     # If the logic of this function is changed, you will also likely need to
     # change urls.py and the ShortenedLink.key field.
     def generate_key(self, link_text):
-        return b58encode(uuid.uuid4().bytes)
+        return b58encode(uuid.uuid4().bytes).decode('ascii')
