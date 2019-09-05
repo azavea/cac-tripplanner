@@ -336,6 +336,7 @@ class Tour(models.Model):
         ordering = ['priority', '?']
 
     name = models.CharField(max_length=50, unique=True)
+    description = RichTextField(blank=True, null=True)
     priority = models.IntegerField(default=9999, null=False)
     destinations = models.ManyToManyField('TourDestination')
     published = models.BooleanField(default=False)
