@@ -31,6 +31,22 @@
                         href="{% url 'place-detail' pk=event_dest.destination.pk %}">
                         {{ event_dest.destination.name }}
                     </a>
+                    {% if event_dest.start_date and event_dest.end_date %}
+                    {% if not event.single_day %}
+                    <!-- only show dates for multi-day events -->
+                        <div class="info-event-date">
+                        {{ event_dest.start_date|date:"D M j" }}&nbsp;
+                    </div>
+                    {% endif %}
+                    <div class="info-event-time">
+                        <span class="start-time">
+                            {{ event_dest.start_date|time:"fA"|lower }}
+                        </span>&ndash;
+                        <span class="end-time">
+                            {{ event_dest.end_date|time:"fA"|lower }}
+                        </span>
+                    </div>
+                    {% endif %}
                     {% if not forloop.last %}<hr />{% endif %}
                     {% endfor %}
                 </h3>
@@ -47,7 +63,7 @@
                 </div>
             </div>
             <div class="info-event-meta">
-                {% if event.start_date|localtime|date:"D M j" == event.end_date|localtime|date:"D M j" %}
+                {% if event.single_day %}
                 <!-- same-day event -->
                 <div class="info-event-date">
                     {{ event.start_date|date:"D M j" }}&nbsp;
