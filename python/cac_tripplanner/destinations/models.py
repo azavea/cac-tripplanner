@@ -229,6 +229,12 @@ class Event(Attraction):
     def __str__(self):
         return self.name
 
+    @property
+    def first_destination(self):
+        if self.event_destinations.count() > 0:
+            return self.event_destinations.order_by('order').first().destination
+        return None
+
 
 class ExtraImage(models.Model):
 
