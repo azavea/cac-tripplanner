@@ -231,9 +231,17 @@ class Event(Attraction):
 
     @property
     def first_destination(self):
+        """Returns the first ordered destination for this event."""
         if self.event_destinations.count() > 0:
             return self.event_destinations.order_by('order').first().destination
         return None
+
+    @property
+    def single_day(self):
+        """"Returns true if event ends on the same day it starts."""
+        if self.start_date and self.end_date:
+            return self.start_date.date() == self.end_date.date()
+        return False
 
 
 class ExtraImage(models.Model):
