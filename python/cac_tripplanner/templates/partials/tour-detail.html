@@ -91,21 +91,6 @@
                     <h2 class="place-card-name">{{ destination.name }}</h2>
                 </div>
                 <div class="place-card-footer">
-                    <div class="place-card-actions">
-                        {% get_directions_id destination as directions_id %}
-                        {% if directions_id %}
-                        <a class="place-card-action place-action-go"
-                            data-destination-id="{{ directions_id }}"
-                            href="#">Directions</a>
-                        {% endif %}
-                        <a class="place-card-action place-action-details"
-                           {% if destination.is_event %}
-                           href="{% url 'event-detail' pk=destination.pk %}"
-                           {% else %}
-                           href="{% url 'place-detail' pk=destination.pk %}"
-                           {% endif %}
-                           >More info</a>
-                    </div>
                     <div class="place-card-badges">
                         {% has_activity destination 'cycling' as has_cycling %}
                         {% if has_cycling %}
