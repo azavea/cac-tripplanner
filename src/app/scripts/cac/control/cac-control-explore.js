@@ -36,7 +36,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     var fetchingIsochrone = false;
 
     var allDestinations = []; // cache full list of destinations
-    var twoEvents = []; // track the first two events, to use when displaying all
+    // track the first two events and tours, to use when displaying all
+    var twoEvents = [];
+    var twoTours = [];
     var isochroneDestinationIds = null; // cache IDs of destinations within isochrone
 
     var events = $({});
@@ -426,12 +428,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         }
 
         Places.getAllPlaces(exploreLatLng).then(function(data) {
-            setDestinationsEvents(data);
+            setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
-            setDestinationsEvents();
+            setDestinationsEventsTours();
             showPlacesContent();
         });
     }
@@ -471,11 +473,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
                 // with the matching destinations (not up top)
                 return places;
             } else {
-                // no isochrone filter in place; show only the first two events, up top
-                var noEvents = _.reject(places, function(place) {
-                    return _.indexOf(place.categories, 'Events') > -1;
+                // no isochrone filter in place;
+                // show only the first two events and tours, up top
+                var noEventsOrTours = _.reject(places, function(place) {
+                    return _.indexOf(place.categories, 'Events') > -1 ||
+                        _.indexOf(place.categories, 'Tours') > -1;
                 });
-                return twoEvents.concat(noEvents);
+                return twoEvents.concat(twoTours).concat(noEventsOrTours);
             }
         }
 
@@ -498,12 +502,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         }
 
         Places.getAllPlaces(exploreLatLng).then(function(data) {
-            setDestinationsEvents(data);
+            setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
-            setDestinationsEvents();
+            setDestinationsEventsTours();
             showPlacesContent();
         });
     }
@@ -515,15 +519,17 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
      *
      * @param data {Object} response from getAllPlaces
      */
-    function setDestinationsEvents(data) {
+    function setDestinationsEventsTours(data) {
         if (!data) {
             allDestinations = [];
             twoEvents = [];
+            twoTours = [];
             return;
         }
         allDestinations = data.destinations.concat(data.events).concat(data.tours);
-        // grab the first two events, to use when displaying 'All'
+        // grab the first two events and tours, to use when displaying 'All'
         twoEvents = data.events.slice(0, 2);
+        twoTours = data.tours.slice(0, 2);
     }
 
 })(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Places.Places, CAC.Routing.Plans,
