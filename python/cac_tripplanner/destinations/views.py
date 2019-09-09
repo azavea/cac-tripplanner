@@ -276,12 +276,19 @@ def set_event_properties(event):
     obj = set_attraction_properties(obj, event, extra_images)
     # add properties of first related destination, if any
     obj = set_location_properties(obj, event.destinations.first())
-    obj['destinations'] = [set_destination_properties(x)
-                           for x in event.destinations.all()]
+    destinations = []
+    for x in event.event_destinations.all():
+        dest = set_destination_properties(x.destination)
+        dest['order'] = x.order
+        # optional start/end date/times
+        dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
+        dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
+        destinations.append(dest)
+    obj['destinations'] = destinations
 
     # if the first related destination belongs to Watershed Alliance, so does this event
-    obj['watershed_alliance'] = (event.destinations.first().watershed_alliance
-                                 if event.destinations.count() else False)
+    obj['watershed_alliance'] = (event.event_destinations.first().destination.watershed_alliance
+                                 if event.event_destinations.count() else False)
     return obj
 
 
@@ -301,9 +308,7 @@ def set_tour_properties(tour):
     obj['destinations'] = []
     for x in tour.tour_destinations.all():
         dest = set_destination_properties(x.destination)
-        # tour destinations also have optional start/end date/times
-        dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
-        dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
+        dest['order'] = x.order
         obj['destinations'].append(dest)
 
     # Use the images from the first destination for the tour
