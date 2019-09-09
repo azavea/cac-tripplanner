@@ -238,6 +238,10 @@
         font-size: 1.8rem;
         font-weight: $font-weight-medium;
         line-height: 1.5;
+
+        .hidden-extra {
+            display: none;
+        }
     }
 
     .info-event-destination-link {
