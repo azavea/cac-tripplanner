@@ -66,10 +66,66 @@
         <ul class="place-list">
             {% for d in tour.tour_destinations.all %}
             {% with destination=d.destination %}
-            <li>
-                <h2 class="place-card-name">
-                    {{ destination.name }} Order: {{ forloop.counter }}
-                </h2>
+            <li class="place-card no-origin"
+                {% get_directions_id destination as directions_id %}
+                data-destination-id="{{ directions_id }}"
+                data-destination-x="{{ destination.point.x }}"
+                data-destination-y="{{ destination.point.y }}">
+                <div class="place-card-photo-container">
+                    <img class="place-card-photo"
+                        {% if destination.image %}
+                            src="{% cropped_thumbnail destination 'image' %}"
+                        {% else %}
+                            src="https://placehold.it/310x155.jpg"
+                        {% endif %}
+                        width="310" height="155"
+                        alt="{{ destination.name }}" />
+                </div>
+                <div class="place-card-info">
+                    <div class="place-card-meta">
+                        <div class="travel-logistics">
+                            <span class="travel-logistics-duration">N min</span>
+                            from <span class="travel-logistics-origin">origin</span>
+                        </div>
+                    </div>
+                    <h2 class="place-card-name">{{ destination.name }}</h2>
+                </div>
+                <div class="place-card-footer">
+                    <div class="place-card-actions">
+                        {% get_directions_id destination as directions_id %}
+                        {% if directions_id %}
+                        <a class="place-card-action place-action-go"
+                            data-destination-id="{{ directions_id }}"
+                            href="#">Directions</a>
+                        {% endif %}
+                        <a class="place-card-action place-action-details"
+                           {% if destination.is_event %}
+                           href="{% url 'event-detail' pk=destination.pk %}"
+                           {% else %}
+                           href="{% url 'place-detail' pk=destination.pk %}"
+                           {% endif %}
+                           >More info</a>
+                    </div>
+                    <div class="place-card-badges">
+                        {% has_activity destination 'cycling' as has_cycling %}
+                        {% if has_cycling %}
+                        <span class="badge activity" title="Cycling">
+                            <i class="icon-cycling"></i>
+                        </span>
+                        {% endif %}
+                        {% if destination.watershed_alliance %}
+                        <a class="badge link"
+                            href="https://www.watershedalliance.org/"
+                            title="Alliance for Watershed Education"
+                            target="_blank">
+                            <img class="image"
+                                src="/static/images/awe-icon.png"
+                                srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
+                                height="20"
+                                alt="Alliance for Watershed Education"></a>
+                        {% endif %}
+                    </div>
+                </div>
             </li>
             {% endwith %}
             {% endfor %}
