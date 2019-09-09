@@ -21,7 +21,7 @@
         <div class="info-article-header-info">
             <div class="info-article-header-main">
                 <h2 class="info-article-title">{{ event.name }}</h2>
-                {% if event.event_destinations.count > 0 %}
+                {% if event.first_destination %}
                 <h3 class="info-event-destination">
                     at
                     <!-- TODO: limit to the first four destinations, with JS to
@@ -52,10 +52,15 @@
                 </h3>
                 {% endif %}
                 <div class="info-place-actions">
-                    {% if event.destination %}
+                    {% if event.event_destinations.count > 1 %}
+                    <!-- TODO: #1111 link to tour directions instead of first destination-->
                     <a class="place-action-go"
-                        data-destination-id="{{ event.destination.id }}"
-                        href="/?destination={{ event.destination.point.y }}%2C{{ event.destination.point.x }}&destinationText={{ event.destination.name|urlencode }}">Directions</a>
+                        data-destination-id="{{ event.first_destination.id }}"
+                        href="/?destination={{ event.first_destination.point.y }}%2C{{ event.first_destination.point.x }}&destinationText={{ event.name|urlencode }}">Map</a>
+                    {% elif event.first_destination %}
+                    <a class="place-action-go"
+                        data-destination-id="{{ event.first_destination.id }}"
+                        href="/?destination={{ event.first_destination.point.y }}%2C{{ event.first_destination.point.x }}&destinationText={{ event.first_destination.name|urlencode }}">Directions</a>
                     {% endif %}
                     <a class="place-website-link"
                         href="{{ event.website_url }}"
