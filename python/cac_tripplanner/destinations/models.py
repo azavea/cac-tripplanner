@@ -205,7 +205,7 @@ class EventDestination(models.Model):
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.destination and self.destination.name and self.order:
             return '{name}, order: {order}'.format(name=self.destination.name,
                                                    order=self.order)
@@ -344,7 +344,7 @@ class TourDestination(models.Model):
                                      related_name='tour_destinations')
     order = models.PositiveIntegerField(default=1, null=False, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.destination and self.destination.name and self.order:
             return '{name}, order: {order}'.format(name=self.destination.name,
                                                    order=self.order)
@@ -364,6 +364,9 @@ class Tour(models.Model):
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
+
+    def __str__(self):
+        return self.name
 
     @property
     def accessible(self):
@@ -402,6 +405,3 @@ class Tour(models.Model):
             if td.destination.activities.filter(name=activity_name).exists():
                 return True
         return False
-
-    def __unicode__(self):
-        return self.name
