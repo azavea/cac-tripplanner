@@ -275,7 +275,7 @@ def set_event_properties(event):
     extra_images = ExtraEventPicture.objects.filter(event=event)
     obj = set_attraction_properties(obj, event, extra_images)
     # add properties of first related destination, if any
-    obj = set_location_properties(obj, event.destinations.first())
+    obj = set_location_properties(obj, event.first_destination)
     destinations = []
     for x in event.event_destinations.all():
         dest = set_destination_properties(x.destination)
