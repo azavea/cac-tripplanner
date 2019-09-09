@@ -62,11 +62,11 @@ def home(request):
     # Show all destinations, events, and tours
     destinations = list(Destination.objects.published().order_by('priority'))
     events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
-    tours = list(Tour.objects.published().order_by('priority'))
+    tours = list(Tour.objects.published().order_by('priority'))[:2]
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': events + destinations + tours
+        'destinations': events + tours + destinations
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
