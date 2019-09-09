@@ -24,31 +24,45 @@
                 {% if event.first_destination %}
                 <h3 class="info-event-destination">
                     at
-                    <!-- TODO: limit to the first four destinations, with JS to
-                        toggle showing the rest, if any -->
+                    <!-- limit to the first four destinations, with JS to show the rest, if any -->
+                    {% with max_destinations=4 %}
                     {% for event_dest in event.event_destinations.all %}
-                    <a class="info-event-destination-link"
-                        href="{% url 'place-detail' pk=event_dest.destination.pk %}">
-                        {{ event_dest.destination.name }}
-                    </a>
-                    {% if event_dest.start_date and event_dest.end_date %}
-                    {% if not event.single_day %}
-                    <!-- only show dates for multi-day events -->
-                        <div class="info-event-date">
-                        {{ event_dest.start_date|date:"D M j" }}&nbsp;
+                    <div class="{% if forloop.counter > max_destinations %}extra-destination hidden-extra{% endif %}">
+                        <a class="info-event-destination-link"
+                            href="{% url 'place-detail' pk=event_dest.destination.pk %}">
+                            {{ event_dest.destination.name }}
+                        </a>
+                        {% if event_dest.start_date and event_dest.end_date %}
+                        {% if not event.single_day %}
+                        <!-- only show dates for multi-day events -->
+                            <div class="info-event-date">
+                            {{ event_dest.start_date|date:"D M j" }}&nbsp;
+                        </div>
+                        {% endif %}
+                        <div class="info-event-time">
+                            <span class="start-time">
+                                {{ event_dest.start_date|time:"fA"|lower }}
+                            </span>&ndash;
+                            <span class="end-time">
+                                {{ event_dest.end_date|time:"fA"|lower }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if not forloop.last %}<hr />{% endif %}
                     </div>
-                    {% endif %}
-                    <div class="info-event-time">
-                        <span class="start-time">
-                            {{ event_dest.start_date|time:"fA"|lower }}
-                        </span>&ndash;
-                        <span class="end-time">
-                            {{ event_dest.end_date|time:"fA"|lower }}
-                        </span>
-                    </div>
-                    {% endif %}
-                    {% if not forloop.last %}<hr />{% endif %}
                     {% endfor %}
+                    {% if event.event_destinations.count > max_destinations %}
+                    <a class="info-event-destination-link info-more-link"
+                        href="#"
+                        onclick="
+                            jQuery('.extra-destination').toggleClass('hidden-extra');
+                            jQuery('.info-more-link').toggleClass('hidden-extra');
+                            return false;
+                        ">
+                        See all {{ event.event_destinations.count }} locations
+                    </a>
+                    {% endif %}
+                    {% endwith %}
                 </h3>
                 {% endif %}
                 <div class="info-place-actions">
