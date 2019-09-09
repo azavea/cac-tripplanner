@@ -286,6 +286,10 @@ def set_event_properties(event):
         destinations.append(dest)
     obj['destinations'] = destinations
 
+    # For backwards compatibility for the mobile app,
+    # still return 'destination' with the ID of the first destination, if any.
+    obj['destination'] = destinations[0]['id'] if len(destinations) > 0 else None
+
     # if the first related destination belongs to Watershed Alliance, so does this event
     obj['watershed_alliance'] = (event.event_destinations.first().destination.watershed_alliance
                                  if event.event_destinations.count() else False)
