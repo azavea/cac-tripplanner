@@ -1,7 +1,7 @@
 {% load cropping %}
 <div class="preview-card">
     <a class="preview-card-link" href="{% url 'tour-detail' pk=tour.pk %}">
-        <img class="preview-photo" src="{% cropped_thumbnail tour 'image' %}"
+        <img class="preview-photo" src="{% cropped_thumbnail tour.first_destination 'image' %}"
              width="310" alt="{{ tour.name }}" />
         <div class="preview-details">
             <h2>{{ tour.name }}</h2>
