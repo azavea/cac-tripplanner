@@ -46,7 +46,7 @@
     font-weight: $font-weight-medium;
     line-height: 1.0rem;
 
-    .place-card.no-origin:not(.event-card) & {
+    .place-card.no-origin.destination & {
         display: none;
     }
 
@@ -66,6 +66,17 @@
     .travel-logistics-distance {
         font-weight: $font-weight-bold;
         line-height: 1.4rem;
+    }
+
+    .tour-label {
+        display: none;
+        color: $gophillygo-green;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+
+        .place-card.no-origin.tour-card & {
+            display: block;
+        }
     }
 
     .event-label {
