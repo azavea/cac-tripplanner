@@ -4,6 +4,28 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def add_eventdestinations(apps, schema_editor):
+    """Move event Destinations to EventDestination complex related objects."""
+    Event = apps.get_model('destinations', 'Event')
+    EventDestination = apps.get_model('destinations', 'EventDestination')
+    for event in Event.objects.all():
+        for idx, destination in enumerate(event.tmp_destinations.all()):
+            event_destination = EventDestination(
+                destination=destination, related_event=event, order=idx + 1)
+            event_destination.save()
+            event.event_destinations.add(event_destination)
+        event.save()
+
+
+def remove_eventdestinations(apps, schema_editor):
+    """Move EventDestinations back to simple related Destinations."""
+    Event = apps.get_model('destinations', 'Event')
+    for event in Event.objects.all():
+        for event_destination in event.event_destinations.all():
+            event.tmp_destinations.add(event_destination.destination)
+            event.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,6 +33,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='event',
+            old_name='destinations',
+            new_name='tmp_destinations',
+        ),
         migrations.CreateModel(
             name='EventDestination',
             fields=[
@@ -23,6 +50,27 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ['order', '-start_date'],
             },
+        ),
+        migrations.AddField(
+            model_name='event',
+            name='destinations',
+            field=models.ManyToManyField(blank=True, to='destinations.EventDestination'),
+        ),
+        migrations.AddField(
+            model_name='eventdestination',
+            name='related_event',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='event_destinations',
+                                    to='destinations.Event'),
+        ),
+        migrations.RunPython(add_eventdestinations, remove_eventdestinations),
+        migrations.RemoveField(
+            model_name='event',
+            name='tmp_destinations',
+        ),
+        migrations.AlterUniqueTogether(
+            name='eventdestination',
+            unique_together={('destination', 'related_event')},
         ),
         migrations.AlterModelOptions(
             name='tourdestination',
@@ -43,19 +91,5 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='tourdestination',
             name='start_date',
-        ),
-        migrations.AlterField(
-            model_name='event',
-            name='destinations',
-            field=models.ManyToManyField(blank=True, to='destinations.EventDestination'),
-        ),
-        migrations.AddField(
-            model_name='eventdestination',
-            name='related_event',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='event_destinations', to='destinations.Event'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='eventdestination',
-            unique_together={('destination', 'related_event')},
         ),
     ]
