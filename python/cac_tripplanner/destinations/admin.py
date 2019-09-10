@@ -98,6 +98,55 @@ class DestinationAdmin(ImageCroppingMixin, PublishableMixin, gis.admin.OSMGeoAdm
         ]
 
 
+def save_ordered_formset(form, formset, OrderedDestination, related_field):
+    """Helper for normalizing tour and event destination ordering on form save.
+
+    :param form: Django form passed to save_formset
+    :param formset: Django formset passed to save_formset
+    :param OrderedDestination: Class of related object for destinations with orders
+    :param related_field: Name of field for this related object on OrderedDestination
+    """
+    # save without committing to be able to delete any removed destinations
+    formset.save(commit=False)
+    for obj in formset.deleted_objects:
+        obj.delete()
+
+    # commit save here to assign IDs to any newly added destinations
+    instances = formset.save(commit=True)
+
+    # Normalize the ordering of the destinations
+    instance_id = form.instance.id
+    # get a list of dicts with 'order' and related 'id' properties
+    filter_kwargs = {'{fld}'.format(fld=related_field): instance_id}
+    last_destinations = list(OrderedDestination.objects.filter(
+        **filter_kwargs).values('id', 'order'))
+    # Retain the current formset order as a third dict property
+    for formset_order, dest in enumerate(last_destinations):
+        dest['formset_order'] = formset_order
+
+    # Update the order with any changed formset value
+    for instance in instances:
+        for d in last_destinations:
+            if d['id'] == instance.id:
+                d['order'] = instance.order
+                break
+
+    # Sort destinations by 1) newly assigned order then 2) last (formset) order.
+    # This means multiple destinations given the same order will be ordered
+    # secondarily based on their position in the inline formset, top to bottom.
+    resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
+
+    # Reassign order values so that they are normalized to
+    # start at 1, increment by 1, and not repeat or skip any integers.
+    for normalized_order, dest in enumerate(resorted):
+        new_order = normalized_order + 1
+        # update objects that need their order changed
+        if dest['order'] != new_order:
+            OrderedDestination.objects.filter(id=dest['id']).update(order=new_order)
+
+    form.save_m2m()
+
+
 class EventAdmin(ImageCroppingMixin, PublishableMixin, admin.ModelAdmin):
     form = EventForm
 
@@ -110,45 +159,7 @@ class EventAdmin(ImageCroppingMixin, PublishableMixin, admin.ModelAdmin):
     inlines = [ExtraEventImagesInline, EventDestinationsInline]
 
     def save_formset(self, request, form, formset, change):
-
-        # save without committing to be able to delete any removed EventDestinations
-        formset.save(commit=False)
-        for obj in formset.deleted_objects:
-            obj.delete()
-
-        # commit save here to assign IDs to any newly added EventDestinations
-        instances = formset.save(commit=True)
-
-        # Normalize the ordering of the destinations
-        event_id = form.instance.id
-        # get a list of dicts with EventDestination 'id' and 'order' properties
-        last_destinations = list(EventDestination.objects.filter(
-            related_event_id=event_id).values('id', 'order'))
-        # Retain the current formset order as a third dict property
-        for formset_order, dest in enumerate(last_destinations):
-            dest['formset_order'] = formset_order
-
-        # Update the order with any changed formset value
-        for instance in instances:
-            for d in last_destinations:
-                if d['id'] == instance.id:
-                    d['order'] = instance.order
-                    break
-
-        # Sort destinations by 1) newly assigned order then 2) last (formset) order.
-        # This means multiple destinations given the same order will be ordered
-        # secondarily based on their position in the inline formset, top to bottom.
-        resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
-
-        # Reassign order values so that they are normalized to
-        # start at 1, increment by 1, and not repeat or skip any integers.
-        for normalized_order, dest in enumerate(resorted):
-            new_order = normalized_order + 1
-            # update objects that need their order changed
-            if dest['order'] != new_order:
-                EventDestination.objects.filter(id=dest['id']).update(order=new_order)
-
-        form.save_m2m()
+        save_ordered_formset(form, formset, EventDestination, 'related_event_id')
 
 
 class AttractionUserFlagsAdmin(admin.ModelAdmin):
@@ -174,44 +185,7 @@ class TourAdmin(PublishableMixin, admin.ModelAdmin):
     ordering = ('name',)
 
     def save_formset(self, request, form, formset, change):
-        # save without committing to be able to delete any removed TourDestinations
-        formset.save(commit=False)
-        for obj in formset.deleted_objects:
-            obj.delete()
-
-        # commit save here to assign IDs to any newly added TourDestinations
-        instances = formset.save(commit=True)
-
-        # Normalize the ordering of the destinations
-        tour_id = form.instance.id
-        # get a list of dicts with TourDestination 'id' and 'order' properties
-        last_destinations = list(TourDestination.objects.filter(
-            related_tour_id=tour_id).values('id', 'order'))
-        # Retain the current formset order as a third dict property
-        for formset_order, dest in enumerate(last_destinations):
-            dest['formset_order'] = formset_order
-
-        # Update the order with any changed formset value
-        for instance in instances:
-            for d in last_destinations:
-                if d['id'] == instance.id:
-                    d['order'] = instance.order
-                    break
-
-        # Sort destinations by 1) newly assigned order then 2) last (formset) order.
-        # This means multiple destinations given the same order will be ordered
-        # secondarily based on their position in the inline formset, top to bottom.
-        resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
-
-        # Reassign order values so that they are normalized to
-        # start at 1, increment by 1, and not repeat or skip any integers.
-        for normalized_order, dest in enumerate(resorted):
-            new_order = normalized_order + 1
-            # update objects that need their order changed
-            if dest['order'] != new_order:
-                TourDestination.objects.filter(id=dest['id']).update(order=new_order)
-
-        form.save_m2m()
+        save_ordered_formset(form, formset, TourDestination, 'related_tour_id')
 
 
 admin.site.register(Destination, DestinationAdmin)
