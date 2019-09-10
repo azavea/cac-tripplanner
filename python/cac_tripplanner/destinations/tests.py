@@ -44,6 +44,19 @@ class EventTests(TestCase):
     def test_event_manager_current(self):
         self.assertEqual(Event.objects.current().count(), 1)
 
+    def test_event_detail_view(self):
+        """Test that event detail view works"""
+        url = reverse('event-detail',
+                      kwargs={'pk': self.event_1.pk})
+        response = self.client.get(url)
+        self.assertContains(response, 'Current Event', status_code=200)
+
+        # cannot view detail for unpublished event
+        url = reverse('event-detail',
+                      kwargs={'pk': self.event_2.pk})
+        response_404 = self.client.get(url)
+        self.assertEqual(response_404.status_code, 404)
+
 
 class DestinationTests(TestCase):
     def setUp(self):
