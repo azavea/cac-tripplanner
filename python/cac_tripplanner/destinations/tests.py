@@ -1,4 +1,5 @@
 from datetime import timedelta
+import json
 
 from django.contrib.gis.geos import Point
 from django.core.files import File
@@ -56,6 +57,17 @@ class EventTests(TestCase):
                       kwargs={'pk': self.event_2.pk})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
+
+    def test_event_search(self):
+        """Test that event shows in search results"""
+        url = reverse('api_destinations_search')
+        response = self.client.get(url)
+        self.assertContains(response, 'events', status_code=200)
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response['events']), 1)
+        event = json_response['events'][0]
+        self.assertEqual(event['name'], 'Current Event')
+        self.assertIn('Events', event['categories'])
 
 
 class EventMultiDestinationTests(TestCase):
@@ -179,6 +191,28 @@ class EventMultiDestinationTests(TestCase):
         self.assertEqual(self.event_2.event_destinations.first().order, 1)
         self.assertEqual(self.event_2.event_destinations.all()[1].order, 2)
 
+    def test_event_search(self):
+        """Test that events show in search results"""
+        url = reverse('api_destinations_search')
+        response = self.client.get(url)
+        self.assertContains(response, 'events', status_code=200)
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response['events']), 2)
+        first_event = json_response['events'][0]
+        # multi day event started earlier and should be listed first
+        self.assertEqual(first_event['name'], 'multi_day_event')
+        self.assertIn('Events', first_event['categories'])
+        self.assertEqual(len(first_event['destinations']), 2)
+        self.assertEqual(first_event['destinations'][0]['name'], 'place_one')
+        self.assertEqual(first_event['destinations'][1]['name'], 'place_two')
+
+        # single day event orders destinations differently
+        second_event = json_response['events'][1]
+        self.assertEqual(second_event['name'], 'single_day_event')
+        self.assertEqual(len(second_event['destinations']), 2)
+        self.assertEqual(second_event['destinations'][0]['name'], 'place_two')
+        self.assertEqual(second_event['destinations'][1]['name'], 'place_one')
+
 
 class DestinationTests(TestCase):
     def setUp(self):
@@ -226,6 +260,14 @@ class DestinationTests(TestCase):
                       kwargs={'pk': self.place_3.pk})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
+
+    def test_destination_search(self):
+        """Test that destinations show in search results"""
+        url = reverse('api_destinations_search') + '?text=place'
+        response = self.client.get(url)
+        self.assertContains(response, 'destinations', status_code=200)
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response['destinations']), 2)
 
 
 class TourTests(TestCase):
@@ -318,6 +360,14 @@ class TourTests(TestCase):
                       kwargs={'pk': self.tour_2.pk})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
+
+    def test_tour_search(self):
+        """Test that tour shows in search results"""
+        url = reverse('api_destinations_search')
+        response = self.client.get(url)
+        self.assertContains(response, 'tours', status_code=200)
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response['tours']), 1)
 
     def test_tour_destination_order(self):
         self.assertEqual(self.tour_1.tour_destinations.count(), 2)
