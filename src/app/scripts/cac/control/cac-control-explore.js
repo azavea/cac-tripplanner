@@ -452,9 +452,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         }
 
         // Filter by both isochrone and category.
-        // For events without a destination (placeID), exclude from results
+        // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
-            return _.includes(isochroneDestinationIds, place.placeID) ? place.placeID: false;
+            const destinationIds = place.destinations ?
+                _.flatMap(place.destinations, 'id') : [place.placeID];
+            return _.intersection(isochroneDestinationIds, destinationIds);
         }));
     }
 
