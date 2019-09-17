@@ -389,7 +389,7 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         }
         var placeCard = $(event.target).closest(options.selectors.placeCard);
         var placeIds = placeCard.data('destination-places');
-        mapControl.isochroneControl.highlightDestinations([placeId], { panTo: true });
+        mapControl.isochroneControl.highlightDestinations([placeIds], { panTo: true });
     }
 
     function onPlaceHovered(event) {

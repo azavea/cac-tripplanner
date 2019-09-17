@@ -23,7 +23,10 @@
                 <div class="info-place-actions">
                     {% if tour.first_destination %}
                     <a class="place-action-go"
+                        {% get_directions_id destination as directions_id %}
+                        {% get_place_ids tour as place_ids %}
                         data-destination-id="{{ tour.first_destination.id }}"
+                        data-destination-places="{{ place_ids }}"
                         href="/?destination={{ tour.first_destination.point.y }}%2C{{ tour.first_destination.point.x }}&destinationText={{ tour.name|urlencode }}">Tour Map</a>
                     {% endif %}
                 </div>
@@ -68,7 +71,9 @@
             {% with destination=d.destination %}
             <li class="place-card no-origin"
                 {% get_directions_id destination as directions_id %}
+                {% get_place_ids destination as place_ids %}
                 data-destination-id="{{ directions_id }}"
+                data-destination-places="{{ place_ids }}"
                 data-destination-x="{{ destination.point.x }}"
                 data-destination-y="{{ destination.point.y }}">
                 <div class="place-card-photo-container">
