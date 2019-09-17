@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django import template
@@ -44,3 +45,17 @@ def get_destination_x(obj):
 def get_destination_y(obj):
     destination = get_destination_from_obj(obj)
     return destination.point.y if destination and destination.point else None
+
+
+@register.simple_tag(name='get_place_ids')
+def get_place_ids(obj):
+    """Get the IDs for the Destinations related to a Tour or Event as a JSON array."""
+    if not obj:
+        return json.dumps([])
+    if hasattr(obj, 'tour_destinations'):
+        return json.dumps([td.destination.id for td in obj.tour_destinations.all()])
+    elif hasattr(obj, 'event_destinations'):
+        return json.dumps([ed.destination.id for ed in obj.event_destinations.all()])
+    else:
+        # return a single place ID for a Destination
+        return json.dumps([obj.id])

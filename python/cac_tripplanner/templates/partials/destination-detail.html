@@ -21,7 +21,9 @@
                 <h2 class="info-article-title">{{ destination.name }}</h2>
                 <div class="info-place-actions">
                     <a class="place-action-go"
+                        {% get_place_ids destination as place_ids %}
                         data-destination-id="{{ destination.id }}"
+                        data-destination-places="{{ place_ids }}"
                         href="/?destination={{ destination.point.y }}%2C{{ destination.point.x }}&destinationText={{ destination.name|urlencode }}">Directions</a>
                     <a class="place-website-link"
                         href="{{ destination.website_url }}"
