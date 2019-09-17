@@ -222,8 +222,6 @@ class Event(Attraction):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-    destinations = models.ManyToManyField('EventDestination', blank=True)
-
     objects = EventManager()
 
     def __str__(self):
@@ -374,7 +372,6 @@ class Tour(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = RichTextField(blank=True, null=True)
     priority = models.IntegerField(default=9999, null=False)
-    destinations = models.ManyToManyField('TourDestination')
     published = models.BooleanField(default=False)
 
     objects = DestinationManager()
