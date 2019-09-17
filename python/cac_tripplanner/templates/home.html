@@ -96,7 +96,9 @@
                     {% get_directions_id destination as directions_id %}
                     {% get_destination_x destination as destination_x %}
                     {% get_destination_y destination as destination_y %}
+                    {% get_place_ids destination as place_ids %}
                     data-destination-id="{{ directions_id }}"
+                    data-destination-places="{{ place_ids }}"
                     data-destination-x="{{ destination_x }}"
                     data-destination-y="{{ destination_y }}">
                     <div class="place-card-photo-container">
@@ -152,6 +154,7 @@
                             {% if directions_id %}
                             <a class="place-card-action place-action-go"
                                 data-destination-id="{{ directions_id }}"
+                                data-destination-places="{{ place_ids }}"
                                 href="#">Directions</a>
                             {% endif %}
                             <a class="place-card-action place-action-details"
