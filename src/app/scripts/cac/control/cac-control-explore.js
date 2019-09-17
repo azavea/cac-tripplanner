@@ -405,7 +405,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             // allDestinations has been loaded by now
             mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         destinations);
+                                                         isochroneDestinationIds);
         }
         showPlacesContent();
     }
@@ -455,8 +455,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
             const destinationIds = place.destinations ?
-                _.flatMap(place.destinations, 'id') : [place.placeID];
-            return _.intersection(isochroneDestinationIds, destinationIds);
+                _.flatMap(place.destinations, 'id') : [place.id];
+            return _.intersection(isochroneDestinationIds, destinationIds).length;
         }));
     }
 
