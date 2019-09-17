@@ -380,6 +380,7 @@ class FindReachableDestinations(View):
                 matched_objects = (Destination.objects.filter(
                     Q(point__within=geom) &
                     (Q(published=True) | Q(tours__isnull=False) | Q(events__isnull=False)))
+                    .distinct()
                     .annotate(distance=Distance('point', geom))
                     .order_by('distance', 'priority'))
         else:
