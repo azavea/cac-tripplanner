@@ -159,10 +159,29 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 url: '/api/destinations/search?text=%QUERY',
                 filter: function (response) {
                     if (response) {
+                        console.log('typeahead response:');
+                        console.log(response);
                         var destinations = response.destinations;
-                        var events = _.reject(response.events, ['placeID', null]);
-                        if (destinations.length || events.length) {
-                            return destinations.concat(events);
+                        var events = _.filter(response.events, function(event) {
+                            return event.destinations.length > 0;
+                        });
+
+                        if (destinations.length || events.length || tours.length) {
+                            var all = destinations.concat(events).concat(tours);
+                            // Prefix the IDs to ensure uniqueness.
+                            // These prefixes must match those used by the
+                            // `get_directions_id` Django template helper and by
+                            // the `cardId` Handlebars template helper.
+                            _.each(all, function(obj) {
+                                var prefix = 'place';
+                                if (obj.is_event) {
+                                    prefix = 'event';
+                                } else if (obj.is_tour) {
+                                    prefix = 'tour';
+                                }
+                                obj.id = prefix + '_' + obj.id;
+                            });
+                            return all;
                         }
                     }
                     return [];
