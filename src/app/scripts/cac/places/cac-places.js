@@ -2,7 +2,7 @@ CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
     'use strict';
 
     var module = {
-        getAllPlaces: getAllPlaces,
+        queryPlaces: queryPlaces,
         getOtpOptions: getOtpOptions,
         getDistancesToPlaces: getDistancesToPlaces
     };
@@ -10,12 +10,14 @@ CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
     return module;
 
     /**
-     * Query Django app for all destinations. If origin set, will order by distance.
+     * Query Django app for all places, events, and tours.
+     * If origin set, will order by distance.
      *
      * @param exploreLatLng {Array} Coordinates of origin point to query with; may be unset
+     * @param searchText {String} Substring of name of place/event/tour to query for; may be unset
      * @return {promise} Promise which resolves to list of destinations
      */
-    function getAllPlaces(exploreLatLng) {
+    function queryPlaces(exploreLatLng, searchText) {
         var dfd = $.Deferred();
         var searchUrl = '/api/destinations/search';
         var params = {
@@ -23,15 +25,18 @@ CAC.Places.Places = (function(_, $, UserPreferences, Utils) {
             type: 'GET'
         };
 
-        if (!exploreLatLng) {
-            // if origin is not set, re-fetch all by querying with a blank text search
-            params.data = {text: ''};
-        } else {
+        if (exploreLatLng) {
             // use origin
             params.data = {
                 lat: exploreLatLng[0],
                 lon: exploreLatLng[1]
             };
+        } else if (searchText) {
+            params.data = {text: searchText};
+        } else {
+            // neither origin nor search text set
+            // re-fetch all by querying with a blank text search
+            params.data = {text: ''};
         }
 
         $.ajax(params).done(function(data) {
