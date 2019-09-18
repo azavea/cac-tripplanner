@@ -15,13 +15,6 @@ def get_destination_from_obj(destination):
     if hasattr(destination, 'first_destination'):
         # tour with related destination(s); use the ordered first
         return destination.first_destination
-    elif hasattr(destination, 'destinations'):
-        # event with related destination(s); use the first
-        if destination.destinations.count() > 0:
-            return destination.destinations.first()
-        else:
-            # event without a destination
-            return None
     else:
         # not an event or tour
         return destination
