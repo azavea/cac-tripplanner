@@ -230,9 +230,10 @@ class Event(Attraction):
     @property
     def first_destination(self):
         """Returns the first ordered destination for this event."""
-        if self.event_destinations.count() > 0:
-            return self.event_destinations.order_by('order').first().destination
-        return None
+        try:
+            return self.event_destinations.first().destination
+        except AttributeError:
+            return None
 
     @property
     def single_day(self):
