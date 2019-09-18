@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferences) {
+CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, UserPreferences) {
 
     'use strict';
 
@@ -17,6 +17,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             places: '.places',
             selectedItineraryClass: 'selected',
             spinner: '.directions-results > .sk-spinner',
+            tourDestinationBlock: '.tour-destination-summary',
             visible: ':visible'
         }
     };
@@ -40,6 +41,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     var directionsFormControl = null;
     var directionsListControl = null;
     var itineraryListControl = null;
+    var tourListControl = null;
 
     function DirectionsControl(params) {
         options = $.extend({}, defaults, params);
@@ -89,6 +91,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             function(e, lon, lat) {
                 mapControl.displayPoint(lon, lat);
         });
+
+        tourListControl = new Control.TourList();
     }
 
     DirectionsControl.prototype = {
@@ -137,6 +141,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
         }
 
+        console.log('about to plan trip with destination:');
+        console.log(directions.destination);
+        console.log('otp options:');
+        console.log(otpOptions);
+
         planTripRequest = Routing.planTrip(directions.origin,
                                            directions.destination,
                                            date,
@@ -163,7 +172,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
+            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy') &&
+                !UserPreferences.getPreference('tourMode')) {
+
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
@@ -208,7 +219,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     }
 
     function clearItineraries() {
-        UserPreferences.setPreference('waypoints', undefined);
+        if (!UserPreferences.getPreference('tourMode')) {
+            UserPreferences.setPreference('waypoints', undefined);
+        }
         itineraryControl.clearItineraries();
         itineraryListControl.hide();
         directionsListControl.hide();
@@ -243,7 +256,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
 
         var otpOptions = {
             arriveBy: arriveBy,
-            maxWalkDistance: UserPreferences.getPreference('maxWalk')
+            maxWalkDistance: UserPreferences.getPreference('maxWalk'),
+            tourMode: UserPreferences.getPreference('tourMode')
         };
 
         // add intermediatePlaces if user edited route
@@ -297,7 +311,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
             itinerary.highlight(true);
 
             // TODO: alert user that cannot use waypoints with arriveBy
-            if (!UserPreferences.getPreference('arriveBy')) {
+            if (!UserPreferences.getPreference('arriveBy') &&
+                !UserPreferences.getPreference('tourMode')) {
+
                 itineraryControl.draggableItinerary(itinerary);
             }
 
@@ -357,6 +373,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
     }
 
     function reverseOriginDestination(event, newOrigin, newDestination) {
+        if (newOrigin && newOrigin.id.indexOf('tour') > -1) {
+            console.warn('cannot have a tour as origin!');
+        }
         // set on this object and validate
         if (newOrigin && newOrigin.location) {
             setDirections('origin', [newOrigin.location.y, newOrigin.location.x]);
@@ -388,14 +407,85 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         }
     }
 
+    /**
+     * Helper to finish `onTypeaheadSelected` event
+
+     * @param key {String} Either 'origin' or 'destination'
+     * @param destinations {Array} List of places, the last of which is the final destination.
+     *                             Can be a single destination, but cannot be empty.
+     */
+    function onTypeaheadSelectDone(key, destinations) {
+        var places = Object.assign([], destinations);
+        var end = places.pop();
+
+        setDirections(key, [end.location.y, end.location.x]);
+
+        // Tour mode is not applicable to origin
+        if (key === 'destination') {
+            var waypoints = _.map(places, function(d) {
+                return [d.location.y, d.location.x];
+            });
+
+            // Set waypoints after `setDirections`, which clears waypoints
+            if (waypoints && waypoints.length) {
+                UserPreferences.setPreference('waypoints', waypoints);
+                updateUrl();
+            }
+        }
+
+        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
+            planTripOrShowPlaces();
+        }
+    }
+
     function onTypeaheadSelected(event, key, result) {
         if (!result) {
             setDirections(key, null);
             return;
         }
-        setDirections(key, [result.location.y, result.location.x]);
-        if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            planTripOrShowPlaces();
+
+
+        // Tour mode does not apply to origin
+        if (key === 'origin') {
+            onTypeaheadSelectDone(key, [result]);
+            return;
+        }
+        // If the typeahead result is a tour, go into tour mode
+        // and route between multiple destinations instead of to a single one.
+        var isTourMode = !!(result.id && result.id.indexOf('tour') > -1);
+        UserPreferences.setPreference('tourMode', isTourMode);
+
+        if (!isTourMode) {
+            // Send the single destination.
+            onTypeaheadSelectDone(key, [result]);
+            return;
+        }
+
+        if (result.destinations) {
+            // Result came from Typeahead, and so already has full destinations
+            // results from API search endpoint.
+            onTypeaheadSelectDone(key, result.destinations);
+        } else {
+            // If destinations are not set on the result, it didn't come from
+            // an autocomplete query, so go search for the tour now in a blocking query.
+            Places.queryPlaces(null, result.address).then(function(data) {
+                // In case multiple tours have the same name, find the one
+                // with the ID of our tour.
+                var tourId = parseInt(result.id.split('_')[1]);
+                var tour = _.find(data.tours, function(tour) {
+                    return tourId === tour.id;
+                });
+                if (tour) {
+                    onTypeaheadSelectDone(key, tour.destinations);
+                } else {
+                    console.error('Failed to find destinations for tour ' + result.address);
+                    onTypeaheadSelectDone(key, [result]);
+                }
+            }).fail(function(error) {
+                console.error('Error querying for tour destinations:');
+                console.error(error);
+                onTypeaheadSelectDone(key, [result]);
+            });
         }
     }
 
@@ -507,4 +597,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Routing, UserPreferen
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Routing.Plans, CAC.User.Preferences);
+})(_, jQuery, moment, CAC.Control, CAC.Places.Places, CAC.Routing.Plans, CAC.User.Preferences);

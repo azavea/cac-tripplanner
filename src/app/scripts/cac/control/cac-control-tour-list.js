@@ -17,7 +17,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             alert: '.alert',
             container: '.directions-list',
             hiddenClass: 'hidden',
-            destinationList: '.routes-list',
+            destinationList: '.tour-destinations-list',
             destinationItem: '.route-summary'
         }
     };
