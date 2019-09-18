@@ -23,6 +23,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
 
     var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
                                                   'destinationText',
+                                                  'tourMode',
                                                   'waypoints']);
 
     var events = $({});

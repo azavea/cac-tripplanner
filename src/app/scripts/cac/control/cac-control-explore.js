@@ -427,7 +427,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
+        Places.queryPlaces(exploreLatLng).then(function(data) {
             setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
@@ -454,7 +454,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // Filter by both isochrone and category.
         // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
-            const destinationIds = place.destinations ?
+            var destinationIds = place.destinations ?
                 _.flatMap(place.destinations, 'id') : [place.id];
             return _.intersection(isochroneDestinationIds, destinationIds).length;
         }));
@@ -503,7 +503,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
+        Places.queryPlaces(exploreLatLng).then(function(data) {
             setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
@@ -519,7 +519,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
      *
      * Sets both destinations and events. If given empty data, will unset local cache.
      *
-     * @param data {Object} response from getAllPlaces
+     * @param data {Object} response from queryPlaces
      */
     function setDestinationsEventsTours(data) {
         if (!data) {

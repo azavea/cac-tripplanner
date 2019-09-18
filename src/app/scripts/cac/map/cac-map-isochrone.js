@@ -237,7 +237,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
             destinations[destination.id] = destination;
             var point = _.property('point')(destination);
             point.properties = _.omit(destination, 'point');
-            point.properties.matched = !!destination.matched
+            point.properties.matched = !!destination.matched;
             return point;
         }).value();
 
