@@ -7,7 +7,8 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         bikeSharePopup: bikeSharePopup,
         eventPopup: eventPopup,
         itinerary: itinerary,
-        itineraryList: itineraryList
+        itineraryList: itineraryList,
+        tourDestinationList: tourDestinationList
     };
 
     // Only register these once, when the module loads
@@ -271,6 +272,22 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({data: templateData});
+        return html;
+    }
+
+    // Template for tour destinations
+    function tourDestinationList(destinations) {
+        var source = [
+        '<h1>Tour Destinations: TODO</h1><div class="routes-list">',
+        '{{#each destinations}}',
+            '<div class="route-summary" data-itinerary="{{this.id}}">',
+                '<div class="route-name">{{this.name}}</div>',
+            '</div>',
+        '{{/each}}',
+        '</div>'].join('');
+
+        var template = Handlebars.compile(source);
+        var html = template({destinations: destinations});
         return html;
     }
 
