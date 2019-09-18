@@ -3,6 +3,8 @@ import logging
 
 from django import template
 
+from destinations.models import Destination, Event, Tour
+
 register = template.Library()
 
 logger = logging.getLogger(__name__)
@@ -29,10 +31,23 @@ def has_activity(destination, activity_name):
 
 @register.simple_tag(name='get_directions_id')
 def get_directions_id(obj):
-    """Get place ID for directions, which is place ID for the first associated destination,
-    if an event or tour."""
-    destination = get_destination_from_obj(obj)
-    return destination.id if destination else None
+    """Get ID for a Destination, Event, or Tour, prefixed by its type.
+
+    Prefix IDs to ensure uniqueness across them.
+    These must match the prefixed IDs set in JS by the `cardId` Handlebars function,
+    and in the autocomplete results.
+    """
+    if not obj:
+        return None
+    if isinstance(obj, Destination):
+        prefix = 'place'
+    elif isinstance(obj, Event):
+        prefix = 'event'
+    elif isinstance(obj, Tour):
+        prefix = 'tour'
+    else:
+        raise ValueError('Object must be a Destination, Event, or Tour')
+    return prefix + '_' + str(obj.id)
 
 
 @register.simple_tag(name='get_destination_x')
