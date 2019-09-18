@@ -22,7 +22,7 @@
         z-index: 1000;
         box-shadow: 0 0 16px rgba(128, 128, 128, 0.7);
 
-        .routes-list {
+        .routes-list, .tour-destinations-list {
             height: auto;
 
             &:empty {
@@ -43,7 +43,7 @@
         }
     }
 
-    .route-summary {
+    .route-summary, .tour-destination-summary {
         display: flex;
         position: relative;
         flex-flow: column nowrap;

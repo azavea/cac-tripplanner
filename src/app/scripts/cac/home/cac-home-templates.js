@@ -90,7 +90,11 @@ CAC.Home.Templates = (function (Handlebars, moment) {
         Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
         Handlebars.registerHelper('filterPartial', filterPartial);
 
-        // helper to get the identifier for a home page card for a place, event, or tour
+        /** Helper to get the identifier for a home page card for a place, event, or tour.
+         *
+         * These must match the prefixes used by the `get_directions_id` Django template
+         * helper and by the typeahead results.
+         */
         Handlebars.registerHelper('cardId', function(isEvent, isTour, id) {
             var prefix = isEvent ? 'event' : (isTour ? 'tour' : 'place');
             return prefix + '_' + id;
