@@ -50,14 +50,15 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
     return TourListControl;
 
-    function setTourDestinations(newDestinations) {
+    function setTourDestinations(newDestinations, tourName) {
         destinations = newDestinations;
 
         // Show the directions div and populate with tour destinations
-        var html = MapTemplates.tourDestinationList(destinations);
+        var html = MapTemplates.tourDestinationList(destinations, tourName);
         $container.html(html);
 
-        enableCarousel(destinations);
+        // TODO: mobile view
+        //enableCarousel(destinations);
 
         $(options.selectors.tourItem).on('click', onTourDestinationClicked);
         $(options.selectors.tourItem).hover(onTourDestinationHover);
@@ -134,7 +135,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     /**
      * Handle click event on destination list item, this is set to element clicked
      */
-    function onDestinationClicked() {
+    function onTourDestinationClicked() {
         var destinationId = this.getAttribute('data-destination-id');
         var destination = getDestinationById(destinationId);
         events.trigger(eventNames.destinationClicked, destination);
@@ -143,7 +144,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     /**
      * Handle hover event on destination list item
      */
-    function onDestinationHover() {
+    function onTourDestinationHover() {
         var destinationId = this.getAttribute('data-destination-id');
         var destination = getDestinationById(destinationId);
         events.trigger(eventNames.destinationHover, destination);
