@@ -212,6 +212,13 @@ class EventDestination(models.Model):
         else:
             return 'Event Destination'
 
+    @property
+    def single_day(self):
+        """"Returns true if destination's event ends on the same day it starts."""
+        if self.start_date and self.end_date:
+            return self.start_date.date() == self.end_date.date()
+        return False
+
 
 class Event(Attraction):
     """Represents an event, which has a start and end date."""
