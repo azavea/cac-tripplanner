@@ -390,24 +390,20 @@ class Tour(models.Model):
     @property
     def accessible(self):
         """Returns true if all destinations in this tour are accessible."""
-        for td in self.tour_destinations.all():
-            if not td.destination.accessible:
-                return False
-        return True
+        return not self.tour_destinations.filter(destination__accessible=False).exists()
 
     @property
     def watershed_alliance(self):
         """Returns true if all destinations in this tour are in the Watershed Alliance."""
-        for td in self.tour_destinations.all():
-            if not td.destination.watershed_alliance:
-                return False
-        return True
+        return not self.tour_destinations.filter(destination__watershed_alliance=False).exists()
 
     @property
     def first_destination(self):
-        if self.tour_destinations.count() > 0:
-            return self.tour_destinations.order_by('order').first().destination
-        return None
+        """Returns the first ordered destination for this tour."""
+        try:
+            return self.tour_destinations.first().destination
+        except AttributeError:
+            return None
 
     @property
     def is_event(self):
