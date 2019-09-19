@@ -171,9 +171,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy') &&
-                !UserPreferences.getPreference('tourMode')) {
-
+            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
                 itineraryControl.draggableItinerary(currentItinerary);
             }
 
@@ -316,9 +314,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             itinerary.highlight(true);
 
             // TODO: alert user that cannot use waypoints with arriveBy
-            if (!UserPreferences.getPreference('arriveBy') &&
-                !UserPreferences.getPreference('tourMode')) {
-
+            if (!UserPreferences.getPreference('arriveBy')) {
                 itineraryControl.draggableItinerary(itinerary);
             }
 
