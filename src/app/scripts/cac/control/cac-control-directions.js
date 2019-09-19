@@ -212,6 +212,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         if (tabId === tabControl.TABS.DIRECTIONS) {
             UserPreferences.setPreference('method', 'directions');
             setFromUserPreferences();
+            // If user toggled away from tab and came back before a directions
+            // query could resolve, show spinner again.
+            if (planTripRequest) {
+                showSpinner();
+            }
         } else {
             clearItineraries();
             showPlaces(true);
