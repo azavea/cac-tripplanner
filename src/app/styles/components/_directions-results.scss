@@ -22,7 +22,7 @@
         z-index: 1000;
         box-shadow: 0 0 16px rgba(128, 128, 128, 0.7);
 
-        .routes-list, .tour-destinations-list {
+        .routes-list {
             height: auto;
 
             &:empty {
@@ -55,6 +55,12 @@
         font-weight: $font-weight-bold;
         justify-content: flex-start;
         padding: 4px 12px 0;
+    }
+
+    .tours {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
     }
 
     .route-summary, .tour-destination-summary {
