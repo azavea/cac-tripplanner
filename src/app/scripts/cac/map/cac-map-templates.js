@@ -276,18 +276,26 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     // Template for tour destinations
-    function tourDestinationList(destinations) {
+    function tourDestinationList(destinations, tourName) {
         var source = [
-        '<h1>Tour Destinations: TODO</h1><div class="tour-destinations-list">',
+        '<div class="tour-label">',
+            'Tour',
+        '</div>',
+        '<div class="tour-name">{{ tourName }}</div>',
+        '<div class="tour-destinations-list">',
+        '<ul>',
         '{{#each destinations}}',
-            '<div class="tour-destination-summary" data-itinerary="{{this.id}}">',
-                '<div class="route-name">{{this.name}}</div>',
-            '</div>',
+            '<li class="place-card tour-card">',
+                '<div class="tour-destination-summary" data-destination-id="tour_{{this.id}}">',
+                    '<div class="route-name">{{this.name}}</div>',
+                '</div>',
+            '</li>',
         '{{/each}}',
+        '</ul>',
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({destinations: destinations});
+        var html = template({destinations: destinations, tourName: tourName});
         return html;
     }
 
