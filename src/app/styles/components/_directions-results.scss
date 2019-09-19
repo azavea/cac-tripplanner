@@ -43,6 +43,20 @@
         }
     }
 
+    .tour-label {
+        color: $gophillygo-green;
+        font-size: 1.2rem;
+        padding: 4px 12px 0;
+        text-transform: uppercase;
+    }
+
+    .tour-name {
+        font-size: 1.6rem;
+        font-weight: $font-weight-bold;
+        justify-content: flex-start;
+        padding: 4px 12px 0;
+    }
+
     .route-summary, .tour-destination-summary {
         display: flex;
         position: relative;

@@ -27,6 +27,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     var OUTDATED_REQUEST_ERROR = 'outdated request';
 
     var currentItinerary = null;
+    var tourDestinations = [];
+    var tourName = null;
 
     var directions = {
         origin: null,
@@ -141,11 +143,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
         }
 
-        console.log('about to plan trip with destination:');
-        console.log(directions.destination);
-        console.log('otp options:');
-        console.log(otpOptions);
-
         planTripRequest = Routing.planTrip(directions.origin,
                                            directions.destination,
                                            date,
@@ -167,6 +164,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             });
             currentItinerary.geojson.bringToFront();
 
+            var tourMode = UserPreferences.getPreference('tourMode');
+
             // If there is only one itinerary, make it draggable.
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
@@ -183,11 +182,21 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             updateLocationPreferenceWithDirections('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
-            itineraryListControl.setItineraries(itineraries);
-            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
-            itineraryListControl.show();
-            // highlight first itinerary in sidebar as well as on map
-            findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
+            if (tourMode) {
+                tourListControl.setTourDestinations(tourDestinations, tourName);
+                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+                tourListControl.show();
+                // highlight first itinerary in sidebar as well as on map
+                findItineraryBlock(currentItinerary.id)
+                    .addClass(options.selectors.selectedItineraryClass);
+            } else {
+                itineraryListControl.setItineraries(itineraries);
+                $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+                itineraryListControl.show();
+                // highlight first itinerary in sidebar as well as on map
+                findItineraryBlock(currentItinerary.id)
+                    .addClass(options.selectors.selectedItineraryClass);
+            }
         }, function (error) {
             // Cancelled requests are expected; do not display an error message to user.
             // Just keep showing the loading animation until a subsequent request completes.
@@ -414,8 +423,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
      * @param key {String} Either 'origin' or 'destination'
      * @param destinations {Array} List of places, the last of which is the final destination.
      *                             Can be a single destination, but cannot be empty.
+     * @param label {String} Name of the tour, if any. Can be empty.
      */
-    function onTypeaheadSelectDone(key, destinations) {
+    function onTypeaheadSelectDone(key, destinations, label) {
+        // Track the current tour for sidebar display
+        if (label) {
+            tourName = label;
+            tourDestinations = destinations;
+        }
+
         var places = Object.assign([], destinations);
         var end = places.pop();
 
@@ -445,7 +461,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             return;
         }
 
-
         // Tour mode does not apply to origin
         if (key === 'origin') {
             onTypeaheadSelectDone(key, [result]);
@@ -465,7 +480,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         if (result.destinations) {
             // Result came from Typeahead, and so already has full destinations
             // results from API search endpoint.
-            onTypeaheadSelectDone(key, result.destinations);
+            onTypeaheadSelectDone(key, result.destinations, result.name);
         } else {
             // If destinations are not set on the result, it didn't come from
             // an autocomplete query, so go search for the tour now in a blocking query.
@@ -477,15 +492,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     return tourId === tour.id;
                 });
                 if (tour) {
-                    onTypeaheadSelectDone(key, tour.destinations);
+                    onTypeaheadSelectDone(key, tour.destinations, result.address);
                 } else {
                     console.error('Failed to find destinations for tour ' + result.address);
-                    onTypeaheadSelectDone(key, [result]);
+                    onTypeaheadSelectDone(key, [result], result.address);
                 }
             }).fail(function(error) {
                 console.error('Error querying for tour destinations:');
                 console.error(error);
-                onTypeaheadSelectDone(key, [result]);
+                onTypeaheadSelectDone(key, [result], result.address);
             });
         }
     }
@@ -590,8 +605,29 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
-            // get nearby places if no destination has been set yet
-            planTripOrShowPlaces(true /* replace state */);
+            // get nearby places if no destination has been set yet, or get directions
+            var tourMode = UserPreferences.getPreference('tourMode');
+            // Fetch tour destinations on tour directions page (re)load
+            if (tourMode) {
+                showSpinner();
+                var tourName = UserPreferences.getPreference('destinationText');
+                Places.queryPlaces(null, tourName).then(function(data) {
+                    var tour = data.tours && data.tours.length ? data.tours[0] : null;
+                    if (tour) {
+                        onTypeaheadSelectDone('destination', tour.destinations, tourName);
+                    } else {
+                        console.error('Failed to find destinations for tour ' + tourName);
+                        planTripOrShowPlaces();
+                    }
+                }).fail(function(error) {
+                    console.error('Error querying for tour destinations:');
+                    console.error(error);
+                    planTripOrShowPlaces();
+                });
+            } else {
+                // Not a tour; go to plan route
+                planTripOrShowPlaces();
+            }
         } else {
             // explore tab visible
             showPlaces(true);
