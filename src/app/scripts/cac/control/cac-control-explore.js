@@ -285,9 +285,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             setAddress(location);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
-            } else {
-                showSpinner();
-                getNearbyPlaces();
             }
         }
     }

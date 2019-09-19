@@ -154,7 +154,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
 
         planTripRequest.then(function (itineraries) {
-            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             // Add the itineraries to the map, highlighting the first one
             var isFirst = true;
             itineraryControl.clearItineraries();
@@ -187,6 +186,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             itineraryListControl.setItineraries(itineraries);
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             itineraryListControl.show();
             // highlight first itinerary in sidebar as well as on map
             findItineraryBlock(currentItinerary.id).addClass(options.selectors.selectedItineraryClass);
