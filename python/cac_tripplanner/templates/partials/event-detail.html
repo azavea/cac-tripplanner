@@ -33,12 +33,11 @@
                             {{ event_dest.destination.name }}
                         </a>
                         {% if event_dest.start_date and event_dest.end_date %}
-                        {% if not event.single_day %}
+                        {% if event_dest.single_day %}
                         <!-- only show dates for multi-day events -->
                             <div class="info-event-date">
                             {{ event_dest.start_date|date:"D M j" }}&nbsp;
                         </div>
-                        {% endif %}
                         <div class="info-event-time">
                             <span class="start-time">
                                 {{ event_dest.start_date|time:"fA"|lower }}
@@ -47,6 +46,16 @@
                                 {{ event_dest.end_date|time:"fA"|lower }}
                             </span>
                         </div>
+                        {% else %}
+                        <!-- multi-day destination -->
+                        <div class="info-event-date">
+                            {{ event_dest.start_date|date:"D M j" }} &middot; {{ event_dest.start_date|time:"fA"|lower }}
+                            &nbsp;&ndash;&nbsp;
+                        </div>
+                        <div class="info-event-date">
+                            {{ event_dest.end_date|date:"D M j" }} &middot; {{ event_dest.end_date|time:"fA"|lower }}
+                        </div>
+                        {% endif %}
                         {% endif %}
                         {% if not forloop.last %}<hr />{% endif %}
                     </div>
