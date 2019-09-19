@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.db.models import Count, Manager as GeoManager, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.utils.timezone import now
+from django.utils.timezone import get_current_timezone, now
 
 from ckeditor.fields import RichTextField
 from image_cropping import ImageCropField, ImageRatioField
@@ -216,7 +216,8 @@ class EventDestination(models.Model):
     def single_day(self):
         """"Returns true if destination's event ends on the same day it starts."""
         if self.start_date and self.end_date:
-            return self.start_date.date() == self.end_date.date()
+            tz = get_current_timezone()
+            return self.start_date.astimezone(tz).date() == self.end_date.astimezone(tz).date()
         return False
 
 
@@ -246,7 +247,8 @@ class Event(Attraction):
     def single_day(self):
         """"Returns true if event ends on the same day it starts."""
         if self.start_date and self.end_date:
-            return self.start_date.date() == self.end_date.date()
+            tz = get_current_timezone()
+            return self.start_date.astimezone(tz).date() == self.end_date.astimezone(tz).date()
         return False
 
 
