@@ -328,7 +328,7 @@ gulp.task('watch', function () {
         'app/scripts/**/*.js',
         'app/styles/**/*.css',
         'app/styles/**/*.scss'
-    ], { usePolling: true }, gulp.parallel('development'));
+    ], { usePolling: true }, gulp.parallel('jshint', 'development'));
 });
 
-gulp.task('default', gulp.series('development', 'watch'));
+gulp.task('default', gulp.series('jshint', 'development', 'watch'));
