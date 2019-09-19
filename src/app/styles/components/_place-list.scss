@@ -8,7 +8,9 @@
     }
 
     .body-map-directions & {
-        display: none;
+        &:not(.tours) {
+            display: none;
+        }
     }
 
     .body-map & .map-view-btn {

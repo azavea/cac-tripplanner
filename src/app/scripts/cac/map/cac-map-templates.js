@@ -278,12 +278,12 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     // Template for tour destinations
     function tourDestinationList(destinations, tourName) {
         var source = [
+        '<div class="places tours">',
         '<div class="tour-label">',
             'Tour',
         '</div>',
         '<div class="tour-name">{{ tourName }}</div>',
-        '<div class="tour-destinations-list">',
-        '<ul>',
+        '<ul class="place-list">',
         '{{#each destinations}}',
             '<li class="place-card tour-card">',
                 '<div class="tour-destination-summary" data-destination-id="tour_{{this.id}}">',
