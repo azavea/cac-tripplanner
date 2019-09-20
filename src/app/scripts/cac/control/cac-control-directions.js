@@ -164,8 +164,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             });
             currentItinerary.geojson.bringToFront();
 
-            var tourMode = UserPreferences.getPreference('tourMode');
-
             // If there is only one itinerary, make it draggable.
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
@@ -182,7 +180,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             updateLocationPreferenceWithDirections('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
-            if (tourMode) {
+            if (UserPreferences.getPreference('tourMode')) {
                 tourListControl.setTourDestinations(tourDestinations, tourName);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 tourListControl.show();

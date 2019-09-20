@@ -17,8 +17,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             alert: '.alert',
             container: '.directions-list',
             hiddenClass: 'hidden',
-            destinationList: '.tour-destinations-list',
-            destinationItem: '.route-summary'
+            destinationList: '.tour-list',
+            destinationItem: '.tour-place-card'
         }
     };
     var options = {};
