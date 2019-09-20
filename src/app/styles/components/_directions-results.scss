@@ -57,6 +57,11 @@
         padding: 4px 12px 0;
     }
 
+    // FIXME: forcing height for the scrollbar to work
+    .tour-list {
+        height: 250px;
+    }
+
     .tours {
         .body-map & {
             @include sidebar-main-inner-scroll;
