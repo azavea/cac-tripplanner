@@ -7,7 +7,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @param {object} otpItinerary OTP itinerary
      * @param {integer} index integer to uniquely identify itinerary
      */
-    function Itinerary(otpItinerary, index) {
+    function Itinerary(otpItinerary, index, tourMode) {
         // extract reverse-geocoded start and end addresses
         var params = Utils.getUrlParams();
         this.fromText = params.originText;
@@ -26,10 +26,13 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.duration = otpItinerary.duration;
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));
+        this.legs = getLegs(otpItinerary.legs, (!tourMode &&
+                                                this.waypoints &&
+                                                this.waypoints.length > 0));
         this.from = _.head(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
+        this.tourMode = tourMode;
 
         // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
