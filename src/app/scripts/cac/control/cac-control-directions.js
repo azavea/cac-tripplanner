@@ -95,6 +95,33 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         });
 
         tourListControl = new Control.TourList();
+
+        tourListControl.events.on(
+            tourListControl.eventNames.destinationHovered,
+            function (e, placeId, placeName) {
+                console.log('TODO: tour list destination hover interaction');
+                console.log(e);
+                console.log(placeId);
+                console.log(placeName);
+        });
+
+        tourListControl.events.on(tourListControl.eventNames.destinationClicked,
+            function(e, placeId, address, x, y) {
+                // push tour map page into browser history first
+                urlRouter.pushDirectionsUrlHistory();
+                UserPreferences.setPreference('placeId', placeId);
+                var location = {
+                    id: placeId,
+                    address: address,
+                    location: {x: x, y: y}
+                }
+                directionsFormControl.setLocation('destination', location);
+                tabControl.setTab(tabControl.TABS.DIRECTIONS);
+                if (!UserPreferences.getPreference('origin')) {
+                    directionsFormControl.setError('origin');
+                    $(options.selectors.originInput).focus();
+                }
+        });
     }
 
     DirectionsControl.prototype = {
