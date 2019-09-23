@@ -196,7 +196,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
             if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
-                itineraryControl.draggableItinerary(currentItinerary);
+                if (currentItinerary.tourMode) {
+                    itineraryControl.tourItinerary(currentItinerary, tourDestinations);
+                } else {
+                    itineraryControl.draggableItinerary(currentItinerary);
+                }
             }
 
             // snap start and end points to where first itinerary starts and ends
@@ -207,7 +211,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             updateLocationPreferenceWithDirections('destination');
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
-            if (UserPreferences.getPreference('tourMode')) {
+            if (currentItinerary.tourMode) {
                 tourListControl.setTourDestinations(tourDestinations, tourName);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 tourListControl.show();
