@@ -127,8 +127,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
     // Helper to hide loading spinner and show places list
     function showPlacesContent() {
-        // FIXME: don't hide spinner on directions tab if directions request pending
-        // (If user toggled tabs while requests outstanding)
         if (!fetchingIsochrone) {
             $(options.selectors.spinner).addClass('hidden');
             $(options.selectors.placesContent).removeClass('hidden');
