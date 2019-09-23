@@ -98,11 +98,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
         tourListControl.events.on(
             tourListControl.eventNames.destinationHovered,
-            function (e, placeId, placeName) {
-                console.log('TODO: tour list destination hover interaction');
-                console.log(e);
-                console.log(placeId);
-                console.log(placeName);
+            function (e, x, y) {
+                mapControl.displayPoint(x, y);
         });
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
