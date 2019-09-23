@@ -25,6 +25,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
     function planTrip(coordsFrom, coordsTo, when, extraOptions, returnDeferred) {
         var deferred = $.Deferred();
         var urlParams = prepareParams(coordsFrom, coordsTo, when, extraOptions);
+        var tourMode = UserPreferences.getPreference('tourMode');
 
         $.ajax({
             url: Settings.routingUrl,
@@ -53,7 +54,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 // return the Itinerary objects for the unique collection
                 var itineraries = _(planItineraries).map(function(itinerary, i) {
-                    var cacItinerary = new Itinerary(itinerary, i);
+                    var cacItinerary = new Itinerary(itinerary, i, tourMode);
                     // keep parameters used to plan this trip
                     cacItinerary.routingParams = {
                         coordsFrom: coordsFrom,
