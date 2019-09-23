@@ -111,7 +111,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     id: placeId,
                     address: address,
                     location: {x: x, y: y}
-                }
+                };
                 directionsFormControl.setLocation('destination', location);
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
                 if (!UserPreferences.getPreference('origin')) {
