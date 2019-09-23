@@ -25,9 +25,10 @@
                     <a class="place-action-go"
                         {% get_directions_id tour as directions_id %}
                         {% get_place_ids tour as place_ids %}
+                        {% get_tour_directions_permalink tour as tour_directions_permalink %}
                         data-destination-id="{{ directions_id }}"
                         data-destination-places="{{ place_ids }}"
-                        href="/?destination={{ tour.first_destination.point.y }}%2C{{ tour.first_destination.point.x }}&destinationText={{ tour.name|urlencode }}">Tour Map</a>
+                        href="{{ tour_directions_permalink }}">Tour Map</a>
                     {% endif %}
                 </div>
             </div>

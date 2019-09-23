@@ -1,5 +1,6 @@
 import json
 import logging
+from urllib.parse import quote
 
 from django import template
 
@@ -8,6 +9,10 @@ from destinations.models import Destination, Event, Tour
 register = template.Library()
 
 logger = logging.getLogger(__name__)
+
+# Number of digits right of the decimal coordinates should round to.
+# Should match constant used in `cac-urlrouting.js`.
+COORDINATE_ROUND = 7
 
 
 def get_destination_from_obj(destination):
@@ -21,6 +26,11 @@ def get_destination_from_obj(destination):
     else:
         # not an event or tour
         return destination
+
+
+def get_rounded_coordinates(point):
+    """Helper to round coordinates for use in permalinks"""
+    return str(round(point.x, COORDINATE_ROUND)) + '%2C' + str(round(point.y, COORDINATE_ROUND))
 
 
 @register.simple_tag(name='has_activity')
@@ -74,3 +84,17 @@ def get_place_ids(obj):
     else:
         # return a single place ID for a Destination
         return json.dumps([obj.id])
+
+
+@register.simple_tag(name='get_tour_directions_permalink')
+def get_tour_directions_permalink(tour):
+    """Build permalink for tour directions, with destinations as waypoints."""
+    url = '/?tourMode=true&destination='
+    places = list(tour.tour_destinations.all())
+    last = places.pop().destination
+    url += get_rounded_coordinates(last.point)
+    url += '&destinationText=' + quote(tour.name)
+    url += '&waypoints='
+    for place in places:
+        url += get_rounded_coordinates(place.destination.point) + '%3B'
+    return url.strip('%3B')
