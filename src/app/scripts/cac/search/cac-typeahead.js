@@ -171,7 +171,6 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                             // These prefixes must match those used by the
                             // `get_directions_id` Django template helper and by
                             // the `cardId` Handlebars template helper.
-                            // FIXME: Factor out to utils to share with Handlebars
                             _.each(all, function(obj) {
                                 var prefix = 'place';
                                 if (obj.is_event) {

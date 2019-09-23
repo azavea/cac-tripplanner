@@ -150,7 +150,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         var index = this.getAttribute('data-tour-place-index');
         var destination = destinations[index];
         var placeId = 'place_' + destination.id;
-        events.trigger(eventNames.destinationHovered, [placeId, destination.name]);
+        events.trigger(eventNames.destinationHovered, [destination.location.x,
+                                                       destination.location.y]);
         e.stopPropagation();
     }
 
