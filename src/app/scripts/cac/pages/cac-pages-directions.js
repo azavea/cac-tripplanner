@@ -57,6 +57,7 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
             originText: { paramName: 'fromText' },
             destination: { paramName: 'toPlace' },
             destinationText: { paramName: 'toText' },
+            tourMode: { paramName: 'tourMode' },
             waypoints: {
                 paramName: 'intermediatePlaces',
                 values: function (val) {
@@ -81,6 +82,13 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
                 }
             }
         }).flatten().value();
+
+
+        var tourMode = false;
+        if (otpParams.hasOwnProperty('tourMode')) {
+            tourMode = otpParams.tourMode;
+            delete otpParams.tourMode;
+        }
         // Join array into param string
         otpParams = _(otpParams).map(function (item) { return item.join('='); }).join('&');
 
@@ -102,7 +110,9 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
             processData: false
         }).done(function(data) {
             var itineraries = data.plan.itineraries;
-            var itinerary = new Itinerary(itineraries[itineraryIndex], itineraryIndex);
+            var itinerary = new Itinerary(itineraries[itineraryIndex],
+                                          itineraryIndex,
+                                          tourMode);
             setMapItinerary(itinerary);
             directionsListControl.setItinerary(itinerary);
         }).fail(function (error) {

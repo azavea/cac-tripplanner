@@ -51,6 +51,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     ItineraryControl.prototype.clearItineraries = clearItineraries;
     ItineraryControl.prototype.clearWaypointInteractivity = clearWaypointInteractivity;
     ItineraryControl.prototype.draggableItinerary = draggableItinerary;
+    ItineraryControl.prototype.tourItinerary = tourItinerary;
     ItineraryControl.prototype.updateItineraryLayer = updateItineraryLayer;
     ItineraryControl.prototype.errorLiveUpdatingLayer = errorLiveUpdatingLayer;
     ItineraryControl.prototype.setMap = setMap;
@@ -74,6 +75,35 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         if (makeFit) {
             map.fitBounds(layer.getBounds());
         }
+    }
+
+    function tourItinerary(itinerary, tourDestinations) {
+        // add a layer of non-draggable markers for tour waypoints (destinations)
+        if (itinerary.waypoints) {
+            var dragging = false;
+            var popupTimeout;
+            var idx = 0;
+            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
+                pointToLayer: function(geojson, latlng) {
+                    var marker = new cartodb.L.marker(latlng, {icon: waypointIcon,
+                                                               draggable: false});
+
+            var place = tourDestinations[idx];
+            idx += 1;
+
+            marker.bindPopup(place.name,
+                             {closeButton: false, className: options.selectors.routeTooltipClassName})
+                    .on('mouseover', function () {
+                        this.openPopup();
+                    }).on('mouseout', function () {
+                        marker.closePopup();
+                    });
+                    return marker;
+                }
+            }).addTo(map);
+        }
+
+        itinerary.geojson.bringToFront();
     }
 
     /**
