@@ -18,7 +18,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             container: '.directions-list',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
-            destinationItem: '.tour-place-card'
+            destinationItem: '.tour-place-card',
+            destinationDirectionsButton: '.tour-place-action-directions'
         }
     };
     var options = {};
@@ -26,7 +27,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     var events = $({});
     var eventNames = {
         destinationClicked: 'cac:control:tourlist:destinationclicked',
-        destinationHover: 'cac:control:tourlist:destinationhover'
+        destinationHovered: 'cac:control:tourlist:destinationhovered'
     };
 
     var $container = null;
@@ -60,8 +61,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         // TODO: mobile view
         //enableCarousel(destinations);
 
-        $(options.selectors.tourItem).on('click', onTourDestinationClicked);
-        $(options.selectors.tourItem).hover(onTourDestinationHover);
+        $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
+        $(options.selectors.destinationItem).hover(onTourDestinationHovered);
     }
 
     /**
@@ -121,33 +122,36 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
         // Highlight route on map on destination carousel swipe
         slider.events.on('indexChanged', function(info) {
-            var items = $(options.selectors.tourItem);
+            var items = $(options.selectors.destinationItem);
             if (items && items.length > info.displayIndex) {
                 items.eq(info.displayIndex).triggerHandler('mouseenter');
             }
         });
     }
 
-    function getDestinationById(id) {
-        return destinations[id];
-    }
-
     /**
      * Handle click event on destination list item, this is set to element clicked
      */
-    function onTourDestinationClicked() {
-        var destinationId = this.getAttribute('data-destination-id');
-        var destination = getDestinationById(destinationId);
-        events.trigger(eventNames.destinationClicked, destination);
+    function onTourDestinationClicked(event) {
+        event.preventDefault();
+        var index = this.getAttribute('data-tour-place-index');
+        var destination = destinations[index];
+        var placeId = 'place_' + destination.id;
+        events.trigger(eventNames.destinationClicked, [placeId,
+                                                       destination.address,
+                                                       destination.location.x,
+                                                       destination.location.y]);
     }
 
     /**
      * Handle hover event on destination list item
      */
-    function onTourDestinationHover() {
-        var destinationId = this.getAttribute('data-destination-id');
-        var destination = getDestinationById(destinationId);
-        events.trigger(eventNames.destinationHover, destination);
+    function onTourDestinationHovered(e) {
+        var index = this.getAttribute('data-tour-place-index');
+        var destination = destinations[index];
+        var placeId = 'place_' + destination.id;
+        events.trigger(eventNames.destinationHovered, [placeId, destination.name]);
+        e.stopPropagation();
     }
 
     function show() {
