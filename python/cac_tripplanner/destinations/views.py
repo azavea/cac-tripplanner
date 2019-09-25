@@ -376,10 +376,13 @@ class FindReachableDestinations(View):
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
                 geom = GEOSGeometry(geom_str, srid=4326)
-                # include destinations that are published, in a tour, or in an event
+                # include destinations that are published
+                # or are in a published tour or event
                 matched_objects = (Destination.objects.filter(
                     Q(point__within=geom) &
-                    (Q(published=True) | Q(tours__isnull=False) | Q(events__isnull=False)))
+                    (Q(published=True) |
+                        (Q(tours__isnull=False) & Q(tours__related_tour__published=True)) |
+                        (Q(events__isnull=False) & Q(events__related_event__published=True))))
                     .distinct()
                     .annotate(distance=Distance('point', geom))
                     .order_by('distance', 'priority'))
