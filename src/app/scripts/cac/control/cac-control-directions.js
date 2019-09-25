@@ -212,9 +212,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 tourListControl.setTourDestinations(tourDestinations, tourName);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 tourListControl.show();
-                // highlight first itinerary in sidebar as well as on map
-                findItineraryBlock(currentItinerary.id)
-                    .addClass(options.selectors.selectedItineraryClass);
             } else {
                 itineraryListControl.setItineraries(itineraries);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
