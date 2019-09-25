@@ -73,6 +73,21 @@
         }
     }
 
+    .tour-place-card {
+        &.selected {
+            background-color: $white;
+
+            @include respond-to('xxs-up') {
+                box-shadow: $place-card-drop-shadow;
+            }
+
+            .tour-place-action-directions {
+                color: $white;
+                background-color: $gophillygo-purple;
+            }
+        }
+    }
+
     .route-summary, .tour-destination-summary {
         display: flex;
         position: relative;
