@@ -14,13 +14,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='destination',
             name='city',
-            field=models.CharField(default=b'Philadelphia', max_length=40),
+            field=models.CharField(default='Philadelphia', max_length=40),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='destination',
             name='state',
-            field=models.CharField(default=b'PA', max_length=20),
+            field=models.CharField(default='PA', max_length=20),
             preserve_default=True,
         ),
     ]
