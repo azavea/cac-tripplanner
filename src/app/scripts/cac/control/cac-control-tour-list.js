@@ -58,9 +58,6 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         var html = MapTemplates.tourDestinationList(destinations, tourName);
         $container.html(html);
 
-        // TODO: mobile view
-        //enableCarousel(destinations);
-
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).hover(onTourDestinationHovered);
     }
@@ -90,42 +87,6 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         // handle alert close button click
         $container.one('click', options.selectors.alert, function() {
             $(options.selectors.alert).remove();
-        });
-    }
-
-    /**
-     * Enable carousel for swiping destinations on mobile
-     */
-    function enableCarousel(destinations) {
-        if (destinations.length < 2) {
-            return;
-        }
-
-        var slider = tns({
-            container: options.selectors.tourList,
-            autoplayButton: false,
-            autoplayButtonOutput: false,
-            autoplayPosition: 'top',
-            controls: false,
-            controlPosition: 'bottom',
-            items: 1,
-            nav: true,
-            navPosition: 'bottom',
-            slideBy: 'page',
-            autoplay: false,
-            autoHeight: true,
-            responsive: {
-                320: {disable: false, controls: false, nav: true, autoHeight: true},
-                481: {disable: true}
-            }
-        });
-
-        // Highlight route on map on destination carousel swipe
-        slider.events.on('indexChanged', function(info) {
-            var items = $(options.selectors.destinationItem);
-            if (items && items.length > info.displayIndex) {
-                items.eq(info.displayIndex).triggerHandler('mouseenter');
-            }
         });
     }
 
