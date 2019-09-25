@@ -59,7 +59,9 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
-        $(options.selectors.destinationItem).hover(onTourDestinationHovered);
+        $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
+
+        $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
     }
 
     /**
@@ -110,9 +112,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     function onTourDestinationHovered(e) {
         var index = this.getAttribute('data-tour-place-index');
         var destination = destinations[index];
-        var placeId = 'place_' + destination.id;
-        events.trigger(eventNames.destinationHovered, [destination.location.x,
-                                                       destination.location.y]);
+        events.trigger(eventNames.destinationHovered, destination);
+        e.stopPropagation();
+    }
+
+    function onTourDestinationHoveredOut(e) {
+        events.trigger(eventNames.destinationHovered, null);
         e.stopPropagation();
     }
 

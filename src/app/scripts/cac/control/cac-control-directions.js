@@ -15,9 +15,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
             places: '.places',
-            selectedItineraryClass: 'selected',
+            selectedClass: 'selected',
             spinner: '.directions-results > .sk-spinner',
-            tourDestinationBlock: '.tour-destination-summary',
+            tourDestinationBlock: '.tour-place-card',
             visible: ':visible'
         }
     };
@@ -26,6 +26,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     var planTripRequest = null;
     var OUTDATED_REQUEST_ERROR = 'outdated request';
 
+    var currentDestination = null;
     var currentItinerary = null;
     var tourDestinations = [];
     var tourName = null;
@@ -97,10 +98,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         tourListControl = new Control.TourList();
 
         tourListControl.events.on(
-            tourListControl.eventNames.destinationHovered,
-            function (e, x, y) {
-                mapControl.displayPoint(x, y);
-        });
+            tourListControl.eventNames.destinationHovered, onTourDestinationHover);
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
             function(e, placeId, address, x, y) {
@@ -218,7 +216,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 itineraryListControl.show();
                 // highlight first itinerary in sidebar as well as on map
                 findItineraryBlock(currentItinerary.id)
-                    .addClass(options.selectors.selectedItineraryClass);
+                    .addClass(options.selectors.selectedClass);
             }
         }, function (error) {
             // Cancelled requests are expected; do not display an error message to user.
@@ -363,18 +361,43 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         return $(options.selectors.itineraryBlock + '[data-itinerary="' + id + '"]');
     }
 
+    function findTourDestinationBlock(id) {
+        return $(options.selectors.tourDestinationBlock + '[data-tour-place-id="' + id + '"]');
+    }
+
     /**
      * Handles hover events to highlight a given itinerary
      */
     function onItineraryHover(event, itinerary) {
         if (itinerary) {
             findItineraryBlock(currentItinerary.id)
-                .removeClass(options.selectors.selectedItineraryClass);
-            findItineraryBlock(itinerary.id).addClass(options.selectors.selectedItineraryClass);
+                .removeClass(options.selectors.selectedClass);
+            findItineraryBlock(itinerary.id).addClass(options.selectors.selectedClass);
             currentItinerary.highlight(false);
             itinerary.highlight(true);
             currentItinerary = itinerary;
             itinerary.geojson.bringToFront();
+        }
+    }
+
+    /**
+     * Handles hover events to highlight a given tour destination
+     */
+    function onTourDestinationHover(event, destination) {
+        if (destination) {
+            mapControl.displayPoint(destination.location.x, destination.location.y);
+            if (currentDestination) {
+                findTourDestinationBlock(currentDestination.id)
+                    .removeClass(options.selectors.selectedClass);
+            }
+            findTourDestinationBlock(destination.id).addClass(options.selectors.selectedClass);
+            currentDestination = destination;
+        } else if (currentDestination) {
+            // un-highlight last destination on hover out
+            findTourDestinationBlock(currentDestination.id)
+                    .removeClass(options.selectors.selectedClass);
+            currentDestination = null;
+            mapControl.displayPoint(null, null);
         }
     }
 
