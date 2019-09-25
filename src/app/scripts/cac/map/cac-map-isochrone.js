@@ -223,10 +223,14 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         clearDestinations();
 
         var locationGeoJSON = _.chain(all).map(function(place) {
-            var destinations = [place];
-            // Pull in any unpublished destinations on events or tours
-            if (place.destinations && place.destinations.length) {
-                destinations = place.destinations;
+            var destinations = [];
+            if (place.published) {
+                // Pull in any unpublished destinations on published events or tours
+                if (place.destinations && place.destinations.length) {
+                    destinations = place.destinations;
+                } else if (!place.is_event && !place.is_tour) {
+                    destinations = [place];
+                }
             }
             return destinations;
         }).flatten().uniqBy('id').map(function(destination) {
