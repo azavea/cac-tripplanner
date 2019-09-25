@@ -451,7 +451,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // Filter by both isochrone and category.
         // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
-            var destinationIds = place.destinations ?
+            var destinationIds = place.is_tour || place.is_event ?
                 _.flatMap(place.destinations, 'id') : [place.id];
             return _.intersection(isochroneDestinationIds, destinationIds).length;
         }));
@@ -468,8 +468,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (!filter || filter === 'All') {
             // handle events display with 'All' filter
             if (isochroneDestinationIds) {
-                // isochrone filter in place; show all events matching filter, in order
-                // with the matching destinations (not up top)
+                // isochrone filter in place; show all events and tours
+                // matching filter, in order with the matching destinations (not up top)
                 return places;
             } else {
                 // no isochrone filter in place;
