@@ -130,8 +130,16 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
      * Throttled to cut down on requests.
      */
     var planTrip = _.debounce(function() {  // jshint ignore:line
+        // show spinner while loading
+        showSpinner();
         showPlaces(false);
-        if (!(directions.origin && directions.destination)) {
+        var tourMode = UserPreferences.getPreference('tourMode');
+        if (tourMode === 'event') {
+            tourListControl.setTourDestinations(tourDestinations, tourName);
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+            tourListControl.show();
+            return;
+        } else if (!(directions.origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
 
@@ -142,9 +150,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
 
         directionsFormControl.clearFocus();
-
-        // show spinner while loading
-        showSpinner();
 
         var date = UserPreferences.getPreference('dateTime');
         date = date ? moment.unix(date) : moment(); // default to now
@@ -267,9 +272,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         $(options.selectors.spinner).removeClass(options.selectors.hiddenClass);
     }
 
-    // helper to call plan trip if a destination is set, or show places list if no destination
+    // Helper to call plan trip if a destination is set,
+    // or show list of event destinations without routing,
+    // or show places list if no destination and not an event.
     function planTripOrShowPlaces() {
-        if (directions.destination) {
+        if (directions.destination ||
+            UserPreferences.getPreference('tourMode') === 'tour') {
+
             showPlaces(false);
             planTrip();
         } else {
@@ -470,29 +479,31 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
      * @param destinations {Array} List of places, the last of which is the final destination.
      *                             Can be a single destination, but cannot be empty.
      * @param label {String} Name of the tour, if any. Can be empty.
+     * @param tourMode {String} Indicates type: 'event', 'tour', or false (neither)
      */
-    function onTypeaheadSelectDone(key, destinations, label) {
+    function onTypeaheadSelectDone(key, destinations, label, tourMode) {
         // Track the current tour for sidebar display
-        if (label) {
+        if (tourMode) {
             tourName = label;
             tourDestinations = destinations;
         }
 
-        var places = Object.assign([], destinations);
-        var end = places.pop();
+        if (tourMode === 'tour') {
+            var places = Object.assign([], destinations);
+            var end = places.pop();
+            setDirections(key, [end.location.y, end.location.x]);
 
-        setDirections(key, [end.location.y, end.location.x]);
+            // Tour mode is not applicable to origin
+            if (key === 'destination') {
+                var waypoints = _.map(places, function(d) {
+                    return [d.location.y, d.location.x];
+                });
 
-        // Tour mode is not applicable to origin
-        if (key === 'destination') {
-            var waypoints = _.map(places, function(d) {
-                return [d.location.y, d.location.x];
-            });
-
-            // Set waypoints after `setDirections`, which clears waypoints
-            if (waypoints && waypoints.length) {
-                UserPreferences.setPreference('waypoints', waypoints);
-                updateUrl();
+                // Set waypoints after `setDirections`, which clears waypoints
+                if (waypoints && waypoints.length) {
+                    UserPreferences.setPreference('waypoints', waypoints);
+                    updateUrl();
+                }
             }
         }
 
@@ -514,10 +525,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
         // If the typeahead result is a tour, go into tour mode
         // and route between multiple destinations instead of to a single one.
+        // If an event, present the destinations like with a tour, but do not route.
         var isTourMode = !!(result.id && result.id.indexOf('tour') > -1);
-        UserPreferences.setPreference('tourMode', isTourMode);
+        var isEventMode = !!(result.id && result.id.indexOf('event') > -1);
+        var tourModePreference = isTourMode ? 'tour' : (isEventMode ? 'event' : false);
 
-        if (!isTourMode) {
+        UserPreferences.setPreference('tourMode', tourModePreference);
+
+        if (!tourModePreference) {
             // Send the single destination.
             onTypeaheadSelectDone(key, [result]);
             return;
@@ -526,7 +541,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         if (result.destinations) {
             // Result came from Typeahead, and so already has full destinations
             // results from API search endpoint.
-            onTypeaheadSelectDone(key, result.destinations, result.name);
+            onTypeaheadSelectDone(key, result.destinations, result.name, tourModePreference);
         } else {
             // If destinations are not set on the result, it didn't come from
             // an autocomplete query, so go search for the tour now in a blocking query.
@@ -534,19 +549,23 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 // In case multiple tours have the same name, find the one
                 // with the ID of our tour.
                 var tourId = parseInt(result.id.split('_')[1]);
-                var tour = _.find(data.tours, function(tour) {
+                var tourResponse = isTourMode ? data.tours : data.events;
+                var tour = _.find(tourResponse, function(tour) {
                     return tourId === tour.id;
                 });
                 if (tour) {
-                    onTypeaheadSelectDone(key, tour.destinations, result.address);
+                    onTypeaheadSelectDone(key,
+                                          tour.destinations,
+                                          result.address,
+                                          tourModePreference);
                 } else {
                     console.error('Failed to find destinations for tour ' + result.address);
-                    onTypeaheadSelectDone(key, [result], result.address);
+                    onTypeaheadSelectDone(key, [result], result.address, tourModePreference);
                 }
             }).fail(function(error) {
                 console.error('Error querying for tour destinations:');
                 console.error(error);
-                onTypeaheadSelectDone(key, [result], result.address);
+                onTypeaheadSelectDone(key, [result], result.address, tourModePreference);
             });
         }
     }
@@ -658,9 +677,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 showSpinner();
                 var tourName = UserPreferences.getPreference('destinationText');
                 Places.queryPlaces(null, tourName).then(function(data) {
-                    var tour = data.tours && data.tours.length ? data.tours[0] : null;
+                    var tour = null;
+                    if (tourMode === 'tour' && data.tours && data.tours.length) {
+                        tour = data.tours[0];
+                    } else if (tourMode === 'event' && data.events && data.events.length) {
+                        tour = data.events[0];
+                    }
                     if (tour) {
-                        onTypeaheadSelectDone('destination', tour.destinations, tourName);
+                        onTypeaheadSelectDone('destination', tour.destinations, tourName, tourMode);
                     } else {
                         console.error('Failed to find destinations for tour ' + tourName);
                         planTripOrShowPlaces();
