@@ -54,19 +54,8 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
     {% if event.extraeventpicture_set.exists %}
-    tns({
-        container: '.detail-image-carousel',
-        autoplayButton: false,
-        autoplayButtonOutput: false,
-        autoplayPosition: 'top',
-        controls: false,
-        controlPosition: 'bottom',
-        items: 1,
-        nav: true,
-        navPosition: 'bottom',
-        slideBy: 'page',
-        autoplay: true
-    });
+    var Utils = CAC.Utils;
+    tns(Object.assign({container: '.detail-image-carousel'}, Utils.defaultCarouselOptions));
     jQuery('.detail-image-carousel-extra-image').removeClass('hidden');
     {% endif %}
 });
