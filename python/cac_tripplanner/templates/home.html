@@ -101,18 +101,30 @@
                     data-destination-places="{{ place_ids }}"
                     data-destination-x="{{ destination_x }}"
                     data-destination-y="{{ destination_y }}">
-                    <div class="place-card-photo-container">
-                        <img class="place-card-photo"
-                            {% if destination.image %}
-                                src="{% cropped_thumbnail destination 'image' %}"
-                            {% elif destination.first_destination %}
-                                src="{% cropped_thumbnail destination.first_destination 'image' %}"
-                            {% else %}
-                                src="https://placehold.it/310x155.jpg"
-                            {% endif %}
-                            width="310" height="155"
-                            alt="{{ destination.name }}" />
-                    </div>
+                    {% if destination.is_tour %}
+                        <div class="detail-image-carousel-container">
+                            <div class="detail-image-carousel">
+                                <img src="{% cropped_thumbnail destination.first_destination 'wide_image' %}">
+                                {% for tour_dest in destination.tour_destinations.all|slice:"1:" %}
+                                <img class="detail-image-carousel-extra-image hidden"
+                                    src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="place-card-photo-container">
+                            <img class="place-card-photo"
+                                {% if destination.image %}
+                                    src="{% cropped_thumbnail destination 'image' %}"
+                                {% elif destination.first_destination %}
+                                    src="{% cropped_thumbnail destination.first_destination 'image' %}"
+                                {% else %}
+                                    src="https://placehold.it/310x155.jpg"
+                                {% endif %}
+                                width="310" height="155"
+                                alt="{{ destination.name }}" />
+                        </div>
+                    {% endif %}
                     <div class="place-card-info">
                         <div class="place-card-meta">
                             <div class="travel-logistics">
@@ -217,7 +229,14 @@ jQuery(document).ready(function ($) {
     CAC.Settings.routingUrl = '{{ routing_url }}';
     CAC.Settings.isochroneUrl = '{{ isochrone_url }}';
     var home = new CAC.Pages.Home();
+    var Utils = CAC.Utils;
     home.initialize();
+
+    jQuery('.detail-image-carousel').each(function (index, carouselNode) {
+        tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions));
+    });
+    jQuery('.detail-image-carousel-extra-image').removeClass('hidden');
+
 });
 </script>
 {% endblock %}
