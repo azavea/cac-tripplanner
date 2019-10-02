@@ -19,6 +19,12 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+# Tell image cropping library to use Django admin jquery,
+# or else loading the image cropper will fail for destinations admin
+# because it loads jquery for gis.admin.OSMGeoAdmin
+IMAGE_CROPPING_JQUERY_URL = '/static/admin/js/vendor/jquery/jquery.js'
+
+
 try:
     secrets = yaml.safe_load(open('/etc/cac_secrets', 'r'))
 except (IOError, NameError):
