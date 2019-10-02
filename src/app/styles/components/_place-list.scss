@@ -221,8 +221,10 @@
             align-items: center;
 
             // Hide events and tours completely from mobile "All" filter
-            &[data-filter="All"] .event-card, .tour-card {
-                display: none;
+            &[data-filter="All"] {
+                & .event-card, & .tour-card {
+                    display: none;
+                }
             }
         }
     }
