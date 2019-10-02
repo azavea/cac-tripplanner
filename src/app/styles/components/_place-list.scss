@@ -8,7 +8,9 @@
     }
 
     .body-map-directions & {
-        display: none;
+        &:not(.tours) {
+            display: none;
+        }
     }
 
     .body-map & .map-view-btn {
@@ -214,17 +216,12 @@
         margin: 0;
         padding: 0;
 
-        // Just show one event in map view "All" filter
-        .body-map &[data-filter="All"] .event-card:not(:first-of-type) {
-            display: none;
-        }
-
         @include respond-to('xs') {
             flex-flow: column nowrap;
             align-items: center;
 
-            // Hide events completely from mobile "All" filter
-            &[data-filter="All"] .event-card {
+            // Hide events and tours completely from mobile "All" filter
+            &[data-filter="All"] .event-card, .tour-card {
                 display: none;
             }
         }

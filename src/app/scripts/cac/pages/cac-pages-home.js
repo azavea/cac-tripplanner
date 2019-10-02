@@ -387,23 +387,25 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
-        mapControl.isochroneControl.highlightDestination(placeId, { panTo: true });
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeIds = placeCard.data('destination-places');
+        mapControl.isochroneControl.highlightDestinations([placeIds], { panTo: true });
     }
 
     function onPlaceHovered(event) {
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
-        mapControl.isochroneControl.highlightDestination(placeId);
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeIds = placeCard.data('destination-places');
+        mapControl.isochroneControl.highlightDestinations(placeIds);
     }
 
     function onPlaceBlurred() {
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        mapControl.isochroneControl.highlightDestination(null);
+        mapControl.isochroneControl.highlightDestinations(null);
     }
 
     /**

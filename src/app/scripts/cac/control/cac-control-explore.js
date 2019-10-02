@@ -285,9 +285,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             setAddress(location);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
-            } else {
-                showSpinner();
-                getNearbyPlaces();
             }
         }
     }
@@ -405,7 +402,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             // allDestinations has been loaded by now
             mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         destinations);
+                                                         isochroneDestinationIds);
         }
         showPlacesContent();
     }
@@ -427,7 +424,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
+        Places.queryPlaces(exploreLatLng).then(function(data) {
             setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
@@ -452,9 +449,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         }
 
         // Filter by both isochrone and category.
-        // For events without a destination (placeID), exclude from results
+        // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
-            return _.includes(isochroneDestinationIds, place.placeID) ? place.placeID: false;
+            var destinationIds = place.is_tour || place.is_event ?
+                _.flatMap(place.destinations, 'id') : [place.id];
+            return _.intersection(isochroneDestinationIds, destinationIds).length;
         }));
     }
 
@@ -469,8 +468,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (!filter || filter === 'All') {
             // handle events display with 'All' filter
             if (isochroneDestinationIds) {
-                // isochrone filter in place; show all events matching filter, in order
-                // with the matching destinations (not up top)
+                // isochrone filter in place; show all events and tours
+                // matching filter, in order with the matching destinations (not up top)
                 return places;
             } else {
                 // no isochrone filter in place;
@@ -501,7 +500,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
+        Places.queryPlaces(exploreLatLng).then(function(data) {
             setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
@@ -517,7 +516,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
      *
      * Sets both destinations and events. If given empty data, will unset local cache.
      *
-     * @param data {Object} response from getAllPlaces
+     * @param data {Object} response from queryPlaces
      */
     function setDestinationsEventsTours(data) {
         if (!data) {

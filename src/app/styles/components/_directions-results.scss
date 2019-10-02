@@ -43,7 +43,52 @@
         }
     }
 
-    .route-summary {
+    .tour-label {
+        color: $gophillygo-green;
+        font-size: 1.2rem;
+        padding: 4px 12px 0;
+        text-transform: uppercase;
+    }
+
+    .tour-header {
+        padding: 4px 12px 0;
+    }
+
+    .tour-name {
+        font-size: 1.6rem;
+        font-weight: $font-weight-bold;
+        justify-content: flex-start;
+        padding: 4px 12px 0;
+    }
+
+    // FIXME: forcing height for the scrollbar to work
+    .tour-list {
+        flex-flow: column nowrap;
+        height: 250px;
+    }
+
+    .tours {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
+    }
+
+    .tour-place-card {
+        &.selected {
+            background-color: $white;
+
+            @include respond-to('xxs-up') {
+                box-shadow: $place-card-drop-shadow;
+            }
+
+            .tour-place-action-directions {
+                color: $white;
+                background-color: $gophillygo-purple;
+            }
+        }
+    }
+
+    .route-summary, .tour-destination-summary {
         display: flex;
         position: relative;
         flex-flow: column nowrap;

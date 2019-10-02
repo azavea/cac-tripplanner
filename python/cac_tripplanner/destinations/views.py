@@ -7,6 +7,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -375,9 +376,16 @@ class FindReachableDestinations(View):
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
                 geom = GEOSGeometry(geom_str, srid=4326)
-                matched_objects = (Destination.objects.filter(published=True, point__within=geom)
-                                                      .annotate(distance=Distance('point', geom))
-                                                      .order_by('distance', 'priority'))
+                # include destinations that are published
+                # or are in a published tour or event
+                matched_objects = (Destination.objects.filter(
+                    Q(point__within=geom) &
+                    (Q(published=True) |
+                        (Q(tours__isnull=False) & Q(tours__related_tour__published=True)) |
+                        (Q(events__isnull=False) & Q(events__related_event__published=True))))
+                    .distinct()
+                    .annotate(distance=Distance('point', geom))
+                    .order_by('distance', 'priority'))
         else:
             matched_objects = []
 

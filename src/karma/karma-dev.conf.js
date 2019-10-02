@@ -62,6 +62,7 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-directions.js',
       'app/scripts/cac/control/cac-control-itinerary-list.js',
       'app/scripts/cac/control/cac-control-directions-list.js',
+      'app/scripts/cac/control/cac-control-tour-list.js',
       'app/scripts/cac/pages/cac-pages-home.js',
       'app/scripts/cac/pages/cac-pages-directions.js',
 

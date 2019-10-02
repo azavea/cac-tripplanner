@@ -90,6 +90,24 @@ CAC.Home.Templates = (function (Handlebars, moment) {
         Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
         Handlebars.registerHelper('filterPartial', filterPartial);
 
+        /** Helper to get the identifier for a home page card for a place, event, or tour.
+         *
+         * These must match the prefixes used by the `get_directions_id` Django template
+         * helper and by the typeahead results.
+         */
+        Handlebars.registerHelper('cardId', function(isEvent, isTour, id) {
+            var prefix = isEvent ? 'event' : (isTour ? 'tour' : 'place');
+            return prefix + '_' + id;
+        });
+
+        // helper to get the IDs for all associated destinations,
+        // for tours or events, or for this destination
+        Handlebars.registerHelper('placeIds', function(destinations, id) {
+            var placeIds = (destinations && destinations.length) ?
+                _.map(destinations, 'id') : [id];
+            return JSON.stringify(placeIds);
+        });
+
         // date/time formatting helpers for events
         Handlebars.registerHelper('eventDate', function(dateTime) {
             var dt = moment(dateTime); // get ISO string
@@ -117,7 +135,8 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                 '{{#each destinations}}',
                 '<li class="place-card {{#unless this.formattedDistance}}no-origin{{/unless}} ',
                     '{{#if this.is_event}}event-card{{/if}} {{#if this.is_tour}}tour-card{{/if}}" ',
-                    'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
+                    'data-destination-id="{{ cardId this.is_event this.is_tour this.id }}" ',
+                    'data-destination-places="{{ placeIds this.destinations this.id }}" ',
                     'data-destination-x="{{ this.location.x }}" ',
                     'data-destination-y="{{ this.location.y }}">',
                     '<div class="place-card-photo-container">',
@@ -166,7 +185,8 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                         '<div class="place-card-actions">',
                             '{{#if this.placeID}}',
                             '<a class="place-card-action place-action-go" ',
-                                'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
+                                'data-destination-id="{{ cardId this.is_event this.is_tour this.id }}" ',
+                                'data-destination-places="{{ placeIds this.destinations this.id }}" ',
                                 'href="#">Directions</a>',
                             '{{/if}}',
                             '<a class="place-card-action place-action-details" href=',

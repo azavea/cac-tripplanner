@@ -3,28 +3,18 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     var module = {
         alert: alert,
-        addressText: addressText,
         bicycleWarningAlert: bicycleWarningAlert,
         bikeSharePopup: bikeSharePopup,
-        destinationBlock: destinationBlock,
-        destinationError: destinationError,
-        destinationDetail: destinationDetail,
         eventPopup: eventPopup,
         itinerary: itinerary,
-        itineraryList: itineraryList
+        itineraryList: itineraryList,
+        tourDestinationList: tourDestinationList
     };
 
     // Only register these once, when the module loads
     registerListItemHelpers();
 
     return module;
-
-    function addressText(address) {
-        var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
-        var template = Handlebars.compile(source);
-        var html = template({address: address});
-        return html;
-    }
 
     /**
      * Build an HTML snippet for a Bootstrap alert, with close button
@@ -136,61 +126,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({share: share.properties});
-        return html;
-    }
-
-    function destinationBlock(destination) {
-        var source = [
-            '<a class="block block-destination" id="destination-{{ d.id }}">',
-                '<div class="modes"></div>',
-                '<h3>{{ d.name }}</h3>',
-                '<h5 class="distance-minutes"></h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" />',
-            '</a>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({d: destination});
-        return html;
-    }
-
-    function destinationError(error) {
-        var source = [
-            '<a class="block block-destination">',
-                '<div class="modes"></div>',
-                '<h3>{{ error.message }}</h3>',
-            '</a>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({error: error});
-        return html;
-    }
-
-    function destinationDetail(destination) {
-        var source = [
-            '<div class="block-detail">',
-                '<div class="trip-numbers">{{#if d.formattedDuration}}<div class="trip-duration"> ',
-                '{{ d.formattedDuration }}</div>{{/if}}<div class="trip-distance">',
-                '{{ d.formattedDistance }}</div></div>',
-                '<h3>{{ d.name }}</h3>',
-                '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}',
-                    '{{^}}https://placehold.it/300x150{{/if}}" />',
-                    // the parent element of whatever is put here is a <p> tag
-                '<div class="explore-block">{{{ d.description }}}</div>',
-                '<div class="explore-block"><a href="{{ d.website_url }}" ',
-                'target="_blank">{{ d.website_url }}</a></div>',
-                '<div class="explore-block visible-xs mobile-unavailable">GoPhillyGo directions are not available on mobile at this time, but this button can give you directions from Google.</div>',
-                '<div class="explore-block">',
-                    '<div class="row">',
-                        // .back and .getdirections are used to select these elements for the click event
-                        '<div class="col-sm-6"><a class="back btn btn-primary btn-block hidden-xs">Back</a></div>',
-                        '<div class="col-sm-6"><a class="getdirections btn btn-primary btn-block">',
-                            'Get directions</a></div>',
-                    '</div>',
-                '</div>',
-            '</div>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({d: destination});
         return html;
     }
 
@@ -337,6 +272,49 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({data: templateData});
+        return html;
+    }
+
+    // Template for tour destinations
+    function tourDestinationList(destinations, tourName) {
+        var source = [
+        '<div class="tours places">',
+        '<div class="tour-label">',
+            'Tour',
+        '</div>',
+        '<h1 class="tour-header">{{ tourName }}</h1>',
+        '<ul class="tour-list place-list">',
+        '{{#each destinations}}',
+            '<li class="tour-place-card" ',
+                'data-tour-place-index="{{ @index }}" ',
+                'data-tour-place-id="{{ this.id }}">',
+                '<div class="tour-place-card-photo-container">',
+                '<img class="tour-place-card-photo"',
+                    '{{#if this.image}}',
+                        'src="{{ this.image }}"',
+                    '{{else}}',
+                        'src="https://placehold.it/310x155.jpg"',
+                    '{{/if}}',
+                    'width="84" height="84"',
+                    'alt="{{ this.name }}" />',
+                '</div>',
+                '<div class="tour-place-card-info">',
+                    '<h2 class="tour-place-card-name">{{ this.name }}</h2>',
+                    '<div class="tour-place-card-actions">',
+                        '<a class="tour-place-card-action tour-place-action-directions" ',
+                            'data-tour-place-index="{{ @index }}" ',
+                            'href="#">Directions</a>',
+                        '<a class="tour-place-card-action tour-place-action-details" href=',
+                        '"/place/{{ this.id }}/">More info</a>',
+                    '</div>',
+                '</div>',
+            '</li>',
+        '{{/each}}',
+        '</ul>',
+        '</div>'].join('');
+
+        var template = Handlebars.compile(source);
+        var html = template({destinations: destinations, tourName: tourName});
         return html;
     }
 
