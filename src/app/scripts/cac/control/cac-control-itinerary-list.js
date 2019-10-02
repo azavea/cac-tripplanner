@@ -2,7 +2,7 @@
  *  View control for the itinerary list
  *
  */
-CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
+CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
     'use strict';
 
@@ -104,24 +104,16 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             return;
         }
 
-        var slider = tns({
+        var slider = tns(Object.assign({
             container: options.selectors.itineraryList,
-            autoplayButton: false,
-            autoplayButtonOutput: false,
-            autoplayPosition: 'top',
-            controls: false,
-            controlPosition: 'bottom',
-            items: 1,
-            nav: true,
-            navPosition: 'bottom',
-            slideBy: 'page',
+        }, Utils.defaultCarouselOptions, {
             autoplay: false,
             autoHeight: true,
             responsive: {
                 320: {disable: false, controls: false, nav: true, autoHeight: true},
                 481: {disable: true}
             }
-        });
+        }));
 
         // Highlight route on map on itinerary carousel swipe
         slider.events.on('indexChanged', function(info) {
@@ -180,4 +172,4 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             hide();
         }
     }
-})(_, jQuery, CAC.Map.Templates);
+})(_, jQuery, CAC.Map.Templates, CAC.Utils);

@@ -76,6 +76,19 @@ CAC.Utils = (function (_, moment) {
         FERRY: brandColors.YELLOW
     };
 
+    var defaultCarouselOptions = {
+        autoplayButton: false,
+        autoplayButtonOutput: false,
+        autoplayPosition: 'top',
+        controls: false,
+        controlPosition: 'bottom',
+        items: 1,
+        nav: true,
+        navPosition: 'bottom',
+        slideBy: 'page',
+        autoplay: true
+    };
+
     var module = {
         convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
         defaultBackgroundLineColor: defaultBackgroundLineColor,
@@ -88,7 +101,8 @@ CAC.Utils = (function (_, moment) {
         encodeUrlParams: encodeUrlParams,
         getModeColor: getModeColor,
         modeStringHelper: modeStringHelper,
-        initializeMoment: initializeMoment
+        initializeMoment: initializeMoment,
+        defaultCarouselOptions: defaultCarouselOptions
     };
 
     return Object.freeze(module);
