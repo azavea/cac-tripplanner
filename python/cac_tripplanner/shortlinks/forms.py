@@ -1,7 +1,7 @@
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django.forms import ModelForm, ValidationError
-from django.core.urlresolvers import resolve, Resolver404
+from django.urls import resolve, Resolver404
 
 from .models import ShortenedLink
 

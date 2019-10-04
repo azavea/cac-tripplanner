@@ -78,7 +78,7 @@ var copyNpmFiles = function() {
 };
 
 gulp.task('collectstatic', function (done) {
-    exec('python ' + pythonRoot + '/manage.py collectstatic --noinput -v0',
+    exec('python3 ' + pythonRoot + '/manage.py collectstatic --noinput -v0',
         function(err, stdout, stderr) {
             if (stdout) {
                 console.log(stdout);

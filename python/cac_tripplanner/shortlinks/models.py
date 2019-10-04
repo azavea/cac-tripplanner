@@ -11,5 +11,5 @@ class ShortenedLink(models.Model):
 
 class ShortenedLinkHit(models.Model):
     """Stores a hit on a ShortRouteURL"""
-    link = models.ForeignKey(ShortenedLink)
+    link = models.ForeignKey(ShortenedLink, on_delete=models.CASCADE)
     hit_date = models.DateTimeField(auto_now_add=True)
