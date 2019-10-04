@@ -135,7 +135,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         showPlaces(false);
         var tourMode = UserPreferences.getPreference('tourMode');
         if (tourMode === 'event') {
-            tourListControl.setTourDestinations(tourDestinations, tourName);
+            tourListControl.setTourDestinations(tourDestinations, tourName, true);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             tourListControl.show();
             return;
@@ -212,7 +212,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // put markers at start and end
             mapControl.setDirectionsMarkers(directions.origin, directions.destination);
             if (currentItinerary.tourMode) {
-                tourListControl.setTourDestinations(tourDestinations, tourName);
+                tourListControl.setTourDestinations(tourDestinations, tourName, false);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 tourListControl.show();
             } else {
