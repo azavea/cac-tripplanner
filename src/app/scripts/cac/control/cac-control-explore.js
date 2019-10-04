@@ -3,7 +3,7 @@
  *
  */
 CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Routing,
-                                 UserPreferences) {
+                                 UserPreferences, Utils) {
 
     'use strict';
 
@@ -23,7 +23,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             placeCard: 'li.place-card',
             noOriginClass: 'no-origin',
             placeAttrX: 'data-destination-x',
-            placeAttrY: 'data-destination-y'
+            placeAttrY: 'data-destination-y',
+            imageCarousel: '.detail-image-carousel'
         }
     };
     var options = {};
@@ -394,6 +395,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
                                                 filter,
                                                 tabControl.isTabShowing(tabControl.TABS.HOME));
         $(options.selectors.placesContent).html(places);
+        $(options.selectors.imageCarousel).each(function (index, carouselNode) {
+            tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions));
+        });
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
 
@@ -532,4 +536,4 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     }
 
 })(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Places.Places, CAC.Routing.Plans,
-   CAC.User.Preferences);
+   CAC.User.Preferences, CAC.Utils);

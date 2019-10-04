@@ -7,7 +7,7 @@
         <div class="detail-image-carousel-container">
             <div class="detail-image-carousel">
                 <img src="{% cropped_thumbnail tour.first_destination 'wide_image' %}">
-                {% for tour_dest in tour.tour_destinations.all %}
+                {% for tour_dest in tour.tour_destinations.all|slice:"1:" %}
                 <img class="detail-image-carousel-extra-image hidden"
                      src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}">
                 {% endfor %}
