@@ -198,7 +198,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                             '<a class="place-card-action place-action-go" ',
                                 'data-destination-id="{{ cardId this.is_event this.is_tour this.id }}" ',
                                 'data-destination-places="{{ placeIds this.destinations this.id }}" ',
-                                'href="#">Directions</a>',
+                                'href="#">{{#if this.is_tour }}Map{{else}}Directions{{/if}}</a>',
                             '{{/if}}',
                             '<a class="place-card-action place-action-details" href=',
                             '"/{{#if this.is_event }}event{{else if this.is_tour}}tour{{else}}place{{/if}}/{{ this.id }}/"',
