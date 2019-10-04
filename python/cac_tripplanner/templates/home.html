@@ -167,7 +167,9 @@
                             <a class="place-card-action place-action-go"
                                 data-destination-id="{{ directions_id }}"
                                 data-destination-places="{{ place_ids }}"
-                                href="#">Directions</a>
+                                href="#">
+                                {% if destination.is_tour %}Map{% else %}Directions{% endif %}
+                                </a>
                             {% endif %}
                             <a class="place-card-action place-action-details"
                                {% if destination.is_event %}
