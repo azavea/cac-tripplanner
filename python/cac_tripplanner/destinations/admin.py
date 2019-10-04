@@ -52,7 +52,8 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
     map_template = 'admin/cac-geocoding-map.html'
 
     # Include geocoder dependencies
-    jquery = 'https://code.jquery.com/jquery-3.4.1.min.js'
+    # Use Django admin jquery
+    jquery = '/static/admin/js/vendor/jquery/jquery.js'
     if settings.DEBUG:
         extra_js = [
             jquery,

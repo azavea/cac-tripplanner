@@ -289,7 +289,7 @@ class FindReachableDestinations(View):
         # Parse and traverse JSON from OTP so that we return only geometries
         try:
             # get a feature collection
-            json_poly = json.loads(isochrone_response.content)
+            json_poly = json.loads(isochrone_response.content.decode('utf-8'))
         except:  # noqa: E722
             # No isochrone found.  Is GTFS loaded?  Is origin within the graph bounds?
             json_poly = json.loads("{}")
