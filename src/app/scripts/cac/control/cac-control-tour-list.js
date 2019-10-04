@@ -51,11 +51,11 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
     return TourListControl;
 
-    function setTourDestinations(newDestinations, tourName) {
+    function setTourDestinations(newDestinations, tourName, isEvent) {
         destinations = newDestinations;
 
         // Show the directions div and populate with tour destinations
-        var html = MapTemplates.tourDestinationList(destinations, tourName);
+        var html = MapTemplates.tourDestinationList(destinations, tourName, isEvent);
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);

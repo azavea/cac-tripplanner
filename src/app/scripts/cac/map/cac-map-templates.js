@@ -276,13 +276,13 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     // Template for tour destinations
-    function tourDestinationList(destinations, tourName) {
+    function tourDestinationList(destinations, tourName, isEvent) {
         var source = [
         '<div class="tours">',
         '<ul class="tour-list">',
             '<li class="tour-heading">',
                 '<div class="tour-label">',
-                    'Tour',
+                    '{{#if isEvent}}Event{{else}}Tour{{/if}}',
                 '</div>',
                 '<h1 class="tour-name">{{ tourName }}</h1>',
             '</li>',
@@ -318,7 +318,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({destinations: destinations, tourName: tourName});
+        var html = template({destinations: destinations,
+                             tourName: tourName,
+                             isEvent: isEvent});
         return html;
     }
 
