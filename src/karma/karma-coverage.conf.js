@@ -18,6 +18,8 @@ module.exports = function(config) {
       // console polyfills
       '/srv/cac/scripts/vendor/index.js',
       '/srv/cac/scripts/vendor/jquery.js',
+      '/srv/cac/scripts/vendor/Sortable.js',
+      '/srv/cac/scripts/vendor/jquery-sortable.js',
       '/srv/cac/scripts/vendor/lodash.js',
       // load moment before other vendor scripts; is requirement for bootstrap datetime picker
       '/srv/cac/scripts/vendor/moment.js',
