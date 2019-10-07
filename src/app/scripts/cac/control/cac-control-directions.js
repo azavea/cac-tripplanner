@@ -154,6 +154,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // Still update the URL and show marker if they request one-sided directions
             updateUrl();
             mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             return;
         }
 
