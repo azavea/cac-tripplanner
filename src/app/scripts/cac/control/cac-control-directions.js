@@ -115,6 +115,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 if (!UserPreferences.getPreference('origin')) {
                     directionsFormControl.setError('origin');
                     $(options.selectors.originInput).focus();
+                    // Hide spinner if trying to get directions without an origin
+                    $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 }
         });
     }
@@ -135,11 +137,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         showPlaces(false);
         var tourMode = UserPreferences.getPreference('tourMode');
         if (tourMode === 'event') {
+            // Show event destinations and their markers but do not route
             tourListControl.setTourDestinations(tour);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             tourListControl.show();
             itineraryControl.clearItineraries();
             mapControl.setDirectionsMarkers(null, null, true);
+            mapControl.isochroneControl.drawDestinations(tour.destinations,
+                _.flatMap(tour.destinations, 'id'));
             updateUrl();
             return;
         } else if (!(directions.origin && directions.destination)) {
@@ -264,6 +269,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             UserPreferences.setPreference('waypoints', undefined);
         }
         itineraryControl.clearItineraries();
+        mapControl.setDirectionsMarkers(null, null);
+        mapControl.isochroneControl.clearDestinations();
         itineraryListControl.hide();
         directionsListControl.hide();
     }
@@ -603,6 +610,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     function showPlaces(doShowPlaces) {
         if (doShowPlaces) {
             $(options.selectors.directions).hide();
+            mapControl.isochroneControl.clearDestinations();
             $(options.selectors.places).show();
         } else {
             $(options.selectors.directions).show();
