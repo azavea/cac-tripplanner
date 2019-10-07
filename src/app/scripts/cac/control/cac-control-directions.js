@@ -548,30 +548,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         if (result.destinations) {
             // Result came from Typeahead, and so already has full destinations
             // results from API search endpoint.
+            // If result did not come from Typeahead, the full tour will be
+            // loaded in the Places query in setFromUserPreferences.
             tour = result;
             onTypeaheadSelectDone(key, result.destinations);
-        } else {
-            // If destinations are not set on the result, it didn't come from
-            // an autocomplete query, so go search for the tour now in a blocking query.
-            Places.queryPlaces(null, result.address).then(function(data) {
-                // In case multiple tours have the same name, find the one
-                // with the ID of our tour.
-                var tourId = parseInt(result.id.split('_')[1]);
-                var tourResponse = isTourMode ? data.tours : data.events;
-                tour = _.find(tourResponse, function(tour) {
-                    return tourId === tour.id;
-                });
-                if (tour) {
-                    onTypeaheadSelectDone(key, tour.destinations);
-                } else {
-                    console.error('Failed to find destinations for tour ' + result.address);
-                    onTypeaheadSelectDone(key, [result]);
-                }
-            }).fail(function(error) {
-                console.error('Error querying for tour destinations:');
-                console.error(error);
-                onTypeaheadSelectDone(key, [result]);
-            });
         }
     }
 
