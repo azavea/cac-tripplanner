@@ -19,7 +19,8 @@
     }
 }
 
-.place-card-photo-container {
+.place-card-photo-container,
+.place-card-carousel-container {
     margin-right: -16px;
     margin-left: -16px;
 }
@@ -166,4 +167,16 @@
     .badge {
         margin-left: .8rem;
     }
+}
+
+.place-card .tns-outer {
+    position: relative;
+}
+
+.place-card .tns-nav {
+    position: absolute;
+    top: 100%;
+    bottom: initial;
+    margin-top: -1px;
+    width: 100%;
 }
