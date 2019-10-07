@@ -144,7 +144,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             itineraryControl.clearItineraries();
             mapControl.setDirectionsMarkers(null, null, true);
             mapControl.isochroneControl.drawDestinations(tour.destinations,
-                _.flatMap(tour.destinations, 'id'));
+                _.flatMap(tour.destinations, 'id'), true);
             updateUrl();
             return;
         } else if (!(directions.origin && directions.destination)) {
