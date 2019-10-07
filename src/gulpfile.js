@@ -67,11 +67,22 @@ var scriptOrder = [
     '**/*.js',
 ];
 
+// Load jQuery and Sortable dependencies before the plugin
+var vendorScriptOrder = [
+    '**/jquery.js',
+    '**/Sortable*.js',
+    '**/jquery-sortable*.js',
+    '**/*.js'
+];
+
 // Helper for copying over dependency files
 var copyNpmFiles = function() {
-    return gulp.src(mainNPM({
-        showWarnings: true
-    }), {allowEmpty: true, ignore: '**/*gulpfile*'});
+    return pump([
+        gulp.src(mainNPM({
+            showWarnings: true
+        }), {allowEmpty: true, ignore: '**/*gulpfile*'}),
+        order(vendorScriptOrder)
+    ]);
 };
 
 gulp.task('collectstatic', function (done) {
