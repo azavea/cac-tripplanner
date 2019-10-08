@@ -252,6 +252,11 @@ def set_destination_properties(destination):
     obj['is_event'] = False
     obj['is_tour'] = False
 
+    # Add truncated information on related tours (just ID and name)
+    related_tours = list(Tour.objects.filter(published=True,
+                         tour_destinations__destination=destination).values('id', 'name'))
+
+    obj['related_tours'] = related_tours
     extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
     obj = set_attraction_properties(obj, destination, extra_images)
     obj = set_location_properties(obj, destination)
