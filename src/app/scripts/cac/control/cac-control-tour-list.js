@@ -60,8 +60,26 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
-
         $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
+
+        var $destinationList = $(options.selectors.destinationList);
+
+        // First remove sortable if already initialized
+        if ($destinationList.sortable('widget')) {
+            $destinationList.sortable('destroy');
+        }
+
+        // Set up sortable list
+        var $sortableList = $destinationList.sortable({
+            animation: 150,
+            direction: 'vertical',
+            draggable: '.tour-place-card',
+            sort: true,
+            onUpdate: function(e) {
+                console.log('sortable updated');
+                console.log(e);
+            }
+        });
     }
 
     /**
