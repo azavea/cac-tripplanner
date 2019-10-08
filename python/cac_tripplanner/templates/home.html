@@ -92,7 +92,7 @@
             </header>
             <ul class="place-list" data-filter="All">
                 {% for destination in destinations %}
-                <li class="place-card {% if destination.is_event %}event-card {% endif %}{% if destination.is_tour %}tour-card {% endif %}no-origin"
+                <li class="place-card {% if destination.is_event %}event-card {% elif destination.is_tour %}tour-card {% else %}destination-card {% endif %}no-origin"
                     {% get_directions_id destination as directions_id %}
                     {% get_destination_x destination as destination_x %}
                     {% get_destination_y destination as destination_y %}
