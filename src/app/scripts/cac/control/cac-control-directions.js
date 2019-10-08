@@ -6,8 +6,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
     'use strict';
 
-    // Number of millis to wait on input changes before sending directions request
+    // Number of milliseconds to wait on input changes before sending directions request
     var DIRECTION_THROTTLE_MILLIS = 750;
+
+    // Number of milliseconds to wait on destination list reorder before requerying directions
+    var REORDER_TOUR_THROTTLE_MILLIS = 1000;
 
     var defaults = {
         selectors: {
@@ -119,6 +122,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     // Hide spinner if trying to get directions without an origin
                     $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 }
+        });
+
+        tourListControl.events.on(tourListControl.eventNames.destinationsReordered,
+            function(e, destinations) {
+                reorderTourDestinations(destinations);
         });
     }
 
@@ -248,6 +256,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             itineraryListControl.show();
         });
     }, DIRECTION_THROTTLE_MILLIS, {leading: true, trailing: true});
+
+    /**
+     * Reorder tour destination waypoints and end point and requery for directions.
+     * Throttled to cut down on requests.
+     */
+    var reorderTourDestinations = _.debounce(function(destinations) {  // jshint ignore:line
+        tour.destinations = destinations;
+        itineraryControl.clearItineraries();
+        mapControl.setDirectionsMarkers(null, null, true);
+        onTypeaheadSelectDone('destination', destinations);
+    }, REORDER_TOUR_THROTTLE_MILLIS, {leading: false, trailing: true});
 
     return DirectionsControl;
 
