@@ -32,10 +32,11 @@
     }
 
     h1 {
-        margin: 0;
+        margin: 2.2rem 0;
+        padding: 0;
         font-size: 2rem;
         font-weight: $font-weight-bold;
-        line-height: 4;
+        line-height: 1;
         text-align: center;
 
         @include respond-to('xxs') {
@@ -46,44 +47,49 @@
     .tour-label {
         color: $gophillygo-green;
         font-size: 1.2rem;
-        padding: 4px 12px 0;
         text-transform: uppercase;
     }
 
-    .tour-header {
-        padding: 4px 12px 0;
-    }
-
-    .tour-name {
-        font-size: 1.6rem;
+    h1.tour-name {
+        margin: 0.6rem 0 2.4rem;
+        font-size: 1.8rem;
         font-weight: $font-weight-bold;
-        justify-content: flex-start;
-        padding: 4px 12px 0;
+        text-transform: none;
     }
 
     // FIXME: forcing height for the scrollbar to work
     .tour-list {
+        display: flex;
         flex-flow: column nowrap;
-        height: 250px;
+        align-items: stretch;
+        justify-content: flex-start;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
     }
 
     .tours {
+        padding: 0.8rem 1.2rem;
+
         .body-map & {
             @include sidebar-main-inner-scroll;
         }
-    }
 
-    .tour-place-card {
-        &.selected {
-            background-color: $white;
+        .place-card {
+            width: 100%;
 
-            @include respond-to('xxs-up') {
-                box-shadow: $place-card-drop-shadow;
-            }
+            &.selected {
+                background-color: $white;
 
-            .tour-place-action-directions {
-                color: $white;
-                background-color: $gophillygo-purple;
+                @include respond-to('xxs-up') {
+                    box-shadow: $place-card-drop-shadow;
+                }
+
+                .place-card-action-directions {
+                    color: $white;
+                    background-color: $gophillygo-purple;
+                    border-color: $gophillygo-purple;
+                }
             }
         }
     }

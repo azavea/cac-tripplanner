@@ -78,16 +78,16 @@
                 data-destination-x="{{ destination.point.x }}"
                 data-destination-y="{{ destination.point.y }}">
                 <a href="{% url 'place-detail' pk=destination.pk %}"
-                   class="place-card-link"
+                   class="place-card-link place-card-inner"
                    title="{{ destination.name }}">
                     <span class="place-card-photo-container">
                         <img class="place-card-photo"
                             {% if destination.image %}
                                 src="{% cropped_thumbnail destination 'image' %}"
                             {% else %}
-                                src="https://placehold.it/310x155.jpg"
+                                src="https://placehold.it/80x80.jpg"
                             {% endif %}
-                            width="310" height="155"
+                            height="80"
                             alt="{{ destination.name }}" />
                     </span>
                     <span class="place-card-info">

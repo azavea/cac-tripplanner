@@ -190,6 +190,9 @@
 
     .place-card-link {
         @include delinkify();
+    }
+
+    .place-card-inner {
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;
@@ -229,8 +232,26 @@
 
     .place-card-name {
         white-space: normal;
+
+        &.oneline {
+            white-space: nowrap;
+        }
     }
 
     .place-card-badges {
+    }
+
+    .place-card-actions {
+        justify-content: space-between;
+        margin-bottom: 0.4rem;
+    }
+
+    .place-card-action {
+        flex: auto;
+        line-height: 2;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
     }
 }

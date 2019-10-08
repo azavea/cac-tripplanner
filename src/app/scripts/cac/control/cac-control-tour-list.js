@@ -18,8 +18,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             container: '.directions-list',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
-            destinationItem: '.tour-place-card',
-            destinationDirectionsButton: '.tour-place-action-directions'
+            destinationItem: '.place-card',
+            destinationDirectionsButton: '.place-card-action-directions'
         }
     };
     var options = {};

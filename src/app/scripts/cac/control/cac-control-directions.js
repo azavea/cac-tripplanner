@@ -17,7 +17,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             places: '.places',
             selectedClass: 'selected',
             spinner: '.directions-results > .sk-spinner',
-            tourDestinationBlock: '.tour-place-card',
+            tourDestinationBlock: '.place-card',
             visible: ':visible'
         }
     };
