@@ -235,9 +235,11 @@
         line-height: 1.5;
     }
 
-    .info-event-destination {
-        margin: .8rem 0;
-        font-size: 1.8rem;
+    .info-event-destinations {
+        display: flex;
+        flex-flow: row nowrap;
+        margin: 1.2rem 0;
+        font-size: 1.6rem;
         font-weight: $font-weight-medium;
         line-height: 1.5;
 
@@ -246,16 +248,43 @@
         }
     }
 
+    .info-event-destinations-at {
+        flex: none;
+        margin-right: 0.5em;
+    }
+
+    .info-event-destinations-list {
+        flex: auto;
+    }
+
+    .info-event-destination {
+        padding-bottom: 0.8rem;
+        margin-bottom: 0.8rem;
+
+        &:not(:last-of-type) {
+            border-bottom: 1px solid $v-lt-gray;
+        }
+
+        .info-event-date {
+            color: $gray;
+            font-size: 1.5rem;
+        }
+    }
+
     .info-event-destination-link {
         @include delinkify($gophillygo-blue);
+    }
+
+    .info-more-link {
+        font-style: italic;
     }
 
     .info-event-meta {
         flex: none;
         margin-left: 30px;
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         font-weight: $font-weight-bold;
-        line-height: 2;
+        line-height: 1.8;
 
         @include respond-to('xs') {
             display: flex;
