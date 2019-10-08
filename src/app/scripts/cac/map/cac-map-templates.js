@@ -303,7 +303,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '<div class="tour-place-card-actions">',
                         '<a class="tour-place-card-action tour-place-action-directions" ',
                             'data-tour-place-index="{{ @index }}" ',
-                            'href="#">Directions</a>',
+                            'href="#">Map</a>',
                         '<a class="tour-place-card-action tour-place-action-details" href=',
                         '"/place/{{ this.id }}/">More info</a>',
                     '</div>',
