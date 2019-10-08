@@ -37,6 +37,7 @@
         <h1><a href="{% url 'home' %}">Tours We Love</a></h1>
         {% include "partials/tour-detail.html" %}
 
+        {% if more_tours %}
         <div class="summaries-list">
             <h3>More great tours around Philly</h3>
             {% for tour in more_tours %}
@@ -46,6 +47,7 @@
                 <a href="{% url 'home' %}">See them all</a>
             </div>
         </div>
+        {% endif %}
     </div>
     {% include "partials/footer.html" %}
 {% endblock %}
