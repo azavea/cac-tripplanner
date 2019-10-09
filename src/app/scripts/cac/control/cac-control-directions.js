@@ -472,6 +472,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     }
 
     function onTypeaheadCleared(event, key) {
+        // Only clear map when origin cleared in tour mode
+        if (key === 'origin' && UserPreferences.getPreference('tourMode')) {
+            itineraryControl.clearItineraries();
+            mapControl.setDirectionsMarkers(null, null);
+            directions[key] = null;
+            return;
+        }
         clearItineraries();
         directions[key] = null;
 
@@ -576,6 +583,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     }
 
     function setDirections(key, value) {
+        // skip clearing sidebar or markers in tour mode
+        if (key === 'origin' && !value && UserPreferences.getPreference('tourMode')) {
+            itineraryControl.clearItineraries();
+            mapControl.setDirectionsMarkers(null, null);
+            directions[key] = value;
+            return;
+        }
+
         clearItineraries();
         if (key === 'origin' || key === 'destination') {
             directions[key] = value;
