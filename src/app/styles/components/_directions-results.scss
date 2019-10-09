@@ -44,35 +44,38 @@
         }
     }
 
-    .tour-label {
-        color: $gophillygo-green;
-        font-size: 1.2rem;
-        text-transform: uppercase;
-    }
-
-    h1.tour-name {
-        margin: 0.6rem 0 2.4rem;
-        font-size: 1.8rem;
-        font-weight: $font-weight-bold;
-        text-transform: none;
-    }
-
-    // FIXME: forcing height for the scrollbar to work
-    .tour-list {
-        display: flex;
-        flex-flow: column nowrap;
-        align-items: stretch;
-        justify-content: flex-start;
-        margin: 0;
-        padding: 0;
-        overflow: auto;
-    }
-
     .tours {
-        padding: 0.8rem 1.2rem;
 
-        .body-map & {
-            @include sidebar-main-inner-scroll;
+        .tour-list {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: stretch;
+            justify-content: flex-start;
+            margin: 0;
+            padding: 0.8rem 1.2rem;
+            overflow: auto;
+
+            .body-map & {
+                @include sidebar-main-inner-scroll;
+            }
+        }
+
+        .tour-heading {
+            margin-bottom: 1.6rem;
+
+            .tour-label {
+                color: $gophillygo-green;
+                font-size: 1.2rem;
+                text-transform: uppercase;
+            }
+
+            .tour-name {
+                margin: 0.6rem 0;
+                font-size: 1.8rem;
+                font-weight: $font-weight-bold;
+                text-align: left;
+                text-transform: none;
+            }
         }
 
         .place-card {
