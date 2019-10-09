@@ -311,7 +311,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
         itineraryControl.clearItineraries();
         mapControl.setDirectionsMarkers(null, null);
-        mapControl.isochroneControl.clearDestinations();
+        if (mapControl.isochroneControl) {
+            mapControl.isochroneControl.clearDestinations();
+        }
         itineraryListControl.hide();
         directionsListControl.hide();
     }

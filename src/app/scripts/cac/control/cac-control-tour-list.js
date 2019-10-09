@@ -2,7 +2,7 @@
  *  View control for the tour overview destinations list
  *
  */
-CAC.Control.TourList = (function (_, $, MapTemplates) {
+CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     'use strict';
 
@@ -54,7 +54,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     return TourListControl;
 
     function setTourDestinations(tour) {
-        if (tour.id !== tourId) {
+        if (tour && tour.id !== tourId) {
             tourId = tour.id;
             destinations = tour.destinations;
         } else {
@@ -91,6 +91,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
                 onUpdate: onDestinationListReordered
             });
         }
+
+        enableCarousel();
     }
 
     // Called when Sortable list of destinations gets updated
@@ -106,6 +108,34 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
         destinations = _.sortBy(destinations, 'userOrder');
         events.trigger(eventNames.destinationsReordered, [destinations]);
+    }
+
+    /**
+     * Enable carousel for swiping tour destinations on mobile
+     */
+    function enableCarousel() {
+        if (!destinations || destinations.length < 2) {
+            return;
+        }
+
+        var slider = tns(Object.assign({
+            container: options.selectors.destinationList,
+        }, Utils.defaultCarouselOptions, {
+            autoplay: false,
+            autoHeight: true,
+            responsive: {
+                320: {disable: false, controls: false, nav: true, autoHeight: true},
+                481: {disable: true}
+            }
+        }));
+
+        // Highlight place on map on destinations carousel swipe
+        slider.events.on('indexChanged', function(info) {
+            var items = $(options.selectors.destinationItem);
+            if (items && items.length > info.displayIndex) {
+                items.eq(info.displayIndex).triggerHandler('mouseenter');
+            }
+        });
     }
 
     /**
@@ -191,4 +221,4 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             hide();
         }
     }
-})(_, jQuery, CAC.Map.Templates);
+})(_, jQuery, CAC.Map.Templates, CAC.Utils);
