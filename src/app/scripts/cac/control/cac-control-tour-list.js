@@ -82,7 +82,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
             var $sortableList = $destinationList.sortable({
                 animation: 150,
                 direction: 'vertical',
-                draggable: '.tour-place-card',
+                draggable: options.selectors.destinationItem,
                 // Allow scrolling while dragging by not using native HTML5
                 // See: https://github.com/SortableJS/Sortable/issues/935
                 forceFallback: true,
@@ -95,7 +95,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     // Called when Sortable list of destinations gets updated
     function onDestinationListReordered(e) {
         var kids = e.to.children;
-        for (var i = 0; i < kids.length; i++) {
+        // First list item is the header; skip it
+        for (var i = 1; i < kids.length; i++) {
             var k = kids[i];
             var originalIndex = k.getAttribute('data-tour-place-index');
             // assign property with new order
