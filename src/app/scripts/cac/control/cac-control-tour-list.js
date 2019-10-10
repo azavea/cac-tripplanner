@@ -15,7 +15,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         showShareButton: false,
         selectors: {
             alert: '.alert',
-            container: '.directions-list',
+            container: '.tours',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
             destinationItem: '.place-card',
