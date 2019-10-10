@@ -24,7 +24,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             noOriginClass: 'no-origin',
             placeAttrX: 'data-destination-x',
             placeAttrY: 'data-destination-y',
-            imageCarousel: '.detail-image-carousel'
+            imageCarousel: '.place-card-carousel'
         }
     };
     var options = {};
