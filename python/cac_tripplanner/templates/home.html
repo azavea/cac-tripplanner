@@ -80,7 +80,7 @@
                     <div class="educational filter-option" data-filter="Educational">
                         Educational
                     </div>
-                    <div class="filter-divider">|</div>
+                    <div class="filter-divider"></div>
                     <div class="tours filter-option" data-filter="Tours">
                         Tours
                     </div>
@@ -92,7 +92,7 @@
             </header>
             <ul class="place-list" data-filter="All">
                 {% for destination in destinations %}
-                <li class="place-card {% if destination.is_event %}event-card {% endif %}{% if destination.is_tour %}tour-card {% endif %}no-origin"
+                <li class="place-card {% if destination.is_event %}event-card {% elif destination.is_tour %}tour-card {% else %}destination-card {% endif %}no-origin"
                     {% get_directions_id destination as directions_id %}
                     {% get_destination_x destination as destination_x %}
                     {% get_destination_y destination as destination_y %}
@@ -102,12 +102,14 @@
                     data-destination-x="{{ destination_x }}"
                     data-destination-y="{{ destination_y }}">
                     {% if destination.is_tour %}
-                        <div class="detail-image-carousel-container">
-                            <div class="detail-image-carousel">
-                                <img src="{% cropped_thumbnail destination.first_destination 'wide_image' %}">
+                        <div class="place-card-carousel-container">
+                            <div class="place-card-carousel">
+                                <img src="{% cropped_thumbnail destination.first_destination 'wide_image' %}"
+                                    width="310" height="155" />
                                 {% for tour_dest in destination.tour_destinations.all|slice:"1:" %}
-                                <img class="detail-image-carousel-extra-image hidden"
-                                    src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}">
+                                <img class="place-card-carousel-extra-image hidden"
+                                    src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}"
+                                    width="310" height="155" />
                                 {% endfor %}
                             </div>
                         </div>
@@ -234,10 +236,10 @@ jQuery(document).ready(function ($) {
     var Utils = CAC.Utils;
     home.initialize();
 
-    jQuery('.detail-image-carousel').each(function (index, carouselNode) {
-        tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions));
+    jQuery('.place-card-carousel').each(function (index, carouselNode) {
+        tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions, {autoplay: false}));
     });
-    jQuery('.detail-image-carousel-extra-image').removeClass('hidden');
+    jQuery('.place-card-carousel-extra-image').removeClass('hidden');
 
 });
 </script>

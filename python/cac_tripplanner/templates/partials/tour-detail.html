@@ -20,6 +20,7 @@
         <div class="info-article-header-info">
             <div class="info-article-header-main">
                 <h2 class="info-article-title">{{ tour.name }}</h2>
+                <p class="info-tour">GoPhillyGo tours are curated collections of places that share a common theme. Customize your self-guided tour on the map page.</p>
                 <div class="info-place-actions">
                     {% if tour.first_destination %}
                     <a class="place-action-go"
@@ -33,7 +34,6 @@
                 </div>
             </div>
             <div class="info-place-meta">
-                <p class="info-tour">GoPhillyGo tours are curated collections of places that share a common theme. Customize your self-guided tour on the map page.</p>
                 <ul class="info-event-activities">
                     {% has_activity event 'cycling' as has_cycling %}
                     {% has_activity event 'hiking' as has_hiking %}
@@ -65,58 +65,50 @@
     <section class="info-article-section">
         {{ tour.description|safe }}
     </section>
-    <section class="info-article-section">
+    <section class="info-article-section info-tour-locations">
         <h3>Locations in this tour</h3>
-        <ul class="place-list">
+        <ul class="tour-locations-list">
             {% for d in tour.tour_destinations.all %}
             {% with destination=d.destination %}
-            <li class="place-card no-origin"
+            <li class="place-card place-card-compact no-origin"
                 {% get_directions_id destination as directions_id %}
                 {% get_place_ids destination as place_ids %}
                 data-destination-id="{{ directions_id }}"
                 data-destination-places="{{ place_ids }}"
                 data-destination-x="{{ destination.point.x }}"
                 data-destination-y="{{ destination.point.y }}">
-                <div class="place-card-photo-container">
-                    <img class="place-card-photo"
-                        {% if destination.image %}
-                            src="{% cropped_thumbnail destination 'image' %}"
-                        {% else %}
-                            src="https://placehold.it/310x155.jpg"
-                        {% endif %}
-                        width="310" height="155"
-                        alt="{{ destination.name }}" />
-                </div>
-                <div class="place-card-info">
-                    <div class="place-card-meta">
-                        <div class="travel-logistics">
-                            <span class="travel-logistics-duration">N min</span>
-                            from <span class="travel-logistics-origin">origin</span>
-                        </div>
-                    </div>
-                    <h2 class="place-card-name">{{ destination.name }}</h2>
-                </div>
-                <div class="place-card-footer">
-                    <div class="place-card-badges">
-                        {% has_activity destination 'cycling' as has_cycling %}
-                        {% if has_cycling %}
-                        <span class="badge activity" title="Cycling">
-                            <i class="icon-cycling"></i>
-                        </span>
-                        {% endif %}
-                        {% if destination.watershed_alliance %}
-                        <a class="badge link"
-                            href="https://www.watershedalliance.org/"
-                            title="Alliance for Watershed Education"
-                            target="_blank">
-                            <img class="image"
+                <a href="{% url 'place-detail' pk=destination.pk %}"
+                   class="place-card-link place-card-inner"
+                   title="{{ destination.name }}">
+                    <span class="place-card-photo-container">
+                        <img class="place-card-photo"
+                            {% if destination.image %}
+                                src="{% cropped_thumbnail destination 'image' %}"
+                            {% else %}
+                                src="https://placehold.it/80x80.jpg"
+                            {% endif %}
+                            height="80"
+                            alt="{{ destination.name }}" />
+                    </span>
+                    <span class="place-card-info">
+                        <span class="place-card-name">{{ destination.name }}</span>
+                        <span class="place-card-badges">
+                            {% has_activity destination 'cycling' as has_cycling %}
+                            {% if has_cycling %}
+                            <span class="badge activity" title="Cycling">
+                                <i class="icon-cycling"></i>
+                            </span>
+                            {% endif %}
+                            {% if destination.watershed_alliance %}
+                            <img class="badge image"
                                 src="/static/images/awe-icon.png"
                                 srcset="/static/images/awe-icon.png 1x, /static/images/awe-icon@2x.png 2x"
                                 height="20"
-                                alt="Alliance for Watershed Education"></a>
-                        {% endif %}
-                    </div>
-                </div>
+                                alt="Alliance for Watershed Education">
+                            {% endif %}
+                        </span>
+                    </span>
+                </a>
             </li>
             {% endwith %}
             {% endfor %}
