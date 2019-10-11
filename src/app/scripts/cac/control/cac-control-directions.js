@@ -144,7 +144,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         showSpinner();
         showPlaces(false);
         var tourMode = UserPreferences.getPreference('tourMode');
-        if (tourMode === 'event' || (tourMode === 'tour' && !directions.origin)) {
+        var useInitialWaypoint = false;
+        var origin = directions.origin;
+        if (tourMode === 'event') {
             // Show destinations and their markers but do not route
             tourListControl.setTourDestinations(tour);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
@@ -155,13 +157,22 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 _.flatMap(tour.destinations, 'id'), true);
             updateUrl();
             return;
-        } else if (!(directions.origin && directions.destination)) {
+        } else if (tourMode === 'tour' && !origin &&
+                   tour.destinations && tour.destinations.length) {
+            // Viewing a tour with no origin set, implicitly use first destination
+            // without displaying it in the form.
+            origin = tour.destinations[0];
+            origin = [origin.location.y, origin.location.x];
+            useInitialWaypoint = true;
+        }
+
+        if (!(origin && directions.destination)) {
             directionsFormControl.setError('origin');
             directionsFormControl.setError('destination');
 
             // Still update the URL and show marker if they request one-sided directions
             updateUrl();
-            mapControl.setDirectionsMarkers(directions.origin, directions.destination, true);
+            mapControl.setDirectionsMarkers(origin, directions.destination, true);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             return;
         }
@@ -179,6 +190,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         // Most changes trigger this function, so doing this here keeps the URL mostly in sync
         updateUrl();
 
+        // If using first tour destination as implicit origin,
+        // remove it from waypoints *after* upating URL.
+        if (useInitialWaypoint) {
+            otpOptions.waypoints.shift();
+        }
+
         tabControl.setTab(tabControl.TABS.DIRECTIONS);
 
         // If a previous request is in progress, cancel it before issuing the new one.
@@ -187,7 +204,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
         }
 
-        planTripRequest = Routing.planTrip(directions.origin,
+        planTripRequest = Routing.planTrip(origin,
                                            directions.destination,
                                            date,
                                            otpOptions,
@@ -222,12 +239,16 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
             // snap start and end points to where first itinerary starts and ends
             // (in case one or both markers is someplace unroutable, like in a river)
-            directions.origin = [currentItinerary.from.lat, currentItinerary.from.lon];
             directions.destination = [currentItinerary.to.lat, currentItinerary.to.lon];
-            updateLocationPreferenceWithDirections('origin');
             updateLocationPreferenceWithDirections('destination');
+            if (!useInitialWaypoint) {
+                // Only update origin if it isn't the first destination of a tour
+                directions.origin = [currentItinerary.from.lat, currentItinerary.from.lon];
+                updateLocationPreferenceWithDirections('origin');
+                origin = directions.origin;
+            }
             // put markers at start and end
-            mapControl.setDirectionsMarkers(directions.origin, directions.destination);
+            mapControl.setDirectionsMarkers(origin, directions.destination);
             if (currentItinerary.tourMode) {
                 tourListControl.setTourDestinations(tour);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
@@ -333,7 +354,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             tourMode: UserPreferences.getPreference('tourMode')
         };
 
-        // add intermediatePlaces if user edited route
+        // add intermediatePlaces if user edited route or in tour mode
         var waypoints = UserPreferences.getPreference('waypoints');
         if (waypoints && waypoints.length && !arriveBy) {
             otpOptions.waypoints = waypoints;
@@ -685,7 +706,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
 
         if (destination && destination.location) {
-            directions.destination = [destination.location.y, destination.location.x ];
+            directions.destination = [destination.location.y, destination.location.x];
         }
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
