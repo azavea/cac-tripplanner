@@ -144,8 +144,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         showSpinner();
         showPlaces(false);
         var tourMode = UserPreferences.getPreference('tourMode');
-        if (tourMode === 'event') {
-            // Show event destinations and their markers but do not route
+        if (tourMode === 'event' || (tourMode === 'tour' && !directions.origin)) {
+            // Show destinations and their markers but do not route
             tourListControl.setTourDestinations(tour);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             tourListControl.show();
