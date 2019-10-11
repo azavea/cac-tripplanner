@@ -87,13 +87,18 @@ def get_place_ids(obj):
 
 
 @register.simple_tag(name='get_tour_directions_permalink')
-def get_tour_directions_permalink(tour):
-    """Build permalink for tour directions, with destinations as waypoints."""
-    url = '/?tourMode=true&destination='
-    places = list(tour.tour_destinations.all())
+def get_tour_directions_permalink(obj):
+    """Build permalink for tour directions or event map, with destinations as waypoints."""
+    url = '/?tourMode='
+    if hasattr(obj, 'tour_destinations'):
+        places = list(obj.tour_destinations.all())
+        url += 'tour'
+    else:
+        places = list(obj.event_destinations.all())
+        url += 'event'
     last = places.pop().destination
-    url += get_rounded_coordinates(last.point)
-    url += '&destinationText=' + quote(tour.name)
+    url += '&destination=' + get_rounded_coordinates(last.point)
+    url += '&destinationText=' + quote(obj.name)
     url += '&waypoints='
     for place in places:
         url += get_rounded_coordinates(place.destination.point) + '%3B'

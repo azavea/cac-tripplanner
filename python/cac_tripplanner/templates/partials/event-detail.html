@@ -70,13 +70,13 @@
                 {% endif %}
                 <div class="info-place-actions">
                     {% if event.event_destinations.count > 1 %}
-                    <!-- TODO: #1111 link to tour directions instead of first destination-->
                     <a class="place-action-go"
                         {% get_directions_id event as directions_id %}
-                        {% get_place_ids event as place_ids %}
+                        {% get_place_ids tour as place_ids %}
+                        {% get_tour_directions_permalink event as tour_directions_permalink %}
                         data-destination-id="{{ directions_id }}"
                         data-destination-places="{{ place_ids }}"
-                        href="/?destination={{ event.first_destination.point.y }}%2C{{ event.first_destination.point.x }}&destinationText={{ event.name|urlencode }}">Map</a>
+                        href="{{ tour_directions_permalink }}">Map</a>
                     {% elif event.first_destination %}
                     <a class="place-action-go"
                         {% get_directions_id event as directions_id %}
