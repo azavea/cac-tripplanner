@@ -105,7 +105,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
             function(e, placeId, address, x, y) {
                 showSpinner();
-                showPlaces(false);
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
                 UserPreferences.setPreference('placeId', placeId);
@@ -631,7 +630,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         } else {
             $(options.selectors.directions).show();
             $(options.selectors.places).hide();
-            exploreControl.showPlacesContent(); // hide spinner
         }
     }
 
