@@ -225,13 +225,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         var locationGeoJSON = _.chain(all).map(function(place) {
             var destinations = [];
-            if (place.published) {
-                // Pull in any unpublished destinations on published events or tours
-                if (place.destinations && place.destinations.length) {
-                    destinations = place.destinations;
-                } else if (!place.is_event && !place.is_tour) {
-                    destinations = [place];
-                }
+            // Pull in any unpublished destinations on published events or tours
+            if (place.destinations && place.destinations.length) {
+                destinations = place.destinations;
+            } else if (!place.is_event && !place.is_tour) {
+                destinations = [place];
             }
             return destinations;
         }).flatten().uniqBy('id').map(function(destination) {
@@ -291,7 +289,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         if (zoomToFit) {
             var markers = _.flatMap(destinationMarkers, 'marker._latlng');
-            if (zoomToFit && !_.isEmpty(markers)) {
+            if (!_.isEmpty(markers)) {
                 // zoom to fit all markers if several, or if there's only one, center on it
                 if (markers.length > 1) {
                     map.fitBounds(L.latLngBounds(markers), { maxZoom: defaults.zoom });
