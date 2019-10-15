@@ -89,5 +89,14 @@
             @include delinkify($gophillygo-blue);
             cursor: pointer;
         }
+
+        .destination-description-tours {
+            list-style: none;
+            padding-inline-start: 0;
+        }
+
+        .destination-description-tours-header {
+            margin-bottom: 0;
+        }
     }
 }
