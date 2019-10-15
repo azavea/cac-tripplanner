@@ -331,7 +331,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     function planTripOrShowPlaces() {
         if (directions.destination ||
             UserPreferences.getPreference('tourMode') === 'tour') {
-
             showPlaces(false);
             planTrip();
         } else {
@@ -528,7 +527,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         directions[key] = null;
 
         // Plan tour trip with first destination as implicit origin
-        if (tourMode === 'tour' && tour && tour.destinations && tour.destinations.length) {
+        if (UserPreferences.getPreference('tourMode') === 'tour' &&
+            tour && tour.destinations && tour.destinations.length) {
+
             planTripOrShowPlaces();
         }
 
@@ -723,20 +724,25 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // get nearby places if no destination has been set yet, or get directions
             var tourMode = UserPreferences.getPreference('tourMode');
             // Fetch tour destinations on tour directions page (re)load
-            if (tourMode) {
+            if (tourMode && destination) {
                 showSpinner();
-                var tourName = UserPreferences.getPreference('destinationText');
-                Places.queryPlaces(null, tourName).then(function(data) {
+                Places.queryPlaces(null, destination.address).then(function(data) {
                     tour = null;
                     if (tourMode === 'tour' && data.tours && data.tours.length) {
-                        tour = data.tours[0];
+                        tour = _.find(data.tours, function(tour) {
+                            return 'tour_' + tour.id === destination.id;
+                        });
+                        if (tour) {
+                            // Match format of Typeahead response
+                            tour.id = 'tour_' + tour.id;
+                        }
                     } else if (tourMode === 'event' && data.events && data.events.length) {
                         tour = data.events[0];
                     }
                     if (tour) {
                         onTypeaheadSelectDone('destination', tour.destinations);
                     } else {
-                        console.error('Failed to find destinations for tour ' + tourName);
+                        console.error('Failed to find destinations for tour ' + destination.address);
                         planTripOrShowPlaces();
                     }
                 }).fail(function(error) {

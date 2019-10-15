@@ -277,11 +277,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
             // Get all places in sidebar when no origin set.
-            // Check for tour mode to prevent hiding spinner while reloading with
-            // implicit origin.
-            if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS) &&
-                !UserPreferences.getPreference('tourMode') === 'tour') {
-
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 getNearbyPlaces();
             }
         }
