@@ -15,7 +15,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
         showShareButton: false,
         selectors: {
             alert: '.alert',
-            container: '.directions-list',
+            container: '.tours',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
             destinationItem: '.place-card',
@@ -51,11 +51,11 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
     return TourListControl;
 
-    function setTourDestinations(newDestinations, tourName) {
-        destinations = newDestinations;
+    function setTourDestinations(tour) {
+        destinations = tour.destinations;
 
         // Show the directions div and populate with tour destinations
-        var html = MapTemplates.tourDestinationList(destinations, tourName);
+        var html = MapTemplates.tourDestinationList(tour);
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);

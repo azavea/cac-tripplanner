@@ -214,9 +214,10 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
      * Draw an array of geojson destination points onto the map
      *
      * @param {Array} all All destinations to draw
-     * @param {Array} IDs of matched Destinations witin the travelshed
+     * @param {Array} matched IDs of matched Destinations witin the travelshed
+     * @param {Boolean} zoomToFit If true, zoom map to fit all markers
      */
-    function drawDestinations(all, matched) {
+    function drawDestinations(all, matched, zoomToFit) {
         // put destination details onto point geojson object's properties
         // build map of unconverted destination objects
         var destinations = {};
@@ -224,13 +225,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         var locationGeoJSON = _.chain(all).map(function(place) {
             var destinations = [];
-            if (place.published) {
-                // Pull in any unpublished destinations on published events or tours
-                if (place.destinations && place.destinations.length) {
-                    destinations = place.destinations;
-                } else if (!place.is_event && !place.is_tour) {
-                    destinations = [place];
-                }
+            // Pull in any unpublished destinations on published events or tours
+            if (place.destinations && place.destinations.length) {
+                destinations = place.destinations;
+            } else if (!place.is_event && !place.is_tour) {
+                destinations = [place];
             }
             return destinations;
         }).flatten().uniqBy('id').map(function(destination) {
@@ -287,6 +286,18 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 return marker;
             }
         }).addTo(map);
+
+        if (zoomToFit) {
+            var markers = _.flatMap(destinationMarkers, 'marker._latlng');
+            if (!_.isEmpty(markers)) {
+                // zoom to fit all markers if several, or if there's only one, center on it
+                if (markers.length > 1) {
+                    map.fitBounds(L.latLngBounds(markers), { maxZoom: defaults.zoom });
+                } else {
+                    map.setView(markers[0].getLatLng());
+                }
+            }
+        }
     }
 
     function highlightDestinations(destinationIds, opts) {

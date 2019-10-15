@@ -276,17 +276,34 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     // Template for tour destinations
-    function tourDestinationList(destinations, tourName) {
+    // Note that the date/time helpers used here were registered in the home templates
+    function tourDestinationList(tour) {
         var source = [
-        '<div class="tours">',
         '<ul class="tour-list">',
-            '<li class="tour-heading">',
+            '<div class="tour-heading">',
                 '<div class="tour-label">',
-                    'Tour',
+                    '{{#if tour.is_event}}Event{{else}}Tour{{/if}}',
                 '</div>',
                 '<h1 class="tour-name">{{ tourName }}</h1>',
-            '</li>',
-            '{{#each destinations}}',
+                '<div class="event-date-time">',
+            	    '{{#if tour.is_event }}',
+            	        '{{#if (sameDay tour.start_date tour.end_date) }}',
+            	        '<div class="event-date event-time">',
+            		    '{{eventDate tour.start_date }}',
+            		    ' &middot; ',
+            		    '{{eventTime tour.start_date }}',
+            	        '</div>',
+            	    '{{else}}',
+            	        '<div class="event-date event-time">',
+            		    '{{eventDate tour.start_date }}',
+            		    ' &ndash; ',
+            		    '{{eventDate tour.end_date }}',
+            	        '</div>',
+            	    '{{/if}}',
+            	'{{/if}}',
+            	'</div>',
+            '</div>',
+            '{{#each tour.destinations}}',
                 '<li class="place-card place-card-compact no-origin" ',
                     'data-tour-place-index="{{ @index }}" ',
                     'data-tour-place-id="{{ this.id }}">',
@@ -314,11 +331,10 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                     '</div>',
                 '</li>',
             '{{/each}}',
-        '</ul>',
-        '</div>'].join('');
+        '</ul>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({destinations: destinations, tourName: tourName});
+        var html = template({tour: tour});
         return html;
     }
 
