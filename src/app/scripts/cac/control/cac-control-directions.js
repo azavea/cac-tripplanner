@@ -173,6 +173,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // Still update the URL and show marker if they request one-sided directions
             updateUrl();
             mapControl.setDirectionsMarkers(origin, directions.destination, true);
+
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             return;
         }
@@ -512,15 +513,24 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     }
 
     function onTypeaheadCleared(event, key) {
-        // Only clear map when origin cleared in tour mode
-        if (key === 'origin' && UserPreferences.getPreference('tourMode')) {
-            itineraryControl.clearItineraries();
-            mapControl.setDirectionsMarkers(null, null);
-            directions[key] = null;
-            return;
+        if (key === 'origin') {
+            var tourMode = UserPreferences.getPreference('tourMode');
+
+            if (tourMode === 'event') {
+                itineraryControl.clearItineraries();
+                mapControl.setDirectionsMarkers(null, null);
+                directions[key] = null;
+                return;
+            }
         }
+
         clearItineraries();
         directions[key] = null;
+
+        // Plan tour trip with first destination as implicit origin
+        if (tourMode === 'tour' && tour && tour.destinations && tour.destinations.length) {
+            planTripOrShowPlaces();
+        }
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             mapControl.clearDirectionsMarker(key);

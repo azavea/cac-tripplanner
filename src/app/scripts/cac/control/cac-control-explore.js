@@ -276,8 +276,14 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             enableSlider(false);
             mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
-            // get all places in sidebar when no origin set
-            getNearbyPlaces();
+            // Get all places in sidebar when no origin set.
+            // Check for tour mode to prevent hiding spinner while reloading with
+            // implicit origin.
+            if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS) &&
+                !UserPreferences.getPreference('tourMode') === 'tour') {
+
+                getNearbyPlaces();
+            }
         }
     }
 
