@@ -27,11 +27,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     var events = $({});
     var eventNames = {
         destinationClicked: 'cac:control:tourlist:destinationclicked',
-        destinationHovered: 'cac:control:tourlist:destinationhovered'
+        destinationHovered: 'cac:control:tourlist:destinationhovered',
+        destinationsReordered: 'cac:control:tourlist:destinationsreordered'
     };
 
     var $container = null;
     var destinations = [];
+    var tourId = null;
 
     function TourListControl(params) {
         options = $.extend({}, defaults, params);
@@ -52,7 +54,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
     return TourListControl;
 
     function setTourDestinations(tour) {
-        destinations = tour.destinations;
+        if (tour.id !== tourId) {
+            tourId = tour.id;
+            destinations = tour.destinations;
+        } else {
+            // tour unchanged; preserve user assigned destination order
+            tour.destinations = destinations;
+        }
 
         // Show the directions div and populate with tour destinations
         var html = MapTemplates.tourDestinationList(tour);
@@ -60,8 +68,43 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
-
         $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
+
+        var $destinationList = $(options.selectors.destinationList);
+
+        // First remove sortable if already initialized
+        if ($destinationList.sortable('widget')) {
+            $destinationList.sortable('destroy');
+        }
+
+        // Set up sortable list for tours (not events)
+        if (tour.is_tour) {
+            var $sortableList = $destinationList.sortable({
+                animation: 150,
+                direction: 'vertical',
+                draggable: options.selectors.destinationItem,
+                // Allow scrolling while dragging by not using native HTML5
+                // See: https://github.com/SortableJS/Sortable/issues/935
+                forceFallback: true,
+                sort: true,
+                onUpdate: onDestinationListReordered
+            });
+        }
+    }
+
+    // Called when Sortable list of destinations gets updated
+    function onDestinationListReordered(e) {
+        var kids = e.to.children;
+        // First list item is the header; skip it
+        for (var i = 1; i < kids.length; i++) {
+            var k = kids[i];
+            var originalIndex = k.getAttribute('data-tour-place-index');
+            // assign property with new order
+            destinations[originalIndex].userOrder = i;
+        }
+
+        destinations = _.sortBy(destinations, 'userOrder');
+        events.trigger(eventNames.destinationsReordered, [destinations]);
     }
 
     /**
