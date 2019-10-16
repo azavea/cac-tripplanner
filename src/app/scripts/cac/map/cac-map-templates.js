@@ -279,12 +279,12 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     // Note that the date/time helpers used here were registered in the home templates
     function tourDestinationList(tour) {
         var source = [
-        '<ul class="tour-list">',
+        '<div class="tour-list">',
             '<div class="tour-heading">',
                 '<div class="tour-label">',
                     '{{#if tour.is_event}}Event{{else}}Tour{{/if}}',
                 '</div>',
-                '<h1 class="tour-name">{{ tourName }}</h1>',
+                '<h1 class="tour-name">{{ tour.name }}</h1>',
                 '<div class="event-date-time">',
             	    '{{#if tour.is_event }}',
             	        '{{#if (sameDay tour.start_date tour.end_date) }}',
@@ -304,7 +304,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             	'</div>',
             '</div>',
             '{{#each tour.destinations}}',
-                '<li class="place-card place-card-compact no-origin" ',
+                '<div class="place-card place-card-compact no-origin" ',
                     'data-tour-place-index="{{ @index }}" ',
                     'data-tour-place-id="{{ this.id }}">',
                     '<div class="place-card-inner">',
@@ -329,9 +329,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '</div>',
                         '</div>',
                     '</div>',
-                '</li>',
+                '</div>',
             '{{/each}}',
-        '</ul>'].join('');
+        '</div>'].join('');
 
         var template = Handlebars.compile(source);
         var html = template({tour: tour});
