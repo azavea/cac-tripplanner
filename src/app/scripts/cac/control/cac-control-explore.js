@@ -276,8 +276,10 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             enableSlider(false);
             mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
-            // get all places in sidebar when no origin set
-            getNearbyPlaces();
+            // Get all places in sidebar when no origin set.
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                getNearbyPlaces();
+            }
         }
     }
 
