@@ -86,6 +86,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates) {
                 // Allow scrolling while dragging by not using native HTML5
                 // See: https://github.com/SortableJS/Sortable/issues/935
                 forceFallback: true,
+                handle: '.place-card-drag-handle',
                 sort: true,
                 onUpdate: onDestinationListReordered
             });

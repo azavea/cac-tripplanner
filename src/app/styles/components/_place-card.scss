@@ -12,10 +12,6 @@
     .body-map & {
         margin-right: auto;
         margin-left: auto;
-
-        .place-card-photo-container {
-            background-color: $white;
-        }
     }
 }
 
@@ -198,6 +194,7 @@
     }
 
     .place-card-inner {
+        position: relative;
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;
@@ -218,6 +215,7 @@
         justify-content: center;
         align-items: center;
         flex: none;
+        background: #000;
     }
 
     .place-card-photo {
@@ -258,5 +256,43 @@
         &:last-of-type {
             margin-right: 0;
         }
+    }
+}
+
+.place-card.sortable-ghost {
+    border: 2px dashed $default-background-line-color !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    > * {
+        opacity: 0 !important;
+    }
+}
+
+.place-card-drag-handle {
+    position: absolute;
+    display: none;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    left: 0.4rem;
+    margin-top: -1.2rem;
+    height: 2.4rem;
+    color: $white;
+    text-shadow: 1px 1px #000;
+    cursor: move;
+    cursor: grab;
+
+    @include respond-to('xxs-up') {
+        .place-card-sortable:hover & {
+            display: flex;
+        }
+    }
+}
+
+@include respond-to('xxs-up') {
+    .place-card-sortable:hover .place-card-photo {
+        opacity: 0.8;
     }
 }
