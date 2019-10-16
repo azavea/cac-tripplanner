@@ -398,7 +398,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
                                                 tabControl.isTabShowing(tabControl.TABS.HOME));
         $(options.selectors.placesContent).html(places);
         $(options.selectors.imageCarousel).each(function (index, carouselNode) {
-            tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions));
+            tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions, {autoplay: false}));
         });
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
