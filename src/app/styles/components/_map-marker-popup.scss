@@ -91,12 +91,17 @@
         }
 
         .destination-description-tours {
+            margin: 0 0 2.4rem;
             list-style: none;
             padding-inline-start: 0;
+            font-size: 1.4rem;
+            font-weight: $font-weight-medium;
         }
 
         .destination-description-tours-header {
-            margin-bottom: 0;
+            margin-bottom: 0.8rem;
+            font-size: 1.4rem;
+            font-weight: $font-weight-bold;
         }
     }
 }
