@@ -74,6 +74,10 @@
                 font-weight: $font-weight-bold;
                 text-align: left;
                 text-transform: none;
+
+                .tour-name-link {
+                    @include delinkify();
+                }
             }
         }
 
