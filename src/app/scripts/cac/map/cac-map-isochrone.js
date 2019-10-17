@@ -258,7 +258,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                      '</h5>',
                                      '<ul class="destination-description-tours">',
                                      '{{#each geojson.properties.related_tours}}',
-                                     '<li><a class="destination-website-link" target="_blank" ',
+                                     '<li><a class="destination-website-link" ',
                                      'href="/tour/{{this.id}}/">{{this.name}}</a></li>',
                                      '{{/each}}',
                                      '</ul>',
