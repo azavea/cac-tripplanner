@@ -233,10 +233,23 @@
         overflow: hidden;
     }
 
+    .event-date-time {
+        flex: none;
+        margin-bottom: 0.2rem;
+        color: $font-color;
+        font-size: 1.1rem;
+        font-weight: $font-weight-semibold;
+        text-align: left;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
     .place-card-name {
         white-space: normal;
 
         &.oneline {
+            margin-top: 0.1rem;
+            line-height: 1;
             white-space: nowrap;
         }
     }
