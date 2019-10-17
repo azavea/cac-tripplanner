@@ -62,8 +62,13 @@ def home(request):
     article = Article.objects.random()
     # Show all destinations, events, and tours
     destinations = list(Destination.objects.published().order_by('priority'))
+    # Return one tour and one event each, unless there aren't any of one kind,
+    # then return two of the other.
     events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
     tours = list(Tour.objects.published().order_by('priority'))[:2]
+    if len(events) > 0 and len(tours) > 0:
+        events = events[0:1]
+        tours = tours[0:1]
     context = {
         'tab': 'home',
         'article': article,
