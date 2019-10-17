@@ -45,6 +45,9 @@
     }
 
     .tours {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
 
         .tour-list {
             display: flex;
@@ -54,10 +57,6 @@
             margin: 0;
             padding: 0.8rem 1.2rem;
             overflow: auto;
-
-            .body-map & {
-                @include sidebar-main-inner-scroll;
-            }
         }
 
         .tour-heading {
@@ -75,6 +74,10 @@
                 font-weight: $font-weight-bold;
                 text-align: left;
                 text-transform: none;
+
+                .tour-name-link {
+                    @include delinkify();
+                }
             }
         }
 
