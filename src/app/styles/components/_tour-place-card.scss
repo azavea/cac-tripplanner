@@ -35,21 +35,13 @@
     padding: .6rem 0 .7rem;
 }
 
-.tour-place-card-meta {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: $font-weight-medium;
-    line-height: 1.0rem;
-
+.tour-list {
     .event-date-time {
-        display: none;
         flex: none;
         color: $font-color;
         font-size: 1.1rem;
         font-weight: $font-weight-semibold;
-        text-align: right;
+        text-align: left;
         text-transform: uppercase;
         white-space: nowrap;
 
