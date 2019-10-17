@@ -407,8 +407,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             // allDestinations has been loaded by now
+            // Only filter to isochrone if it is set.
+            var filterPlaces = _.isNull(isochroneDestinationIds) ?
+                _.flatMap(allDestinations, 'id') : isochroneDestinationIds;
             mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         isochroneDestinationIds, false);
+                                                         filterPlaces, false);
         }
         showPlacesContent();
     }
