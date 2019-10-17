@@ -296,6 +296,10 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
             if (origin && destination) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
+            } else if (origin) {
+                // reload places list to get new distances from origin
+                exploreControl.showSpinner();
+                exploreControl.getNearbyPlaces();
             }
         }
     }
