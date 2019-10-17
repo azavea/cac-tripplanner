@@ -488,7 +488,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
                         _.indexOf(place.categories, 'Tours') > -1;
                 });
                 // Show one tour and one event each, or up to two of one kind if there aren't any
-                return twoEvents.concat(twoTours).slice(0, 2).concat(noEventsOrTours);
+                var eventsTours = twoEvents && twoTours &&
+                    twoEvents.length > 0 && twoTours.length > 0 ?
+                    [twoEvents[0], twoTours[0]] :
+                    twoEvents.concat(twoTours);
+                return eventsTours.concat(noEventsOrTours);
             }
         }
 
