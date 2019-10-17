@@ -263,6 +263,7 @@
     border: 2px dashed $default-background-line-color !important;
     background: transparent !important;
     box-shadow: none !important;
+    overflow: hidden !important;
 
     > * {
         opacity: 0 !important;
