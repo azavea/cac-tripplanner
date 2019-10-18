@@ -4,6 +4,7 @@
     state: present
     pkg:
       - build-essential
+      - gcc
       - libgeos-dev
       - libgdal-dev
       - libproj-dev
