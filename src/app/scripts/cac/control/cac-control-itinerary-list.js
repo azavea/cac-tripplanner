@@ -109,6 +109,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
         }, Utils.defaultCarouselOptions, {
             autoplay: false,
             autoHeight: true,
+            loop: false,
             responsive: {
                 320: {disable: false, controls: false, nav: true, autoHeight: true},
                 481: {disable: true}
