@@ -104,7 +104,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
             function(e, placeId, address, x, y) {
-                showSpinner();
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
                 UserPreferences.setPreference('placeId', placeId);
@@ -312,7 +311,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
         itineraryControl.clearItineraries();
         mapControl.setDirectionsMarkers(null, null);
-        mapControl.isochroneControl.clearDestinations();
+        if (mapControl.isochroneControl) {
+            mapControl.isochroneControl.clearDestinations();
+        }
         itineraryListControl.hide();
         directionsListControl.hide();
     }
