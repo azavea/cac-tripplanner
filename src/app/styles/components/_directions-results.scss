@@ -40,7 +40,9 @@
         text-align: center;
 
         @include respond-to('xxs') {
-            display: none;
+            &:not(.tour-name) {
+                display: none;
+            }
         }
     }
 
@@ -50,17 +52,22 @@
         }
 
         .tour-list {
-            display: flex;
-            flex-flow: column nowrap;
-            align-items: stretch;
-            justify-content: flex-start;
             margin: 0;
-            padding: 0.8rem 1.2rem;
             overflow: auto;
+
+            @include respond-to('xxs-up') {
+                padding: 0.8rem 1.2rem;
+            }
         }
 
         .tour-heading {
             margin-bottom: 1.6rem;
+
+            @include respond-to('xxs') {
+                min-height: 80px;
+                padding: 0.8rem 1.2rem;
+                background-color: $white;
+            }
 
             .tour-label {
                 color: $gophillygo-green;
@@ -77,6 +84,16 @@
 
                 .tour-name-link {
                     @include delinkify();
+                }
+            }
+
+            .swipe-hint {
+                font-size: 1.3rem;
+                font-style: italic;
+                color: $lt-gray;
+
+                @include respond-to('xxs-up') {
+                    display: none;
                 }
             }
         }
