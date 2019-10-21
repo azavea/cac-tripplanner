@@ -121,16 +121,16 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     // Called when Sortable list of destinations gets updated
     function onDestinationListReordered(e) {
         var kids = e.to.children;
-        for (var i = 0; i < kids.length; i++) {
-            var k = kids[i];
-            var originalIndex = k.getAttribute('data-tour-place-index');
-
-            if (!originalIndex) {
-                continue; // skip header list element
+        var indexOrder = 0;
+        _.each(kids, function(kid) {
+            var originalIndex = kid.getAttribute('data-tour-place-index');
+            // If attribute is missing, it is the header element; skip
+            if (originalIndex) {
+                // assign property with new order
+                destinations[originalIndex].userOrder = indexOrder;
+                indexOrder++;
             }
-            // assign property with new order
-            destinations[originalIndex].userOrder = i;
-        }
+        });
 
         destinations = _.sortBy(destinations, 'userOrder');
         reorderDestinations();
