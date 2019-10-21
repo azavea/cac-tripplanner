@@ -171,6 +171,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
             // Still update the URL and show marker if they request one-sided directions
             updateUrl();
+
             mapControl.setDirectionsMarkers(origin, directions.destination, true);
 
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
@@ -229,12 +230,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
-                if (currentItinerary.tourMode) {
-                    itineraryControl.tourItinerary(currentItinerary, tour.destinations);
-                } else {
-                    itineraryControl.draggableItinerary(currentItinerary);
-                }
+            if (!currentItinerary.tourMode && itineraries.length === 1 &&
+                !UserPreferences.getPreference('arriveBy')) {
+
+                itineraryControl.draggableItinerary(currentItinerary);
+            }
+
+            if (currentItinerary.tourMode) {
+                itineraryControl.tourItinerary(currentItinerary, tour.destinations);
             }
 
             // snap start and end points to where first itinerary starts and ends
@@ -247,8 +250,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 updateLocationPreferenceWithDirections('origin');
                 origin = directions.origin;
             }
-            // put markers at start and end
-            mapControl.setDirectionsMarkers(origin, directions.destination);
+            // put markers at start and end, if set by user
+            if (!currentItinerary.tourMode) {
+                mapControl.setDirectionsMarkers(directions.origin, directions.destination);
+            } else if (directions.origin) {
+                mapControl.setDirectionsMarkers(directions.origin, null);
+            }
+
             if (currentItinerary.tourMode) {
                 tourListControl.setTourDestinations(tour);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
