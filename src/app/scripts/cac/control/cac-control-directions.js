@@ -213,17 +213,25 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
 
         planTripRequest.then(function (itineraries) {
-            // Add the itineraries to the map, highlighting the first one
-            var isFirst = true;
             itineraryControl.clearItineraries();
-            _.forEach(itineraries, function (itinerary) {
-                itineraryControl.plotItinerary(itinerary, isFirst);
-                itinerary.highlight(isFirst);
-                if (isFirst) {
-                    currentItinerary = itinerary;
-                    isFirst = false;
-                }
-            });
+            // Only use first itinerary in tour mode
+            if (tourMode && itineraries.length) {
+                currentItinerary = itineraries[0];
+                itineraryControl.plotItinerary(currentItinerary, true);
+                currentItinerary.showTour();
+            } else if (!tourMode) {
+                // Add the itineraries to the map, highlighting the first one
+                var isFirst = true;
+                _.forEach(itineraries, function (itinerary) {
+                    itineraryControl.plotItinerary(itinerary, isFirst);
+                    itinerary.highlight(isFirst);
+                    if (isFirst) {
+                        currentItinerary = itinerary;
+                        isFirst = false;
+                    }
+                });
+            }
+
             currentItinerary.geojson.bringToFront();
 
             // If there is only one itinerary, make it draggable.

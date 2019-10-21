@@ -42,7 +42,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.setLineColors = setLineColors;
 
         // default to visible, backgrounded linestring styling
-        this.setLineColors(true, false);
+        this.setLineColors(true, false, false);
 
         // set by CAC.Routing.Plans with the arguments sent to planTrip:
         // coordsFrom, coordsTo, when, extraOptions
@@ -63,12 +63,16 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     Itinerary.prototype.highlight = function(isHighlighted) {
-        this.setLineColors(true, isHighlighted);
+        this.setLineColors(true, isHighlighted, false);
     };
 
     Itinerary.prototype.show = function(isShown) {
-        this.setLineColors(isShown, false);
+        this.setLineColors(isShown, false, false);
     };
+
+    Itinerary.prototype.showTour = function() {
+        this.setLineColors(true, false, true);
+    }
 
     /**
      * Get geoJSON for an itinerary. Also updates `from` and `to` points while building geoJSON.
@@ -362,20 +366,23 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      *
      * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
      * @param {Boolean} highlighted Should this itinerary be highlighted on the map
+     * @param {Boolean} tour Should this itinerary be styled as a tour
      */
-    function setLineColors(shown, highlighted) {
+    function setLineColors(shown, highlighted, tour) {
 
         if (!shown) {
             this.geojson.setStyle({opacity: 0});
             return;
         }
 
-        var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
-                        color: Utils.defaultModeColor,
-                        dashArray: null,
-                        lineCap: 'round',
-                        lineJoin: 'round',
-                        opacity: 0.75};
+        var defaultStyle = {
+            clickable: true, // to get mouse events (listen to hover)
+            color: Utils.defaultModeColor,
+            dashArray: null,
+            lineCap: 'round',
+            lineJoin: 'round',
+            opacity: 0.75
+        };
 
         if (highlighted) {
             defaultStyle.dashArray = null;
@@ -387,6 +394,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                 var modeColor = Utils.getModeColor(layer.feature.properties.mode);
                 layer.setStyle({color: modeColor});
             });
+        } else if (tour) {
+            defaultStyle.color = 'black';
+            defaultStyle.opacity = 1;
+            this.geojson.setStyle(defaultStyle);
         } else {
             // in background
             defaultStyle.color = Utils.defaultBackgroundLineColor;
