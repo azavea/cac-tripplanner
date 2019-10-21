@@ -129,6 +129,9 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
+        directionsFormControl.events.on(directionsFormControl.eventNames.cleared,
+                                        $.proxy(onTypeaheadCleared, this));
+
         directionsFormControl.events.on(directionsFormControl.eventNames.selected,
                                         $.proxy(onTypeaheadSelected, this));
 
@@ -286,6 +289,14 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         if (tabId === tabControl.TABS.HOME) {
             UserPreferences.setPreference('method', undefined);
             clearUserSettings();
+        }
+    }
+
+    function onTypeaheadCleared(event, key) {
+        if (key === 'origin') {
+            // reload places list to clear distances from origin
+            exploreControl.showSpinner();
+            exploreControl.getNearbyPlaces();
         }
     }
 
