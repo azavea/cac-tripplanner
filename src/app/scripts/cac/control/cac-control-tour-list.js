@@ -121,10 +121,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     // Called when Sortable list of destinations gets updated
     function onDestinationListReordered(e) {
         var kids = e.to.children;
-        // First list item is the header; skip it
-        for (var i = 1; i < kids.length; i++) {
+        for (var i = 0; i < kids.length; i++) {
             var k = kids[i];
-            var originalIndex = k.getAttribute(options.selectors.dataPlaceIndex);
+            var originalIndex = k.getAttribute('data-tour-place-index');
+
+            if (!originalIndex) {
+                continue; // skip header list element
+            }
             // assign property with new order
             destinations[originalIndex].userOrder = i;
         }
