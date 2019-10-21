@@ -26,9 +26,9 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.duration = otpItinerary.duration;
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.legs = getLegs(otpItinerary.legs, (!tourMode &&
-                                                this.waypoints &&
-                                                this.waypoints.length > 0));
+        this.legs = getLegs(otpItinerary.legs,
+                            this.waypoints && this.waypoints.length > 0,
+                            tourMode);
         this.from = _.head(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
@@ -72,7 +72,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
 
     Itinerary.prototype.showTour = function() {
         this.setLineColors(true, false, true);
-    }
+    };
 
     /**
      * Get geoJSON for an itinerary. Also updates `from` and `to` points while building geoJSON.
@@ -262,10 +262,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * Does some post-processing for the legs, for cleanup and template convenience
      *
      * @params {Array} legs Itinerary legs returned by OTP
-     * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
+     * @param {Boolean} hasWaypoints If true, itinerary has waypoints
+     * @param {Boolean} tourMode If true, itinerary is a tour
      * @returns {Array} Itinerary legs, with prettified place labels and other improvements
      */
-    function getLegs(legs, hasWaypoints) {
+    function getLegs(legs, hasWaypoints, tourMode) {
         // Check leg from/to place name; if it's an OSM node label, reverse geocode it
         // and update label
 
@@ -283,9 +284,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             return leg;
         });
 
-        // If there are waypoints, call the function to merge legs across them.
         if (hasWaypoints) {
-            newLegs = mergeLegsAcrossWaypoints(newLegs);
+            if (!tourMode) {
+                // merge legs across user-set waypoints
+                newLegs = mergeLegsAcrossWaypoints(newLegs);
+            } else {
+                // label the next waypoint for each leg in a tour
+                newLegs = labelWaypointSection(newLegs);
+            }
         }
 
         // Add some derived data to be used in the template:
@@ -359,6 +365,17 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             }
         }
         return legs;
+    }
+
+    function labelWaypointSection(legs) {
+        var nextWaypoint = 1;
+        return _.map(legs, function(leg, index) {
+            leg.nextWaypoint = nextWaypoint;
+            if (leg.to.name === 'Destination') {
+                nextWaypoint++;
+            }
+            return leg;
+        });
     }
 
     /**

@@ -12,11 +12,13 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var events = $({});
     var eventNames = {
+        itineraryHovered: 'cac:map:control:itineraryhovered',
         waypointMoved: 'cac:map:control:waypointmoved',
         waypointsSet: 'cac:map:control:waypointsset'
     };
     var lastItineraryHoverMarker = null;
     var itineraryHoverListener = null;
+    var itineraryHoverOutListener = null;
     var liveUpdatingItinerary = false; // true when live update request sent but not completed
     var waypointsLayer = null;
 
@@ -101,14 +103,14 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         if (waypoints) {
             var dragging = false;
             var popupTimeout;
-            var idx = 0;
+            var i = 0;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(waypoints), {
                 pointToLayer: function(geojson, latlng) {
                     var marker = new cartodb.L.marker(latlng, {icon: tourWaypointIcon,
                                                                draggable: false});
 
-            var place = tourDestinations[idx];
-            idx += 1;
+            var place = tourDestinations[i];
+            i += 1;
 
             marker.bindPopup(place.name,
                              {closeButton: false, className: options.selectors.routeTooltipClassName})
@@ -123,6 +125,16 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         }
 
         itinerary.geojson.bringToFront();
+
+        itineraryHoverListener = function (e) {
+            var nextWaypoint = e.layer.feature.properties.nextWaypoint;
+            events.trigger(eventNames.itineraryHovered, nextWaypoint);
+        };
+        itineraryHoverOutListener = function (e) {
+            events.trigger(eventNames.itineraryHovered, null);
+        };
+        itinerary.geojson.on('mouseover', itineraryHoverListener);
+        itinerary.geojson.on('mouseout', itineraryHoverOutListener);
     }
 
     /**
@@ -483,6 +495,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         _.forEach(itineraries, function (itinerary) {
             itinerary.geojson.off('mouseover', itineraryHoverListener);
+            itinerary.geojson.off('mouseout', itineraryHoverOutListener);
         });
     }
 

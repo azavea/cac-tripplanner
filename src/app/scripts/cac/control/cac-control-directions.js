@@ -87,6 +87,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
 
+        itineraryControl.events.on(itineraryControl.eventNames.itineraryHovered,
+                                   onTourItineraryHover);
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
@@ -459,12 +461,41 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
     }
 
+    function onTourItineraryHover(event, nextWaypoint) {
+        if (_.isNull(nextWaypoint)) {
+            onTourDestinationHover(event, null);
+            return;
+        }
+
+        if (directions.origin) {
+            nextWaypoint -= 1;
+        }
+        onTourDestinationHover(event, tour.destinations[nextWaypoint]);
+    }
+
     /**
-     * Handles hover events to highlight a given tour destination
+     * Handles hover events to highlight a given tour or event destination
      */
     function onTourDestinationHover(event, destination) {
+        var tourMode = UserPreferences.getPreference('tourMode');
         if (destination) {
-            mapControl.displayPoint(destination.location.x, destination.location.y);
+            var order = destination.userOrder ? destination.userOrder : destination.order;
+            // If first waypoint is used as origin, do not highlight a segment for it.
+            if (!directions.origin) {
+                order -= 1;
+            }
+            // Also highlight itinerary segment for tours
+            if (tourMode === 'tour') {
+                currentItinerary.geojson.eachLayer(function(layer) {
+                    var highlight = layer.feature.properties.nextWaypoint === order;
+                    layer.setStyle({color: highlight ?
+                        'green' : 'black'
+                    });
+                    if (highlight) {
+                        layer.bringToFront();
+                    }
+                });
+            }
             if (currentDestination) {
                 findTourDestinationBlock(currentDestination.id)
                     .removeClass(options.selectors.selectedClass);
@@ -476,7 +507,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             findTourDestinationBlock(currentDestination.id)
                     .removeClass(options.selectors.selectedClass);
             currentDestination = null;
-            mapControl.displayPoint(null, null);
+            if (tourMode === 'tour') {
+                currentItinerary.geojson.setStyle({color: 'black'});
+            }
         }
     }
 
