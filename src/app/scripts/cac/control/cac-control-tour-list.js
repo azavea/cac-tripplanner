@@ -114,7 +114,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      * Enable carousel for swiping tour destinations on mobile
      */
     function enableCarousel() {
-        if (!destinations || destinations.length < 2) {
+        if (!destinations || destinations.length < 1) {
             return;
         }
 
@@ -123,6 +123,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         }, Utils.defaultCarouselOptions, {
             autoplay: false,
             autoHeight: true,
+            loop: false,
             responsive: {
                 320: {disable: false, controls: false, nav: true, autoHeight: true},
                 481: {disable: true}
