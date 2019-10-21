@@ -87,11 +87,22 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     function tourItinerary(itinerary, tourDestinations) {
         // add a layer of non-draggable markers for tour waypoints (destinations)
-        if (itinerary.waypoints) {
+        var waypoints = itinerary.waypoints ? _.cloneDeep(itinerary.waypoints) : [];
+
+        // Add the last tour destination as a marker styled like the waypoints
+        if (tourDestinations && tourDestinations.length > 0) {
+            var idx = tourDestinations.length - 1;
+            var destination = tourDestinations[idx];
+            var coords = [destination.location.x, destination.location.y];
+            var lastPoint = turf.point(coords, {index: idx});
+            waypoints.push(lastPoint);
+        }
+
+        if (waypoints) {
             var dragging = false;
             var popupTimeout;
             var idx = 0;
-            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
+            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(waypoints), {
                 pointToLayer: function(geojson, latlng) {
                     var marker = new cartodb.L.marker(latlng, {icon: tourWaypointIcon,
                                                                draggable: false});
