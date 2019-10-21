@@ -106,7 +106,7 @@ CAC.Routing.Plans = (function($, moment, _, UserPreferences, Itinerary, Settings
 
                 itinerary.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
                                           features: itinerary.getFeatures(otpItinerary.legs)});
-                itinerary.setLineColors(true, true);
+                itinerary.setLineColors(true, !itinerary.tourMode, itinerary.tourMode);
 
                 deferred.resolve(itinerary);
             } else {
