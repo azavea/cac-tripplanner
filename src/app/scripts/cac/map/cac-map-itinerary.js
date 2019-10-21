@@ -22,6 +22,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var options = null;
 
+    // Draggable itinerary styling
     var waypointRadius = 6;
     var waypointFillColor = 'white';
     var waypointStrokeColor = '#d02d2d';
@@ -39,6 +40,13 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         iconSize: [(waypointRadius + waypointStrokeWidth) * 2, (waypointRadius + waypointStrokeWidth) * 2],
         popupAnchor: [60, 40]
     } );
+
+   // Tour itinerary styling
+   var tourWaypointIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'black'
+    });
 
     function ItineraryControl(opts) {
         this.events = events;
@@ -85,7 +93,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
             var idx = 0;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
                 pointToLayer: function(geojson, latlng) {
-                    var marker = new cartodb.L.marker(latlng, {icon: waypointIcon,
+                    var marker = new cartodb.L.marker(latlng, {icon: tourWaypointIcon,
                                                                draggable: false});
 
             var place = tourDestinations[idx];
