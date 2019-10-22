@@ -277,7 +277,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     // Template for tour destinations
     // Note that the date/time helpers used here were registered in the home templates
-    function tourDestinationList(tour) {
+    function tourDestinationList(tour, canRemoveDestinations) {
         var source = [
         '<div class="tour-list">',
             '<div class="tour-heading">',
@@ -311,6 +311,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<div class="swipe-hint">Swipe to see locations</div>',
             '</div>',
             '{{#each tour.destinations}}',
+                '{{#unless this.removed}}',
                 '<div class="place-card place-card-compact no-origin ',
                     '{{#if ../tour.is_tour}}place-card-sortable{{/if}}" ',
                     'data-tour-place-index="{{ @index }}" ',
@@ -327,6 +328,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                                 'alt="{{ this.name }}" />',
                         '</div>',
                         '<div class="place-card-info">',
+                            '{{#if ../canRemoveDestinations}}',
+                                '<div class="place-card-remove">X</div>',
+                            '{{/if}}',
                             '<div class="place-card-name oneline">{{ this.name }}</div>',
                             '<div class="event-date-time">',
                                 '{{#if this.start_date }}',
@@ -360,11 +364,18 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '{{/if}}',
                     '</div>',
                 '</div>',
+                '{{/unless}}',
             '{{/each}}',
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({tour: tour});
+        // Only show button to remove a place from the list if it is in a reorderable tour
+        // still containing at least three destinations.
+        var canRemove = tour && tour.is_tour && _.reduce(tour.destinations, function(ct, dest) {
+            // only count destinations the user has not removed
+            return dest.removed ? ct : ct + 1;
+        }, 0) > 2;
+        var html = template({tour: tour, canRemoveDestinations: canRemove});
         return html;
     }
 
