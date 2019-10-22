@@ -69,6 +69,11 @@
                 background-color: $white;
             }
 
+            i {
+                float: right;
+                cursor: pointer;
+            }
+
             .tour-label {
                 color: $gophillygo-green;
                 font-size: 1.2rem;
