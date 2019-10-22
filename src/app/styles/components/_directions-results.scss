@@ -106,6 +106,12 @@
         .place-card {
             width: 100%;
 
+            .place-card-remove {
+                cursor: pointer;
+                text-align: end;
+                margin-top: -10px;
+            }
+
             &.selected {
                 background-color: $white;
 
