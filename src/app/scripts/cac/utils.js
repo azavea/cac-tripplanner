@@ -76,6 +76,10 @@ CAC.Utils = (function (_, moment) {
         FERRY: brandColors.YELLOW
     };
 
+    // Map styling for tours
+    var dashArray = [5, 8];
+    var tourHighlightColor = brandColors.PURPLE;
+
     var defaultCarouselOptions = {
         autoplayButton: false,
         autoplayButtonOutput: false,
@@ -102,7 +106,9 @@ CAC.Utils = (function (_, moment) {
         getModeColor: getModeColor,
         modeStringHelper: modeStringHelper,
         initializeMoment: initializeMoment,
-        defaultCarouselOptions: defaultCarouselOptions
+        defaultCarouselOptions: defaultCarouselOptions,
+        dashArray: dashArray,
+        tourHighlightColor: tourHighlightColor
     };
 
     return Object.freeze(module);
