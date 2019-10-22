@@ -10,7 +10,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     var DIRECTION_THROTTLE_MILLIS = 750;
 
     // Number of milliseconds to wait on destination list reorder before requerying directions
-    var REORDER_TOUR_THROTTLE_MILLIS = 1000;
+    var REORDER_TOUR_THROTTLE_MILLIS = 500;
 
     var defaults = {
         selectors: {
