@@ -19,7 +19,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
             destinationItem: '.place-card',
-            destinationDirectionsButton: '.place-card-action-directions'
+            destinationDirectionsButton: '.place-card-action-directions',
+            undoButton: '.tour-heading i'
         }
     };
     var options = {};
@@ -69,6 +70,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
         $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
+        $(options.selectors.undoButton).on('click', onUndoButtonClick);
 
         var $destinationList = $(options.selectors.destinationList);
 
@@ -194,6 +196,25 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     function onTourDestinationHoveredOut(e) {
         events.trigger(eventNames.destinationHovered, null);
         e.stopPropagation();
+    }
+
+    /**
+     * Handle undo icon button click by resetting destination order to default (admin-assigned).
+     */
+     function onUndoButtonClick(e) {
+         var needsReordering = false;
+        _.each(destinations, function(destination) {
+            if (!_.isUndefined(destination.userOrder) &&
+                destination.userOrder !== destination.order) {
+                needsReordering = true;
+            }
+            destination.userOrder = destination.order;
+        });
+
+        if (needsReordering) {
+            destinations = _.sortBy(destinations, 'order');
+            events.trigger(eventNames.destinationsReordered, [destinations]);
+        }
     }
 
     function show() {
