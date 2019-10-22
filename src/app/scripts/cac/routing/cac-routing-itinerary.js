@@ -63,15 +63,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
     }
 
     Itinerary.prototype.highlight = function(isHighlighted) {
-        this.setLineColors(true, isHighlighted, false);
+        this.setLineColors(true, isHighlighted);
     };
 
     Itinerary.prototype.show = function(isShown) {
-        this.setLineColors(isShown, false, false);
-    };
-
-    Itinerary.prototype.showTour = function() {
-        this.setLineColors(true, false, true);
+        this.setLineColors(isShown, false);
     };
 
     /**
@@ -383,9 +379,8 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      *
      * @param {Boolean} shown Should this itinerary be shown (if false, make transparent)
      * @param {Boolean} highlighted Should this itinerary be highlighted on the map
-     * @param {Boolean} tour Should this itinerary be styled as a tour
      */
-    function setLineColors(shown, highlighted, tour) {
+    function setLineColors(shown, highlighted) {
 
         if (!shown) {
             this.geojson.setStyle({opacity: 0});
@@ -411,14 +406,10 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
                 var modeColor = Utils.getModeColor(layer.feature.properties.mode);
                 layer.setStyle({color: modeColor});
             });
-        } else if (tour) {
-            defaultStyle.color = 'black';
-            defaultStyle.opacity = 1;
-            this.geojson.setStyle(defaultStyle);
         } else {
             // in background
             defaultStyle.color = Utils.defaultBackgroundLineColor;
-            defaultStyle.dashArray = [5, 8];
+            defaultStyle.dashArray = Utils.dashArray;
             this.geojson.setStyle(defaultStyle);
         }
     }
