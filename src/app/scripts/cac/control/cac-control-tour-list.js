@@ -16,10 +16,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         selectors: {
             alert: '.alert',
             container: '.tours',
+            dataPlaceIndex: 'data-tour-place-index',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
             destinationItem: '.place-card',
             destinationDirectionsButton: '.place-card-action-directions',
+            removeButton: '.place-card-remove',
             undoButton: '.tour-heading i'
         }
     };
@@ -70,6 +72,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
         $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
+        $(options.selectors.removeButton).on('click', onRemoveButtonClick);
         $(options.selectors.undoButton).on('click', onUndoButtonClick);
 
         var $destinationList = $(options.selectors.destinationList);
@@ -103,13 +106,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         // First list item is the header; skip it
         for (var i = 1; i < kids.length; i++) {
             var k = kids[i];
-            var originalIndex = k.getAttribute('data-tour-place-index');
+            var originalIndex = k.getAttribute(options.selectors.dataPlaceIndex);
             // assign property with new order
             destinations[originalIndex].userOrder = i;
         }
 
         destinations = _.sortBy(destinations, 'userOrder');
-        events.trigger(eventNames.destinationsReordered, [destinations]);
+        reorderDestinations();
     }
 
     /**
@@ -174,7 +177,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      */
     function onTourDestinationClicked(event) {
         event.preventDefault();
-        var index = this.getAttribute('data-tour-place-index');
+        var index = this.getAttribute(options.selectors.dataPlaceIndex);
         var destination = destinations[index];
         var placeId = 'place_' + destination.id;
         events.trigger(eventNames.destinationClicked, [placeId,
@@ -187,7 +190,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      * Handle hover event on destination list item
      */
     function onTourDestinationHovered(e) {
-        var index = this.getAttribute('data-tour-place-index');
+        var index = this.getAttribute(options.selectors.dataPlaceIndex);
         var destination = destinations[index];
         events.trigger(eventNames.destinationHovered, destination);
         e.stopPropagation();
@@ -198,22 +201,41 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         e.stopPropagation();
     }
 
+    // Helper to filter user-removed destinations before triggering reorder
+    function reorderDestinations() {
+        var showDestinations = _.filter(destinations, function(destination) {
+            return !destination.removed;
+        });
+        events.trigger(eventNames.destinationsReordered, [showDestinations]);
+    }
+
+    /**
+     * Handle remove button click on card.
+     */
+    function onRemoveButtonClick(e) {
+        var $placeCard = $(e.target).closest(options.selectors.destinationItem);
+        var index = $placeCard.data('tour-place-index');
+        destinations[index].removed = true;
+        reorderDestinations();
+    }
+
     /**
      * Handle undo icon button click by resetting destination order to default (admin-assigned).
      */
      function onUndoButtonClick(e) {
          var needsReordering = false;
         _.each(destinations, function(destination) {
-            if (!_.isUndefined(destination.userOrder) &&
-                destination.userOrder !== destination.order) {
+            if (destination.removed || (!_.isUndefined(destination.userOrder) &&
+                destination.userOrder !== destination.order)) {
                 needsReordering = true;
             }
             destination.userOrder = destination.order;
+            destination.removed = false;
         });
 
         if (needsReordering) {
             destinations = _.sortBy(destinations, 'order');
-            events.trigger(eventNames.destinationsReordered, [destinations]);
+            reorderDestinations();
         }
     }
 
