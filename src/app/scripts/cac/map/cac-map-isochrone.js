@@ -20,6 +20,7 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var destinationMarkers = {};
     var destinationsLayer = null;
     var lastHighlightedMarkers = null;
+    var lastHighlightedEventMarker = null;
     var options = null;
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'default',
@@ -37,6 +38,17 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         icon: 'default',
         prefix: 'icon',
         markerColor: 'blue',
+    });
+    // Event marker styling
+   var eventHighlightIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'darkpurple'
+    });
+   var eventIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'black'
     });
 
 
@@ -65,6 +77,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     IsochroneControl.prototype.drawDestinations = drawDestinations;
     IsochroneControl.prototype.clearDestinations = clearDestinations;
     IsochroneControl.prototype.highlightDestinations = highlightDestinations;
+    IsochroneControl.prototype.highlightEventMarker = highlightEventMarker;
+    IsochroneControl.prototype.unhighlightEventMarker = unhighlightEventMarker;
 
     return IsochroneControl;
 
@@ -216,8 +230,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
      * @param {Array} all All destinations to draw
      * @param {Array} matched IDs of matched Destinations witin the travelshed
      * @param {Boolean} zoomToFit If true, zoom map to fit all markers
+     * @param {Boolean} isEvent If true, style for event map page display
      */
-    function drawDestinations(all, matched, zoomToFit) {
+    function drawDestinations(all, matched, zoomToFit, isEvent) {
         // put destination details onto point geojson object's properties
         // build map of unconverted destination objects
         var destinations = {};
@@ -277,6 +292,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 // use a different icon for places outside of the travel than those within it
                 var useIcon = geojson.properties.matched ? destinationIcon:
                     destinationOutsideTravelshedIcon;
+                if (isEvent) {
+                    useIcon = eventIcon;
+                }
                 var marker = new cartodb.L.marker(latLng, {icon: useIcon})
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
                 marker.matched = geojson.properties.matched;
@@ -308,6 +326,20 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                     map.setView(markers[0].getLatLng());
                 }
             }
+        }
+    }
+
+    function highlightEventMarker(markerId) {
+        unhighlightEventMarker();
+        lastHighlightedEventMarker = destinationMarkers[markerId];
+        lastHighlightedEventMarker.marker.setIcon(eventHighlightIcon);
+
+    }
+
+    function unhighlightEventMarker() {
+        if (lastHighlightedEventMarker) {
+            lastHighlightedEventMarker.marker.setIcon(eventIcon);
+            lastHighlightedEventMarker = null;
         }
     }
 

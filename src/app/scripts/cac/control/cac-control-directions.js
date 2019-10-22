@@ -155,7 +155,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             itineraryControl.clearItineraries();
             mapControl.setDirectionsMarkers(null, null, true);
             mapControl.isochroneControl.drawDestinations(tour.destinations,
-                _.flatMap(tour.destinations, 'id'), true);
+                _.flatMap(tour.destinations, 'id'), true, true);
             updateUrl();
             return;
         } else if (tourMode === 'tour' && !origin &&
@@ -481,7 +481,11 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         if (destination) {
             var order = destination.userOrder ? destination.userOrder : destination.order;
             // Highlight marker
-            itineraryControl.highlightTourMarker(order - 1);
+            if (tourMode === 'tour') {
+                itineraryControl.highlightTourMarker(order - 1);
+            } else if (tourMode === 'event') {
+                mapControl.isochroneControl.highlightEventMarker(destination.id);
+            }
             // If first waypoint is used as origin, do not highlight a segment for it.
             if (!directions.origin) {
                 order -= 1;
@@ -512,10 +516,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             findTourDestinationBlock(currentDestination.id)
                     .removeClass(options.selectors.selectedClass);
             currentDestination = null;
-            itineraryControl.unhighlightTourMarker();
             if (tourMode === 'tour') {
                 currentItinerary.geojson.setStyle({color: Utils.defaultBackgroundLineColor,
                                                    dashArray: Utils.dashArray});
+                itineraryControl.unhighlightTourMarker();
+            } else if (tourMode === 'event') {
+                mapControl.isochroneControl.unhighlightEventMarker();
             }
         }
     }

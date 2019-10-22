@@ -411,7 +411,7 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             var filterPlaces = _.isNull(isochroneDestinationIds) ?
                 _.flatMap(allDestinations, 'id') : isochroneDestinationIds;
             mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         filterPlaces, false);
+                                                         filterPlaces, false, false);
         }
         showPlacesContent();
     }
