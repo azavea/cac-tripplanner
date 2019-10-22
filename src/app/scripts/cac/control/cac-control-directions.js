@@ -158,7 +158,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 _.flatMap(tour.destinations, 'id'), true, true);
             updateUrl();
             return;
-        } else if (tourMode === 'tour' && !origin &&
+        } else if (tourMode === 'tour' && !origin && tour &&
                    tour.destinations && tour.destinations.length) {
             // Viewing a tour with no origin set, implicitly use first destination
             // without displaying it in the form.
@@ -793,7 +793,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     tour = null;
                     if (tourMode === 'tour' && data.tours && data.tours.length) {
                         tour = _.find(data.tours, function(tour) {
-                            return 'tour_' + tour.id === destination.id;
+                            return tour.name === destination.address;
                         });
                         if (tour) {
                             // Match format of Typeahead response
