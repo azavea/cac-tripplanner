@@ -56,6 +56,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     return TourListControl;
 
+    // Helper to check if a given tour place has been reordered or removed by the user
+    function destinationIsDirty(destination) {
+        return destination.removed || (!_.isUndefined(destination.userOrder) &&
+                destination.userOrder !== destination.order);
+    }
+
     function setTourDestinations(tour) {
         if (tour && tour.id !== tourId) {
             tourId = tour.id;
@@ -73,7 +79,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
             // only count destinations the user has not removed
             return dest.removed ? ct : ct + 1;
         }, 0) > 2;
-        var html = MapTemplates.tourDestinationList(tour, canRemove);
+
+        // Only show undo button if destinations have been reordered or removed
+        var isDirty = tour && tour.is_tour && !!_.find(tour.destinations, function(destination) {
+            return destinationIsDirty(destination);
+        });
+        var html = MapTemplates.tourDestinationList(tour, canRemove, isDirty);
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
@@ -232,8 +243,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      function onUndoButtonClick(e) {
          var needsReordering = false;
         _.each(destinations, function(destination) {
-            if (destination.removed || (!_.isUndefined(destination.userOrder) &&
-                destination.userOrder !== destination.order)) {
+            if (destinationIsDirty(destination)) {
                 needsReordering = true;
             }
             destination.userOrder = destination.order;
