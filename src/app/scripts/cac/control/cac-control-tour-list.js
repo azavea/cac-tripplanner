@@ -16,10 +16,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         selectors: {
             alert: '.alert',
             container: '.tours',
+            dataPlaceIndex: 'data-tour-place-index',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
             destinationItem: '.place-card',
-            destinationDirectionsButton: '.place-card-action-directions'
+            destinationDirectionsButton: '.place-card-action-directions',
+            removeButton: '.place-card-remove',
+            undoButton: '.tour-heading i'
         }
     };
     var options = {};
@@ -53,6 +56,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     return TourListControl;
 
+    // Helper to check if a given tour place has been reordered or removed by the user
+    function destinationIsDirty(destination) {
+        return destination.removed || (!_.isUndefined(destination.userOrder) &&
+                destination.userOrder !== destination.order);
+    }
+
     function setTourDestinations(tour) {
         if (tour && tour.id !== tourId) {
             tourId = tour.id;
@@ -63,12 +72,26 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         }
 
         // Show the directions div and populate with tour destinations
-        var html = MapTemplates.tourDestinationList(tour);
+
+        // Only show button to remove a place from the list if it is in a reorderable tour
+        // still containing at least three destinations.
+        var canRemove = tour && tour.is_tour && _.reduce(tour.destinations, function(ct, dest) {
+            // only count destinations the user has not removed
+            return dest.removed ? ct : ct + 1;
+        }, 0) > 2;
+
+        // Only show undo button if destinations have been reordered or removed
+        var isDirty = tour && tour.is_tour && !!_.find(tour.destinations, function(destination) {
+            return destinationIsDirty(destination);
+        });
+        var html = MapTemplates.tourDestinationList(tour, canRemove, isDirty);
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
         $(options.selectors.destinationItem).on('mouseenter', onTourDestinationHovered);
         $(options.selectors.destinationItem).on('mouseleave', onTourDestinationHoveredOut);
+        $(options.selectors.removeButton).on('click', onRemoveButtonClick);
+        $(options.selectors.undoButton).on('click', onUndoButtonClick);
 
         var $destinationList = $(options.selectors.destinationList);
 
@@ -101,13 +124,13 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         // First list item is the header; skip it
         for (var i = 1; i < kids.length; i++) {
             var k = kids[i];
-            var originalIndex = k.getAttribute('data-tour-place-index');
+            var originalIndex = k.getAttribute(options.selectors.dataPlaceIndex);
             // assign property with new order
             destinations[originalIndex].userOrder = i;
         }
 
         destinations = _.sortBy(destinations, 'userOrder');
-        events.trigger(eventNames.destinationsReordered, [destinations]);
+        reorderDestinations();
     }
 
     /**
@@ -172,7 +195,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      */
     function onTourDestinationClicked(event) {
         event.preventDefault();
-        var index = this.getAttribute('data-tour-place-index');
+        var index = this.getAttribute(options.selectors.dataPlaceIndex);
         var destination = destinations[index];
         var placeId = 'place_' + destination.id;
         events.trigger(eventNames.destinationClicked, [placeId,
@@ -185,7 +208,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
      * Handle hover event on destination list item
      */
     function onTourDestinationHovered(e) {
-        var index = this.getAttribute('data-tour-place-index');
+        var index = this.getAttribute(options.selectors.dataPlaceIndex);
         var destination = destinations[index];
         events.trigger(eventNames.destinationHovered, destination);
         e.stopPropagation();
@@ -194,6 +217,43 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     function onTourDestinationHoveredOut(e) {
         events.trigger(eventNames.destinationHovered, null);
         e.stopPropagation();
+    }
+
+    // Helper to filter user-removed destinations before triggering reorder
+    function reorderDestinations() {
+        var showDestinations = _.filter(destinations, function(destination) {
+            return !destination.removed;
+        });
+        events.trigger(eventNames.destinationsReordered, [showDestinations]);
+    }
+
+    /**
+     * Handle remove button click on card.
+     */
+    function onRemoveButtonClick(e) {
+        var $placeCard = $(e.target).closest(options.selectors.destinationItem);
+        var index = $placeCard.data('tour-place-index');
+        destinations[index].removed = true;
+        reorderDestinations();
+    }
+
+    /**
+     * Handle undo icon button click by resetting destination order to default (admin-assigned).
+     */
+     function onUndoButtonClick(e) {
+         var needsReordering = false;
+        _.each(destinations, function(destination) {
+            if (destinationIsDirty(destination)) {
+                needsReordering = true;
+            }
+            destination.userOrder = destination.order;
+            destination.removed = false;
+        });
+
+        if (needsReordering) {
+            destinations = _.sortBy(destinations, 'order');
+            reorderDestinations();
+        }
     }
 
     function show() {

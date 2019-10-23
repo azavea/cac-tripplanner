@@ -275,15 +275,23 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         return html;
     }
 
-    // Template for tour destinations
-    // Note that the date/time helpers used here were registered in the home templates
-    function tourDestinationList(tour) {
+    /**
+     * Build an HTML snippet for tour destination sidebar list.
+     * Note that the date/time helpers used here were registered in the home templates
+     *
+     * @param {Object} tour The tour object that has a list of destinations to display
+     * @param {Boolean} canRemoveDestinations If true, show the button for removing places
+     * @param {Boolean} isDirty If true, show the undo button
+     * @returns {String} Compiled HTML snippet
+     */
+    function tourDestinationList(tour, canRemoveDestinations, isDirty) {
         var source = [
         '<div class="tour-list">',
             '<div class="tour-heading">',
                 '<div class="tour-label">',
                     '{{#if tour.is_event}}Event{{else}}Tour{{/if}}',
                 '</div>',
+                '{{#if isDirty}}<i class="icon-counterclockwise"></i>{{/if}}',
                 '<h1 class="tour-name">',
                     '<a class="tour-name-link" href=',
                         '"/{{#if tour.is_event}}event{{else}}tour{{/if}}/{{ tour.id }}/">',
@@ -310,6 +318,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '<div class="swipe-hint">Swipe to see locations</div>',
             '</div>',
             '{{#each tour.destinations}}',
+                '{{#unless this.removed}}',
                 '<div class="place-card place-card-compact no-origin ',
                     '{{#if ../tour.is_tour}}place-card-sortable{{/if}}" ',
                     'data-tour-place-index="{{ @index }}" ',
@@ -326,6 +335,9 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                                 'alt="{{ this.name }}" />',
                         '</div>',
                         '<div class="place-card-info">',
+                            '{{#if ../canRemoveDestinations}}',
+                                '<div class="place-card-remove">X</div>',
+                            '{{/if}}',
                             '<div class="place-card-name oneline">{{ this.name }}</div>',
                             '<div class="event-date-time">',
                                 '{{#if this.start_date }}',
@@ -359,11 +371,16 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '{{/if}}',
                     '</div>',
                 '</div>',
+                '{{/unless}}',
             '{{/each}}',
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({tour: tour});
+        var html = template({
+            tour: tour,
+            canRemoveDestinations: canRemoveDestinations,
+            isDirty: isDirty
+        });
         return html;
     }
 

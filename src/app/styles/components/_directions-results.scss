@@ -69,6 +69,11 @@
                 background-color: $white;
             }
 
+            i {
+                float: right;
+                cursor: pointer;
+            }
+
             .tour-label {
                 color: $gophillygo-green;
                 font-size: 1.2rem;
@@ -100,6 +105,12 @@
 
         .place-card {
             width: 100%;
+
+            .place-card-remove {
+                cursor: pointer;
+                text-align: end;
+                margin-top: -10px;
+            }
 
             &.selected {
                 background-color: $white;
