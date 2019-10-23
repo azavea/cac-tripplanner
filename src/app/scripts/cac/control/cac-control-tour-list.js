@@ -66,7 +66,14 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         }
 
         // Show the directions div and populate with tour destinations
-        var html = MapTemplates.tourDestinationList(tour);
+
+        // Only show button to remove a place from the list if it is in a reorderable tour
+        // still containing at least three destinations.
+        var canRemove = tour && tour.is_tour && _.reduce(tour.destinations, function(ct, dest) {
+            // only count destinations the user has not removed
+            return dest.removed ? ct : ct + 1;
+        }, 0) > 2;
+        var html = MapTemplates.tourDestinationList(tour, canRemove);
         $container.html(html);
 
         $(options.selectors.destinationDirectionsButton).on('click', onTourDestinationClicked);
