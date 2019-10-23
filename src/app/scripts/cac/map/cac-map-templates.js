@@ -369,13 +369,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        // Only show button to remove a place from the list if it is in a reorderable tour
-        // still containing at least three destinations.
-        var canRemove = tour && tour.is_tour && _.reduce(tour.destinations, function(ct, dest) {
-            // only count destinations the user has not removed
-            return dest.removed ? ct : ct + 1;
-        }, 0) > 2;
-        var html = template({tour: tour, canRemoveDestinations: canRemove});
+        var html = template({tour: tour, canRemoveDestinations: canRemoveDestinations});
         return html;
     }
 
