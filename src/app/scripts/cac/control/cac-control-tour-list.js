@@ -36,6 +36,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     var $container = null;
     var destinations = [];
+    var isEvent = false;
     var tourId = null;
 
     function TourListControl(params) {
@@ -65,6 +66,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     function setTourDestinations(tour) {
         if (tour && tour.id !== tourId) {
             tourId = tour.id;
+            isEvent = tour.is_event;
             destinations = tour.destinations;
         } else {
             // tour unchanged; preserve user assigned destination order
@@ -201,7 +203,24 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         var index = this.getAttribute(options.selectors.dataPlaceIndex);
         var destination = destinations[index];
         var placeId = 'place_' + destination.id;
-        events.trigger(eventNames.destinationClicked, [placeId,
+
+        // For tours, use preceding tour destination as origin, unless this is the first
+        var originPlaceId = null;
+        var originAddress = null;
+        var originX = null;
+        var originY = null;
+        if (!isEvent && index > 0) {
+            var origin = destinations[index-1];
+            originPlaceId = 'place_' + origin.id;
+            originAddress = origin.address;
+            originX = origin.location.x;
+            originY = origin.location.y;
+        }
+        events.trigger(eventNames.destinationClicked, [originPlaceId,
+                                                       originAddress,
+                                                       originX,
+                                                       originY,
+                                                       placeId,
                                                        destination.address,
                                                        destination.location.x,
                                                        destination.location.y]);

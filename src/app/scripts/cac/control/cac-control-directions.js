@@ -105,18 +105,30 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             tourListControl.eventNames.destinationHovered, onTourDestinationHover);
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
-            function(e, placeId, address, x, y) {
+            function(e,
+                     originPlaceId, originAddress, originX, originY,
+                     destinationPlaceId, destinationAddress, destinationX, destinationY) {
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
-                UserPreferences.setPreference('placeId', placeId);
-                var location = {
-                    id: placeId,
-                    address: address,
-                    location: {x: x, y: y}
+                UserPreferences.setPreference('placeId', destinationPlaceId);
+                var originLocation = {
+                    id: originPlaceId,
+                    address: originAddress,
+                    location: {x: originX, y: originY}
                 };
-                directionsFormControl.setLocation('destination', location);
+                var destinationLocation = {
+                    id: destinationPlaceId,
+                    address: destinationAddress,
+                    location: {x: destinationX, y: destinationY}
+                };
+                // Set the origin without triggering requery; keeps tour last in history
+                if (originX && originY) {
+                    directionsFormControl.setStoredLocation('origin', originLocation);
+                    setDirections('origin', [originY, originX]);
+                }
+                directionsFormControl.setLocation('destination', destinationLocation);
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
-                if (!UserPreferences.getPreference('origin')) {
+                if (!originX && !UserPreferences.getPreference('origin')) {
                     directionsFormControl.setError('origin');
                     $(options.selectors.originInput).focus();
                     // Hide spinner if trying to get directions without an origin
@@ -774,9 +786,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     function setFromUserPreferences() {
         var origin = UserPreferences.getPreference('origin');
         var destination = UserPreferences.getPreference('destination');
+        var tourMode = UserPreferences.getPreference('tourMode');
 
         if (origin && origin.location) {
             directions.origin = [origin.location.y, origin.location.x];
+        } else if (tourMode === 'tour') {
+            // Support using browser history to return to a tour without an origin set
+            directions.origin = null;
+            directionsFormControl.setStoredLocation('origin', null);
         }
 
         if (destination && destination.location) {
@@ -785,7 +802,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             // get nearby places if no destination has been set yet, or get directions
-            var tourMode = UserPreferences.getPreference('tourMode');
             // Fetch tour destinations on tour directions page (re)load
             if (tourMode && destination) {
                 showSpinner();
