@@ -31,6 +31,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
     var currentDestination = null;
     var currentItinerary = null;
+    var fromTour = null;
     var tour = null;
 
     var directions = {
@@ -110,6 +111,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                      destinationPlaceId, destinationAddress, destinationX, destinationY) {
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
+                // locally track that directions navigated to from a tour, to show back button
+                fromTour = true;
                 UserPreferences.setPreference('placeId', destinationPlaceId);
                 var originLocation = {
                     id: originPlaceId,
@@ -190,6 +193,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             itineraryListControl.setItineraries(null);
             itineraryListControl.show();
+            if (fromTour) {
+                itineraryListControl.showBackButton();
+            }
+            fromTour = false;
             return;
         }
 
@@ -288,10 +295,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 itineraryListControl.setItineraries(itineraries);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 itineraryListControl.show();
+                if (fromTour) {
+                    itineraryListControl.showBackButton();
+                }
                 // highlight first itinerary in sidebar as well as on map
                 findItineraryBlock(currentItinerary.id)
                     .addClass(options.selectors.selectedClass);
             }
+            fromTour = false;
         }, function (error) {
             // Cancelled requests are expected; do not display an error message to user.
             // Just keep showing the loading animation until a subsequent request completes.
