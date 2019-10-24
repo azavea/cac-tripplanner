@@ -1,4 +1,13 @@
 ---
+- name: Install GCC for PostgreSQL support role
+  apt:
+    state: present
+    pkg: gcc
+
+- name: Dynamically include PostgreSQL support role
+  include_role:
+    name: azavea.postgresql-support
+
 - name: Install PostGIS extension from source
   import_tasks: install-postgis-from-source.yml
 
