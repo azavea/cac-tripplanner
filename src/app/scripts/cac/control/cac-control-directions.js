@@ -187,8 +187,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             updateUrl();
 
             mapControl.setDirectionsMarkers(origin, directions.destination, true);
-
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+            itineraryListControl.setItineraries(null);
+            itineraryListControl.show();
             return;
         }
 
