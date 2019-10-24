@@ -39,6 +39,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
         eventNames: eventNames,
         setItineraries: setItineraries,
         setItinerariesError: setItinerariesError,
+        showBackButton: showBackButton,
         showItineraries: showItineraries,
         show: show,
         hide: hide,
@@ -62,9 +63,11 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
         $(options.selectors.itineraryItem).on('click', onItineraryClicked);
         $(options.selectors.itineraryItem).hover(onItineraryHover);
-        $(options.selectors.backButton).on('click', function() {
-            window.history.back();
-        });
+        if (options.showBackButton) {
+            $(options.selectors.backButton).on('click', function() {
+                window.history.back();
+            });
+        }
     }
 
     /**
@@ -149,6 +152,10 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
     function show() {
         $container.removeClass(options.selectors.hiddenClass);
+    }
+
+    function showBackButton() {
+        $(options.selectors.backButton).removeClass(options.selectors.hiddenClass);
     }
 
     /**
