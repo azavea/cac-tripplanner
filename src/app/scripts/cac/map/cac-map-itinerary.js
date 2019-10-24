@@ -150,7 +150,9 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     function highlightTourMarker(index) {
         unhighlightTourMarker();
         lastItineraryHoverMarker = waypointsLayer.getLayers()[index];
-        lastItineraryHoverMarker.setIcon(tourHighlightWaypointIcon);
+        if (lastItineraryHoverMarker) {
+            lastItineraryHoverMarker.setIcon(tourHighlightWaypointIcon);
+        }
     }
 
 
