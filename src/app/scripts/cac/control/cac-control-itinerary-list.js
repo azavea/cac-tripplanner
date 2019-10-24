@@ -8,13 +8,10 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
     var defaults = {
         // Should the back button be shown in the control
-        //  this is weird, ideally we would handle the back button in the wrapper view, but we
-        //  need to switch out the sidebar div as a whole
-        showBackButton: false,
-        // Should the share button be shown in the control
-        showShareButton: false,
+        showBackButton: true,
         selectors: {
             alert: '.alert',
+            backButton: '.back-to-itinerary',
             container: '.directions-list',
             hiddenClass: 'hidden',
             itineraryList: '.routes-list',
@@ -65,6 +62,9 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
         $(options.selectors.itineraryItem).on('click', onItineraryClicked);
         $(options.selectors.itineraryItem).hover(onItineraryHover);
+        $(options.selectors.backButton).on('click', function() {
+            window.history.back();
+        });
     }
 
     /**
@@ -100,7 +100,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
      * @param {[object]} itineraries An open trip planner itinerary object, as returned from the plan endpoint
      */
     function enableCarousel(itineraries) {
-        if (itineraries.length < 2) {
+        if (!itineraries || itineraries.length < 2) {
             return;
         }
 
