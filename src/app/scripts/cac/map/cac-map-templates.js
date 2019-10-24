@@ -150,7 +150,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     function itineraryList(itineraries, showBackButton) {
         var source = [
         '{{#if showBackButton}}',
-            '<button name="back-to-itinerary" class="back-to-itinerary" title="Back">',
+            '<button name="back-to-itinerary" class="back-to-itinerary hidden" title="Back">',
             '<i class="icon-left-big"></i></button>',
         '{{/if}}',
         '<div class="routes-list">',
