@@ -10,7 +10,7 @@
     "console-polyfill": "~0.3.0",
     "handlebars": "~4.4.5",
     "jquery": "~3.4.1",
-    "jquery-sortablejs": "~1.0.0",
+    "jquery-sortablejs": "~1.0.1",
     "js-storage": "~1.1.0",
     "leaflet": "~0.7.7",
     "leaflet.awesome-markers": "~2.0.5",
