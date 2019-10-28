@@ -2,7 +2,7 @@
  *  View control for the directions form
  *
  */
-CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, UserPreferences) {
+CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, UserPreferences, Utils) {
 
     'use strict';
 
@@ -31,6 +31,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
     var currentDestination = null;
     var currentItinerary = null;
+    var fromTour = null;
     var tour = null;
 
     var directions = {
@@ -87,6 +88,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         itineraryListControl.events.on(itineraryListControl.eventNames.itineraryHover,
                                        onItineraryHover);
 
+        itineraryControl.events.on(itineraryControl.eventNames.itineraryHovered,
+                                   onTourItineraryHover);
         itineraryControl.events.on(itineraryControl.eventNames.waypointsSet, queryWithWaypoints);
         itineraryControl.events.on(itineraryControl.eventNames.waypointMoved, liveUpdateItinerary);
 
@@ -103,18 +106,32 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             tourListControl.eventNames.destinationHovered, onTourDestinationHover);
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
-            function(e, placeId, address, x, y) {
+            function(e,
+                     originPlaceId, originAddress, originX, originY,
+                     destinationPlaceId, destinationAddress, destinationX, destinationY) {
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
-                UserPreferences.setPreference('placeId', placeId);
-                var location = {
-                    id: placeId,
-                    address: address,
-                    location: {x: x, y: y}
+                // locally track that directions navigated to from a tour, to show back button
+                fromTour = true;
+                UserPreferences.setPreference('placeId', destinationPlaceId);
+                var originLocation = {
+                    id: originPlaceId,
+                    address: originAddress,
+                    location: {x: originX, y: originY}
                 };
-                directionsFormControl.setLocation('destination', location);
+                var destinationLocation = {
+                    id: destinationPlaceId,
+                    address: destinationAddress,
+                    location: {x: destinationX, y: destinationY}
+                };
+                // Set the origin without triggering requery; keeps tour last in history
+                if (originX && originY) {
+                    directionsFormControl.setStoredLocation('origin', originLocation);
+                    setDirections('origin', [originY, originX]);
+                }
+                directionsFormControl.setLocation('destination', destinationLocation);
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
-                if (!UserPreferences.getPreference('origin')) {
+                if (!originX && !UserPreferences.getPreference('origin')) {
                     directionsFormControl.setError('origin');
                     $(options.selectors.originInput).focus();
                     // Hide spinner if trying to get directions without an origin
@@ -153,10 +170,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             itineraryControl.clearItineraries();
             mapControl.setDirectionsMarkers(null, null, true);
             mapControl.isochroneControl.drawDestinations(tour.destinations,
-                _.flatMap(tour.destinations, 'id'), true);
+                _.flatMap(tour.destinations, 'id'), true, true);
             updateUrl();
             return;
-        } else if (tourMode === 'tour' && !origin &&
+        } else if (tourMode === 'tour' && !origin && tour &&
                    tour.destinations && tour.destinations.length) {
             // Viewing a tour with no origin set, implicitly use first destination
             // without displaying it in the form.
@@ -171,9 +188,15 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
             // Still update the URL and show marker if they request one-sided directions
             updateUrl();
-            mapControl.setDirectionsMarkers(origin, directions.destination, true);
 
+            mapControl.setDirectionsMarkers(origin, directions.destination, true);
             $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
+            itineraryListControl.setItineraries(null);
+            itineraryListControl.show();
+            if (fromTour) {
+                itineraryListControl.showBackButton();
+            }
+            fromTour = false;
             return;
         }
 
@@ -212,29 +235,39 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
 
         planTripRequest.then(function (itineraries) {
-            // Add the itineraries to the map, highlighting the first one
-            var isFirst = true;
             itineraryControl.clearItineraries();
-            _.forEach(itineraries, function (itinerary) {
-                itineraryControl.plotItinerary(itinerary, isFirst);
-                itinerary.highlight(isFirst);
-                if (isFirst) {
-                    currentItinerary = itinerary;
-                    isFirst = false;
-                }
-            });
+            // Only use first itinerary in tour mode
+            if (tourMode && itineraries.length) {
+                currentItinerary = itineraries[0];
+                itineraryControl.plotItinerary(currentItinerary, true);
+                currentItinerary.show(true);
+            } else if (!tourMode) {
+                // Add the itineraries to the map, highlighting the first one
+                var isFirst = true;
+                _.forEach(itineraries, function (itinerary) {
+                    itineraryControl.plotItinerary(itinerary, isFirst);
+                    itinerary.highlight(isFirst);
+                    if (isFirst) {
+                        currentItinerary = itinerary;
+                        isFirst = false;
+                    }
+                });
+            }
+
             currentItinerary.geojson.bringToFront();
 
             // If there is only one itinerary, make it draggable.
             // Only one itinerary is returned if there are waypoints, so this
             // lets the user to continue to add or modify waypoints without
             // having to select it in the list.
-            if (itineraries.length === 1 && !UserPreferences.getPreference('arriveBy')) {
-                if (currentItinerary.tourMode) {
-                    itineraryControl.tourItinerary(currentItinerary, tour.destinations);
-                } else {
-                    itineraryControl.draggableItinerary(currentItinerary);
-                }
+            if (!currentItinerary.tourMode && itineraries.length === 1 &&
+                !UserPreferences.getPreference('arriveBy')) {
+
+                itineraryControl.draggableItinerary(currentItinerary);
+            }
+
+            if (currentItinerary.tourMode) {
+                itineraryControl.tourItinerary(currentItinerary, tour.destinations);
             }
 
             // snap start and end points to where first itinerary starts and ends
@@ -247,8 +280,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 updateLocationPreferenceWithDirections('origin');
                 origin = directions.origin;
             }
-            // put markers at start and end
-            mapControl.setDirectionsMarkers(origin, directions.destination);
+            // put markers at start and end, if set by user
+            if (!currentItinerary.tourMode) {
+                mapControl.setDirectionsMarkers(directions.origin, directions.destination);
+            } else if (directions.origin) {
+                mapControl.setDirectionsMarkers(directions.origin, null);
+            }
+
             if (currentItinerary.tourMode) {
                 tourListControl.setTourDestinations(tour);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
@@ -257,10 +295,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 itineraryListControl.setItineraries(itineraries);
                 $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
                 itineraryListControl.show();
+                if (fromTour) {
+                    itineraryListControl.showBackButton();
+                }
                 // highlight first itinerary in sidebar as well as on map
                 findItineraryBlock(currentItinerary.id)
                     .addClass(options.selectors.selectedClass);
             }
+            fromTour = false;
         }, function (error) {
             // Cancelled requests are expected; do not display an error message to user.
             // Just keep showing the loading animation until a subsequent request completes.
@@ -443,12 +485,50 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
     }
 
+    function onTourItineraryHover(event, nextWaypoint) {
+        if (_.isNull(nextWaypoint)) {
+            onTourDestinationHover(event, null);
+            return;
+        }
+
+        if (directions.origin) {
+            nextWaypoint -= 1;
+        }
+        onTourDestinationHover(event, tour.destinations[nextWaypoint]);
+    }
+
     /**
-     * Handles hover events to highlight a given tour destination
+     * Handles hover events to highlight a given tour or event destination
      */
     function onTourDestinationHover(event, destination) {
+        var tourMode = UserPreferences.getPreference('tourMode');
         if (destination) {
-            mapControl.displayPoint(destination.location.x, destination.location.y);
+            var order = destination.userOrder ? destination.userOrder : destination.order;
+            // Highlight marker
+            if (tourMode === 'tour') {
+                itineraryControl.highlightTourMarker(order - 1);
+            } else if (tourMode === 'event') {
+                mapControl.isochroneControl.highlightEventMarker(destination.id);
+            }
+            // If first waypoint is used as origin, do not highlight a segment for it.
+            if (!directions.origin) {
+                order -= 1;
+            }
+            // Also highlight itinerary segment for tours
+            if (tourMode === 'tour') {
+                currentItinerary.geojson.eachLayer(function(layer) {
+                    var highlight = layer.feature.properties.nextWaypoint === order;
+                    layer.setStyle({
+                        color: highlight ?
+                            Utils.tourHighlightColor : Utils.defaultBackgroundLineColor,
+                        dashArray: highlight ?
+                            null : Utils.dashArray
+                    });
+                    if (highlight) {
+                        layer.bringToFront();
+                    }
+                });
+            }
             if (currentDestination) {
                 findTourDestinationBlock(currentDestination.id)
                     .removeClass(options.selectors.selectedClass);
@@ -460,7 +540,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             findTourDestinationBlock(currentDestination.id)
                     .removeClass(options.selectors.selectedClass);
             currentDestination = null;
-            mapControl.displayPoint(null, null);
+            if (tourMode === 'tour') {
+                currentItinerary.geojson.setStyle({color: Utils.defaultBackgroundLineColor,
+                                                   dashArray: Utils.dashArray});
+                itineraryControl.unhighlightTourMarker();
+            } else if (tourMode === 'event') {
+                mapControl.isochroneControl.unhighlightEventMarker();
+            }
         }
     }
 
@@ -712,9 +798,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     function setFromUserPreferences() {
         var origin = UserPreferences.getPreference('origin');
         var destination = UserPreferences.getPreference('destination');
+        var tourMode = UserPreferences.getPreference('tourMode');
 
         if (origin && origin.location) {
             directions.origin = [origin.location.y, origin.location.x];
+        } else if (tourMode === 'tour') {
+            // Support using browser history to return to a tour without an origin set
+            directions.origin = null;
+            directionsFormControl.setStoredLocation('origin', null);
         }
 
         if (destination && destination.location) {
@@ -723,7 +814,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
         if (tabControl.isTabShowing(tabControl.TABS.DIRECTIONS)) {
             // get nearby places if no destination has been set yet, or get directions
-            var tourMode = UserPreferences.getPreference('tourMode');
             // Fetch tour destinations on tour directions page (re)load
             if (tourMode && destination) {
                 showSpinner();
@@ -731,7 +821,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     tour = null;
                     if (tourMode === 'tour' && data.tours && data.tours.length) {
                         tour = _.find(data.tours, function(tour) {
-                            return 'tour_' + tour.id === destination.id;
+                            return tour.name === destination.address;
                         });
                         if (tour) {
                             // Match format of Typeahead response
@@ -761,4 +851,4 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
     }
 
-})(_, jQuery, moment, CAC.Control, CAC.Places.Places, CAC.Routing.Plans, CAC.User.Preferences);
+})(_, jQuery, moment, CAC.Control, CAC.Places.Places, CAC.Routing.Plans, CAC.User.Preferences, CAC.Utils);

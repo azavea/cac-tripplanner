@@ -147,9 +147,14 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     // Template for itinerary summaries
-    function itineraryList(itineraries) {
+    function itineraryList(itineraries, showBackButton) {
         var source = [
-        '<h1>Choose a route</h1><div class="routes-list">',
+        '{{#if showBackButton}}',
+            '<button name="back-to-itinerary" class="back-to-itinerary hidden" title="Back">',
+            '<i class="icon-left-big"></i></button>',
+        '{{/if}}',
+        '<div class="routes-list">',
+        '{{#if itineraries}}<h1>Choose a route</h1>{{/if}}',
         '{{#each itineraries}}',
             '<div class="route-summary" data-itinerary="{{this.id}}">',
                 '<div class="route-name">via {{this.via}}</div>',
@@ -179,7 +184,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({itineraries: itineraries});
+        var html = template({itineraries: itineraries, showBackButton: true});
         return html;
     }
 

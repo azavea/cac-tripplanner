@@ -12,16 +12,19 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     var events = $({});
     var eventNames = {
+        itineraryHovered: 'cac:map:control:itineraryhovered',
         waypointMoved: 'cac:map:control:waypointmoved',
         waypointsSet: 'cac:map:control:waypointsset'
     };
     var lastItineraryHoverMarker = null;
     var itineraryHoverListener = null;
+    var itineraryHoverOutListener = null;
     var liveUpdatingItinerary = false; // true when live update request sent but not completed
     var waypointsLayer = null;
 
     var options = null;
 
+    // Draggable itinerary styling
     var waypointRadius = 6;
     var waypointFillColor = 'white';
     var waypointStrokeColor = '#d02d2d';
@@ -40,6 +43,18 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         popupAnchor: [60, 40]
     } );
 
+   // Tour itinerary styling
+   var tourHighlightWaypointIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'darkpurple'
+    });
+   var tourWaypointIcon = L.AwesomeMarkers.icon({
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'black'
+    });
+
     function ItineraryControl(opts) {
         this.events = events;
         this.eventNames = eventNames;
@@ -51,6 +66,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     ItineraryControl.prototype.clearItineraries = clearItineraries;
     ItineraryControl.prototype.clearWaypointInteractivity = clearWaypointInteractivity;
     ItineraryControl.prototype.draggableItinerary = draggableItinerary;
+    ItineraryControl.prototype.highlightTourMarker = highlightTourMarker;
+    ItineraryControl.prototype.unhighlightTourMarker = unhighlightTourMarker;
     ItineraryControl.prototype.tourItinerary = tourItinerary;
     ItineraryControl.prototype.updateItineraryLayer = updateItineraryLayer;
     ItineraryControl.prototype.errorLiveUpdatingLayer = errorLiveUpdatingLayer;
@@ -79,31 +96,72 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
     function tourItinerary(itinerary, tourDestinations) {
         // add a layer of non-draggable markers for tour waypoints (destinations)
-        if (itinerary.waypoints) {
+        var waypoints = itinerary.waypoints ? _.cloneDeep(itinerary.waypoints) : [];
+
+        // Add the last tour destination as a marker styled like the waypoints
+        if (tourDestinations && tourDestinations.length > 0) {
+            var idx = tourDestinations.length - 1;
+            var destination = tourDestinations[idx];
+            var coords = [destination.location.x, destination.location.y];
+            var lastPoint = turf.point(coords, {index: idx});
+            waypoints.push(lastPoint);
+        }
+
+        if (waypoints) {
             var dragging = false;
             var popupTimeout;
-            var idx = 0;
-            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(itinerary.waypoints), {
+            var i = 0;
+            waypointsLayer = cartodb.L.geoJson(turf.featureCollection(waypoints), {
                 pointToLayer: function(geojson, latlng) {
-                    var marker = new cartodb.L.marker(latlng, {icon: waypointIcon,
+                    var marker = new cartodb.L.marker(latlng, {icon: tourWaypointIcon,
                                                                draggable: false});
-
-            var place = tourDestinations[idx];
-            idx += 1;
-
-            marker.bindPopup(place.name,
-                             {closeButton: false, className: options.selectors.routeTooltipClassName})
-                    .on('mouseover', function () {
-                        this.openPopup();
-                    }).on('mouseout', function () {
-                        marker.closePopup();
-                    });
+                    var place = tourDestinations[i];
+                    i += 1;
+                    marker.bindPopup(place.name, {closeButton: false,
+                                     className: options.selectors.routeTooltipClassName})
+                            .on('mouseover', function () {
+                                this.openPopup();
+                            }).on('mouseout', function () {
+                                marker.closePopup();
+                            });
                     return marker;
                 }
             }).addTo(map);
         }
 
         itinerary.geojson.bringToFront();
+
+        itineraryHoverListener = function (e) {
+            var nextWaypoint = e.layer.feature.properties.nextWaypoint;
+            events.trigger(eventNames.itineraryHovered, nextWaypoint);
+        };
+        itineraryHoverOutListener = function (e) {
+            events.trigger(eventNames.itineraryHovered, null);
+        };
+        itinerary.geojson.on('mouseover', itineraryHoverListener);
+        itinerary.geojson.on('mouseout', itineraryHoverOutListener);
+    }
+
+    /**
+     * Change which one of the tour place markers to highlight.
+     *
+     * @param {Number} index Offset of marker in marker layer to highlight
+     */
+    function highlightTourMarker(index) {
+        unhighlightTourMarker();
+        lastItineraryHoverMarker = waypointsLayer.getLayers()[index];
+        if (lastItineraryHoverMarker) {
+            lastItineraryHoverMarker.setIcon(tourHighlightWaypointIcon);
+        }
+    }
+
+
+    // Un-highlight the last highlighted tour marker (if any).
+    function unhighlightTourMarker() {
+        if (lastItineraryHoverMarker) {
+            lastItineraryHoverMarker.setIcon(tourWaypointIcon);
+            lastItineraryHoverMarker = null;
+        }
     }
 
     /**
@@ -464,6 +522,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
 
         _.forEach(itineraries, function (itinerary) {
             itinerary.geojson.off('mouseover', itineraryHoverListener);
+            itinerary.geojson.off('mouseout', itineraryHoverOutListener);
         });
     }
 
