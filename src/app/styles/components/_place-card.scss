@@ -224,6 +224,7 @@
         width: 100%;
         height: 100%;
         padding: 0 1.2rem 0 0;
+        z-index: 1;
     }
 
     .place-card-photo-container {
@@ -290,6 +291,26 @@
 
         &:last-of-type {
             margin-right: 0;
+        }
+    }
+
+    .place-card-route-line {
+        display: none;
+
+        path {
+            stroke: #979797;
+            stroke-dasharray: 5 8;
+            stroke-width: 3px;
+        }
+
+        @include respond-to('xxs-up') {
+            .place-card-compact + & {
+                display: block;
+                position: absolute;
+                z-index: 0;
+                bottom: 100%;
+                left: 4rem;
+            }
         }
     }
 }
