@@ -375,6 +375,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         '</div>',
                         '{{/if}}',
                     '</div>',
+                    '{{#if ../tour.is_tour}}<svg class="place-card-route-line" height="53" viewBox="0 0 3 53" width="3" xmlns="http://www.w3.org/2000/svg"><path d="m1.5 1.5v50" fill="none" stroke-linecap="square" /></svg>{{/if}}',
                 '</div>',
                 '{{/unless}}',
             '{{/each}}',
