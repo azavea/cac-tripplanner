@@ -1,4 +1,5 @@
 .place-card {
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
@@ -33,6 +34,28 @@
     justify-content: space-around;
     min-height: 5.6rem;
     padding: .6rem 0 .7rem;
+}
+
+.place-card-remove {
+    display: none;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    border-radius: 50%;
+    background: $gophillygo-blue;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    appearance: none;
+
+    @include respond-to('xxs-up') {
+        .place-card:hover & {
+            display: block;
+        }
+    }
 }
 
 .place-card-meta {
@@ -187,7 +210,6 @@
     width: auto;
     height: 8rem;
     padding: 0;
-    overflow: auto;
 
     .place-card-link {
         @include delinkify();
