@@ -47,12 +47,12 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
    var tourHighlightWaypointIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'darkpurple'
+        markerColor: 'darkblue'
     });
    var tourWaypointIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'black'
+        markerColor: 'lightgray'
     });
 
     function ItineraryControl(opts) {

@@ -1,4 +1,5 @@
 .place-card {
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
@@ -33,6 +34,28 @@
     justify-content: space-around;
     min-height: 5.6rem;
     padding: .6rem 0 .7rem;
+}
+
+.place-card-remove {
+    display: none;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    border-radius: 50%;
+    background: $gophillygo-blue;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    appearance: none;
+
+    @include respond-to('xxs-up') {
+        .place-card:hover & {
+            display: block;
+        }
+    }
 }
 
 .place-card-meta {
@@ -187,7 +210,6 @@
     width: auto;
     height: 8rem;
     padding: 0;
-    overflow: auto;
 
     .place-card-link {
         @include delinkify();
@@ -202,6 +224,7 @@
         width: 100%;
         height: 100%;
         padding: 0 1.2rem 0 0;
+        z-index: 1;
     }
 
     .place-card-photo-container {
@@ -268,6 +291,26 @@
 
         &:last-of-type {
             margin-right: 0;
+        }
+    }
+
+    .place-card-route-line {
+        display: none;
+
+        path {
+            stroke: #979797;
+            stroke-dasharray: 5 8;
+            stroke-width: 3px;
+        }
+
+        @include respond-to('xxs-up') {
+            .place-card-compact + & {
+                display: block;
+                position: absolute;
+                z-index: 0;
+                bottom: 100%;
+                left: 4rem;
+            }
         }
     }
 }

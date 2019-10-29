@@ -31,6 +31,21 @@
         }
     }
 
+    .back-to-itinerary {
+        position: absolute;
+        top: 2rem;
+        left: 1.2rem;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: none;
+        cursor: pointer;
+
+        @include respond-to('xxs') {
+            display: none;
+        }
+    }
+
     h1 {
         margin: 2.2rem 0;
         padding: 0;
@@ -106,12 +121,6 @@
         .place-card {
             width: 100%;
 
-            .place-card-remove {
-                cursor: pointer;
-                text-align: end;
-                margin-top: -10px;
-            }
-
             &.selected {
                 background-color: $white;
 
@@ -121,8 +130,13 @@
 
                 .place-card-action-directions {
                     color: $white;
-                    background-color: $gophillygo-purple;
-                    border-color: $gophillygo-purple;
+                    background-color: $gophillygo-blue;
+                    border-color: $gophillygo-blue;
+                }
+
+                .place-card-route-line path {
+                    stroke: $gophillygo-blue;
+                    stroke-dasharray: none;
                 }
             }
         }

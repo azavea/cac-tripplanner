@@ -78,7 +78,7 @@ CAC.Utils = (function (_, moment) {
 
     // Map styling for tours
     var dashArray = [5, 8];
-    var tourHighlightColor = brandColors.PURPLE;
+    var tourHighlightColor = brandColors.BLUE;
 
     var defaultCarouselOptions = {
         autoplayButton: false,
