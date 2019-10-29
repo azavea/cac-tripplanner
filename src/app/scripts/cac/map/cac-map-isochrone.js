@@ -25,30 +25,30 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var destinationIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'orange'
+        markerColor: 'lightgray'
     });
     var destinationOutsideTravelshedIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        // modified by styles to actually be orange, with reduced opacity
+        // modified by styles to actually be lightgray, with reduced opacity
         markerColor: 'darkred',
         extraClasses: 'outside'
     });
     var highlightIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'blue',
+        markerColor: 'darkblue',
     });
     // Event marker styling
    var eventHighlightIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'darkpurple'
+        markerColor: 'darkblue'
     });
    var eventIcon = L.AwesomeMarkers.icon({
         icon: 'default',
         prefix: 'icon',
-        markerColor: 'black'
+        markerColor: 'lightgray'
     });
 
 
