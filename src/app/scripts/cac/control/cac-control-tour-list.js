@@ -216,7 +216,8 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
             originX = origin.location.x;
             originY = origin.location.y;
         }
-        events.trigger(eventNames.destinationClicked, [originPlaceId,
+        events.trigger(eventNames.destinationClicked, [isEvent,
+                                                       originPlaceId,
                                                        originAddress,
                                                        originX,
                                                        originY,
