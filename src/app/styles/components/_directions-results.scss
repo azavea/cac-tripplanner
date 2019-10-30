@@ -323,4 +323,11 @@
             }
         }
     }
+
+    // WORKAROUND for tiny slider bug in MS Edge
+    @include respond-to('xxs-up') {
+        .tns-item {
+            margin-left: 0 !important;
+        }
+    }
 }
