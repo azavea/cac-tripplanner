@@ -107,12 +107,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
 
         tourListControl.events.on(tourListControl.eventNames.destinationClicked,
             function(e,
-                     originPlaceId, originAddress, originX, originY,
+                     isEvent, originPlaceId, originAddress, originX, originY,
                      destinationPlaceId, destinationAddress, destinationX, destinationY) {
                 // push tour map page into browser history first
                 urlRouter.pushDirectionsUrlHistory();
                 // locally track that directions navigated to from a tour, to show back button
-                fromTour = true;
+                fromTour = !isEvent;
                 UserPreferences.setPreference('placeId', destinationPlaceId);
                 var originLocation = {
                     id: originPlaceId,
