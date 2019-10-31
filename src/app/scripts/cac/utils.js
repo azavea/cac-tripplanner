@@ -89,6 +89,7 @@ CAC.Utils = (function (_, moment) {
         items: 1,
         nav: true,
         navPosition: 'bottom',
+        preventScrollOnTouch: 'auto',
         slideBy: 'page',
         autoplay: true
     };
