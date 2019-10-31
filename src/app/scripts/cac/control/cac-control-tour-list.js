@@ -19,7 +19,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
             dataPlaceIndex: 'data-tour-place-index',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
-            destinationItem: '.place-card',
+            destinationItem: '.place-card-compact',
             destinationDirectionsButton: '.place-card-action-directions',
             removeButton: '.place-card-remove',
             undoButton: '.tour-heading i'
@@ -161,8 +161,9 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         // Highlight place on map on destinations carousel swipe
         slider.events.on('indexChanged', function(info) {
             var items = $(options.selectors.destinationItem);
-            if (items && items.length > info.displayIndex) {
-                items.eq(info.displayIndex).triggerHandler('mouseenter');
+            var index = info.displayIndex - 2;
+            if (index > -1 && items && items.length > index) {
+                items.eq(index).triggerHandler('mouseenter');
             }
         });
     }

@@ -14,7 +14,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
             backButton: '.back-to-itinerary',
             container: '.directions-list',
             hiddenClass: 'hidden',
-            itineraryList: '.routes-list',
+            itineraryList: '.route-summary-list',
             itineraryItem: '.route-summary'
         }
     };
@@ -122,8 +122,9 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
         // Highlight route on map on itinerary carousel swipe
         slider.events.on('indexChanged', function(info) {
             var items = $(options.selectors.itineraryItem);
-            if (items && items.length > info.displayIndex) {
-                items.eq(info.displayIndex).triggerHandler('mouseenter');
+            var index = info.displayIndex - 1;
+            if (items && items.length > index) {
+                items.eq(index).triggerHandler('mouseenter');
             }
         });
     }
