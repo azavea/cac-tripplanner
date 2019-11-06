@@ -80,8 +80,8 @@
         "sudo apt-get -y install build-essential python-dev python-pip git",
         "sudo pip install --upgrade pip",
         "sudo pip install --upgrade setuptools",
-        "sudo pip install paramiko==2.6.0",
-        "sudo pip install ansible==2.8.2"
+        "sudo pip install --upgrade paramiko",
+        "sudo pip install --upgrade ansible"
       ]
     },
     {
