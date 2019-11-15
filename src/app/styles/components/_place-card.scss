@@ -312,6 +312,10 @@
                 left: 4rem;
             }
         }
+
+        .tour-list.sorting & {
+            display: none;
+        }
     }
 }
 

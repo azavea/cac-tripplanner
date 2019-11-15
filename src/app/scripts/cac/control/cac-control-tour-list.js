@@ -113,7 +113,9 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
                 forceFallback: true,
                 handle: '.place-card-drag-handle',
                 sort: true,
-                onUpdate: onDestinationListReordered
+                onUpdate: onDestinationListReordered,
+                onStart: onDestinationListReorderStart,
+                onEnd: onDestinationListReorderEnd
             });
         }
 
@@ -136,6 +138,16 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
         destinations = _.sortBy(destinations, 'userOrder');
         reorderDestinations();
+    }
+
+    // Called when destinations list sorting begins
+    function onDestinationListReorderStart(e) {
+        $(options.selectors.destinationList).addClass('sorting');
+    }
+
+    // Called when destinations list sorting ends
+    function onDestinationListReorderEnd(e) {
+        $(options.selectors.destinationList).removeClass('sorting');
     }
 
     /**
