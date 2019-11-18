@@ -1,12 +1,28 @@
 ---
-- name: Install GCC for PostgreSQL support role
+- name: Configure the PostgreSQL APT key
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+
+- name: Configure the PostgreSQL main APT repository
+  apt_repository: repo="deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release}}-pgdg main"
+                  state=present
+
+- name: Install client API libraries for PostgreSQL
   apt:
     state: present
-    pkg: gcc
+    pkg:
+      - libpq5={{ postgresql_support_libpq_version }}
+      - libpq-dev={{ postgresql_support_libpq_version }}
 
-- name: Dynamically include PostgreSQL support role
-  include_role:
-    name: azavea.postgresql-support
+- name: Install PostgreSQL client
+  apt:
+    state: latest
+    pkg:
+      - postgresql-client-{{ postgresql_version }}
+
+- name: Install PostgreSQL driver for Python
+  pip: name=psycopg2
+       version={{ postgresql_support_psycopg2_version }}
+       state=present
 
 - name: Install PostGIS extension from source
   import_tasks: install-postgis-from-source.yml
@@ -24,7 +40,7 @@
 
 - name: Add PostGIS extension
   become_user: postgres
-  command: psql {{ postgres_db }} -c "CREATE EXTENSION postgis"
+  command: psql {{ postgres_db }} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
   register: psql_result
   failed_when: >
     psql_result.rc != 0 and ("already exists" not in psql_result.stderr)
