@@ -292,6 +292,12 @@
         &:last-of-type {
             margin-right: 0;
         }
+
+        &:hover {
+            color: $white;
+            background-color: $gophillygo-blue;
+            border-color: $gophillygo-blue;
+        }
     }
 
     .place-card-route-line {
