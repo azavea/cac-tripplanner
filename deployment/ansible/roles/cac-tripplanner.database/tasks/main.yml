@@ -21,6 +21,7 @@
 
 - name: Install PostgreSQL driver for Python
   pip: name=psycopg2
+       executable=/usr/bin/pip3
        version={{ postgresql_support_psycopg2_version }}
        state=present
 
