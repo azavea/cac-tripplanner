@@ -44,16 +44,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     } );
 
    // Tour itinerary styling
-   var tourHighlightWaypointIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'darkblue'
-    });
-   var tourWaypointIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'lightgray'
-    });
+   var tourHighlightWaypointIcon = L.AwesomeMarkers.icon(Utils.hightlightIconConfig);
+   var tourWaypointIcon = L.AwesomeMarkers.icon(Utils.placeIconConfig);
 
     function ItineraryControl(opts) {
         this.events = events;

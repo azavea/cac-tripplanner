@@ -141,17 +141,8 @@ CAC.Pages.Directions = (function ($, _, DirectionsList, Itinerary, Settings, Uti
             });
             itinerary.geojson.addTo(map);
 
-            var originIcon = L.AwesomeMarkers.icon({
-                icon: 'home',
-                prefix: 'fa',
-                markerColor: 'purple'
-            });
-
-            var destIcon = L.AwesomeMarkers.icon({
-                icon: 'flag-o',
-                prefix: 'fa',
-                markerColor: 'red'
-            });
+            var originIcon = L.AwesomeMarkers.icon(Utils.originIconConfig);
+            var destIcon = L.AwesomeMarkers.icon(Utils.destinationIconConfig);
 
             var origin = [itinerary.from.lat, itinerary.from.lon];
             var destination = [itinerary.to.lat, itinerary.to.lon];
