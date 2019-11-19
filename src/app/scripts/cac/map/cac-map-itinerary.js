@@ -1,4 +1,4 @@
-CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
+CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
     'use strict';
 
     var defaults = {
@@ -44,7 +44,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
     } );
 
    // Tour itinerary styling
-   var tourHighlightWaypointIcon = L.AwesomeMarkers.icon(Utils.hightlightIconConfig);
+   var destinationIcon = L.AwesomeMarkers.icon(Utils.destinationIconConfig);
+   var tourHighlightWaypointIcon = L.AwesomeMarkers.icon(Utils.highlightIconConfig);
    var tourWaypointIcon = L.AwesomeMarkers.icon(Utils.placeIconConfig);
 
     function ItineraryControl(opts) {
@@ -90,7 +91,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         // add a layer of non-draggable markers for tour waypoints (destinations)
         var waypoints = itinerary.waypoints ? _.cloneDeep(itinerary.waypoints) : [];
 
-        // Add the last tour destination as a marker styled like the waypoints
+        // Add the last tour destination
         if (tourDestinations && tourDestinations.length > 0) {
             var idx = tourDestinations.length - 1;
             var destination = tourDestinations[idx];
@@ -103,9 +104,11 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
             var dragging = false;
             var popupTimeout;
             var i = 0;
+            var lastIdx = tourDestinations.length - 1;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(waypoints), {
                 pointToLayer: function(geojson, latlng) {
-                    var marker = new cartodb.L.marker(latlng, {icon: tourWaypointIcon,
+                    var icon = (i < lastIdx) ? tourWaypointIcon : destinationIcon;
+                    var marker = new cartodb.L.marker(latlng, {icon: icon,
                                                                draggable: false});
                     var place = tourDestinations[i];
                     i += 1;
@@ -141,7 +144,11 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
      */
     function highlightTourMarker(index) {
         unhighlightTourMarker();
-        lastItineraryHoverMarker = waypointsLayer.getLayers()[index];
+        var waypointMarkers = waypointsLayer.getLayers();
+        if (index === (waypointMarkers.length - 1)) {
+            return; // do not highlight destination marker
+        }
+        lastItineraryHoverMarker = waypointMarkers[index];
         if (lastItineraryHoverMarker) {
             lastItineraryHoverMarker.setIcon(tourHighlightWaypointIcon);
         }
@@ -518,4 +525,4 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _) {
         });
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Utils);
