@@ -345,7 +345,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                             '<button class="place-card-remove"><i class="icon-cancel"></i></button>',
                         '{{/if}}',
                         '<div class="place-card-info">',
-                            '<div class="place-card-name oneline">{{ this.name }}</div>',
+                            '<div class="place-card-name">{{ this.name }}</div>',
                             '<div class="event-date-time">',
                                 '{{#if this.start_date }}',
                                     '{{#if (sameDay this.start_date this.end_date) }}',
