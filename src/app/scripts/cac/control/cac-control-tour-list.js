@@ -125,7 +125,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     // Called when Sortable list of destinations gets updated
     function onDestinationListReordered(e) {
         var kids = e.to.children;
-        var indexOrder = 0;
+        var indexOrder = 1;
         _.each(kids, function(kid) {
             var originalIndex = kid.getAttribute('data-tour-place-index');
             // If attribute is missing, it is the header element; skip
@@ -270,6 +270,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         var $placeCard = $(e.target).closest(options.selectors.destinationItem);
         var index = $placeCard.data('tour-place-index');
         destinations[index].removed = true;
+        _.each(destinations, function(destination) {
+            var order = destination.userOrder ? destination.userOrder: destination.order;
+            if (order >= index) {
+                destination.userOrder = order - 1;
+            }
+        });
         reorderDestinations();
     }
 
