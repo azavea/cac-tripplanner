@@ -264,7 +264,9 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             }
 
             if (currentItinerary.tourMode) {
-                itineraryControl.tourItinerary(currentItinerary, tour.destinations);
+                itineraryControl.tourItinerary(currentItinerary,
+                                               tour.destinations,
+                                               useInitialWaypoint);
             }
 
             // snap start and end points to where first itinerary starts and ends
