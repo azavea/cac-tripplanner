@@ -105,6 +105,9 @@ CAC.Home.Templates = (function (Handlebars, moment) {
          * Inverse of the `cardId` helper above.
          */
         Handlebars.registerHelper('getId', function(fromId) {
+            if (!fromId || !fromId.split) {
+                return fromId;
+            }
             var splitId = fromId.split('_');
             return (splitId.length > 1 ? splitId[1] : splitId[0]);
         });
