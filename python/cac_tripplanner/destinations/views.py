@@ -141,7 +141,7 @@ def service_worker(request):
 
 
 def place_detail(request, pk):
-    destination = get_object_or_404(Destination.objects.published(), pk=pk)
+    destination = get_object_or_404(Destination.objects.all(), pk=pk)
     more_destinations = Destination.objects.published().exclude(pk=destination.pk)[:3]
     context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
                    **DEFAULT_CONTEXT)
@@ -149,7 +149,7 @@ def place_detail(request, pk):
 
 
 def event_detail(request, pk):
-    event = get_object_or_404(Event.objects.published(), pk=pk)
+    event = get_object_or_404(Event.objects.all(), pk=pk)
     more_events = Event.objects.current().exclude(pk=event.pk)[:3]
     context = dict(tab='explore', event=event, more_events=more_events,
                    **DEFAULT_CONTEXT)
@@ -157,7 +157,7 @@ def event_detail(request, pk):
 
 
 def tour_detail(request, pk):
-    tour = get_object_or_404(Tour.objects.published(), pk=pk)
+    tour = get_object_or_404(Tour.objects.all(), pk=pk)
     more_tours = Tour.objects.published().exclude(pk=tour.pk)[:3]
     context = dict(tab='explore', tour=tour, more_tours=more_tours,
                    **DEFAULT_CONTEXT)
