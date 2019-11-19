@@ -85,11 +85,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
 
     function getFeedEventMarker(event) {
         var latLng = cartodb.L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
-        var icon = L.AwesomeMarkers.icon({
-            icon: 'calendar',
-            markerColor: 'orange',
-            prefix: 'fa'
-        });
+        var icon = L.AwesomeMarkers.icon(Utils.feedEventIconConfig);
         var marker = new cartodb.L.marker(latLng, { icon: icon });
         marker.bindPopup(CAC.Map.Templates.eventPopup(event),
                          {className: options.selectors.eventPopupClassName});

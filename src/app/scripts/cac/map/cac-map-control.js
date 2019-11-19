@@ -1,4 +1,4 @@
-CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
+CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
     'use strict';
 
     var defaults = {
@@ -263,11 +263,7 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         if (geocodeMarker) {
             geocodeMarker.setLatLng(latLng);
         } else {
-            var icon = L.AwesomeMarkers.icon({
-                icon: 'marker-origin',
-                prefix: 'icon',
-                markerColor: 'green'
-            });
+            var icon = L.AwesomeMarkers.icon(Utils.originIconConfig);
             geocodeMarker = new cartodb.L.marker(latLng, { icon: icon, draggable: true });
             geocodeMarker.addTo(map);
             geocodeMarker.on('dragend', markerDrag);
@@ -297,20 +293,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
             events.trigger(trigger, position);
         }
 
-        // Due to time constraints, these two icon definitions were copied to cac-pages-directions.js
-        // for use on the static map page there. If you change them here, change them there as well
-        // Remove comment if icon definitions are abstracted elsewhere
-        var originIcon = L.AwesomeMarkers.icon({
-            icon: 'marker-origin',
-            prefix: 'icon',
-            markerColor: 'green'
-        });
-
-        var destIcon = L.AwesomeMarkers.icon({
-            icon: 'marker-destination',
-            prefix: 'icon',
-            markerColor: 'red'
-        });
+        var originIcon = L.AwesomeMarkers.icon(Utils.originIconConfig);
+        var destIcon = L.AwesomeMarkers.icon(Utils.destinationIconConfig);
 
         if (originCoords) {
             var origin = cartodb.L.latLng(originCoords[0], originCoords[1]);
@@ -470,4 +454,4 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _) {
         });
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Utils);

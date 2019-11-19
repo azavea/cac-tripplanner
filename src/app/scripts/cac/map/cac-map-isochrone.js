@@ -1,4 +1,4 @@
-CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
+CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
     'use strict';
 
     var defaults = {
@@ -22,35 +22,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var lastHighlightedMarkers = null;
     var lastHighlightedEventMarker = null;
     var options = null;
-    var destinationIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'lightgray'
-    });
-    var destinationOutsideTravelshedIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        // modified by styles to actually be lightgray, with reduced opacity
-        markerColor: 'darkred',
-        extraClasses: 'outside'
-    });
-    var highlightIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'darkblue',
-    });
-    // Event marker styling
-   var eventHighlightIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'darkblue'
-    });
-   var eventIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'lightgray'
-    });
-
+    var placeIcon = L.AwesomeMarkers.icon(Utils.placeIconConfig);
+    var outsideTravelshedIcon = L.AwesomeMarkers.icon(Utils.outsideTravelshedIconConfig);
+    var highlightIcon = L.AwesomeMarkers.icon(Utils.highlightIconConfig);
 
     /**
      * Variables used for limiting to one isochrone request at a time.
@@ -289,11 +263,11 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 var popupContent = template({geojson: geojson});
                 var markerId = geojson.properties.id;
 
-                // use a different icon for places outside of the travel than those within it
-                var useIcon = geojson.properties.matched ? destinationIcon:
-                    destinationOutsideTravelshedIcon;
+                // use a different icon for places outside of the travelshed than those within it
+                var useIcon = geojson.properties.matched ? placeIcon:
+                    outsideTravelshedIcon;
                 if (isEvent) {
-                    useIcon = eventIcon;
+                    useIcon = placeIcon;
                 }
                 var marker = new cartodb.L.marker(latLng, {icon: useIcon})
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
@@ -332,13 +306,13 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     function highlightEventMarker(markerId) {
         unhighlightEventMarker();
         lastHighlightedEventMarker = destinationMarkers[markerId];
-        lastHighlightedEventMarker.marker.setIcon(eventHighlightIcon);
+        lastHighlightedEventMarker.marker.setIcon(highlightIcon);
 
     }
 
     function unhighlightEventMarker() {
         if (lastHighlightedEventMarker) {
-            lastHighlightedEventMarker.marker.setIcon(eventIcon);
+            lastHighlightedEventMarker.marker.setIcon(placeIcon);
             lastHighlightedEventMarker = null;
         }
     }
@@ -353,8 +327,8 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         // If passed no destinations to highlight, un-highlight instead
         if ((!destinationIds || !destinationIds.length) && lastHighlightedMarkers) {
             _.each(lastHighlightedMarkers, function(marker) {
-                var icon = marker.matched ? destinationIcon:
-                    destinationOutsideTravelshedIcon;
+                var icon = marker.matched ? placeIcon:
+                    outsideTravelshedIcon;
                 marker.setIcon(icon);
             });
             lastHighlightedMarkers = null;
@@ -388,4 +362,4 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Utils);
