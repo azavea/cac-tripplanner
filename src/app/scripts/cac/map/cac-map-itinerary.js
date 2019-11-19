@@ -17,6 +17,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils)
         waypointsSet: 'cac:map:control:waypointsset'
     };
     var lastItineraryHoverMarker = null;
+    var firstIsOrigin = false;
     var itineraryHoverListener = null;
     var itineraryHoverOutListener = null;
     var liveUpdatingItinerary = false; // true when live update request sent but not completed
@@ -45,6 +46,7 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils)
 
    // Tour itinerary styling
    var destinationIcon = L.AwesomeMarkers.icon(Utils.destinationIconConfig);
+   var originIcon = L.AwesomeMarkers.icon(Utils.originIconConfig);
    var tourHighlightWaypointIcon = L.AwesomeMarkers.icon(Utils.highlightIconConfig);
    var tourWaypointIcon = L.AwesomeMarkers.icon(Utils.placeIconConfig);
 
@@ -87,9 +89,10 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils)
         }
     }
 
-    function tourItinerary(itinerary, tourDestinations) {
+    function tourItinerary(itinerary, tourDestinations, useFirstAsOrigin) {
         // add a layer of non-draggable markers for tour waypoints (destinations)
         var waypoints = itinerary.waypoints ? _.cloneDeep(itinerary.waypoints) : [];
+        firstIsOrigin = useFirstAsOrigin;
 
         // Add the last tour destination
         if (tourDestinations && tourDestinations.length > 0) {
@@ -107,7 +110,12 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils)
             var lastIdx = tourDestinations.length - 1;
             waypointsLayer = cartodb.L.geoJson(turf.featureCollection(waypoints), {
                 pointToLayer: function(geojson, latlng) {
+                    // style last waypoint as destination
                     var icon = (i < lastIdx) ? tourWaypointIcon : destinationIcon;
+                    if (i === 0 && firstIsOrigin) {
+                        // style first waypoint as origin, if there is no user-set origin
+                        icon = originIcon;
+                    }
                     var marker = new cartodb.L.marker(latlng, {icon: icon,
                                                                draggable: false});
                     var place = tourDestinations[i];
@@ -145,8 +153,8 @@ CAC.Map.ItineraryControl = (function ($, Handlebars, cartodb, L, turf, _, Utils)
     function highlightTourMarker(index) {
         unhighlightTourMarker();
         var waypointMarkers = waypointsLayer.getLayers();
-        if (index === (waypointMarkers.length - 1)) {
-            return; // do not highlight destination marker
+        if ((index === (waypointMarkers.length - 1)) || (firstIsOrigin && (index === 0))) {
+            return; // do not highlight origin or destination marker
         }
         lastItineraryHoverMarker = waypointMarkers[index];
         if (lastItineraryHoverMarker) {
