@@ -100,6 +100,18 @@ CAC.Home.Templates = (function (Handlebars, moment) {
             return prefix + '_' + id;
         });
 
+        /** Helper to get just the ID from the end of a prefixed place/event/tour identifier.
+         *
+         * Inverse of the `cardId` helper above.
+         */
+        Handlebars.registerHelper('getId', function(fromId) {
+            if (!fromId || !fromId.split) {
+                return fromId;
+            }
+            var splitId = fromId.split('_');
+            return (splitId.length > 1 ? splitId[1] : splitId[0]);
+        });
+
         // helper to get the IDs for all associated destinations,
         // for tours or events, or for this destination
         Handlebars.registerHelper('placeIds', function(destinations, id) {
