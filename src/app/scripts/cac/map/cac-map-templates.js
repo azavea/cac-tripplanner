@@ -301,7 +301,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                 '{{#if isDirty}}<i class="icon-counterclockwise"></i>{{/if}}',
                 '<h1 class="tour-name">',
                     '<a class="tour-name-link" href=',
-                        '"/{{#if tour.is_event}}event{{else}}tour{{/if}}/{{ tour.id }}/">',
+                        '"/{{#if tour.is_event}}event{{else}}tour{{/if}}/{{ getId tour.id }}/">',
                         '{{ tour.name }}',
                     '</a>',
                 '</h1>',
