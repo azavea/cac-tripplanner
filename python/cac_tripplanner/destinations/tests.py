@@ -52,11 +52,11 @@ class EventTests(TestCase):
         response = self.client.get(url)
         self.assertContains(response, 'Current Event', status_code=200)
 
-        # cannot view detail for unpublished event
+        # can also view detail for unpublished event
         url = reverse('event-detail',
                       kwargs={'pk': self.event_2.pk})
-        response_404 = self.client.get(url)
-        self.assertEqual(response_404.status_code, 404)
+        response = self.client.get(url)
+        self.assertContains(response, 'Unpublished Past Event', status_code=200)
 
     def test_event_search(self):
         """Test that event shows in search results"""
@@ -256,10 +256,11 @@ class DestinationTests(TestCase):
         response = self.client.get(url)
         self.assertContains(response, 'place_one', status_code=200)
 
+        # unpublished place should also be viewable
         url = reverse('place-detail',
                       kwargs={'pk': self.place_3.pk})
-        response_404 = self.client.get(url)
-        self.assertEqual(response_404.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
     def test_destination_search(self):
         """Test that destinations show in search results"""
@@ -355,11 +356,11 @@ class TourTests(TestCase):
         response = self.client.get(url)
         self.assertContains(response, 'tour_one', status_code=200)
 
-        # unpublished tour detail should not be available
+        # unpublished tour detail should also be available
         url = reverse('tour-detail',
                       kwargs={'pk': self.tour_2.pk})
-        response_404 = self.client.get(url)
-        self.assertEqual(response_404.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
     def test_tour_search(self):
         """Test that tour shows in search results"""
