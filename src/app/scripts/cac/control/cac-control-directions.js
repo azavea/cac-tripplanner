@@ -577,9 +577,6 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
     }
 
     function reverseOriginDestination(event, newOrigin, newDestination) {
-        if (newOrigin && newOrigin.id.indexOf('tour') > -1) {
-            console.warn('cannot have a tour as origin!');
-        }
         // set on this object and validate
         if (newOrigin && newOrigin.location) {
             setDirections('origin', [newOrigin.location.y, newOrigin.location.x]);
@@ -591,6 +588,17 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             setDirections('destination', [newDestination.location.y, newDestination.location.x]);
         } else {
             setDirections('destination', null);
+        }
+
+        // Set error on origin if it is a tour
+        if (newOrigin && newOrigin.id && newOrigin.id.indexOf('tour') > -1) {
+            UserPreferences.setPreference('origin', null);
+            UserPreferences.setPreference('tourMode', '');
+            directionsFormControl.setError('origin');
+            $(options.selectors.originInput).focus();
+            clearItineraries();
+            updateUrl();
+            return;
         }
 
         // update the directions for the reverse trip
