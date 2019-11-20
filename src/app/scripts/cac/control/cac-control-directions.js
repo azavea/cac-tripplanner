@@ -698,6 +698,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             // results from API search endpoint.
             // If result did not come from Typeahead, the full tour will be
             // loaded in the Places query in setFromUserPreferences.
+            result.address = result.name;
+            directionsFormControl.setStoredLocation('destination', result);
             tour = result;
             onTypeaheadSelectDone(key, result.destinations);
         }
