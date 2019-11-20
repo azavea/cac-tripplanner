@@ -87,10 +87,14 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
 
         if (origin && origin.location) {
             typeaheads.origin.setValue(UserPreferences.getPreference('originText'));
+        } else {
+            typeaheads.origin.setValue('');
         }
 
         if (destination && destination.location) {
             typeaheads.destination.setValue(UserPreferences.getPreference('destinationText'));
+        } else {
+            typeaheads.destination.setValue('');
         }
     }
 
