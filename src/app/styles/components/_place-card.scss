@@ -249,16 +249,15 @@
     .place-card-info {
         display: flex;
         flex-flow: column nowrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: stretch;
         flex: auto;
-        padding: 0.6rem 0;
+        padding: 0.6rem 0 0.7rem;
         overflow: hidden;
     }
 
     .event-date-time {
         flex: none;
-        margin-bottom: 0.2rem;
         color: $font-color;
         font-size: 1.1rem;
         font-weight: $font-weight-semibold;
@@ -268,13 +267,8 @@
     }
 
     .place-card-name {
-        white-space: normal;
-
-        &.oneline {
-            margin-top: 0.1rem;
-            line-height: 1;
-            white-space: nowrap;
-        }
+        line-height: 1.4;
+        white-space: nowrap;
     }
 
     .place-card-badges {
@@ -282,7 +276,7 @@
 
     .place-card-actions {
         justify-content: space-between;
-        margin-bottom: 0.4rem;
+        margin-top: auto;
     }
 
     .place-card-action {
