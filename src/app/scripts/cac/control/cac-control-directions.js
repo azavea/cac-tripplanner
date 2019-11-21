@@ -675,8 +675,12 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         // If an event, present the destinations like with a tour, but do not route.
         var isTourMode = !!(result.id && result.id.indexOf('tour') > -1);
         var isEventMode = !!(result.id && result.id.indexOf('event') > -1);
-        var tourModePreference = isTourMode ? 'tour' : (isEventMode ? 'event' : false);
+        // Single-destination events that came from Typeahead go straight to directions
+        if (isEventMode && result.destinations && result.destinations.length === 1) {
+            isEventMode = false;
+        }
 
+        var tourModePreference = isTourMode ? 'tour' : (isEventMode ? 'event' : false);
         UserPreferences.setPreference('tourMode', tourModePreference);
 
         if (!tourModePreference) {
@@ -826,6 +830,13 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                         }
                     } else if (tourMode === 'event' && data.events && data.events.length) {
                         tour = data.events[0];
+                        // Go directly to route for single-destination events
+                        if (tour.destinations && tour.destinations.length === 1) {
+                            UserPreferences.setPreference('tourMode', false);
+                            tour = null;
+                            onTypeaheadSelectDone('destination', [data.events[0]]);
+                            return;
+                        }
                     }
                     if (tour) {
                         onTypeaheadSelectDone('destination', tour.destinations);
