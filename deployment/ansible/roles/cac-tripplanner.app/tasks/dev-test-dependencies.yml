@@ -1,5 +1,5 @@
 ---
 - name: Install dev/test python packages
-  pip: name={{ item.name }} version={{ item.version }}
+  pip: name={{ item.name }} version={{ item.version }} executable=/usr/bin/pip3
   with_items:
     - { name: 'flake8', version: '3.7.7' }

@@ -1,0 +1,5 @@
+---
+production: False
+
+# Use python 3 on database VM
+ansible_python_interpreter: "/usr/bin/python3"
