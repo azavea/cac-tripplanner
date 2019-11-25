@@ -591,7 +591,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         }
 
         // Set error on origin if it is a tour
-        if (newOrigin && newOrigin.id && newOrigin.id.indexOf('tour') > -1) {
+        if (tour && tour.name === newOrigin.address && tour.id.indexOf('tour') > -1) {
             UserPreferences.setPreference('origin', null);
             UserPreferences.setPreference('tourMode', '');
             directionsFormControl.setError('origin');
