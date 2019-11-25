@@ -272,7 +272,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         destinations[index].removed = true;
         _.each(destinations, function(destination) {
             var order = destination.userOrder ? destination.userOrder: destination.order;
-            if (order >= index) {
+            if (order > index) {
                 destination.userOrder = order - 1;
             }
         });
