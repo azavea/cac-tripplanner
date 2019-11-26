@@ -33,13 +33,14 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
 
     var selectors = {
         geolocate: '.icon-geolocate',
-        spinClass: 'spin'
+        spinClass: 'spin',
+        typeaheadFrom: '#input-directions-from'
     };
 
     function CACTypeahead(selector, options) {
         this.options = $.extend({}, defaults, options);
         this.suggestAdapter = suggestAdapterFactory();
-        this.destinationAdapter = destinationAdapterFactory();
+        this.destinationAdapter = destinationAdapterFactory(selector);
 
         // Define event objects within the constructor so events aren't shared among all typeaheads
         this.events = $({});
@@ -151,7 +152,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         }
     }
 
-    function destinationAdapterFactory() {
+    function destinationAdapterFactory(selector) {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -160,11 +161,12 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 filter: function (response) {
                     if (response) {
                         var destinations = response.destinations;
-                        var events = _.filter(response.events, function(event) {
+                        // Do not suggest events or tours as origin, only destination
+                        var events = selector === selectors.typeaheadFrom ? [] : _.filter(
+                            response.events, function(event) {
                             return event.destinations.length > 0;
                         });
-                        var tours = response.tours;
-
+                        var tours = selector === selectors.typeaheadFrom ? [] : response.tours;
                         if (destinations.length || events.length || tours.length) {
                             var all = destinations.concat(events).concat(tours);
                             // Prefix the IDs to ensure uniqueness.
