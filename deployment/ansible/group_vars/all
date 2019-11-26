@@ -17,9 +17,6 @@ packer_version: "1.4.4"
 nodejs_version: 12.13.1
 nodejs_npm_version: 6.13.1
 
-otp_version: "1.4.0"
-otp_jar_sha1: "0367b1a15bac5f587807a5b897a9734209f8135c"
-
 otp_router: "default"
 
 # used by nginx and gunicorn to set timeouts; OTP defaults to 30s

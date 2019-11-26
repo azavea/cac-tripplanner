@@ -24,8 +24,10 @@ def add_sample_tours(apps, schema_editor):
 
     tour = Tour(**tour_data)
     tour.save()
+    dest_num = 1
     for wa in Destination.objects.filter(watershed_alliance=True):
-        td = TourDestination(destination=wa, related_tour=tour)
+        td = TourDestination(destination=wa, related_tour=tour, order=dest_num)
+        dest_num += 1
         td.save()
 
 
