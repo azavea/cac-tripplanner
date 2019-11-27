@@ -15,7 +15,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         showShareButton: false,
         selectors: {
             alert: '.alert',
-            container: '.tours',
+            container: '.tour-places',
             dataPlaceIndex: 'data-tour-place-index',
             hiddenClass: 'hidden',
             destinationList: '.tour-list',
@@ -96,12 +96,6 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
         $(options.selectors.undoButton).on('click', onUndoButtonClick);
 
         var $destinationList = $(options.selectors.destinationList);
-
-        // workaround for #1201
-        // remove second destination list if there are two
-        if ($destinationList.length > 1) {
-            $destinationList.first().remove();
-        }
 
         // First remove sortable if already initialized
         if ($destinationList.sortable('widget')) {
