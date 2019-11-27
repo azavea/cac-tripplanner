@@ -97,6 +97,12 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
         var $destinationList = $(options.selectors.destinationList);
 
+        // workaround for #1201
+        // remove second destination list if there are two
+        if ($destinationList.length > 1) {
+            $destinationList.first().remove();
+        }
+
         // First remove sortable if already initialized
         if ($destinationList.sortable('widget')) {
             $destinationList.sortable('destroy');
