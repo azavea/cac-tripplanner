@@ -347,6 +347,8 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
                 map.setView(markers[0].getLatLng());
             }
         }
+        // Deal with Chrome mobile not always fully loading tiles
+        map.invalidateSize();
     }
 
     function clearDirectionsMarker(type) {
