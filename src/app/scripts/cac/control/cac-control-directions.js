@@ -18,6 +18,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             hiddenClass: 'hidden',
             itineraryBlock: '.route-summary',
             places: '.places',
+            reverseButton: '.btn-reverse',
             selectedClass: 'selected',
             spinner: '.directions-results > .sk-spinner',
             tourDestinationBlock: '.place-card',
@@ -615,6 +616,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                 directions[key] = null;
                 return;
             }
+        } else {
+            $(options.selectors.reverseButton).show();
         }
 
         clearItineraries();
@@ -694,11 +697,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         UserPreferences.setPreference('tourMode', tourModePreference);
 
         if (!tourModePreference) {
+            $(options.selectors.reverseButton).show();
             // Send the single destination.
             onTypeaheadSelectDone(key, [result]);
             return;
         } else {
             tour = null;
+            // Cannot set a tour or multi-location event as origin, so hide reverse button
+            $(options.selectors.reverseButton).hide();
         }
 
         if (result.destinations) {
@@ -851,6 +857,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                         }
                     }
                     if (tour) {
+                        $(options.selectors.reverseButton).hide();
                         onTypeaheadSelectDone('destination', tour.destinations);
                     } else {
                         console.error('Failed to find destinations for tour ' + destination.address);
@@ -862,6 +869,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                     planTripOrShowPlaces();
                 });
             } else {
+                $(options.selectors.reverseButton).show();
                 // Not a tour; go to plan route
                 planTripOrShowPlaces();
             }
