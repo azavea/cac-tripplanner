@@ -846,8 +846,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                             // Match format of Typeahead response
                             tour.id = 'tour_' + tour.id;
                         }
-                        // Reset the tour to clear changes to order or removed destinations
-                        tourListControl.clearTour();
+                        // Reset the tour to update map with user edits to the destinations/order
+                        tourListControl.resetTour();
                     } else if (tourMode === 'event' && data.events && data.events.length) {
                         tour = data.events[0];
                         // Go directly to route for single-destination events

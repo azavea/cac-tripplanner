@@ -45,7 +45,7 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
     }
 
     TourListControl.prototype = {
-        clearTour: clearTour,
+        resetTour: resetTour,
         events: events,
         eventNames: eventNames,
         setTourDestinations: setTourDestinations,
@@ -58,9 +58,11 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     return TourListControl;
 
-    function clearTour() {
-        tourId = null;
-        destinations = [];
+    function resetTour() {
+        // Trigger event to let map know about any user edits to the tour destinations
+        if (tourId && destinations && destinations.length) {
+            reorderDestinations();
+        }
     }
 
     // Helper to check if a given tour place has been reordered or removed by the user
