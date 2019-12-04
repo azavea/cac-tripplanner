@@ -129,6 +129,9 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
         modeOptionsControl.events.on(modeOptionsControl.eventNames.toggle, toggledMode);
 
+        directionsFormControl.events.on(directionsFormControl.eventNames.cleared,
+                                        $.proxy(onTypeaheadCleared, this));
+
         directionsFormControl.events.on(directionsFormControl.eventNames.selected,
                                         $.proxy(onTypeaheadSelected, this));
 
@@ -289,6 +292,14 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         }
     }
 
+    function onTypeaheadCleared(event, key) {
+        if (key === 'origin') {
+            // reload places list to clear distances from origin
+            exploreControl.showSpinner();
+            exploreControl.getNearbyPlaces();
+        }
+    }
+
     function onTypeaheadSelected() {
         if (tabControl.isTabShowing(tabControl.TABS.HOME)) {
             var origin = UserPreferences.getPreference('origin');
@@ -296,6 +307,10 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
 
             if (origin && destination) {
                 tabControl.setTab(tabControl.TABS.DIRECTIONS);
+            } else if (origin) {
+                // reload places list to get new distances from origin
+                exploreControl.showSpinner();
+                exploreControl.getNearbyPlaces();
             }
         }
     }
@@ -387,23 +402,25 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
-        mapControl.isochroneControl.highlightDestination(placeId, { panTo: true });
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeIds = placeCard.data('destination-places');
+        mapControl.isochroneControl.highlightDestinations([placeIds], { panTo: true });
     }
 
     function onPlaceHovered(event) {
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        var placeId = $(event.target).closest(options.selectors.placeCard).data('destination-id');
-        mapControl.isochroneControl.highlightDestination(placeId);
+        var placeCard = $(event.target).closest(options.selectors.placeCard);
+        var placeIds = placeCard.data('destination-places');
+        mapControl.isochroneControl.highlightDestinations(placeIds);
     }
 
     function onPlaceBlurred() {
         if (!mapControl || !mapControl.isochroneControl) {
             return;
         }
-        mapControl.isochroneControl.highlightDestination(null);
+        mapControl.isochroneControl.highlightDestinations(null);
     }
 
     /**

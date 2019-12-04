@@ -1,4 +1,5 @@
 import json
+import logging
 import requests
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -21,10 +23,13 @@ from .models import (Destination,
                      Event,
                      ExtraDestinationPicture,
                      ExtraEventPicture,
+                     Tour,
                      UserFlag,
                      NARROW_IMAGE_DIMENSIONS,
                      WIDE_IMAGE_DIMENSIONS)
 from cms.models import Article
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_CONTEXT = {
@@ -35,6 +40,7 @@ DEFAULT_CONTEXT = {
 }
 
 EVENT_CATEGORY = 'Events'
+TOUR_CATEGORY = 'Tours'
 
 
 def base_view(request, page, context):
@@ -54,13 +60,19 @@ def base_view(request, page, context):
 def home(request):
     # Load one random article
     article = Article.objects.random()
-    # Show all destinations
+    # Show all destinations, events, and tours
     destinations = list(Destination.objects.published().order_by('priority'))
+    # Return one tour and one event each, unless there aren't any of one kind,
+    # then return two of the other.
     events = list(Event.objects.current().order_by('priority', 'start_date'))[:2]
+    tours = list(Tour.objects.published().order_by('priority'))[:2]
+    if len(events) > 0 and len(tours) > 0:
+        events = events[0:1]
+        tours = tours[0:1]
     context = {
         'tab': 'home',
         'article': article,
-        'destinations': events + destinations
+        'destinations': events + tours + destinations
     }
     if request.GET.get('destination') is not None:
         # If there's a destination in the URL, go right to directions
@@ -129,7 +141,7 @@ def service_worker(request):
 
 
 def place_detail(request, pk):
-    destination = get_object_or_404(Destination.objects.published(), pk=pk)
+    destination = get_object_or_404(Destination.objects.all(), pk=pk)
     more_destinations = Destination.objects.published().exclude(pk=destination.pk)[:3]
     context = dict(tab='explore', destination=destination, more_destinations=more_destinations,
                    **DEFAULT_CONTEXT)
@@ -137,11 +149,19 @@ def place_detail(request, pk):
 
 
 def event_detail(request, pk):
-    event = get_object_or_404(Event.objects.published(), pk=pk)
+    event = get_object_or_404(Event.objects.all(), pk=pk)
     more_events = Event.objects.current().exclude(pk=event.pk)[:3]
     context = dict(tab='explore', event=event, more_events=more_events,
                    **DEFAULT_CONTEXT)
     return base_view(request, 'event-detail.html', context=context)
+
+
+def tour_detail(request, pk):
+    tour = get_object_or_404(Tour.objects.all(), pk=pk)
+    more_tours = Tour.objects.published().exclude(pk=tour.pk)[:3]
+    context = dict(tab='explore', tour=tour, more_tours=more_tours,
+                   **DEFAULT_CONTEXT)
+    return base_view(request, 'tour-detail.html', context=context)
 
 
 def image_to_url(obj, field_name, size, raw_field_name=''):
@@ -235,7 +255,13 @@ def set_destination_properties(destination):
     obj['address'] = obj['name']
     obj['categories'] = [c.name for c in obj['categories']]
     obj['is_event'] = False
+    obj['is_tour'] = False
 
+    # Add truncated information on related tours (just ID and name)
+    related_tours = list(Tour.objects.filter(published=True,
+                         tour_destinations__destination=destination).values('id', 'name'))
+
+    obj['related_tours'] = related_tours
     extra_images = ExtraDestinationPicture.objects.filter(destination=destination)
     obj = set_attraction_properties(obj, destination, extra_images)
     obj = set_location_properties(obj, destination)
@@ -255,14 +281,57 @@ def set_event_properties(event):
     obj['start_date'] = timezone.localtime(event.start_date).isoformat()
     obj['end_date'] = timezone.localtime(event.end_date).isoformat()
     obj['is_event'] = True
+    obj['is_tour'] = False
 
     extra_images = ExtraEventPicture.objects.filter(event=event)
     obj = set_attraction_properties(obj, event, extra_images)
-    # add properties of related destination, if any
-    obj = set_location_properties(obj, event.destination)
+    # add properties of first related destination, if any
+    obj = set_location_properties(obj, event.first_destination)
+    destinations = []
+    for x in event.event_destinations.all():
+        dest = set_destination_properties(x.destination)
+        dest['order'] = x.order
+        # optional start/end date/times
+        dest['start_date'] = timezone.localtime(x.start_date).isoformat() if x.start_date else ''
+        dest['end_date'] = timezone.localtime(x.end_date).isoformat() if x.end_date else ''
+        destinations.append(dest)
+    obj['destinations'] = destinations
 
-    # if related destination belongs to Watershed Alliance, so does this event
-    obj['watershed_alliance'] = event.destination.watershed_alliance if event.destination else False
+    # For backwards compatibility for the mobile app,
+    # still return 'destination' with the ID of the first destination, if any.
+    obj['destination'] = destinations[0]['id'] if len(destinations) > 0 else None
+
+    # if the first related destination belongs to Watershed Alliance, so does this event
+    obj['watershed_alliance'] = (event.event_destinations.first().destination.watershed_alliance
+                                 if event.event_destinations.count() else False)
+    return obj
+
+
+def set_tour_properties(tour):
+    """Helper for adding and converting properties in serializing tours as JSON.
+
+    :param tour: Tour model object
+    :returns: Dictionary representation of object, with added properties
+    """
+    obj = model_to_dict(tour)
+    obj['categories'] = (TOUR_CATEGORY,)  # tours are a special category
+    # tour location is that of its first destination
+    obj = set_location_properties(obj, tour.first_destination)
+    obj['is_tour'] = True
+    obj['is_event'] = False
+
+    obj['destinations'] = []
+    for x in tour.tour_destinations.all():
+        dest = set_destination_properties(x.destination)
+        dest['order'] = x.order
+        obj['destinations'].append(dest)
+
+    # Use the images from the first destination for the tour
+    if tour.tour_destinations.count() > 0:
+        first_dest = obj['destinations'][0]
+        obj['image'] = first_dest['image']
+        obj['wide_image'] = first_dest['wide_image']
+
     return obj
 
 
@@ -317,9 +386,16 @@ class FindReachableDestinations(View):
             for poly in json_poly['features']:
                 geom_str = json.dumps(poly['geometry'])
                 geom = GEOSGeometry(geom_str, srid=4326)
-                matched_objects = (Destination.objects.filter(published=True, point__within=geom)
-                                                      .annotate(distance=Distance('point', geom))
-                                                      .order_by('distance', 'priority'))
+                # include destinations that are published
+                # or are in a published tour or event
+                matched_objects = (Destination.objects.filter(
+                    Q(point__within=geom) &
+                    (Q(published=True) |
+                        (Q(tours__isnull=False) & Q(tours__related_tour__published=True)) |
+                        (Q(events__isnull=False) & Q(events__related_event__published=True))))
+                    .distinct()
+                    .annotate(distance=Distance('point', geom))
+                    .order_by('distance', 'priority'))
         else:
             matched_objects = []
 
@@ -345,10 +421,11 @@ class SearchDestinations(View):
           - text param
         Optional:
           - limit param: maximum number of results to return (integer)
-          - categories param: comma-separated list of destination category names to filter to
+          - categories param: comma-separated list of category names to filter to
 
-        A search via text returns destinations and events that match the destination name
-        A search via lat/lon returns destinations and events that are closest to the search point
+        A search via text returns destinations, events, and tours that match the name
+        A search via lat/lon returns destinations, events, and tours that are
+        closest to the search point
 
         """
         params = request.GET
@@ -360,6 +437,7 @@ class SearchDestinations(View):
 
         destinations = Destination.objects.none()
         events = Event.objects.none()
+        tours = Tour.objects.none()
 
         if lat and lon:
             try:
@@ -380,13 +458,18 @@ class SearchDestinations(View):
                 categories.remove(EVENT_CATEGORY)
                 events = (Event.objects.current()
                           .order_by('priority', 'start_date'))
+            if TOUR_CATEGORY in categories:
+                categories.remove(TOUR_CATEGORY)
+                tours = (Tour.objects.filter(published=True).order_by('priority'))
             destinations = destinations.filter(categories__name__in=categories)
         else:
             events = (Event.objects.current()
                       .order_by('priority', 'start_date'))
+            tours = (Tour.objects.filter(published=True).order_by('priority'))
 
         if text is not None:
             events = events.filter(name__icontains=text)
+            tours = tours.filter(name__icontains=text)
 
         if limit:
             try:
@@ -395,11 +478,13 @@ class SearchDestinations(View):
                 return return_400('Invalid limit, must be an integer', str(e))
             destinations = destinations[:limit_int]
             events = events[:limit_int]
+            tours = tours[:limit_int]
 
         destinations = [set_destination_properties(x) for x in destinations]
         events = [set_event_properties(x) for x in events]
+        tours = [set_tour_properties(x) for x in tours]
 
-        response = {'destinations': destinations, 'events': events}
+        response = {'destinations': destinations, 'events': events, 'tours': tours}
         return JsonResponse(response)
 
 

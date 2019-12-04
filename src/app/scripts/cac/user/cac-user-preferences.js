@@ -42,6 +42,7 @@ CAC.User.Preferences = (function(Storages, _) {
         mode: 'TRANSIT,WALK',
         originText: '',
         destinationText: '',
+        tourMode: false,
         waypoints: [],
         wheelchair: false
     };

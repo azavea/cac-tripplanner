@@ -2,22 +2,19 @@
  *  View control for the itinerary list
  *
  */
-CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
+CAC.Control.ItineraryList = (function (_, $, MapTemplates, Utils) {
 
     'use strict';
 
     var defaults = {
         // Should the back button be shown in the control
-        //  this is weird, ideally we would handle the back button in the wrapper view, but we
-        //  need to switch out the sidebar div as a whole
-        showBackButton: false,
-        // Should the share button be shown in the control
-        showShareButton: false,
+        showBackButton: true,
         selectors: {
             alert: '.alert',
+            backButton: '.back-to-itinerary',
             container: '.directions-list',
             hiddenClass: 'hidden',
-            itineraryList: '.routes-list',
+            itineraryList: '.route-summary-list',
             itineraryItem: '.route-summary'
         }
     };
@@ -42,6 +39,7 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         eventNames: eventNames,
         setItineraries: setItineraries,
         setItinerariesError: setItinerariesError,
+        showBackButton: showBackButton,
         showItineraries: showItineraries,
         show: show,
         hide: hide,
@@ -65,6 +63,11 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
 
         $(options.selectors.itineraryItem).on('click', onItineraryClicked);
         $(options.selectors.itineraryItem).hover(onItineraryHover);
+        if (options.showBackButton) {
+            $(options.selectors.backButton).on('click', function() {
+                window.history.back();
+            });
+        }
     }
 
     /**
@@ -100,34 +103,28 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
      * @param {[object]} itineraries An open trip planner itinerary object, as returned from the plan endpoint
      */
     function enableCarousel(itineraries) {
-        if (itineraries.length < 2) {
+        if (!itineraries || itineraries.length < 2) {
             return;
         }
 
-        var slider = tns({
+        var slider = tns(Object.assign({
             container: options.selectors.itineraryList,
-            autoplayButton: false,
-            autoplayButtonOutput: false,
-            autoplayPosition: 'top',
-            controls: false,
-            controlPosition: 'bottom',
-            items: 1,
-            nav: true,
-            navPosition: 'bottom',
-            slideBy: 'page',
+        }, Utils.defaultCarouselOptions, {
             autoplay: false,
             autoHeight: true,
+            loop: false,
             responsive: {
                 320: {disable: false, controls: false, nav: true, autoHeight: true},
                 481: {disable: true}
             }
-        });
+        }));
 
         // Highlight route on map on itinerary carousel swipe
         slider.events.on('indexChanged', function(info) {
             var items = $(options.selectors.itineraryItem);
-            if (items && items.length > info.displayIndex) {
-                items.eq(info.displayIndex).triggerHandler('mouseenter');
+            var index = info.displayIndex - 1;
+            if (items && items.length > index) {
+                items.eq(index).triggerHandler('mouseenter');
             }
         });
     }
@@ -158,6 +155,10 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
         $container.removeClass(options.selectors.hiddenClass);
     }
 
+    function showBackButton() {
+        $(options.selectors.backButton).removeClass(options.selectors.hiddenClass);
+    }
+
     /**
      * Show/hide all itineraries
      *
@@ -180,4 +181,4 @@ CAC.Control.ItineraryList = (function (_, $, MapTemplates) {
             hide();
         }
     }
-})(_, jQuery, CAC.Map.Templates);
+})(_, jQuery, CAC.Map.Templates, CAC.Utils);

@@ -71,9 +71,6 @@
                     <div class="all filter-option on" data-filter="All">
                         All
                     </div>
-                    <div class="events filter-option" data-filter="Events">
-                        Events
-                    </div>
                     <div class="nature filter-option" data-filter="Nature">
                         Nature
                     </div>
@@ -83,36 +80,61 @@
                     <div class="educational filter-option" data-filter="Educational">
                         Educational
                     </div>
+                    <div class="filter-divider"></div>
+                    <div class="tours filter-option" data-filter="Tours">
+                        Tours
+                    </div>
+                    <div class="events filter-option" data-filter="Events">
+                        Events
+                    </div>
                     <input type="hidden" name="destination-filter" value="All">
                 </div>
             </header>
             <ul class="place-list" data-filter="All">
                 {% for destination in destinations %}
-                <li class="place-card {% if destination.is_event %}event-card {% endif %} no-origin"
+                <li class="place-card {% if destination.is_event %}event-card {% elif destination.is_tour %}tour-card {% else %}destination-card {% endif %}no-origin"
                     {% get_directions_id destination as directions_id %}
+                    {% get_destination_x destination as destination_x %}
+                    {% get_destination_y destination as destination_y %}
+                    {% get_place_ids destination as place_ids %}
                     data-destination-id="{{ directions_id }}"
-                    {% if destination.is_event and directions_id %}
-                        data-destination-x="{{ destination.destination.point.x }}"
-                        data-destination-y="{{ destination.destination.point.y }}"
-                    {% elif not destination.is_event %}
-                        data-destination-x="{{ destination.point.x }}"
-                        data-destination-y="{{ destination.point.y }}"
-                    {% endif %}>
-                    <div class="place-card-photo-container">
-                        <img class="place-card-photo"
-                            {% if destination.image %}
-                                src="{% cropped_thumbnail destination 'image' %}"
-                            {% else %}
-                                src="https://placehold.it/310x155.jpg"
-                            {% endif %}
-                            width="310" height="155"
-                            alt="{{ destination.name }}" />
-                    </div>
+                    data-destination-places="{{ place_ids }}"
+                    data-destination-x="{{ destination_x }}"
+                    data-destination-y="{{ destination_y }}">
+                    {% if destination.is_tour %}
+                        <div class="place-card-carousel-container">
+                            <div class="place-card-carousel">
+                                <img src="{% cropped_thumbnail destination.first_destination 'wide_image' %}"
+                                    width="310" height="155" />
+                                {% for tour_dest in destination.tour_destinations.all|slice:"1:" %}
+                                <img class="place-card-carousel-extra-image hidden"
+                                    src="{% cropped_thumbnail tour_dest.destination 'wide_image' %}"
+                                    width="310" height="155" />
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="place-card-photo-container">
+                            <img class="place-card-photo"
+                                {% if destination.image %}
+                                    src="{% cropped_thumbnail destination 'image' %}"
+                                {% elif destination.first_destination %}
+                                    src="{% cropped_thumbnail destination.first_destination 'image' %}"
+                                {% else %}
+                                    src="https://placehold.it/310x155.jpg"
+                                {% endif %}
+                                width="310" height="155"
+                                alt="{{ destination.name }}" />
+                        </div>
+                    {% endif %}
                     <div class="place-card-info">
                         <div class="place-card-meta">
                             <div class="travel-logistics">
                                 <span class="travel-logistics-duration">N min</span>
                                 from <span class="travel-logistics-origin">origin</span>
+                            </div>
+                            <div class="tour-label">
+                                Tour
                             </div>
                             <div class="event-label">
                                 Upcoming Event
@@ -146,11 +168,16 @@
                             {% if directions_id %}
                             <a class="place-card-action place-action-go"
                                 data-destination-id="{{ directions_id }}"
-                                href="#">Directions</a>
+                                data-destination-places="{{ place_ids }}"
+                                href="#">
+                                {% if destination.is_tour %}Map{% else %}Directions{% endif %}
+                                </a>
                             {% endif %}
                             <a class="place-card-action place-action-details"
                                {% if destination.is_event %}
                                href="{% url 'event-detail' pk=destination.pk %}"
+                               {% elif destination.is_tour %}
+                               href="{% url 'tour-detail' pk=destination.pk %}"
                                {% else %}
                                href="{% url 'place-detail' pk=destination.pk %}"
                                {% endif %}
@@ -190,6 +217,7 @@
     <div class="directions-results">
         {% include "partials/spinner.html" %}
         <div class="directions-list"></div>
+        <div class="tour-places"></div>
     </div>
 
     <div class="directions-step-by-step"></div>
@@ -206,7 +234,14 @@ jQuery(document).ready(function ($) {
     CAC.Settings.routingUrl = '{{ routing_url }}';
     CAC.Settings.isochroneUrl = '{{ isochrone_url }}';
     var home = new CAC.Pages.Home();
+    var Utils = CAC.Utils;
     home.initialize();
+
+    jQuery('.place-card-carousel').each(function (index, carouselNode) {
+        tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions, {autoplay: false}));
+    });
+    jQuery('.place-card-carousel-extra-image').removeClass('hidden');
+
 });
 </script>
 {% endblock %}

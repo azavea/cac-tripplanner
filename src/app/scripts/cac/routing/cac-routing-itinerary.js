@@ -7,7 +7,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * @param {object} otpItinerary OTP itinerary
      * @param {integer} index integer to uniquely identify itinerary
      */
-    function Itinerary(otpItinerary, index) {
+    function Itinerary(otpItinerary, index, tourMode) {
         // extract reverse-geocoded start and end addresses
         var params = Utils.getUrlParams();
         this.fromText = params.originText;
@@ -26,10 +26,13 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.duration = otpItinerary.duration;
         this.startTime = otpItinerary.startTime;
         this.endTime = otpItinerary.endTime;
-        this.legs = getLegs(otpItinerary.legs, (this.waypoints && this.waypoints.length > 0));
+        this.legs = getLegs(otpItinerary.legs,
+                            this.waypoints && this.waypoints.length > 0,
+                            tourMode);
         this.from = _.head(otpItinerary.legs).from;
         this.to = _.last(otpItinerary.legs).to;
         this.agencies = getTransitAgencies(otpItinerary.legs);
+        this.tourMode = tourMode;
 
         // not actually GeoJSON, but a Leaflet layer made from GeoJSON
         this.geojson = cartodb.L.geoJson({type: 'FeatureCollection',
@@ -39,7 +42,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         this.setLineColors = setLineColors;
 
         // default to visible, backgrounded linestring styling
-        this.setLineColors(true, false);
+        this.setLineColors(true, false, false);
 
         // set by CAC.Routing.Plans with the arguments sent to planTrip:
         // coordsFrom, coordsTo, when, extraOptions
@@ -255,10 +258,11 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
      * Does some post-processing for the legs, for cleanup and template convenience
      *
      * @params {Array} legs Itinerary legs returned by OTP
-     * @param {Boolean} hasWaypoints If true, call mergeLegsAcrossWaypoints
+     * @param {Boolean} hasWaypoints If true, itinerary has waypoints
+     * @param {Boolean} tourMode If true, itinerary is a tour
      * @returns {Array} Itinerary legs, with prettified place labels and other improvements
      */
-    function getLegs(legs, hasWaypoints) {
+    function getLegs(legs, hasWaypoints, tourMode) {
         // Check leg from/to place name; if it's an OSM node label, reverse geocode it
         // and update label
 
@@ -276,9 +280,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             return leg;
         });
 
-        // If there are waypoints, call the function to merge legs across them.
         if (hasWaypoints) {
-            newLegs = mergeLegsAcrossWaypoints(newLegs);
+            if (!tourMode) {
+                // merge legs across user-set waypoints
+                newLegs = mergeLegsAcrossWaypoints(newLegs);
+            } else {
+                // label the next waypoint for each leg in a tour
+                newLegs = labelWaypointSection(newLegs);
+            }
         }
 
         // Add some derived data to be used in the template:
@@ -354,6 +363,17 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         return legs;
     }
 
+    function labelWaypointSection(legs) {
+        var nextWaypoint = 1;
+        return _.map(legs, function(leg, index) {
+            leg.nextWaypoint = nextWaypoint;
+            if (leg.to.name === 'Destination') {
+                nextWaypoint++;
+            }
+            return leg;
+        });
+    }
+
     /**
      * Helper function to set style for an itinerary
      *
@@ -367,12 +387,14 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
             return;
         }
 
-        var defaultStyle = {clickable: true, // to get mouse events (listen to hover)
-                        color: Utils.defaultModeColor,
-                        dashArray: null,
-                        lineCap: 'round',
-                        lineJoin: 'round',
-                        opacity: 0.75};
+        var defaultStyle = {
+            clickable: true, // to get mouse events (listen to hover)
+            color: Utils.defaultModeColor,
+            dashArray: null,
+            lineCap: 'round',
+            lineJoin: 'round',
+            opacity: 0.75
+        };
 
         if (highlighted) {
             defaultStyle.dashArray = null;
@@ -387,7 +409,7 @@ CAC.Routing.Itinerary = (function ($, cartodb, L, _, moment, Geocoder, Utils) {
         } else {
             // in background
             defaultStyle.color = Utils.defaultBackgroundLineColor;
-            defaultStyle.dashArray = [5, 8];
+            defaultStyle.dashArray = Utils.dashArray;
             this.geojson.setStyle(defaultStyle);
         }
     }

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load cropping %}
+{% load staticfiles %}
+
+{% block pagetitle %}
+<title>{% block title %}GoPhillyGo | {{ tour.name }}{% endblock %}</title>
+
+<meta property="og:title" content="{{ tour.name }}" />
+<meta name="twitter:title" content="{{ tour.name }}" />
+<meta name="apple-mobile-web-app-title" content="{{ tour.name }}">
+<meta property="og:type" content="place" />
+<meta property="og:rich_attachment" content="true" />
+{% endblock %}
+
+{% block extrametatags %}
+<meta property="fb:app_id" content="{{ fb_app_id }}" />
+<meta property="fb:pages" content="299797223477237" />
+<meta property="fb:profile_id" content="gophillygo" />
+<meta property="og:url" content="{{ request.build_absolute_uri }}" />
+<meta property="og:site_name" content="GoPhillyGo" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@go_philly_go" />
+<meta property="og:description" content="{{ tour.description|striptags }}" />
+<meta name="twitter:description" content="{{ tour.description|striptags }}" />
+<meta property="og:image" content="https://gophillygo.org{% cropped_thumbnail tour.first_destination 'wide_image' %}" />
+<meta name="twitter:image" content="https://gophillygo.org{% cropped_thumbnail tour.first_destination 'wide_image' %}" />
+<meta name="og:image:alt" content="{{ tour.name }}" />
+<meta name="twitter:image:alt" content="{{ tour.name }}" />
+<meta property="og:image:width" content="680" />
+<meta property="og:image:height" content="400" />
+{% endblock %}
+
+{% block content %}
+    {% include "partials/header.html" %}
+    <div class="main">
+        <h1><a href="{% url 'home' %}">Tours We Love</a></h1>
+        {% include "partials/tour-detail.html" %}
+
+        {% if more_tours %}
+        <div class="summaries-list">
+            <h3>More great tours around Philly</h3>
+            {% for tour in more_tours %}
+                {% include "partials/tour-card.html" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% include "partials/footer.html" %}
+{% endblock %}
+
+{%block jspage %}
+<script type="text/javascript">
+jQuery(document).ready(function () {
+    {% if tour.tour_destinations.count > 1 %}
+    var Utils = CAC.Utils;
+    tns(Object.assign({container: '.detail-image-carousel'}, Utils.defaultCarouselOptions));
+    jQuery('.detail-image-carousel-extra-image').removeClass('hidden');
+    {% endif %}
+});
+</script>
+{% endblock %}

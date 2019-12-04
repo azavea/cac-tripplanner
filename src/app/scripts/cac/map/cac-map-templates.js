@@ -3,28 +3,18 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
 
     var module = {
         alert: alert,
-        addressText: addressText,
         bicycleWarningAlert: bicycleWarningAlert,
         bikeSharePopup: bikeSharePopup,
-        destinationBlock: destinationBlock,
-        destinationError: destinationError,
-        destinationDetail: destinationDetail,
         eventPopup: eventPopup,
         itinerary: itinerary,
-        itineraryList: itineraryList
+        itineraryList: itineraryList,
+        tourDestinationList: tourDestinationList
     };
 
     // Only register these once, when the module loads
     registerListItemHelpers();
 
     return module;
-
-    function addressText(address) {
-        var source = '{{ address.StAddr }} \n<small>{{ address.City }}, {{ address.Region }} {{ address.Postal }}</small>';
-        var template = Handlebars.compile(source);
-        var html = template({address: address});
-        return html;
-    }
 
     /**
      * Build an HTML snippet for a Bootstrap alert, with close button
@@ -139,61 +129,6 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         return html;
     }
 
-    function destinationBlock(destination) {
-        var source = [
-            '<a class="block block-destination" id="destination-{{ d.id }}">',
-                '<div class="modes"></div>',
-                '<h3>{{ d.name }}</h3>',
-                '<h5 class="distance-minutes"></h5>',
-                '<img src="{{#if d.wide_image}}{{ d.wide_image }}{{^}}https://placehold.it/300x150{{/if}}" />',
-            '</a>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({d: destination});
-        return html;
-    }
-
-    function destinationError(error) {
-        var source = [
-            '<a class="block block-destination">',
-                '<div class="modes"></div>',
-                '<h3>{{ error.message }}</h3>',
-            '</a>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({error: error});
-        return html;
-    }
-
-    function destinationDetail(destination) {
-        var source = [
-            '<div class="block-detail">',
-                '<div class="trip-numbers">{{#if d.formattedDuration}}<div class="trip-duration"> ',
-                '{{ d.formattedDuration }}</div>{{/if}}<div class="trip-distance">',
-                '{{ d.formattedDistance }}</div></div>',
-                '<h3>{{ d.name }}</h3>',
-                '<img class="explore-block" src="{{#if d.wide_image}}{{ d.wide_image }}',
-                    '{{^}}https://placehold.it/300x150{{/if}}" />',
-                    // the parent element of whatever is put here is a <p> tag
-                '<div class="explore-block">{{{ d.description }}}</div>',
-                '<div class="explore-block"><a href="{{ d.website_url }}" ',
-                'target="_blank">{{ d.website_url }}</a></div>',
-                '<div class="explore-block visible-xs mobile-unavailable">GoPhillyGo directions are not available on mobile at this time, but this button can give you directions from Google.</div>',
-                '<div class="explore-block">',
-                    '<div class="row">',
-                        // .back and .getdirections are used to select these elements for the click event
-                        '<div class="col-sm-6"><a class="back btn btn-primary btn-block hidden-xs">Back</a></div>',
-                        '<div class="col-sm-6"><a class="getdirections btn btn-primary btn-block">',
-                            'Get directions</a></div>',
-                    '</div>',
-                '</div>',
-            '</div>'
-        ].join('');
-        var template = Handlebars.compile(source);
-        var html = template({d: destination});
-        return html;
-    }
-
     function eventPopup(event) {
         event.uwishunuLogo = Utils.getImageUrl('uwishunu_logo.png');
         var source = [
@@ -212,39 +147,46 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     }
 
     // Template for itinerary summaries
-    function itineraryList(itineraries) {
+    function itineraryList(itineraries, showBackButton) {
         var source = [
-        '<h1>Choose a route</h1><div class="routes-list">',
-        '{{#each itineraries}}',
-            '<div class="route-summary" data-itinerary="{{this.id}}">',
-                '<div class="route-name">via {{this.via}}</div>',
-                '<div class="route-details">',
-                    '<div class="route-stats{{#unless showSummaryModes}} route-single-mode {{onlyModeClass modeSummaries}}{{/unless}}">',
-                        '<span class="route-duration">',
-                            '{{this.formattedDuration}}</span>',
-                        '&ensp;&middot;&ensp;',
-                        '<span class="route-distance">{{this.formattedDistance}}</span>',
+        '<div class="routes-list">',
+        '{{#if showBackButton}}',
+            '<button name="back-to-itinerary" class="back-to-itinerary hidden" title="Back">',
+            '<i class="icon-left-big"></i></button>',
+        '{{/if}}',
+        '{{#if itineraries}}<h1>Choose a route</h1>{{/if}}',
+            '<div class="route-summary-list">',
+            '{{#each itineraries}}',
+                '<div class="route-summary" data-itinerary="{{this.id}}">',
+                    '<div class="route-name">via {{this.via}}</div>',
+                    '<div class="route-details">',
+                        '<div class="route-stats{{#unless showSummaryModes}} route-single-mode {{onlyModeClass modeSummaries}}{{/unless}}">',
+                            '<span class="route-duration">',
+                                '{{this.formattedDuration}}</span>',
+                            '&ensp;&middot;&ensp;',
+                            '<span class="route-distance">{{this.formattedDistance}}</span>',
+                        '</div>',
+                        '{{#if showSummaryModes}}',
+                            '<div class="route-start-stop">{{datetime this.startTime}}&ndash;{{datetime this.endTime}}</div>',
+                        '{{/if}}',
                     '</div>',
                     '{{#if showSummaryModes}}',
-                        '<div class="route-start-stop">{{datetime this.startTime}}&ndash;{{datetime this.endTime}}</div>',
+                        '<div class="route-per-mode-details">',
+                            '{{#each modeSummaries}}',
+                                '<div class="route-mode-stats {{modeClass @key}}">',
+                                    '{{this.formattedDuration}}&nbsp;&middot;&nbsp;{{this.formattedDistance}}',
+                                    '{{#if this.transfers}}&nbsp;&middot;&nbsp;{{this.transfers}}{{/if}}',
+                                '</div>',
+                            '{{/each}}',
+                        '</div>',
                     '{{/if}}',
                 '</div>',
-                '{{#if showSummaryModes}}',
-                    '<div class="route-per-mode-details">',
-                        '{{#each modeSummaries}}',
-                            '<div class="route-mode-stats {{modeClass @key}}">',
-                                '{{this.formattedDuration}}&nbsp;&middot;&nbsp;{{this.formattedDistance}}',
-                                '{{#if this.transfers}}&nbsp;&middot;&nbsp;{{this.transfers}}{{/if}}',
-                            '</div>',
-                        '{{/each}}',
-                    '</div>',
-                '{{/if}}',
+            '{{/each}}',
             '</div>',
-        '{{/each}}',
         '</div>'].join('');
 
         var template = Handlebars.compile(source);
-        var html = template({itineraries: itineraries});
+        var html = template({itineraries: itineraries, showBackButton: true});
         return html;
     }
 
@@ -337,6 +279,116 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({data: templateData});
+        return html;
+    }
+
+    /**
+     * Build an HTML snippet for tour destination sidebar list.
+     * Note that the date/time helpers used here were registered in the home templates
+     *
+     * @param {Object} tour The tour object that has a list of destinations to display
+     * @param {Boolean} canRemoveDestinations If true, show the button for removing places
+     * @param {Boolean} isDirty If true, show the undo button
+     * @returns {String} Compiled HTML snippet
+     */
+    function tourDestinationList(tour, canRemoveDestinations, isDirty) {
+        var source = [
+        '<div class="tour-list">',
+            '<div class="tour-heading">',
+                '<div class="tour-label">',
+                    '{{#if tour.is_event}}Event{{else}}Tour{{/if}}',
+                '</div>',
+                '{{#if isDirty}}<i class="icon-counterclockwise"></i>{{/if}}',
+                '<h1 class="tour-name">',
+                    '<a class="tour-name-link" href=',
+                        '"/{{#if tour.is_event}}event{{else}}tour{{/if}}/{{ getId tour.id }}/">',
+                        '{{ tour.name }}',
+                    '</a>',
+                '</h1>',
+                '<div class="event-date-time">',
+            	    '{{#if tour.is_event }}',
+            	        '{{#if (sameDay tour.start_date tour.end_date) }}',
+                	        '<div class="event-date event-time">',
+                		    '{{eventDate tour.start_date }}',
+                		    ' &middot; ',
+                		    '{{eventTime tour.start_date }}',
+                	        '</div>',
+                	    '{{else}}',
+                	        '<div class="event-date event-time">',
+                		    '{{eventDate tour.start_date }}',
+                		    ' &ndash; ',
+                		    '{{eventDate tour.end_date }}',
+                	        '</div>',
+                	    '{{/if}}',
+                	'{{/if}}',
+            	'</div>',
+                '<div class="swipe-hint">Swipe to see locations</div>',
+            '</div>',
+            '{{#each tour.destinations}}',
+                '{{#unless this.removed}}',
+                '<div class="place-card place-card-compact no-origin ',
+                    '{{#if ../tour.is_tour}}place-card-sortable{{/if}}" ',
+                    'data-tour-place-index="{{ @index }}" ',
+                    'data-tour-place-id="{{ this.id }}">',
+                    '<div class="place-card-inner">',
+                        '<div class="place-card-photo-container">',
+                            '<img class="place-card-photo"',
+                                '{{#if this.image}}',
+                                    'src="{{ this.image }}"',
+                                '{{else}}',
+                                    'src="https://placehold.it/80x80.jpg"',
+                                '{{/if}}',
+                                'height="80"',
+                                'alt="{{ this.name }}" />',
+                        '</div>',
+                        '{{#if ../canRemoveDestinations}}',
+                            '<button class="place-card-remove"><i class="icon-cancel"></i></button>',
+                        '{{/if}}',
+                        '<div class="place-card-info">',
+                            '<div class="place-card-name">{{ this.name }}</div>',
+                            '<div class="event-date-time">',
+                                '{{#if this.start_date }}',
+                                    '{{#if (sameDay this.start_date this.end_date) }}',
+                                    '<div class="event-date event-time">',
+                                    '{{eventDate this.start_date }}',
+                                    ' &middot; ',
+                                    '{{eventTime this.start_date }}',
+                                    '</div>',
+                                '{{else}}',
+                                    '<div class="event-date event-time">',
+                                    '{{eventDate this.start_date }}',
+                                    ' &ndash; ',
+                                    '{{eventDate this.end_date }}',
+                                    '</div>',
+                                '{{/if}}',
+                            '{{/if}}',
+                            '</div>',
+                            '<div class="place-card-actions">',
+                                '<a class="place-card-action place-card-action-directions" ',
+                                    'data-tour-place-index="{{ @index }}" ',
+                                    'href="#">Directions</a>',
+                                '<a class="place-card-action place-card-action-details" href=',
+                                    '"/place/{{ this.id }}/">More info</a>',
+                            '</div>',
+                        '</div>',
+                        '{{#if ../tour.is_tour}}',
+                        '<div class="place-card-drag-handle" title="Drag to reorder">',
+                            '<i class="icon-menu"></i>',
+                        '</div>',
+                        '{{/if}}',
+                    '</div>',
+                    '{{#if ../tour.is_tour}}<svg class="place-card-route-line" height="53" viewBox="0 0 3 53" width="3" xmlns="http://www.w3.org/2000/svg"><path d="m1.5 1.5v50" fill="none" stroke-linecap="square" /></svg>{{/if}}',
+                '</div>',
+                '{{/unless}}',
+            '{{/each}}',
+        '</div>'].join('');
+
+        var template = Handlebars.compile(source);
+        var html = template({
+            tour: tour,
+            canRemoveDestinations: canRemoveDestinations,
+            isDirty: isDirty
+        });
         return html;
     }
 

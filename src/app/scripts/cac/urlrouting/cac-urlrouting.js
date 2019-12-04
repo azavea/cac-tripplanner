@@ -23,6 +23,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
 
     var DIRECTIONS_ENCODE = SHARED_ENCODE.concat(['destination',
                                                   'destinationText',
+                                                  'tourMode',
                                                   'waypoints']);
 
     var events = $({});
@@ -60,6 +61,7 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
     }
 
     UrlRouter.prototype.updateUrl = updateUrl;
+    UrlRouter.prototype.pushDirectionsUrlHistory = pushDirectionsUrlHistory;
     UrlRouter.prototype.clearUrl = clearUrl;
     UrlRouter.prototype.buildExploreUrlFromPrefs = buildExploreUrlFromPrefs;
     UrlRouter.prototype.buildDirectionsUrlFromPrefs = buildDirectionsUrlFromPrefs;
@@ -84,6 +86,12 @@ CAC.UrlRouting.UrlRouter = (function (_, $, UserPreferences, Utils, route) {
         }
         updatingUrl = true;
         route(url, undefined /* Title */, replaceState);
+    }
+
+    // Push current directions into browser history
+    function pushDirectionsUrlHistory() {
+        updatingUrl = true;
+        route(buildDirectionsUrlFromPrefs(), undefined, false);
     }
 
     function clearUrl() {

@@ -50,6 +50,7 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         clearFocus: clearFocus,
         clearAll: clearAll,
         setLocation: setLocation,
+        setStoredLocation: setStoredLocation,
         setError: setError,
         setFromUserPreferences: setFromUserPreferences
     };
@@ -86,10 +87,14 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
 
         if (origin && origin.location) {
             typeaheads.origin.setValue(UserPreferences.getPreference('originText'));
+        } else {
+            typeaheads.origin.setValue('');
         }
 
         if (destination && destination.location) {
             typeaheads.destination.setValue(UserPreferences.getPreference('destinationText'));
+        } else {
+            typeaheads.destination.setValue('');
         }
     }
 
@@ -110,10 +115,20 @@ CAC.Control.DirectionsFormControl = (function ($, Typeahead, Geocoder, UserPrefe
         events.trigger(eventNames.selected, [key, location]);
     }
 
+    // Set the origin or destination without triggering trip recalculation
+    function setStoredLocation(key, location) {
+        if (location) {
+            typeaheads[key].setValue(location.address);
+            UserPreferences.setLocation(key, location);
+        } else {
+            typeaheads[key].setValue('');
+            UserPreferences.clearLocation(key);
+        }
+    }
+
     // For setting origin or destination from code, e.g. directions links
     function setLocation(key, location) {
-        typeaheads[key].setValue(location.address);
-        UserPreferences.setLocation(key, location);
+        setStoredLocation(key, location);
         events.trigger(eventNames.selected, [key, location]);
     }
 

@@ -33,13 +33,14 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
 
     var selectors = {
         geolocate: '.icon-geolocate',
-        spinClass: 'spin'
+        spinClass: 'spin',
+        typeaheadFrom: '#input-directions-from'
     };
 
     function CACTypeahead(selector, options) {
         this.options = $.extend({}, defaults, options);
         this.suggestAdapter = suggestAdapterFactory();
-        this.destinationAdapter = destinationAdapterFactory();
+        this.destinationAdapter = destinationAdapterFactory(selector);
 
         // Define event objects within the constructor so events aren't shared among all typeaheads
         this.events = $({});
@@ -151,7 +152,7 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
         }
     }
 
-    function destinationAdapterFactory() {
+    function destinationAdapterFactory(selector) {
         var adapter = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -160,9 +161,28 @@ CAC.Search.Typeahead = (function (_, $, Geocoder, SearchParams, Utils) {
                 filter: function (response) {
                     if (response) {
                         var destinations = response.destinations;
-                        var events = _.reject(response.events, ['placeID', null]);
-                        if (destinations.length || events.length) {
-                            return destinations.concat(events);
+                        // Do not suggest events or tours as origin, only destination
+                        var events = selector === selectors.typeaheadFrom ? [] : _.filter(
+                            response.events, function(event) {
+                            return event.destinations.length > 0;
+                        });
+                        var tours = selector === selectors.typeaheadFrom ? [] : response.tours;
+                        if (destinations.length || events.length || tours.length) {
+                            var all = destinations.concat(events).concat(tours);
+                            // Prefix the IDs to ensure uniqueness.
+                            // These prefixes must match those used by the
+                            // `get_directions_id` Django template helper and by
+                            // the `cardId` Handlebars template helper.
+                            _.each(all, function(obj) {
+                                var prefix = 'place';
+                                if (obj.is_event) {
+                                    prefix = 'event';
+                                } else if (obj.is_tour) {
+                                    prefix = 'tour';
+                                }
+                                obj.id = prefix + '_' + obj.id;
+                            });
+                            return all;
                         }
                     }
                     return [];

@@ -38,7 +38,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
 
     function bikeRoutesOverlay(map) {
         var layerGroup = cartodb.L.featureGroup([]);
-        var url = 'https://cac-tripplanner.cartodb.com/api/v2/viz/77aa8a63-fd35-4f6e-b5d5-361cbbdb45cb/viz.json';
+        var url = 'https://cac-tripplanner.carto.com/api/v2/viz/c57728a5-55b6-41f9-af4f-6d982dc346b4/viz.json';
         cartodb.createLayer(map, url).on('done', function(layer) {
             layerGroup.addLayer(layer);
             // Wait until layer has loaded to bring it to front.  Otherwise, it loads behind
@@ -85,11 +85,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
 
     function getFeedEventMarker(event) {
         var latLng = cartodb.L.latLng(event.point.coordinates[1], event.point.coordinates[0]);
-        var icon = L.AwesomeMarkers.icon({
-            icon: 'calendar',
-            markerColor: 'orange',
-            prefix: 'fa'
-        });
+        var icon = L.AwesomeMarkers.icon(Utils.feedEventIconConfig);
         var marker = new cartodb.L.marker(latLng, { icon: icon });
         marker.bindPopup(CAC.Map.Templates.eventPopup(event),
                          {className: options.selectors.eventPopupClassName});

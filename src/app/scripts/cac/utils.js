@@ -1,6 +1,47 @@
 CAC.Utils = (function (_, moment) {
     'use strict';
 
+    // Map icon settings
+    var destinationIconConfig = {
+        icon: 'marker-destination',
+        prefix: 'icon',
+        markerColor: 'red'
+    };
+
+    // Note: feed events no longer display on the map
+    var feedEventIconConfig = {
+        icon: 'calendar',
+        markerColor: 'orange',
+        prefix: 'fa'
+    };
+
+    var highlightIconConfig = {
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'darkblue',
+    };
+
+    var originIconConfig = {
+        icon: 'marker-origin',
+        prefix: 'icon',
+        markerColor: 'green'
+    };
+
+    var outsideTravelshedIconConfig = {
+        icon: 'default',
+        prefix: 'icon',
+        // modified by styles to actually be lightgray, with reduced opacity
+        markerColor: 'darkred',
+        extraClasses: 'outside'
+    };
+
+    var placeIconConfig = {
+        icon: 'default',
+        prefix: 'icon',
+        markerColor: 'lightgray'
+    };
+
+    // Direction string mappings
     var directions = {
         north: 'N',
         northeast: 'NE',
@@ -76,19 +117,46 @@ CAC.Utils = (function (_, moment) {
         FERRY: brandColors.YELLOW
     };
 
+    // Map styling for tours
+    var dashArray = [5, 8];
+    var tourHighlightColor = brandColors.BLUE;
+
+    var defaultCarouselOptions = {
+        autoplayButton: false,
+        autoplayButtonOutput: false,
+        autoplayPosition: 'top',
+        controls: false,
+        controlPosition: 'bottom',
+        items: 1,
+        nav: true,
+        navPosition: 'bottom',
+        preventScrollOnTouch: 'auto',
+        slideBy: 'page',
+        autoplay: true
+    };
+
     var module = {
-        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
-        defaultBackgroundLineColor: defaultBackgroundLineColor,
-        defaultModeColor: defaultModeColor,
-        getImageUrl: getImageUrl,
-        getFormattedDistance: getFormattedDistance,
         abbrevStreetName: abbrevStreetName,
-        getBikeOptimizeLabel: getBikeOptimizeLabel,
-        getUrlParams: getUrlParams,
+        convertReverseGeocodeToLocation: convertReverseGeocodeToLocation,
+        dashArray: dashArray,
+        defaultBackgroundLineColor: defaultBackgroundLineColor,
+        defaultCarouselOptions: defaultCarouselOptions,
+        defaultModeColor: defaultModeColor,
+        destinationIconConfig: destinationIconConfig,
         encodeUrlParams: encodeUrlParams,
+        feedEventIconConfig: feedEventIconConfig,
+        getBikeOptimizeLabel: getBikeOptimizeLabel,
+        getFormattedDistance: getFormattedDistance,
+        getImageUrl: getImageUrl,
         getModeColor: getModeColor,
+        getUrlParams: getUrlParams,
+        highlightIconConfig: highlightIconConfig,
+        initializeMoment: initializeMoment,
         modeStringHelper: modeStringHelper,
-        initializeMoment: initializeMoment
+        originIconConfig: originIconConfig,
+        outsideTravelshedIconConfig: outsideTravelshedIconConfig,
+        placeIconConfig: placeIconConfig,
+        tourHighlightColor: tourHighlightColor
     };
 
     return Object.freeze(module);

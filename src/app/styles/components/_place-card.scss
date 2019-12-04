@@ -1,4 +1,5 @@
 .place-card {
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
@@ -12,14 +13,11 @@
     .body-map & {
         margin-right: auto;
         margin-left: auto;
-
-        .place-card-photo-container {
-            background-color: $white;
-        }
     }
 }
 
-.place-card-photo-container {
+.place-card-photo-container,
+.place-card-carousel-container {
     margin-right: -16px;
     margin-left: -16px;
 }
@@ -38,6 +36,28 @@
     padding: .6rem 0 .7rem;
 }
 
+.place-card-remove {
+    display: none;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    border-radius: 50%;
+    background: $gophillygo-blue;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    appearance: none;
+
+    @include respond-to('xxs-up') {
+        .place-card:hover & {
+            display: block;
+        }
+    }
+}
+
 .place-card-meta {
     display: flex;
     flex-flow: row nowrap;
@@ -46,7 +66,7 @@
     font-weight: $font-weight-medium;
     line-height: 1.0rem;
 
-    .place-card.no-origin:not(.event-card) & {
+    .place-card.no-origin.destination-card & {
         display: none;
     }
 
@@ -66,6 +86,17 @@
     .travel-logistics-distance {
         font-weight: $font-weight-bold;
         line-height: 1.4rem;
+    }
+
+    .tour-label {
+        display: none;
+        color: $gophillygo-green;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+
+        .place-card.no-origin.tour-card & {
+            display: block;
+        }
     }
 
     .event-label {
@@ -154,5 +185,175 @@
 
     .badge {
         margin-left: .8rem;
+    }
+}
+
+.place-card .tns-outer {
+    position: relative;
+}
+
+.place-card .tns-nav {
+    display: none;
+}
+
+.place-card.no-origin .tns-nav {
+    display: block;
+    position: absolute;
+    top: 100%;
+    bottom: initial;
+    margin-top: -1px;
+    width: 100%;
+}
+
+.place-card-compact {
+    display: block;
+    width: auto;
+    height: 8rem;
+    padding: 0;
+
+    .place-card-link {
+        @include delinkify();
+    }
+
+    .place-card-inner {
+        position: relative;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+        padding: 0 1.2rem 0 0;
+        z-index: 1;
+    }
+
+    .place-card-photo-container {
+        height: 8rem;
+        width: 8rem;
+        margin-right: 1.2rem;
+        margin-left: 0;
+        overflow: hidden;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        flex: none;
+        background: #000;
+    }
+
+    .place-card-photo {
+        width: auto;
+        height: 100%;
+    }
+
+    .place-card-info {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+        flex: auto;
+        padding: 0.6rem 0 0.7rem;
+        overflow: hidden;
+    }
+
+    .event-date-time {
+        flex: none;
+        color: $font-color;
+        font-size: 1.1rem;
+        font-weight: $font-weight-semibold;
+        text-align: left;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .place-card-name {
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+
+    .place-card-badges {
+    }
+
+    .place-card-actions {
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .place-card-action {
+        flex: auto;
+        line-height: 2;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+
+        &:hover {
+            color: $white;
+            background-color: $gophillygo-blue;
+            border-color: $gophillygo-blue;
+        }
+    }
+
+    .place-card-route-line {
+        display: none;
+
+        path {
+            stroke: #979797;
+            stroke-dasharray: 5 8;
+            stroke-width: 3px;
+        }
+
+        @include respond-to('xxs-up') {
+            .place-card-compact + & {
+                display: block;
+                position: absolute;
+                z-index: 0;
+                bottom: 100%;
+                left: 4rem;
+            }
+        }
+
+        .tour-list.sorting & {
+            display: none;
+        }
+    }
+}
+
+.place-card.sortable-ghost {
+    border: 2px dashed $default-background-line-color !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+
+    > * {
+        opacity: 0 !important;
+    }
+}
+
+.place-card-drag-handle {
+    position: absolute;
+    display: none;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    left: 0.4rem;
+    margin-top: -1.2rem;
+    height: 2.4rem;
+    color: $white;
+    text-shadow: 1px 1px #000;
+    cursor: move;
+    cursor: grab;
+
+    @include respond-to('xxs-up') {
+        .place-card-sortable:hover & {
+            display: flex;
+        }
+    }
+}
+
+@include respond-to('xxs-up') {
+    .place-card-sortable:hover .place-card-photo {
+        opacity: 0.8;
     }
 }

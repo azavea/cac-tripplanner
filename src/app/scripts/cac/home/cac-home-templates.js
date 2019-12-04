@@ -8,10 +8,11 @@ CAC.Home.Templates = (function (Handlebars, moment) {
 
     var filterOptions = [
         {'class': 'all', 'label': 'All', 'value': 'All'},
-        {'class': 'events', 'label': 'Events', 'value': 'Events'},
         {'class': 'nature', 'label': 'Nature', 'value': 'Nature'},
         {'class': 'exercise', 'label': 'Exercise', 'value': 'Exercise'},
         {'class': 'educational', 'label': 'Educational', 'value': 'Educational'},
+        {'class': 'tours', 'label': 'Tours', 'value': 'Tours', 'breakBefore': true},
+        {'class': 'events', 'label': 'Events', 'value': 'Events'}
     ];
 
     var module = {
@@ -61,6 +62,7 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                 '<a href="#" class="map-view-btn">Map View</a>',
                 '<div class="filter-toggle filter-toggle-tabs">',
                     '{{#each filterOptions}}',
+                    '{{#if breakBefore}}<div class="filter-divider"></div>{{/if}}',
                     '<div class="{{class}} filter-option" ',
                         'data-filter="{{value}}">',
                         '{{label}}',
@@ -88,6 +90,36 @@ CAC.Home.Templates = (function (Handlebars, moment) {
         Handlebars.registerPartial('filterDropdown', filterDropdownTemplate);
         Handlebars.registerHelper('filterPartial', filterPartial);
 
+        /** Helper to get the identifier for a home page card for a place, event, or tour.
+         *
+         * These must match the prefixes used by the `get_directions_id` Django template
+         * helper and by the typeahead results.
+         */
+        Handlebars.registerHelper('cardId', function(isEvent, isTour, id) {
+            var prefix = isEvent ? 'event' : (isTour ? 'tour' : 'place');
+            return prefix + '_' + id;
+        });
+
+        /** Helper to get just the ID from the end of a prefixed place/event/tour identifier.
+         *
+         * Inverse of the `cardId` helper above.
+         */
+        Handlebars.registerHelper('getId', function(fromId) {
+            if (!fromId || !fromId.split) {
+                return fromId;
+            }
+            var splitId = fromId.split('_');
+            return (splitId.length > 1 ? splitId[1] : splitId[0]);
+        });
+
+        // helper to get the IDs for all associated destinations,
+        // for tours or events, or for this destination
+        Handlebars.registerHelper('placeIds', function(destinations, id) {
+            var placeIds = (destinations && destinations.length) ?
+                _.map(destinations, 'id') : [id];
+            return JSON.stringify(placeIds);
+        });
+
         // date/time formatting helpers for events
         Handlebars.registerHelper('eventDate', function(dateTime) {
             var dt = moment(dateTime); // get ISO string
@@ -114,25 +146,41 @@ CAC.Home.Templates = (function (Handlebars, moment) {
             '<ul class="place-list" data-filter="{{currentFilter}}">',
                 '{{#each destinations}}',
                 '<li class="place-card {{#unless this.formattedDistance}}no-origin{{/unless}} ',
-                    '{{#if this.is_event}}event-card{{/if}}" ',
-                    'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
+                    '{{#if this.is_event}}event-card {{else if this.is_tour}}tour-card {{else}}destination-card {{/if}}" ',
+                    'data-destination-id="{{ cardId this.is_event this.is_tour this.id }}" ',
+                    'data-destination-places="{{ placeIds this.destinations this.id }}" ',
                     'data-destination-x="{{ this.location.x }}" ',
                     'data-destination-y="{{ this.location.y }}">',
-                    '<div class="place-card-photo-container">',
-                    '<img class="place-card-photo"',
-                        '{{#if this.image}}',
-                            'src="{{ this.image }}"',
-                        '{{else}}',
-                            'src="https://placehold.it/310x155.jpg"',
-                        '{{/if}}',
-                        'width="310" height="155"',
-                        'alt="{{ this.name }}" />',
-                    '</div>',
+                    '{{#if this.is_tour }}',
+                        '<div class="place-card-carousel-container">',
+                            '<div class="place-card-carousel">',
+                                '{{#each this.destinations }}',
+                                '<img class="place-card-carousel-extra-image hidden"',
+                                    'width="310" height="155"',
+                                    'src="{{ this.image }}" />',
+                                '{{/each }}',
+                            '</div>',
+                        '</div>',
+                    '{{else}}',
+                        '<div class="place-card-photo-container">',
+                            '<img class="place-card-photo"',
+                                '{{#if this.image}}',
+                                    'src="{{ this.image }}"',
+                                '{{else}}',
+                                    'src="https://placehold.it/310x155.jpg"',
+                                '{{/if}}',
+                                'width="310" height="155"',
+                                'alt="{{ this.name }}" />',
+                        '</div>',
+                    '{{/if}}',
                     '<div class="place-card-info">',
                         '<div class="place-card-meta">',
                             '<div class="travel-logistics">',
                                 '<span class="travel-logistics-distance">{{ this.formattedDistance }}</span> ',
                                 'from <span class="travel-logistics-origin">{{ this.originLabel }}</span>',
+                            '</div>',
+                            '<div class="tour-label">',
+                                'Tour',
                             '</div>',
                             '<div class="event-label">',
                                 'Upcoming Event',
@@ -161,11 +209,18 @@ CAC.Home.Templates = (function (Handlebars, moment) {
                         '<div class="place-card-actions">',
                             '{{#if this.placeID}}',
                             '<a class="place-card-action place-action-go" ',
-                                'data-destination-id="{{ this.id }}_{{this.placeID}}" ',
-                                'href="#">Directions</a>',
+                                'data-destination-id="{{ cardId this.is_event this.is_tour this.id }}" ',
+                                'data-destination-places="{{ placeIds this.destinations this.id }}" ',
+                                'href="#">',
+                                '{{#if this.is_tour}}',
+                                'Map',
+                                '{{else}}',
+                                'Directions',
+                                '{{/if}}',
+                                '</a>',
                             '{{/if}}',
                             '<a class="place-card-action place-action-details" href=',
-                            '"/{{#if this.is_event }}event{{else}}place{{/if}}/{{ this.id }}/"',
+                            '"/{{#if this.is_event }}event{{else if this.is_tour}}tour{{else}}place{{/if}}/{{ this.id }}/"',
                                '>More info</a>',
                         '</div>',
                         '<div class="place-card-badges">',
