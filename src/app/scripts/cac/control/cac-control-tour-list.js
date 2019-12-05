@@ -58,10 +58,14 @@ CAC.Control.TourList = (function (_, $, MapTemplates, Utils) {
 
     return TourListControl;
 
-    function resetTour() {
-        // Trigger event to let map know about any user edits to the tour destinations
-        if (tourId && destinations && destinations.length) {
+    // Clear the current tour if the IDs don't match, or tell the map to reflect the last user
+    // edits if the IDs do match, or if no ID is passed in.
+    function resetTour(forId) {
+        if (forId && tourId === forId && destinations && destinations.length) {
             reorderDestinations();
+        } else {
+            tourId = null;
+            destinations = [];
         }
     }
 

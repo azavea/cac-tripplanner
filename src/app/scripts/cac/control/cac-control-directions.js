@@ -377,6 +377,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             showPlaces(false);
             planTrip();
         } else {
+            clearItineraries();
             showPlaces(true);
             exploreControl.getNearbyPlaces();
         }
@@ -618,6 +619,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             }
         } else {
             $(options.selectors.reverseButton).show();
+            tour = null;
+            tourListControl.resetTour();
         }
 
         clearItineraries();
@@ -634,6 +637,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             mapControl.clearDirectionsMarker(key);
             // only load destinations list in directions mode when destination field empty
             if (key === 'destination') {
+                clearItineraries();
                 showPlaces(true);
                 exploreControl.getNearbyPlaces();
             }
@@ -703,6 +707,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             return;
         } else {
             tour = null;
+            tourListControl.resetTour();
             // Cannot set a tour or multi-location event as origin, so hide reverse button
             $(options.selectors.reverseButton).hide();
         }
@@ -847,13 +852,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
                             tour.id = 'tour_' + tour.id;
                         }
                         // Reset the tour to update map with user edits to the destinations/order
-                        tourListControl.resetTour();
+                        tourListControl.resetTour(tour.id);
                     } else if (tourMode === 'event' && data.events && data.events.length) {
                         tour = data.events[0];
                         // Go directly to route for single-destination events
                         if (tour.destinations && tour.destinations.length === 1) {
                             UserPreferences.setPreference('tourMode', false);
                             tour = null;
+                            tourListControl.resetTour();
                             onTypeaheadSelectDone('destination', [data.events[0]]);
                             return;
                         }
@@ -877,6 +883,7 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             }
         } else {
             // explore tab visible
+            clearItineraries();
             showPlaces(true);
         }
     }
