@@ -173,6 +173,10 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             mapControl.isochroneControl.drawDestinations(tour.destinations,
                 _.flatMap(tour.destinations, 'id'), true, true);
             updateUrl();
+            if (planTripRequest) {
+                planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
+                planTripRequest = null;
+            }
             return;
         } else if (tourMode === 'tour' && !origin && tour &&
                    tour.destinations && tour.destinations.length) {
@@ -191,10 +195,14 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
             updateUrl();
 
             mapControl.setDirectionsMarkers(origin, directions.destination, true);
-            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             itineraryListControl.setItineraries(null);
             itineraryListControl.show();
             showBackToTourButton = false;
+            if (planTripRequest) {
+                planTripRequest.reject(Error(OUTDATED_REQUEST_ERROR));
+                planTripRequest = null;
+            }
+            $(options.selectors.spinner).addClass(options.selectors.hiddenClass);
             return;
         }
 
@@ -690,8 +698,8 @@ CAC.Control.Directions = (function (_, $, moment, Control, Places, Routing, User
         // If the typeahead result is a tour, go into tour mode
         // and route between multiple destinations instead of to a single one.
         // If an event, present the destinations like with a tour, but do not route.
-        var isTourMode = !!(result.id && result.id.indexOf('tour') > -1);
-        var isEventMode = !!(result.id && result.id.indexOf('event') > -1);
+        var isTourMode = !!(result.id && result.id.toString().indexOf('tour') > -1);
+        var isEventMode = !!(result.id && result.id.toString().indexOf('event') > -1);
         // Single-destination events that came from Typeahead go straight to directions
         if (isEventMode && result.destinations && result.destinations.length === 1) {
             isEventMode = false;
