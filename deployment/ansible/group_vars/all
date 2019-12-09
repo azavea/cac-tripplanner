@@ -9,19 +9,13 @@ postgres_user: "cac_tripplanner"
 postgres_password: "cac_tripplanner"
 postgres_host: "192.168.8.25"
 
+postgresql_support_psycopg2_version: "2.8.*"
+'postgis_version': [2, 1, 8]
+
 packer_version: "1.4.4"
 
-# Python 2 version used where python 2 interpreter needed
-python_version: "2.7.*"
-
-nodejs_version: 12.13.0
-nodejs_npm_version: 6.12.0
-
-pip_version: 19.3.*
-virtualenv_version: 16.7.7
-
-otp_version: "1.4.0"
-otp_jar_sha1: "0367b1a15bac5f587807a5b897a9734209f8135c"
+nodejs_version: 12.13.1
+nodejs_npm_version: 6.13.1
 
 otp_router: "default"
 

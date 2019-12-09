@@ -1,10 +1,12 @@
+import logging
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.db.models import Count, Manager as GeoManager, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.utils.timezone import now
+from django.utils.timezone import get_current_timezone, now
 
 from ckeditor.fields import RichTextField
 from image_cropping import ImageCropField, ImageRatioField
@@ -15,6 +17,8 @@ NARROW_IMAGE_DIMENSIONS = (310, 155)
 WIDE_IMAGE_DIMENSIONS = (680, 400)
 NARROW_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in NARROW_IMAGE_DIMENSIONS])
 WIDE_IMAGE_DIMENSION_STRING = 'x'.join([str(x) for x in WIDE_IMAGE_DIMENSIONS])
+
+logger = logging.getLogger(__name__)
 
 
 def generate_filename(instance, filename):
@@ -146,6 +150,10 @@ class Attraction(models.Model):
         """Helper to check which sub-class this Attraction belongs to."""
         return isinstance(self, Event)
 
+    @property
+    def is_tour(self):
+        return False
+
     def has_activity(self, activity_name):
         """Helper to check if an activity of a given name is available at a destination."""
         return self.activities.filter(name=activity_name).exists()
@@ -181,6 +189,38 @@ class Destination(Attraction):
         return self.name
 
 
+class EventDestination(models.Model):
+
+    class Meta:
+        ordering = ['order', '-start_date']
+        unique_together = [['destination', 'related_event']]
+
+    destination = models.ForeignKey('Destination',
+                                    on_delete=models.CASCADE,
+                                    related_name='events')
+    related_event = models.ForeignKey('Event',
+                                      on_delete=models.CASCADE,
+                                      related_name='event_destinations')
+    order = models.PositiveIntegerField(default=1, null=False, db_index=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        if self.destination and self.destination.name and self.order:
+            return '{name}, order: {order}'.format(name=self.destination.name,
+                                                   order=self.order)
+        else:
+            return 'Event Destination'
+
+    @property
+    def single_day(self):
+        """"Returns true if destination's event ends on the same day it starts."""
+        if self.start_date and self.end_date:
+            tz = get_current_timezone()
+            return self.start_date.astimezone(tz).date() == self.end_date.astimezone(tz).date()
+        return False
+
+
 class Event(Attraction):
     """Represents an event, which has a start and end date."""
 
@@ -190,12 +230,26 @@ class Event(Attraction):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-    destination = models.ForeignKey('Destination', on_delete=models.SET_NULL, null=True, blank=True)
-
     objects = EventManager()
 
     def __str__(self):
         return self.name
+
+    @property
+    def first_destination(self):
+        """Returns the first ordered destination for this event."""
+        try:
+            return self.event_destinations.first().destination
+        except AttributeError:
+            return None
+
+    @property
+    def single_day(self):
+        """"Returns true if event ends on the same day it starts."""
+        if self.start_date and self.end_date:
+            tz = get_current_timezone()
+            return self.start_date.astimezone(tz).date() == self.end_date.astimezone(tz).date()
+        return False
 
 
 class ExtraImage(models.Model):
@@ -296,3 +350,75 @@ class EventUserFlags(Event):
     def not_interested(self):
         return self.not_interested
     not_interested.admin_order_field = 'not_interested'
+
+
+class TourDestination(models.Model):
+
+    class Meta:
+        ordering = ['order', ]
+        unique_together = [['destination', 'related_tour']]
+
+    destination = models.ForeignKey('Destination',
+                                    on_delete=models.CASCADE,
+                                    related_name='tours')
+    related_tour = models.ForeignKey('Tour',
+                                     on_delete=models.CASCADE,
+                                     related_name='tour_destinations')
+    order = models.PositiveIntegerField(default=1, null=False, db_index=True)
+
+    def __str__(self):
+        if self.destination and self.destination.name and self.order:
+            return '{name}, order: {order}'.format(name=self.destination.name,
+                                                   order=self.order)
+        else:
+            return 'Tour Destination'
+
+
+class Tour(models.Model):
+
+    class Meta:
+        ordering = ['priority', '?']
+
+    name = models.CharField(max_length=50, unique=True)
+    description = RichTextField(blank=True, null=True)
+    priority = models.IntegerField(default=9999, null=False)
+    published = models.BooleanField(default=False)
+
+    objects = DestinationManager()
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def accessible(self):
+        """Returns true if all destinations in this tour are accessible."""
+        return not self.tour_destinations.filter(destination__accessible=False).exists()
+
+    @property
+    def watershed_alliance(self):
+        """Returns true if all destinations in this tour are in the Watershed Alliance."""
+        return not self.tour_destinations.filter(destination__watershed_alliance=False).exists()
+
+    @property
+    def first_destination(self):
+        """Returns the first ordered destination for this tour."""
+        try:
+            return self.tour_destinations.first().destination
+        except AttributeError:
+            return None
+
+    @property
+    def is_event(self):
+        return False
+
+    @property
+    def is_tour(self):
+        return True
+
+    def has_activity(self, activity_name):
+        """Helper to check if an activity of a given name is available at
+        any of this tour's destinations."""
+        for td in self.tour_destinations.all():
+            if td.destination.activities.filter(name=activity_name).exists():
+                return True
+        return False

@@ -31,19 +31,112 @@
         }
     }
 
-    h1 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: $font-weight-bold;
-        line-height: 4;
-        text-align: center;
+    .back-to-itinerary {
+        position: absolute;
+        top: 2rem;
+        left: 1.2rem;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: none;
+        cursor: pointer;
 
         @include respond-to('xxs') {
             display: none;
         }
     }
 
-    .route-summary {
+    h1 {
+        margin: 2.2rem 0;
+        padding: 0;
+        font-size: 2rem;
+        font-weight: $font-weight-bold;
+        line-height: 1;
+        text-align: center;
+
+        @include respond-to('xxs') {
+            &:not(.tour-name) {
+                display: none;
+            }
+        }
+    }
+
+    .tour-places {
+        .body-map & {
+            @include sidebar-main-inner-scroll;
+        }
+
+        .tour-list {
+            margin: 0;
+            overflow: auto;
+
+            @include respond-to('xxs-up') {
+                padding: 0.8rem 1.2rem;
+            }
+        }
+
+        .tour-heading {
+            margin-bottom: 1.6rem;
+
+            @include respond-to('xxs') {
+                min-height: 80px;
+                padding: 0.8rem 1.2rem;
+                background-color: $white;
+            }
+
+            i {
+                float: right;
+                cursor: pointer;
+            }
+
+            .tour-label {
+                color: $gophillygo-green;
+                font-size: 1.2rem;
+                text-transform: uppercase;
+            }
+
+            .tour-name {
+                margin: 0.6rem 0;
+                font-size: 1.8rem;
+                font-weight: $font-weight-bold;
+                text-align: left;
+                text-transform: none;
+
+                .tour-name-link {
+                    @include delinkify();
+                }
+            }
+
+            .swipe-hint {
+                font-size: 1.3rem;
+                font-style: italic;
+                color: $lt-gray;
+
+                @include respond-to('xxs-up') {
+                    display: none;
+                }
+            }
+        }
+
+        .place-card {
+            width: 100%;
+
+            &.selected {
+                background-color: $white;
+
+                @include respond-to('xxs-up') {
+                    box-shadow: $place-card-drop-shadow;
+                }
+
+                .place-card-route-line path {
+                    stroke: $gophillygo-blue;
+                    stroke-dasharray: none;
+                }
+            }
+        }
+    }
+
+    .route-summary, .tour-destination-summary {
         display: flex;
         position: relative;
         flex-flow: column nowrap;
@@ -222,6 +315,13 @@
                 content: '\e801';
                 color: desaturate($gophillygo-purple, 40%);
             }
+        }
+    }
+
+    // WORKAROUND for tiny slider bug in MS Edge
+    @include respond-to('xxs-up') {
+        .tns-item {
+            margin-left: 0 !important;
         }
     }
 }

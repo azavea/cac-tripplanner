@@ -1,15 +1,30 @@
+import logging
+from operator import itemgetter
+
 from django.conf import settings
 from django.contrib import admin, gis
 
 from image_cropping import ImageCroppingMixin
 
-from .forms import DestinationForm, EventForm, ExtraImagesForm
+from cac_tripplanner.publish_utils import PublishableMixin
+
+from .forms import (DestinationForm,
+                    EventForm,
+                    EventDestinationForm,
+                    ExtraImagesForm,
+                    TourDestinationForm,
+                    TourForm)
 from .models import (Destination,
                      DestinationUserFlags,
+                     EventDestination,
                      Event,
                      EventUserFlags,
                      ExtraDestinationPicture,
-                     ExtraEventPicture)
+                     ExtraEventPicture,
+                     TourDestination,
+                     Tour)
+
+logger = logging.getLogger(__name__)
 
 
 class ExtraDestinationImagesInline(ImageCroppingMixin, admin.StackedInline):
@@ -28,11 +43,24 @@ class ExtraEventImagesInline(ImageCroppingMixin, admin.StackedInline):
     extra = 0
 
 
-class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
+class EventDestinationsInline(admin.StackedInline):
+
+    form = EventDestinationForm
+    model = EventDestination
+    extra = 1
+
+
+class TourDestinationsInline(admin.StackedInline):
+
+    form = TourDestinationForm
+    model = TourDestination
+    extra = 1
+
+
+class DestinationAdmin(ImageCroppingMixin, PublishableMixin, gis.admin.OSMGeoAdmin):
     form = DestinationForm
 
     list_display = ('name', 'published', 'priority', 'address', 'city', 'state', 'zipcode')
-    actions = ('make_published', 'make_unpublished')
     ordering = ('name', )
     """To change field display order, define them all here.
     Default is order defined in model, but due to inheritance, cannot reorder across
@@ -69,34 +97,69 @@ class DestinationAdmin(ImageCroppingMixin, gis.admin.OSMGeoAdmin):
             '/static/scripts/main.js'
         ]
 
-    def make_published(self, request, queryset):
-        queryset.update(published=True)
-    make_published.short_description = 'Publish selected destinations'
 
-    def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
-    make_unpublished.short_description = 'Unpublish selected destinations'
+def save_ordered_formset(form, formset, OrderedDestination, related_field):
+    """Helper for normalizing tour and event destination ordering on form save.
+
+    :param form: Django form passed to save_formset
+    :param formset: Django formset passed to save_formset
+    :param OrderedDestination: Class of related object for destinations with orders
+    :param related_field: Name of field for this related object on OrderedDestination
+    """
+    # save without committing to be able to delete any removed destinations
+    formset.save(commit=False)
+    for obj in formset.deleted_objects:
+        obj.delete()
+
+    # commit save here to assign IDs to any newly added destinations
+    instances = formset.save(commit=True)
+
+    # Normalize the ordering of the destinations
+    instance_id = form.instance.id
+    # get a list of dicts with 'order' and related 'id' properties
+    filter_kwargs = {'{fld}'.format(fld=related_field): instance_id}
+    last_destinations = list(OrderedDestination.objects.filter(
+        **filter_kwargs).values('id', 'order'))
+    # Retain the current formset order as a third dict property
+    for formset_order, dest in enumerate(last_destinations):
+        dest['formset_order'] = formset_order
+
+    # Update the order with any changed formset value
+    for instance in instances:
+        for d in last_destinations:
+            if d['id'] == instance.id:
+                d['order'] = instance.order
+                break
+
+    # Sort destinations by 1) newly assigned order then 2) last (formset) order.
+    # This means multiple destinations given the same order will be ordered
+    # secondarily based on their position in the inline formset, top to bottom.
+    resorted = sorted(last_destinations, key=itemgetter('order', 'formset_order'))
+
+    # Reassign order values so that they are normalized to
+    # start at 1, increment by 1, and not repeat or skip any integers.
+    for normalized_order, dest in enumerate(resorted):
+        new_order = normalized_order + 1
+        # update objects that need their order changed
+        if dest['order'] != new_order:
+            OrderedDestination.objects.filter(id=dest['id']).update(order=new_order)
+
+    form.save_m2m()
 
 
-class EventAdmin(ImageCroppingMixin, admin.ModelAdmin):
+class EventAdmin(ImageCroppingMixin, PublishableMixin, admin.ModelAdmin):
     form = EventForm
 
     fields = ('name', 'website_url', 'description', 'image', 'image_raw', 'wide_image',
               'wide_image_raw', 'published', 'priority', 'accessible', 'activities',
-              'start_date', 'end_date', 'destination')
+              'start_date', 'end_date', )
     list_display = ('name', 'published', 'priority', )
-    actions = ('make_published', 'make_unpublished', )
     ordering = ('name', )
 
-    inlines = [ExtraEventImagesInline]
+    inlines = [ExtraEventImagesInline, EventDestinationsInline]
 
-    def make_published(self, request, queryset):
-        queryset.update(published=True)
-    make_published.short_description = 'Publish selected events'
-
-    def make_unpublished(self, request, queryset):
-        queryset.update(published=False)
-    make_unpublished.short_description = 'Unpublish selected events'
+    def save_formset(self, request, form, formset, change):
+        save_ordered_formset(form, formset, EventDestination, 'related_event_id')
 
 
 class AttractionUserFlagsAdmin(admin.ModelAdmin):
@@ -114,8 +177,21 @@ class AttractionUserFlagsAdmin(admin.ModelAdmin):
         return False  # hide 'delete' button
 
 
+class TourAdmin(PublishableMixin, admin.ModelAdmin):
+
+    form = TourForm
+    inlines = [TourDestinationsInline]
+    list_display = ('name', 'published', 'priority')
+    ordering = ('name',)
+
+    def save_formset(self, request, form, formset, change):
+        save_ordered_formset(form, formset, TourDestination, 'related_tour_id')
+
+
 admin.site.register(Destination, DestinationAdmin)
 admin.site.register(Event, EventAdmin)
 
 admin.site.register(DestinationUserFlags, AttractionUserFlagsAdmin)
 admin.site.register(EventUserFlags, AttractionUserFlagsAdmin)
+
+admin.site.register(Tour, TourAdmin)

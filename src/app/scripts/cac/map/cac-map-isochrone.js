@@ -1,4 +1,4 @@
-CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
+CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
     'use strict';
 
     var defaults = {
@@ -19,26 +19,12 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     var isochroneLayer = null;
     var destinationMarkers = {};
     var destinationsLayer = null;
-    var lastHighlightedMarker = null;
+    var lastHighlightedMarkers = null;
+    var lastHighlightedEventMarker = null;
     var options = null;
-    var destinationIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'orange'
-    });
-    var destinationOutsideTravelshedIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        // modified by styles to actually be orange, with reduced opacity
-        markerColor: 'darkred',
-        extraClasses: 'outside'
-    });
-    var highlightIcon = L.AwesomeMarkers.icon({
-        icon: 'default',
-        prefix: 'icon',
-        markerColor: 'blue',
-    });
-
+    var placeIcon = L.AwesomeMarkers.icon(Utils.placeIconConfig);
+    var outsideTravelshedIcon = L.AwesomeMarkers.icon(Utils.outsideTravelshedIconConfig);
+    var highlightIcon = L.AwesomeMarkers.icon(Utils.highlightIconConfig);
 
     /**
      * Variables used for limiting to one isochrone request at a time.
@@ -64,7 +50,9 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
     IsochroneControl.prototype.fetchIsochrone = fetchIsochrone;
     IsochroneControl.prototype.drawDestinations = drawDestinations;
     IsochroneControl.prototype.clearDestinations = clearDestinations;
-    IsochroneControl.prototype.highlightDestination = highlightDestination;
+    IsochroneControl.prototype.highlightDestinations = highlightDestinations;
+    IsochroneControl.prototype.highlightEventMarker = highlightEventMarker;
+    IsochroneControl.prototype.unhighlightEventMarker = unhighlightEventMarker;
 
     return IsochroneControl;
 
@@ -214,30 +202,37 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
      * Draw an array of geojson destination points onto the map
      *
      * @param {Array} all All destinations to draw
-     * @param {Array} matched Destinations witin the travelshed; styles differ for the markers
+     * @param {Array} matched IDs of matched Destinations witin the travelshed
+     * @param {Boolean} zoomToFit If true, zoom map to fit all markers
+     * @param {Boolean} isEvent If true, style for event map page display
      */
-    function drawDestinations(all, matched) {
+    function drawDestinations(all, matched, zoomToFit, isEvent) {
         // put destination details onto point geojson object's properties
         // build map of unconverted destination objects
         var destinations = {};
         clearDestinations();
 
-        var locationGeoJSON = _.chain(all).reject(function(place) {
-            // Do not attempt to map events without a location (destination)
-            return !place.placeID;
-        }).map(function(destination) {
-            // index by combination of ID and place ID to prevent conflict between
-            // event and destination IDs
-            destinations[destination.id + '_' + destination.placeID] = destination;
+        var locationGeoJSON = _.chain(all).map(function(place) {
+            var destinations = [];
+            // Pull in any unpublished destinations on published events or tours
+            if (place.destinations && place.destinations.length) {
+                destinations = place.destinations;
+            } else if (!place.is_event && !place.is_tour) {
+                destinations = [place];
+            }
+            return destinations;
+        }).flatten().uniqBy('id').map(function(destination) {
+            // set matched property to true if place is within isochrone
+            destination.matched = _.findIndex(matched, function(match) {
+                return match === destination.id;
+            }) > -1;
+            destinations[destination.id] = destination;
             var point = _.property('point')(destination);
             point.properties = _.omit(destination, 'point');
-
-            // set matched property to true if destination is within isochrone
-            point.properties.matched = _.findIndex(matched, function(match) {
-                return match.placeID && (match.placeID === destination.placeID);
-            }) > -1;
+            point.properties.matched = !!destination.matched;
             return point;
         }).value();
+
         destinationMarkers = {};
         destinationsLayer = cartodb.L.geoJson(locationGeoJSON, {
             pointToLayer: function (geojson, latLng) {
@@ -246,22 +241,37 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                                     // HTML-formatted description
                                      geojson.properties.description,
                                      '</div>',
+                                     '{{#if geojson.properties.related_tours.length}}',
+                                     '<h5 class="destination-description-tours-header">',
+                                     'Included in these tours:',
+                                     '</h5>',
+                                     '<ul class="destination-description-tours">',
+                                     '{{#each geojson.properties.related_tours}}',
+                                     '<li><a class="destination-website-link" ',
+                                     'href="/tour/{{this.id}}/">{{this.name}}</a></li>',
+                                     '{{/each}}',
+                                     '</ul>',
+                                     '{{/if}}',
                                      '<p class="links"><a class="destination-website-link" ',
                                      'href="{{geojson.properties.website_url}}" ',
                                      'target="_blank">Visit website</a>',
                                      '<a class="destination-directions-link" ',
-                                     'id="{{geojson.properties.id}}_{{geojson.properties.placeID}}"',
+                                     'id="{{geojson.properties.id}}"',
                                      '>Get Directions</a></p>'
                                     ].join('');
                 var template = Handlebars.compile(popupTemplate);
                 var popupContent = template({geojson: geojson});
-                var markerId = geojson.properties.id + '_' + geojson.properties.placeID;
+                var markerId = geojson.properties.id;
 
-                // use a different icon for places outside of the travel than those within it
-                var useIcon = geojson.properties.matched ? destinationIcon:
-                    destinationOutsideTravelshedIcon;
+                // use a different icon for places outside of the travelshed than those within it
+                var useIcon = geojson.properties.matched ? placeIcon:
+                    outsideTravelshedIcon;
+                if (isEvent) {
+                    useIcon = placeIcon;
+                }
                 var marker = new cartodb.L.marker(latLng, {icon: useIcon})
                         .bindPopup(popupContent, {className: options.selectors.poiPopupClassName});
+                marker.matched = geojson.properties.matched;
                 destinationMarkers[markerId] = {
                     marker: marker,
                     destination: destinations[markerId]
@@ -279,27 +289,65 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
                 return marker;
             }
         }).addTo(map);
+
+        if (zoomToFit) {
+            var markers = _.flatMap(destinationMarkers, 'marker._latlng');
+            if (!_.isEmpty(markers)) {
+                // zoom to fit all markers if several, or if there's only one, center on it
+                if (markers.length > 1) {
+                    map.fitBounds(L.latLngBounds(markers), { maxZoom: defaults.zoom });
+                } else {
+                    map.setView(markers[0].getLatLng());
+                }
+            }
+        }
     }
 
-    function highlightDestination(destinationId, opts) {
+    function highlightEventMarker(markerId) {
+        unhighlightEventMarker();
+        lastHighlightedEventMarker = destinationMarkers[markerId];
+        lastHighlightedEventMarker.marker.setIcon(highlightIcon);
+
+    }
+
+    function unhighlightEventMarker() {
+        if (lastHighlightedEventMarker) {
+            lastHighlightedEventMarker.marker.setIcon(placeIcon);
+            lastHighlightedEventMarker = null;
+        }
+    }
+
+    function highlightDestinations(destinationIds, opts) {
         var defaults = {
             panTo: false
         };
+
         var highlightOpts = $.extend({}, defaults, opts);
-        if (!destinationId || !destinationMarkers[destinationId]) {
-            // revert to original marker if set
-            if (lastHighlightedMarker) {
-                lastHighlightedMarker.setIcon(destinationIcon);
-            }
+
+        // If passed no destinations to highlight, un-highlight instead
+        if ((!destinationIds || !destinationIds.length) && lastHighlightedMarkers) {
+            _.each(lastHighlightedMarkers, function(marker) {
+                var icon = marker.matched ? placeIcon:
+                    outsideTravelshedIcon;
+                marker.setIcon(icon);
+            });
+            lastHighlightedMarkers = null;
             return;
         }
-        // Update icon for passed destination
-        var marker = destinationMarkers[destinationId].marker;
-        marker.setIcon(highlightIcon);
-        if (highlightOpts.panTo) {
-            map.panTo(marker.getLatLng());
+        // Update icons for passed destinations
+        lastHighlightedMarkers = [];
+        _.each(destinationIds, function(placeId) {
+            var marker = destinationMarkers[placeId];
+            if (marker) {
+                marker = marker.marker;
+                marker.setIcon(highlightIcon);
+                lastHighlightedMarkers.push(marker);
+            }
+        });
+        // pan to the first destination of those passed, if panning option set
+        if (highlightOpts.panTo && lastHighlightedMarkers.length) {
+            map.panTo(lastHighlightedMarkers[0].getLatLng());
         }
-        lastHighlightedMarker = marker;
     }
 
     function clearDestinations() {
@@ -314,4 +362,4 @@ CAC.Map.IsochroneControl = (function ($, Handlebars, cartodb, L, turf, _) {
         }
     }
 
-})(jQuery, Handlebars, cartodb, L, turf, _);
+})(jQuery, Handlebars, cartodb, L, turf, _, CAC.Utils);

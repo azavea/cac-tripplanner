@@ -83,6 +83,7 @@
         .detail-image-carousel-container {
             margin-left: -4rem;
             margin-right: -4rem;
+            margin-bottom: -1.6rem;
         }
 
         .detail-image-carousel-extra-image {
@@ -130,12 +131,12 @@
 
     .info-place-meta {
         display: flex;
-        flex: none;
         flex-flow: column nowrap;
         align-items: flex-start;
         justify-content: flex-start;
         min-width: 9.6rem;
         margin-left: 3.2rem;
+        align-items: center;
 
         @include respond-to('xs') {
             flex-direction: row;
@@ -149,7 +150,7 @@
         flex-flow: column nowrap;
         align-items: flex-start;
         justify-content: flex-start;
-        margin: 1rem 0 0;
+        margin: 1rem 0;
         padding: 0;
         color: $gophillygo-green;
         font-size: 1.6rem;
@@ -226,23 +227,70 @@
         line-height: 1.5;
     }
 
-    .info-event-destination {
-        margin: .8rem 0;
-        font-size: 1.8rem;
+    .info-tour {
+        color: $lt-gray;
+        font-size: 1.3rem;
+        font-style: italic;
         font-weight: $font-weight-medium;
         line-height: 1.5;
+    }
+
+    .info-tour-desktop {
+        @include respond-to('xxs') {
+            display: none;
+        }
+    }
+
+    .info-event-destinations {
+        display: flex;
+        flex-flow: row nowrap;
+        margin: 1.2rem 0;
+        font-size: 1.6rem;
+        font-weight: $font-weight-medium;
+        line-height: 1.5;
+
+        .hidden-extra {
+            display: none;
+        }
+    }
+
+    .info-event-destinations-at {
+        flex: none;
+        margin-right: 0.5em;
+    }
+
+    .info-event-destinations-list {
+        flex: auto;
+    }
+
+    .info-event-destination {
+        padding-bottom: 0.8rem;
+        margin-bottom: 0.8rem;
+
+        &:not(:last-of-type) {
+            border-bottom: 1px solid $v-lt-gray;
+        }
+
+        .info-event-date {
+            color: $gray;
+            font-size: 1.5rem;
+        }
     }
 
     .info-event-destination-link {
         @include delinkify($gophillygo-blue);
     }
 
+    .info-more-link {
+        font-style: italic;
+    }
+
     .info-event-meta {
         flex: none;
         margin-left: 30px;
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         font-weight: $font-weight-bold;
-        line-height: 2;
+        line-height: 1.8;
 
         @include respond-to('xs') {
             display: flex;
@@ -320,8 +368,6 @@
         font-size: 1.6rem;
         font-weight: $font-weight-semibold;
         line-height: 2.4;
-        text-align: center;
-        text-transform: uppercase;
 
         @include respond-to('xxs') {
             margin-top: 2rem;
@@ -331,9 +377,13 @@
 
         .place-action-go {
             @include delinkify($white);
+            min-width: 12rem;
             margin-right: 2.4rem;
             padding: 0 1em;
             background-color: $gophillygo-blue;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
             cursor: pointer;
         }
 
@@ -342,6 +392,9 @@
             margin-right: 2.4rem;
             padding: 0 1em;
             background-color: $gophillygo-purple;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
             cursor: pointer;
         }
 
@@ -349,6 +402,9 @@
             @include delinkify($white);
             height: 38px;
             background-color: $white;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
             cursor: pointer;
 
             @include respond-to('xxs') {
@@ -410,5 +466,28 @@
     .app-footer {
         flex: none;
         margin-top: auto;
+    }
+
+    .info-tour-locations {
+        margin-top: 4.8rem;
+    }
+
+    .tour-locations-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 2.4rem;
+        justify-items: stretch;
+        align-items: stretch;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        @include respond-to('xs') {
+            grid-template-columns: 1fr;
+        }
+
+        > * {
+            margin: 0;
+        }
     }
 }

@@ -8,7 +8,9 @@
     }
 
     .body-map-directions & {
-        display: none;
+        &:not(.tours) {
+            display: none;
+        }
     }
 
     .body-map & .map-view-btn {
@@ -109,9 +111,23 @@
                 }
 
                 @include respond-to('xs') {
-                    margin: 0 .8rem;
+                    margin: 0 .4rem;
                     padding: .6rem .2rem;
                     font-size: 1.4rem;
+                }
+            }
+
+            .filter-divider {
+                width: 0;
+                height: 2.4rem;
+                margin: 0 1.6rem 0.4rem 1.6rem;
+                border-color: $body-color;
+                border-style: solid;
+                border-width: 0 1px;
+
+                @include respond-to('xs') {
+                    margin: 0 .4rem;
+                    border-color: $v-lt-gray;
                 }
             }
         }
@@ -214,18 +230,15 @@
         margin: 0;
         padding: 0;
 
-        // Just show one event in map view "All" filter
-        .body-map &[data-filter="All"] .event-card:not(:first-of-type) {
-            display: none;
-        }
-
         @include respond-to('xs') {
             flex-flow: column nowrap;
             align-items: center;
 
-            // Hide events completely from mobile "All" filter
-            &[data-filter="All"] .event-card {
-                display: none;
+            // Hide events and tours completely from mobile "All" filter
+            &[data-filter="All"] {
+                & .event-card, & .tour-card {
+                    display: none;
+                }
             }
         }
     }

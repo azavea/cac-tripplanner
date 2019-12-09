@@ -18,6 +18,8 @@ module.exports = function(config) {
       // console polyfills
       '/srv/cac/scripts/vendor/index.js',
       '/srv/cac/scripts/vendor/jquery.js',
+      '/srv/cac/scripts/vendor/Sortable.js',
+      '/srv/cac/scripts/vendor/jquery-sortable.js',
       '/srv/cac/scripts/vendor/lodash.js',
       '/srv/cac/scripts/vendor/handlebars.js',
       // load moment before other vendor scripts; is requirement for bootstrap datetime picker
@@ -62,6 +64,7 @@ module.exports = function(config) {
       'app/scripts/cac/control/cac-control-directions.js',
       'app/scripts/cac/control/cac-control-itinerary-list.js',
       'app/scripts/cac/control/cac-control-directions-list.js',
+      'app/scripts/cac/control/cac-control-tour-list.js',
       'app/scripts/cac/pages/cac-pages-home.js',
       'app/scripts/cac/pages/cac-pages-directions.js',
 

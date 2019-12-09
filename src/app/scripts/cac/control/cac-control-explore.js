@@ -3,7 +3,7 @@
  *
  */
 CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Routing,
-                                 UserPreferences) {
+                                 UserPreferences, Utils) {
 
     'use strict';
 
@@ -23,7 +23,8 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             placeCard: 'li.place-card',
             noOriginClass: 'no-origin',
             placeAttrX: 'data-destination-x',
-            placeAttrY: 'data-destination-y'
+            placeAttrY: 'data-destination-y',
+            imageCarousel: '.place-card-carousel'
         }
     };
     var options = {};
@@ -36,7 +37,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
     var fetchingIsochrone = false;
 
     var allDestinations = []; // cache full list of destinations
-    var twoEvents = []; // track the first two events, to use when displaying all
+    // track the first two events and tours, to use when displaying all
+    var twoEvents = [];
+    var twoTours = [];
     var isochroneDestinationIds = null; // cache IDs of destinations within isochrone
 
     var events = $({});
@@ -273,8 +276,10 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             enableSlider(false);
             mapControl.clearDirectionsMarker('origin');
             clearIsochrone();
-            // get all places in sidebar when no origin set
-            getNearbyPlaces();
+            // Get all places in sidebar when no origin set.
+            if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
+                getNearbyPlaces();
+            }
         }
     }
 
@@ -283,9 +288,6 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             setAddress(location);
             if (tabControl.isTabShowing(tabControl.TABS.EXPLORE)) {
                 clickedExplore();
-            } else {
-                showSpinner();
-                getNearbyPlaces();
             }
         }
     }
@@ -356,7 +358,12 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
 
         // If filter set to only display events, say "events" in the user messages
         var filter = UserPreferences.getPreference('destinationFilter');
-        var placeString =  filter === 'Events' ? 'events' : 'destinations';
+        var placeString = 'destinations';
+        if (filter === 'Events') {
+            placeString = 'events';
+        } else if (filter === 'Tours') {
+            placeString = 'tours';
+        }
 
         // alternate text string to display if there are no destinations found
         var text = null;
@@ -390,6 +397,9 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
                                                 filter,
                                                 tabControl.isTabShowing(tabControl.TABS.HOME));
         $(options.selectors.placesContent).html(places);
+        $(options.selectors.imageCarousel).each(function (index, carouselNode) {
+            tns(Object.assign({container: carouselNode}, Utils.defaultCarouselOptions, {autoplay: false}));
+        });
         // send event that places content changed
         events.trigger(eventNames.destinationsLoaded);
 
@@ -397,8 +407,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         // (not just those in the isochrone)
         if (tabControl.isTabShowing(tabControl.TABS.EXPLORE) && mapControl.isLoaded()) {
             // allDestinations has been loaded by now
+            // Only filter to isochrone if it is set.
+            var filterPlaces = _.isNull(isochroneDestinationIds) ?
+                _.flatMap(allDestinations, 'id') : isochroneDestinationIds;
             mapControl.isochroneControl.drawDestinations(filterPlacesCategory(allDestinations),
-                                                         destinations);
+                                                         filterPlaces, false, false);
         }
         showPlacesContent();
     }
@@ -420,13 +433,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
-            setDestinationsEvents(data);
+        Places.queryPlaces(exploreLatLng).then(function(data) {
+            setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
-            setDestinationsEvents();
+            setDestinationsEventsTours();
             showPlacesContent();
         });
     }
@@ -445,9 +458,11 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         }
 
         // Filter by both isochrone and category.
-        // For events without a destination (placeID), exclude from results
+        // Include events or tours with any matching destinations.
         return filterPlacesCategory(_.filter(places, function(place) {
-            return _.includes(isochroneDestinationIds, place.placeID) ? place.placeID: false;
+            var destinationIds = place.is_tour || place.is_event ?
+                _.flatMap(place.destinations, 'id') : [place.id];
+            return _.intersection(isochroneDestinationIds, destinationIds).length;
         }));
     }
 
@@ -462,15 +477,22 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
         if (!filter || filter === 'All') {
             // handle events display with 'All' filter
             if (isochroneDestinationIds) {
-                // isochrone filter in place; show all events matching filter, in order
-                // with the matching destinations (not up top)
+                // isochrone filter in place; show all events and tours
+                // matching filter, in order with the matching destinations (not up top)
                 return places;
             } else {
-                // no isochrone filter in place; show only the first two events, up top
-                var noEvents = _.reject(places, function(place) {
-                    return _.indexOf(place.categories, 'Events') > -1;
+                // no isochrone filter in place;
+                // show only the first two events and tours, up top
+                var noEventsOrTours = _.reject(places, function(place) {
+                    return _.indexOf(place.categories, 'Events') > -1 ||
+                        _.indexOf(place.categories, 'Tours') > -1;
                 });
-                return twoEvents.concat(noEvents);
+                // Show one tour and one event each, or up to two of one kind if there aren't any
+                var eventsTours = twoEvents && twoTours &&
+                    twoEvents.length > 0 && twoTours.length > 0 ?
+                    [twoEvents[0], twoTours[0]] :
+                    twoEvents.concat(twoTours);
+                return eventsTours.concat(noEventsOrTours);
             }
         }
 
@@ -492,13 +514,13 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
             return;
         }
 
-        Places.getAllPlaces(exploreLatLng).then(function(data) {
-            setDestinationsEvents(data);
+        Places.queryPlaces(exploreLatLng).then(function(data) {
+            setDestinationsEventsTours(data);
             displayPlaces(filterPlaces(allDestinations, filter));
         }).fail(function(error) {
             console.error('error fetching destinations:');
             console.error(error);
-            setDestinationsEvents();
+            setDestinationsEventsTours();
             showPlacesContent();
         });
     }
@@ -508,18 +530,20 @@ CAC.Control.Explore = (function (_, $, MapTemplates, HomeTemplates, Places, Rout
      *
      * Sets both destinations and events. If given empty data, will unset local cache.
      *
-     * @param data {Object} response from getAllPlaces
+     * @param data {Object} response from queryPlaces
      */
-    function setDestinationsEvents(data) {
+    function setDestinationsEventsTours(data) {
         if (!data) {
             allDestinations = [];
             twoEvents = [];
+            twoTours = [];
             return;
         }
-        allDestinations = data.destinations.concat(data.events);
-        // grab the first two events, to use when displaying 'All'
+        allDestinations = data.destinations.concat(data.events).concat(data.tours);
+        // grab the first two events and tours, to use when displaying 'All'
         twoEvents = data.events.slice(0, 2);
+        twoTours = data.tours.slice(0, 2);
     }
 
 })(_, jQuery, CAC.Map.Templates, CAC.Home.Templates, CAC.Places.Places, CAC.Routing.Plans,
-   CAC.User.Preferences);
+   CAC.User.Preferences, CAC.Utils);

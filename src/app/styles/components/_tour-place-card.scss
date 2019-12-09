@@ -1,0 +1,96 @@
+.tour-place-card {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: $place-card-width;
+    margin: 0 0 20px;
+    background-color: $place-card-bg-color;
+    box-shadow: $place-card-drop-shadow;
+
+    .body-map & {
+        margin-right: auto;
+        margin-left: auto;
+
+        .tour-place-card-photo-container {
+            background-color: $white;
+        }
+    }
+}
+
+.tour-place-card-photo-container {
+    flex-flow: column nowrap;
+}
+
+.tour-place-card-photo {
+    display: block;
+    object-fit: cover;
+}
+
+.tour-place-card-info {
+    flex-flow: column wrap;
+    align-items: stretch;
+    justify-content: space-around;
+    min-height: 5.6rem;
+    padding: .6rem 0 .7rem;
+}
+
+.tour-place-card-name {
+    width: 100%;
+    margin: 0;
+    padding-left: 12px;
+    font-size: 1.4rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.tour-place-card-footer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tour-place-card-actions {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.tour-place-card-action {
+    @include delinkify;
+    width: 80px;
+    margin-right: 12px;
+    margin-left: 12px;
+    border: 1px solid $gophillygo-blue;
+    font-size: 1.2rem;
+    font-weight: $font-weight-semibold;
+    line-height: 2.3;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &.tour-place-action-go {
+        background-color: $gophillygo-blue;
+        color: $white;
+    }
+
+    &.tour-place-action-details {
+        background-color: transparent;
+    }
+}
+
+.tour-place-card-badges {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 1.8rem;
+    line-height: 1;
+
+    .badge {
+        margin-left: .8rem;
+    }
+}
