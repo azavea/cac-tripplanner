@@ -474,7 +474,7 @@
 
     .tour-locations-list {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         grid-gap: 2.4rem;
         justify-items: stretch;
         align-items: stretch;
