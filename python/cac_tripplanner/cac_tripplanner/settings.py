@@ -47,7 +47,7 @@ except (IOError, NameError):
         # to the host machine's DNS here, because this code runs in a VM.
         'otp_url': 'http://192.168.8.26/otp/routers/{router}/',
         'internal_ips': ['0.0.0.0', '127.0.0.1'],
-        'postgis_version': [2, 1, 8],
+        'postgis_version': [2, 5, 2],
         'build_dir': '/opt/app/src',
         'production': False,
 
