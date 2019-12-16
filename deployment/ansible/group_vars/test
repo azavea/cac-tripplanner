@@ -6,7 +6,7 @@ production: false
 postgis_version: [2, 5, 2]
 
 postgresql_version: "9.6"
-postgresql_package_version: "9.6.*.pgdg18.04+1"
+postgresql_package_version: "9.6.*"
 postgresql_support_libpq_version: "*"
 
 postgresql_listen_addresses: "*"
