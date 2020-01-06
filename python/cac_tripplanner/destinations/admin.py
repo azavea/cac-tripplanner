@@ -3,6 +3,7 @@ from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import admin, gis
+from django import forms
 
 from image_cropping import ImageCroppingMixin
 
@@ -113,6 +114,11 @@ def save_ordered_formset(form, formset, OrderedDestination, related_field):
 
     # commit save here to assign IDs to any newly added destinations
     instances = formset.save(commit=True)
+
+    # do not attempt to fix orders if there are none on the form
+    # (handle other formset types)
+    if len(instances) > 0 and not hasattr(instances[0], 'order'):
+        return
 
     # Normalize the ordering of the destinations
     instance_id = form.instance.id
