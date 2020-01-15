@@ -239,8 +239,10 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
     }
 
     function fitToBounds(bounds) {
-        map.invalidateSize();
-        map.fitBounds(bounds);
+        if (map) {
+            map.invalidateSize();
+            map.fitBounds(bounds);
+        }
     }
 
     function setGeocodeMarker(latLng) {
@@ -348,7 +350,9 @@ CAC.Map.Control = (function ($, Handlebars, cartodb, L, turf, _, Utils) {
             }
         }
         // Deal with Chrome mobile not always fully loading tiles
-        map.invalidateSize();
+        if (map) {
+            map.invalidateSize();
+        }
     }
 
     function clearDirectionsMarker(type) {
