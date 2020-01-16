@@ -14,8 +14,8 @@ postgresql_support_psycopg2_version: "2.8.*"
 
 packer_version: "1.4.4"
 
-nodejs_version: 12.13.1
-nodejs_npm_version: 6.13.1
+nodejs_version: 12.14.1
+nodejs_npm_version: 6.13.4
 
 otp_router: "default"
 
