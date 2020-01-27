@@ -5,6 +5,7 @@
     pkg:
       - binutils
       - chromium-browser
+      - dh-autoreconf
       - g++
       - gdal-bin
       - libpq-dev

@@ -3,7 +3,11 @@
   file: path={{ otp_data_dir }} state=directory owner={{ otp_user }}
 
 - name: Install AuthBind (for serving OTP on port 80)
-  apt: pkg=authbind state=present
+  apt:
+    state: present
+    pkg:
+      - authbind
+      - dh-autoreconf
 
 - name: Touch AuthBind file if it does not exist
   file: path=/etc/authbind/byport/80 state=touch
