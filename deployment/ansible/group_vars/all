@@ -10,11 +10,11 @@ postgres_password: "cac_tripplanner"
 postgres_host: "192.168.8.25"
 
 postgresql_support_psycopg2_version: "2.8.*"
-'postgis_version': [2, 5, 2]
+'postgis_version': [3, 0, 1]
 
-packer_version: "1.4.4"
+packer_version: "1.5.4"
 
-nodejs_version: 12.16.0
+nodejs_version: 12.16.1
 nodejs_npm_version: 6.13.4
 
 otp_router: "default"
@@ -28,3 +28,12 @@ papertrail_log_files:
     - "/var/log/cac-tripplanner-app.log"
     - "/var/log/event-feed.log"
     - "/var/log/upstart/otp.log"
+
+postgresql_version: "9.6"
+postgresql_package_version: "9.6.*"
+postgresql_support_libpq_version: "*"
+
+postgresql_listen_addresses: "*"
+postgresql_hba_mapping:
+  - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+  - { type: "host", database: "all", user: "all", address: "127.0.0.1/32", method: "md5" }
