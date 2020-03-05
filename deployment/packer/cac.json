@@ -73,13 +73,13 @@
     {
       "type": "shell",
       "inline": [
-        "sleep 20",
-        "sudo apt-get update",
         "sleep 60",
+        "sudo apt-get update",
+        "sleep 120",
         "mkdir -p {{user `ansible_staging_directory`}}",
         "mkdir -p {{user `intermediate_directory`}}",
         "sudo apt-get -y install python3-dev python3-pip git",
-        "sudo -H pip3 install ansible==2.8"
+        "sudo -H pip3 install ansible==2.9"
       ]
     },
     {
