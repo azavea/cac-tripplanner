@@ -24,6 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # because it loads jquery for gis.admin.OSMGeoAdmin
 IMAGE_CROPPING_JQUERY_URL = '/static/admin/js/vendor/jquery/jquery.js'
 
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+# inherit the bucket's ACL
+AWS_DEFAULT_ACL = None
 
 try:
     secrets = yaml.safe_load(open('/etc/cac_secrets', 'r'))
