@@ -2,10 +2,10 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
-from storages.backends.s3boto import S3BotoStorage
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
-class PublicS3BotoStorage(S3BotoStorage):
+class PublicS3BotoStorage(S3Boto3Storage):
     """
     Override of S3BotoStorage that strips authentication parameters for use with public buckets
 

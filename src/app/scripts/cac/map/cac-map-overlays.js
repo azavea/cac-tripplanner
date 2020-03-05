@@ -38,7 +38,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
 
     function bikeRoutesOverlay(map) {
         var layerGroup = cartodb.L.featureGroup([]);
-        var url = 'https://cac-tripplanner.carto.com/api/v2/viz/c57728a5-55b6-41f9-af4f-6d982dc346b4/viz.json';
+        var url = 'https://cac-tripplanner.carto.com/api/v2/viz/aca1808b-b8f0-465d-b8b4-e2fdbca78568/viz.json';
         cartodb.createLayer(map, url).on('done', function(layer) {
             layerGroup.addLayer(layer);
             // Wait until layer has loaded to bring it to front.  Otherwise, it loads behind
