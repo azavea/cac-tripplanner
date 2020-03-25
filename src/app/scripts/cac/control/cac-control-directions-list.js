@@ -113,6 +113,13 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
                 $alert.remove();
             });
             $container.find(options.selectors.directionsHeader).after($alert);
+        } else if (itinerary.agencies.length) {
+            var alert = MapTemplates.transitWarningAlert();
+            var $alert = $(alert);
+            $alert.one('click', options.selectors.alertCloseButton, function () {
+                $alert.remove();
+            });
+            $container.find(options.selectors.directionsHeader).after($alert);
         }
     }
 

@@ -2,7 +2,7 @@ CAC.Control.ModeOptions = (function ($) {
     'use strict';
 
     var defaults = {
-        defaultMode: 'WALK,TRANSIT',
+        defaultMode: 'BICYCLE',
         // map button class names to OpenTripPlanner mode parameters
         modes: {
             walk: 'WALK',
