@@ -1,6 +1,14 @@
 CAC.Map.Templates = (function (Handlebars, moment, Utils) {
     'use strict';
 
+    var transitWarningMessage = ['Consult <a class="alert-link" target="_blank" ',
+        'href="http://septa.org/">SEPTA</a>, ',
+        '<a class="alert-link" target="_blank" href="https://www.njtransit.com/">NJ Transit</a>, ',
+        '<a class="alert-link" target="_blank" href="http://www.ridepatco.org/">PATCO</a>, and ',
+        '<a class="alert-link" target="_blank" href="https://dartfirststate.com/">DART</a> ',
+        'for their most up-to-date schedules and policies when planning your trip. ',
+        'Please exercise social distancing during the COVID-19 health crisis.'].join('');
+
     var module = {
         alert: alert,
         bicycleWarningAlert: bicycleWarningAlert,
@@ -8,6 +16,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         eventPopup: eventPopup,
         itinerary: itinerary,
         itineraryList: itineraryList,
+        transitWarningAlert: transitWarningAlert,
         tourDestinationList: tourDestinationList
     };
 
@@ -73,7 +82,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
                         agency,
                         '</a>, '].join('');
         });
-        msg = msg.substring(0, msg.length - 2); // trim off trailing comma
+        msg = ' ' + msg.substring(0, msg.length - 2) + '. '; // trim off trailing comma
 
         // message is not templated, so we can embed links
         var source = [
@@ -84,6 +93,7 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
             '<i class="icon-cancel"></i></button>',
             '</div>',
             '<div class="alert-body">',
+            transitWarningMessage,
             msg,
             '</div>',
             '</div>'
@@ -279,6 +289,30 @@ CAC.Map.Templates = (function (Handlebars, moment, Utils) {
         ].join('');
         var template = Handlebars.compile(source);
         var html = template({data: templateData});
+        return html;
+    }
+
+    /**
+     * Build an HTML snippet for an alert with SEPTA COVID warning
+     *
+     * @returns {String} Compiled Handlebars template for the Bootstrap alert
+     */
+    function transitWarningAlert() {
+        // TODO: set message
+        var source = [
+            '<div class="alert alert-warning">',
+            '<div class="alert-title">',
+            'notice',
+            '<button title="Dismiss this message" name="close" class="close" aria-label="Close">',
+            '<i class="icon-cancel"></i></button>',
+            '</div>',
+            '<div class="alert-body">',
+            transitWarningMessage,
+            '</div>',
+            '</div>'
+        ].join('');
+        var template = Handlebars.compile(source);
+        var html = template();
         return html;
     }
 

@@ -39,7 +39,7 @@ CAC.User.Preferences = (function(Storages, _) {
         exploreMinutes: 15,
         maxWalk: 482802, // in meters; set large, since not user-controllable
         method: 'directions',
-        mode: 'TRANSIT,WALK',
+        mode: 'BICYCLE',
         originText: '',
         destinationText: '',
         tourMode: false,
