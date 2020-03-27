@@ -25,8 +25,9 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
     function bikeShareOverlay() {
         bikeShareFeatureGroup = cartodb.L.featureGroup([]);
         $.ajax({
-            contentType: 'application/json',
-            url: 'https://api.phila.gov/bike-share-stations/v1',
+            cache: false,
+            dataType: 'json',
+            url: 'https://kiosks.bicycletransit.workers.dev/phl',
             success: function (data) {
                 $.each(data.features, function (i, share) {
                     bikeShareFeatureGroup.addLayer(getBikeShareMarker(share));
