@@ -9,7 +9,7 @@
     "cartodb.js": "~3.15.18",
     "console-polyfill": "~0.3.0",
     "handlebars": "~4.7.3",
-    "jquery": "~3.4.1",
+    "jquery": "~3.5.0",
     "jquery-sortablejs": "~1.0.1",
     "js-storage": "~1.1.0",
     "leaflet": "~0.7.7",
