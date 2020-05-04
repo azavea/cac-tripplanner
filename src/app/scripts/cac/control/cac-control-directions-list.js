@@ -106,15 +106,14 @@ CAC.Control.DirectionsList = (function (_, $, ShareModal, MapTemplates) {
         });
 
         // Show alert with link to transit agency bicycle policy for bike+transit itineraries
+        var alert;
         if (_.includes(itinerary.modes, 'BICYCLE') && itinerary.agencies.length) {
-            var alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
-            var $alert = $(alert);
-            $alert.one('click', options.selectors.alertCloseButton, function () {
-                $alert.remove();
-            });
-            $container.find(options.selectors.directionsHeader).after($alert);
+            alert = MapTemplates.bicycleWarningAlert(itinerary.agencies);
         } else if (itinerary.agencies.length) {
-            var alert = MapTemplates.transitWarningAlert();
+            alert = MapTemplates.transitWarningAlert();
+        }
+
+        if (alert) {
             var $alert = $(alert);
             $alert.one('click', options.selectors.alertCloseButton, function () {
                 $alert.remove();
