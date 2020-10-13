@@ -11,6 +11,7 @@
       - libpq-dev
       - libproj-dev
       - libjpeg-dev
+      - osmctools
 
 - name: Install pip packages for deployment
   pip: requirements={{ root_app_dir }}/deployment_requirements.txt executable=/usr/bin/pip3
