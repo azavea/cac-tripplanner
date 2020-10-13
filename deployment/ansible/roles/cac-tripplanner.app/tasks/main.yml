@@ -3,6 +3,7 @@
   apt:
     state: present
     pkg:
+      - acl
       - binutils
       - chromium-browser
       - dh-autoreconf

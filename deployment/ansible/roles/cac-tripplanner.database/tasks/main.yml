@@ -1,4 +1,10 @@
 ---
+- name: Install ACL for ansible file permission controls
+  apt:
+    state: present
+    pkg:
+      - acl
+
 - name: Configure the PostgreSQL APT key
   apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
 

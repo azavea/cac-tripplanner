@@ -1,4 +1,10 @@
 ---
+- name: Install ACL for ansible file permission controls
+  apt:
+    state: present
+    pkg:
+      - acl
+
 - name: Create Directory for OSM and GTFS
   file: path={{ otp_data_dir }} state=directory owner={{ otp_user }}
 
