@@ -1,9 +1,32 @@
 ---
+- name: Install nginx prerequisites
+  apt:
+    state: present
+    pkg:
+      - curl
+      - gnupg2
+      - ca-certificates
+      - lsb-release
+
+- name: Set up nginx apt repository
+  become: yes
+  command: echo "deb http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" tee /etc/apt/sources.list.d/nginx.list
+  args:
+    creates: /etc/apt/sources.list.d/nginx.list
+
+- name: Add nginx signing key
+  apt_key:
+    url: https://nginx.org/keys/nginx_signing.key
+    state: present
+    id: ABF5BD827BD9BF62
+
+- name: Update APT cache
+  apt: update_cache=yes
+
 - name: Install packages
   apt:
     state: present
     pkg:
-      - acl
       - binutils
       - chromium-browser
       - dh-autoreconf
@@ -12,6 +35,7 @@
       - libpq-dev
       - libproj-dev
       - libjpeg-dev
+      - nginx-full
       - osmctools
 
 - name: Install pip packages for deployment
@@ -56,6 +80,30 @@
     name: "{{ gunicorn_app_name }}.service"
     enabled: yes
     daemon_reload: yes
+
+- name: Delete default site
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  register: delete_default_site
+  when: nginx_delete_default_site | bool
+  notify:
+    - Restart nginx
+
+- name: Delete default web root
+  file: path=/var/www/html state=absent
+  when: nginx_delete_default_site | bool and delete_default_site is changed
+
+- name: Check Nginx Upstart service definition exists
+  stat: path=/etc/init/nginx.conf
+  register: nginx_upstart
+
+- name: Configure Nginx log rotation
+  template: src=logrotate_nginx.j2 dest=/etc/logrotate.d/nginx
+  when: nginx_upstart.stat.exists
+
+- name: Configure Nginx
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+  notify:
+    - Restart nginx
 
 - name: Enable nginx service
   systemd:

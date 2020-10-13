@@ -15,3 +15,5 @@ root_conf_dir: "/etc/cac_tripplanner.d"
 root_src_dir: "/opt/app/src"
 root_static_dir: "/srv/cac"
 root_media_dir: "/media/cac"
+
+nginx_delete_default_site: False
