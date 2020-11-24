@@ -8,17 +8,20 @@ Development Dependencies
 * [Vagrant](http://www.vagrantup.com)
 * [Ansible](http://www.ansible.com)
 
+
 Development Installation
 ------------------------
 
 1. Make sure you have the development dependencies installed
 2. Place GTFS .zip files, OSM files, and elevation .tif files (optional) in the otp_data folder
 3. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
-4. Run `vagrant up`
-5. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
-6. Running `./scripts/serve-js-dev.sh` on the host will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `cd /opt/app/src && npm run gulp-development` can be run manually in the VM to pick up changes to the static files.
+4. Change into the `src/` folder and run `npm install` to install the node modules on the host machine
+5. Run `vagrant up`
+6. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
+7. Running `./scripts/serve-js-dev.sh` on the host will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `cd /opt/app/src && npm run gulp-development` can be run manually in the VM to pick up changes to the static files.
 
 Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisioning in development mode will not attempt to rebuild the graph, but will use the one already present.
+
 
 Building AMIs
 ------------------------
@@ -26,6 +29,7 @@ Building AMIs
 2. If building the `otp` machine, make sure the latest GTFS are in `otp_data`, then build a graph when them in the development environment provisioning.  This will result in a new `Graph.obj` file being written to `otp_data`.
 3. In the project directory within the app VM, run: `deployment/cac-stack.py create-ami --aws-access-key-id YOUR_ACCESS_KEY --aws-secret-access-key YOUR_SECRET_KEY --aws-role-arn YOUR_ASSUMED_ROLE_ARN`
 4. The previous command builds all AMIs. To only build a single AMI, run the same command, but also specify the `--machine-type` parameter, which may be set to one of: `bastion`, `otp`, or `app`.
+
 
 Launching AWS Stacks
 ------------------------
@@ -38,6 +42,7 @@ Launching AWS Stacks
  * Ensure the `WebServer` Blue stack is up in Production -- it will be launched if it isn't already running
 4. Note that database migrations are not automatically run. When the DataPlane is first brought up, it is necessary to manually create the app user/db and run migrations.
 5. Launching a set of Production stacks with the other color (`Green`), will use the same `VPC` and `DataPlane` stacks, but will create different `OtpServer` and `WebServer` stacks (if they don't already exist).
+
 
 Production Blue/Green deployment
 --------------------------------
