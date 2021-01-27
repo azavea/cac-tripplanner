@@ -13,7 +13,7 @@ class CacStackException(Exception):
     pass
 
 
-def get_ubuntu_ami(region, creds):
+def get_ubuntu_ami(region):
     """Gets AMI ID for current release in region
 
     Args:
@@ -42,13 +42,13 @@ def get_ubuntu_ami(region, creds):
     return amis[0]['id']
 
 
-def run_packer(machine_type, region, creds, aws_config):
+def run_packer(machine_type, aws_region, aws_profile):
     """Runs packer command to build the desired AMI(s)
 
     Args:
       machine_type (str): Optional machine type string for passing in as the `-only` param
-      region (str): AWS region id
-      creds (Dict): Dictionary containing AWS credentials
+      aws_region (str): AWS region id
+      aws_profile (str): AWS profile name
     """
 
     # Remove examples subdirectory from all Azavea roles
@@ -60,16 +60,11 @@ def run_packer(machine_type, region, creds, aws_config):
             print(('Removing {}'.format(examples_path)))
             shutil.rmtree(examples_path)
 
-    env = os.environ.copy()
-    env['AWS_ACCESS_KEY_ID'] = creds['aws_access_key_id']
-    env['AWS_SECRET_ACCESS_KEY'] = creds['aws_secret_access_key']
-    env['AWS_SESSION_TOKEN'] = creds['aws_security_token']
-
-    aws_ubuntu_ami = get_ubuntu_ami(region, aws_config)
+    aws_ubuntu_ami = get_ubuntu_ami(aws_region)
 
     packer_template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cac.json')
     packer_command = ['packer', 'build',
-                      '-var', 'aws_region={}'.format(region),
+                      '-var', 'aws_region={}'.format(aws_region),
                       '-var', 'ubuntu_ami={}'.format(aws_ubuntu_ami)]
 
     # Create the specified machine type, or all of them if one is not specified
@@ -80,4 +75,4 @@ def run_packer(machine_type, region, creds, aws_config):
     packer_command.append(packer_template_path)
 
     print('Running Packer Command: {}'.format(' '.join(packer_command)))
-    subprocess.check_call(packer_command, env=env)
+    subprocess.check_call(packer_command, env=os.environ.copy().update({'AWS_PROFILE': aws_profile}))
