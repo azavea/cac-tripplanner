@@ -1,0 +1,8 @@
+version: "3"
+services:
+  osm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/local/src
