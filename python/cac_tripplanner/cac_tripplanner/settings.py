@@ -179,6 +179,11 @@ DEFAULT_MEDIA_PATH = "default_media"
 # src directory for default media images
 DEFAULT_MEDIA_SRC_PATH = os.path.join(BASE_DIR, DEFAULT_MEDIA_PATH)
 
+# Added in 3.2. This is used to create id fields for models where it's not explicitly specified in
+# the model definition. This requires making an explicit choice or Django will issue warnings, so
+# make our choice the same as what the default was before the requirement to make an affirmative
+# choice was introduced.
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
