@@ -12,5 +12,5 @@ psycopg2-binary==2.8.6
 pytz==2020.1
 PyYAML==5.3.1
 requests==2.24.0
-git+https://github.com/azavea/django-wpadmin@v2.2#egg=django-wpadmin
+git+https://github.com/azavea/django-wpadmin@v3.2#egg=django-wpadmin
 virtualenv==20.0.31
