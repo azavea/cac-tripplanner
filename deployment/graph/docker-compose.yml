@@ -1,0 +1,8 @@
+version: '3'
+services:
+  otp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../ansible/roles/cac-tripplanner.otp-data/files/otp_data/:/var/otp/
