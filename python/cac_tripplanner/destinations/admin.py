@@ -3,7 +3,6 @@ from operator import itemgetter
 
 from django.conf import settings
 from django.contrib import admin, gis
-from django import forms
 
 from image_cropping import ImageCroppingMixin
 
