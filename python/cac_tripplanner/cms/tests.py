@@ -11,43 +11,47 @@ from cms.models import Article
 
 class ArticleTests(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username='test-user')
-        test_image = File(open('default_media/square/BartramsGarden.jpg'))
-
-        common_args = dict(
-            teaser='None',
-            content='None',
-            author=user,
-            narrow_image=test_image,
-            wide_image=test_image
-        )
-
-        publish_date = now() - timedelta(hours=1)
-
         self.client = Client()
+        user = User.objects.create_user(username="test-user")
+        with open("default_media/square/BartramsGarden.jpg") as image_file:
+            test_image = File(image_file)
 
-        self.unpublished_comm = Article.objects.create(
-            content_type=Article.ArticleTypes.community_profile,
-            title='unpublished-comm',
-            slug='unpublished-comm',
-            **common_args)
-        self.unpublished_tips = Article.objects.create(
-            content_type=Article.ArticleTypes.tips_and_tricks,
-            title='unpublished-tips',
-            slug='unpublished-tips',
-            **common_args)
-        self.published_comm = Article.objects.create(
-            content_type=Article.ArticleTypes.community_profile,
-            publish_date=publish_date,
-            title='published-comm',
-            slug='published-comm',
-            **common_args)
-        self.published_tips = Article.objects.create(
-            content_type=Article.ArticleTypes.tips_and_tricks,
-            publish_date=publish_date,
-            title='published-tips',
-            slug='published-tips',
-            **common_args)
+            common_args = dict(
+                teaser="None",
+                content="None",
+                author=user,
+                narrow_image=test_image,
+                wide_image=test_image,
+            )
+
+            publish_date = now() - timedelta(hours=1)
+
+            self.unpublished_comm = Article.objects.create(
+                content_type=Article.ArticleTypes.community_profile,
+                title="unpublished-comm",
+                slug="unpublished-comm",
+                **common_args
+            )
+            self.unpublished_tips = Article.objects.create(
+                content_type=Article.ArticleTypes.tips_and_tricks,
+                title="unpublished-tips",
+                slug="unpublished-tips",
+                **common_args
+            )
+            self.published_comm = Article.objects.create(
+                content_type=Article.ArticleTypes.community_profile,
+                publish_date=publish_date,
+                title="published-comm",
+                slug="published-comm",
+                **common_args
+            )
+            self.published_tips = Article.objects.create(
+                content_type=Article.ArticleTypes.tips_and_tricks,
+                publish_date=publish_date,
+                title="published-tips",
+                slug="published-tips",
+                **common_args
+            )
 
     def test_home_view(self):
         """Verify that home view includes one article"""
@@ -55,9 +59,9 @@ class ArticleTests(TestCase):
         # Delete second published article so random always returns the same item
         self.published_tips.delete()
 
-        url = reverse('home')
+        url = reverse("home")
         response = self.client.get(url)
-        self.assertContains(response, 'Places we love', status_code=200)
+        self.assertContains(response, "Places we love", status_code=200)
         self.assertContains(response, self.published_comm.title, status_code=200)
 
     def test_community_profile_manager(self):
@@ -93,19 +97,17 @@ class ArticleTests(TestCase):
 
     def test_learn_detail_view(self):
         """Test that learn detail view works"""
-        url = reverse('learn-detail',
-                      kwargs={'slug': self.published_comm.slug})
+        url = reverse("learn-detail", kwargs={"slug": self.published_comm.slug})
         response = self.client.get(url)
-        self.assertContains(response, 'published-comm', status_code=200)
+        self.assertContains(response, "published-comm", status_code=200)
 
-        url = reverse('learn-detail',
-                      kwargs={'slug': self.unpublished_comm.slug})
+        url = reverse("learn-detail", kwargs={"slug": self.unpublished_comm.slug})
         response_404 = self.client.get(url)
         self.assertEqual(response_404.status_code, 404)
 
     def test_learn_list_view(self):
         """Test that learn list view works"""
-        url = reverse('learn-list')
+        url = reverse("learn-list")
         response = self.client.get(url)
 
         self.assertContains(response, self.published_comm.title, status_code=200)
