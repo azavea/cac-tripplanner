@@ -113,9 +113,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "app" do |app|
+    CAC_APP_SHARED_FOLDER_TYPE = ENV.fetch("CAC_APP_SHARED_FOLDER_TYPE", "nfs")
+
+    if CAC_APP_SHARED_FOLDER_TYPE == "nfs"
+      if Vagrant::Util::Platform.linux? then
+        MOUNT_OPTIONS = ['rw', 'tcp', 'nolock', 'actimeo=1']
+      else
+        MOUNT_OPTIONS = ['vers=3', 'udp', 'actimeo=1']
+      end
+    else
+      if ENV.has_key?("CAC_APP_MOUNT_OPTIONS")
+        MOUNT_OPTIONS = ENV.fetch("CAC_APP_MOUNT_OPTIONS").split
+      else
+        MOUNT_OPTIONS = ["rw"]
+      end
+    end
     app.vm.hostname = "app"
     app.vm.network "private_network", ip: "192.168.8.24"
-    app.vm.synced_folder ".", "/opt/app"
+    app.vm.synced_folder ".", "/opt/app", type: CAC_APP_SHARED_FOLDER_TYPE, mount_options: MOUNT_OPTIONS
 
     # Web
     app.vm.network "forwarded_port", guest: 443, host: 8024
