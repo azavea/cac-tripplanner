@@ -25,7 +25,6 @@
     "typeahead.js": "~0.10.5"
   },
   "devDependencies": {
-    "acorn": "^6.0.0",
     "acorn-dynamic-import": "^4.0.0",
     "aliasify": "~2.1.0",
     "apache-server-configs": "~4.0.0",
