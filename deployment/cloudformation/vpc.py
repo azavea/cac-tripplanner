@@ -81,7 +81,7 @@ class VPC(StackNode):
 
     def set_up_stack(self):
         """Sets up the stack"""
-        super(VPC, self).set_up_stack()
+        self.set_version()
 
         """Creates a VPC object. See Class docstring for description of class
 
@@ -92,7 +92,7 @@ class VPC(StackNode):
           tags (dict): Arbitrary tags to add to all resources that accept tags
         """
         tags = self.get_input('Tags').copy()
-        self.add_description('VPC Stack for Cac')
+        self.set_description('VPC Stack for Cac')
 
         assert isinstance(tags, dict), 'tags must be a dictionary'
 
