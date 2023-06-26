@@ -241,8 +241,8 @@ class DataPlaneGenerator(StackNode):
 
     def set_up_stack(self):
         """Sets up the stack"""
-        super(DataPlaneGenerator, self).set_up_stack()
-        self.add_description('Data Plane Stack for Cac')
+        self.set_version()
+        self.set_description('Data Plane Stack for Cac')
         self.rds_stack = RDSFactory()
         self.rds_stack.populate_template(self)
         for key in self.parameters:

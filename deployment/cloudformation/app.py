@@ -54,10 +54,10 @@ class AppServerStack(StackNode):
         if not self.INPUTS or not self.STACK_NAME_PREFIX or not self.HEALTH_ENDPOINT:
             raise MKInputError('Must define INPUTS, STACK_NAME_PREFIX, and HEALTH_ENDPOINT')
 
-        super(AppServerStack, self).set_up_stack()
+        self.set_version()
 
         tags = self.get_input('Tags').copy()
-        self.add_description('{} App Server Stack for Cac'.format(self.STACK_NAME_PREFIX))
+        self.set_description('{} App Server Stack for Cac'.format(self.STACK_NAME_PREFIX))
 
         assert isinstance(tags, dict), 'tags must be a dictionary'
 
