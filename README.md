@@ -29,16 +29,20 @@ Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisi
 
 Building AMIs
 ------------------------
+1. Configure an AWS profile with `aws configure --profile gophillygo` if you haven't already
 1. Make a production group_vars file (similarly to how is described above with development). Make sure production is set to true, and also specify an app_username, which should be set to: ubuntu
 2. If building the `otp` machine, make sure the latest GTFS are in `otp_data`, then build a graph when them in the development environment provisioning.  This will result in a new `Graph.obj` file being written to `otp_data`.
-3. In the project directory within the app VM, run: `deployment/cac-stack.py create-ami --aws-access-key-id YOUR_ACCESS_KEY --aws-secret-access-key YOUR_SECRET_KEY --aws-role-arn YOUR_ASSUMED_ROLE_ARN`
-4. The previous command builds all AMIs. To only build a single AMI, run the same command, but also specify the `--machine-type` parameter, which may be set to one of: `bastion`, `otp`, or `app`.
+3. Install the deployment dependencies, ideally in a virtualenv: `python3 -m venv .venv && source .venv/bin/activate && pip install -r python/cac_tripplanner/deployment_requirements.txt`
+4. Build AMIs by running (within the virtualenv): `AWS_PROFILE=gophillygo deployment/cac-stack.py create-ami`
+5. The previous command builds all AMIs. To only build a single AMI, run the same command, but also specify the `--machine-type` parameter, which may be set to one of: `bastion`, `otp`, or `app`.
 
 
 Launching AWS Stacks
 ------------------------
 1. Copy `deployment/default_template.yaml` to `deployment/default.yaml` and edit variables
-2. In the project directory, for a set of `Blue` stacks in the `Production` environment, run: `deployment/cac-stack.py launch-stacks --stack-type prod --stack-color blue --aws-access-key-id YOUR_ACCESS_KEY --aws-secret-access-key YOUR_SECRET_KEY --aws-role-arn YOUR_ASSUMED_ROLE_ARN`
+1. Configure an AWS profile with `aws configure --profile gophillygo` if you haven't already
+1. Create a virtualenv with the deployment dependencies if you haven't already (see Building AMIs, above).
+2. In the project directory, for a set of `Blue` stacks in the `Production` environment, run: `AWS_PROFILE=gophillygo deployment/cac-stack.py launch-stacks --stack-color blue --stack-type prod`
 3. The previous command will do the following:
  * Ensure the `VPC` stack is up in Production -- it will be launched if it isn't already running
  * Ensure the `DataPlane` stack is up in Production -- it will be launched if it isn't already running
