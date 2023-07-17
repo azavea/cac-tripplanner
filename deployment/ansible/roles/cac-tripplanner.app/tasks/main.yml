@@ -12,9 +12,6 @@
       - libproj-dev
       - libjpeg-dev
 
-- name: Install pip packages for deployment
-  pip: requirements={{ root_app_dir }}/deployment_requirements.txt executable=/usr/bin/pip3
-
 - name: Install pip packages for app
   pip: requirements={{ root_app_dir }}/requirements.txt executable=/usr/bin/pip3
 
