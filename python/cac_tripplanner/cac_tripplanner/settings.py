@@ -42,14 +42,14 @@ except (OSError, NameError):
             "NAME": "cac_tripplanner",
             "USER": "cac_tripplanner",
             "PASSWORD": "cac_tripplanner",
-            "HOST": "192.168.8.25",
+            "HOST": "192.168.56.25",
             "PORT": "5432",
         },
         # Note: the OTP URL is called directly from within javascript. In
         # order to view the page on an external machine, this URL must be
         # overridden via the secrets file. This can't be automatically set
         # to the host machine's DNS here, because this code runs in a VM.
-        "otp_url": "http://192.168.8.26/otp/routers/{router}/",
+        "otp_url": "http://192.168.56.26/otp/routers/{router}/",
         "internal_ips": ["0.0.0.0", "127.0.0.1"],
         "postgis_version": [2, 5, 2],
         "build_dir": "/opt/app/src",

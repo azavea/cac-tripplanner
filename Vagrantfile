@@ -87,7 +87,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "database" do |database|
     database.vm.hostname = "database"
-    database.vm.network "private_network", ip: "192.168.8.25"
+    database.vm.network "private_network", ip: "192.168.56.25"
 
     database.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -129,7 +129,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
     app.vm.hostname = "app"
-    app.vm.network "private_network", ip: "192.168.8.24"
+    app.vm.network "private_network", ip: "192.168.56.24"
     app.vm.synced_folder ".", "/opt/app", type: CAC_APP_SHARED_FOLDER_TYPE, mount_options: MOUNT_OPTIONS
 
     # Web
@@ -162,7 +162,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "otp" do |otp|
     otp.vm.hostname = "otp"
-    otp.vm.network "private_network", ip: "192.168.8.26"
+    otp.vm.network "private_network", ip: "192.168.56.26"
 
     otp.vm.synced_folder ".", "/vagrant", disabled: true
 
