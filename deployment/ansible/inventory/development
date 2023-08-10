@@ -1,4 +1,4 @@
 [development]
-app ansible_host=192.168.8.24
-database ansible_host=192.168.8.25
-otp ansible_host=192.168.8.26
+app ansible_host=192.168.56.24
+database ansible_host=192.168.56.25
+otp ansible_host=192.168.56.26
