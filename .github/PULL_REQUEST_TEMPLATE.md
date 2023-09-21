@@ -26,6 +26,6 @@ Optional. Ancillary topics, caveats, alternative strategies that didn't work out
 - [ ] No gulp lint warnings
 - [ ] No python lint warnings
 - [ ] Python tests pass
-
+- [ ] All TODOs have an accompanying issue link
 
 Connects #XXX
