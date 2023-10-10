@@ -27,7 +27,7 @@ CAC.Map.OverlaysControl = (function ($, cartodb, L, Utils) {
         $.ajax({
             cache: false,
             dataType: 'json',
-            url: 'https://kiosks.bicycletransit.workers.dev/phl',
+            url: 'https://bts-status.bicycletransit.workers.dev/phl',
             success: function (data) {
                 $.each(data.features, function (i, share) {
                     bikeShareFeatureGroup.addLayer(getBikeShareMarker(share));
