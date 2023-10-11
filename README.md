@@ -6,7 +6,7 @@ Development Dependencies
 ------------------------
 
 * [Vagrant](http://www.vagrantup.com)
-* [Ansible](http://www.ansible.com)
+* [Ansible](http://www.ansible.com) v4 (versions 6+ seem not to work)
 
 
 Development Installation
@@ -14,7 +14,7 @@ Development Installation
 
 1. Make sure you have the development dependencies installed
 2. Place GTFS .zip files, OSM files, and elevation .tif files (optional) in the root of the otp_data folder
-3. Generate a graph file with (takes approx 3 hours) `docker-compose run --rm otp otp --build /var/otp` in the deployment/graph directory.
+3. (Optional) Generate a graph file with (takes approx 3 hours) `docker-compose run --rm otp otp --build /var/otp` in the deployment/graph directory.
 4. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
 5. Change into the `src/` folder and run `npm install` to install the node modules on the host machine
 6. Run `vagrant up`. You can choose to change the Virtualbox shared folder type for the `app` VM from its default NFS by:
