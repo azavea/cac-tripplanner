@@ -13,5 +13,4 @@
 - src: azavea.papertrail
   version: 2.0.0
 
-- src: azavea.postgresql
-  version: 2.0.0
+
