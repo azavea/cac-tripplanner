@@ -1,4 +1,8 @@
 ---
+# postgresql defaults copied from azavea.postgresql
+postgresql_version: "9.6"
+postgresql_package_version: "9.6.*"
+
 production: False
 
 # Use python 3 on database VM
