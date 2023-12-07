@@ -1,4 +1,3 @@
 ---
   dependencies:
-    - { role: "azavea.postgresql" }
     - { role: "cac-tripplanner.python3" }
