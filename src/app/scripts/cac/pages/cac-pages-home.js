@@ -32,6 +32,8 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
             needWheelsBanner: '.sidebar-banner.indego-banner',
             sidebarTripOptionsBanner: '.sidebar-banner.trip-options-banner',
             sidebarBannerClass: 'body-has-sidebar-banner',
+            navBanner: '.nav-banner',
+            navBannerCloseButton: 'button.btn-dismiss-nav-banner',
             hiddenClass: 'hidden',
 
             originInput: '#input-directions-from'
@@ -157,6 +159,12 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
                 }
             });
         }
+
+        // listen to nav banner close button
+        $(options.selectors.navBannerCloseButton).on('click', function(e) {
+            e.stopPropagation();
+            hideNavBanner();
+        });
 
         // listen to sidebar banner close button
         $(options.selectors.sidebarBannerCloseButton).on('click', function(e) {
@@ -543,6 +551,10 @@ CAC.Pages.Home = (function ($, FilterOptions, ModeOptions,  MapControl, TripOpti
         $(options.selectors.needWheelsBanner).addClass(options.selectors.hiddenClass);
         // show trip options instead, if applicable
         updateTripOptionsBanner();
+    }
+
+    function hideNavBanner(){
+        $(options.selectors.navBanner).addClass(options.selectors.hiddenClass);
     }
 
     /**

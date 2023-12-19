@@ -14,4 +14,7 @@
             data-tab-id="EXPLORE" href="/explore">Explore</a>
         <a class="nav-item {% if tab == 'info'%} on {% endif %}" href="{% url 'learn-list' %}">Learn</a>
     </nav>
+    {% if tab == 'home' or tab == 'info' %}
+        {% include "partials/alert-banner.html" %}
+    {% endif %}
 </header>
