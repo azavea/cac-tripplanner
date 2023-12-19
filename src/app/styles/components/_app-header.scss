@@ -161,25 +161,6 @@
         }
     }
 
-    .android-link {
-        @include delinkify();
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        height: 60px;  // dimensions hard-coded bc otherwise some browsers
-        width: 155px;  // don't position it properly ¯\_(ツ)_/¯
-
-        @include respond-to('xxs') {
-            display: none;
-        }
-
-        .image {
-            height: 100%;
-            width: auto;
-        }
-    }
-
     .slogan-start {
         text-align: right;
     }
