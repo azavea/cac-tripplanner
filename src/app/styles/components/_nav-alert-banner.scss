@@ -1,0 +1,39 @@
+
+.nav-banner {
+    position: relative;
+    display: flex;
+    flex: 0 0 $nav-alert-banner-height;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.3rem;
+    padding: 1rem 1rem 1.2rem;
+    text-align: center;
+
+    @include respond-to('xs') {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    &.hidden {
+        visibility: hidden;
+        flex: 0 0 0;
+        padding: 0px;
+        height: 0px;
+    }
+
+    .alert-body {
+        display: flex;
+        align-items: center;
+    }
+
+    button {
+        flex: 0 0 20px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: none;
+        text-align: center;
+        cursor: pointer;
+    }
+}
