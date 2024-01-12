@@ -172,14 +172,18 @@
         jQuery.noConflict(); // because JotForms.
         // Hide top alert banner across pages on close
         jQuery(document).ready(function ($) {
-            const hideBanner = localStorage.getItem('hide-top-alert-banner') || false;
-            if(!hideBanner){
+            // update this for every new alert to match id in alert-banner.html
+            var alertId = 'gophillygo-alert-2024-01-12',
+            hasAlertMessage = jQuery('.alert-body').text().trim(),
+            wasAlreadyHidden = localStorage.getItem(alertId) || false,
+            shouldShowBanner = hasAlertMessage && !wasAlreadyHidden;
+            if(shouldShowBanner){
                 jQuery('.nav-banner').removeClass('hidden');
             };
 
             jQuery('.nav-banner').on('click', function(e) {
                 e.stopPropagation();
-                localStorage.setItem('hide-top-alert-banner', true);
+                localStorage.setItem(alertId, true);
                 jQuery('.nav-banner').addClass('hidden');
             });
         });
