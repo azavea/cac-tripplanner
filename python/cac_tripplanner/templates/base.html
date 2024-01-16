@@ -174,9 +174,9 @@
         jQuery(document).ready(function ($) {
             // update this for every new alert to match id in alert-banner.html
             var alertId = 'gophillygo-alert-2024-01-12',
-            hasAlertMessage = jQuery('.alert-body').text().trim(),
-            wasAlreadyHidden = localStorage.getItem(alertId) || false,
-            shouldShowBanner = hasAlertMessage && !wasAlreadyHidden;
+              hasAlertMessage = jQuery('.alert-body').text().trim(),
+              wasAlreadyHidden = localStorage.getItem(alertId) || false,
+              shouldShowBanner = hasAlertMessage && !wasAlreadyHidden;
             if(shouldShowBanner){
                 jQuery('.nav-banner').removeClass('hidden');
             };
