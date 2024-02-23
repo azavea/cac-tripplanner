@@ -1,5 +1,5 @@
 """Helper functions and classes for dealing with cloudformation"""
-import boto
+import boto3
 
 
 class AvailabilityZone(object):
@@ -38,5 +38,5 @@ def get_availability_zones():
     Returns:
       (list of AvailabilityZone): List of availability zones for a given EC2 region
     """
-    conn = boto.connect_ec2()
-    return  [AvailabilityZone(az) for az in conn.get_all_zones()]
+    client = boto3.client('ec2', region_name='us-east-1')
+    return  [AvailabilityZone(az) for az in client.describe_availability_zones()]
