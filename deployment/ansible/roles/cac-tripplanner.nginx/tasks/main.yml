@@ -1,6 +1,8 @@
 ---
+# Tasks and related artifacts copied from azavea.nginx role
+# Customized to use Nginx Stable PPA that works with Ubuntu 22.04
 - name: Configure the Nginx PPA
-  apt_repository: repo=ppa:nginx/{{ nginx_version }} state=present
+  apt_repository: repo=ppa:ondrej/nginx state=present
 
 - name: Install Nginx
   apt: pkg=nginx-full state=present
