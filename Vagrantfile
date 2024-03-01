@@ -71,7 +71,7 @@ VAGRANT_PROXYCONF_ENDPOINT = ENV["VAGRANT_PROXYCONF_ENDPOINT"]
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.box = "bento/ubuntu-22.04"
 
   # Wire up the proxy if:
   #
@@ -86,6 +86,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "database" do |database|
+    # SSH issues bringing up DB VM with base box 22.04
+    # Explicitly define downgraded version for use by database until fix 
+    database.vm.box = "bento/ubuntu-20.04"
     database.vm.hostname = "database"
     database.vm.network "private_network", ip: "192.168.56.25"
 
