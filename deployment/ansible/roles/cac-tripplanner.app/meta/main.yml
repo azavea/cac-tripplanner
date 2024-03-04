@@ -1,8 +1,8 @@
 ---
   dependencies:
     - { role: "azavea.git" }
-    - { role: "azavea.nginx" }
     - { role: "azavea.nodejs" }
     - { role: "azavea.packer" }
+    - { role: "cac-tripplanner.nginx" }
     - { role: "cac-tripplanner.papertrail", when: production }
     - { role: "cac-tripplanner.python3" }
