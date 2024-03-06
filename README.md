@@ -26,6 +26,11 @@ CAC_APP_SHARED_FOLDER_TYPE=virtualbox vagrant up
 
 Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisioning in development mode will not attempt to rebuild the graph, but will use the one already present.
 
+Django migrations are run as part of app provisioning, [here](https://github.com/azavea/cac-tripplanner/blob/develop/deployment/ansible/roles/cac-tripplanner.app/tasks/main.yml#L67-L72), but there may be instances where you need to manually run migrations outside of provisioning, in which case use the command:
+```
+vagrant ssh app -c 'cd /opt/app/python/cac_tripplanner && python3 manage.py migrate'
+```
+
 
 Building AMIs
 ------------------------
