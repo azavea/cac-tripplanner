@@ -1,5 +1,4 @@
-from django.conf.urls import re_path
-from django.urls import include, path
+from django.urls import include, path, re_path
 from shortlinks.test.views import stub_view
 
 app_name = 'shortlinks'

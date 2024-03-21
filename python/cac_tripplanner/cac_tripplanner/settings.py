@@ -165,8 +165,6 @@ TIME_ZONE = "America/New_York"
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 # Directory for default featured destinations added in destinations 0012

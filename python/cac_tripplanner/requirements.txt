@@ -1,9 +1,9 @@
 base58==2.0.1
 boto3==1.15.9
 boto==2.49.0
-Django==3.2.25
+Django==4.0.1
 django-ckeditor==6.0.0
-django-image-cropping==1.5.0
+django-image-cropping==1.7.0
 django-extensions==3.1.5
 django-storages==1.10.1
 easy-thumbnails==2.8.1
