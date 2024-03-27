@@ -187,7 +187,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = "/srv/cac"
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/'),
+]
 
 MEDIA_ROOT = "/media/cac/"
 MEDIA_URL = "/media/"
@@ -312,6 +314,7 @@ WPADMIN = {
             "top": "wpadmin.menu.menus.BasicTopMenu",
             "left": "wpadmin.menu.menus.BasicLeftMenu",
         },
+        'custom_style': STATIC_URL + 'admin/css/pagination.css',
     }
 }
 
