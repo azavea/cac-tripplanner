@@ -21,7 +21,7 @@ def get_ubuntu_ami(region):
       creds (Dict): Dictionary containing AWS credentials
     """
 
-    response = urllib.urlopen('http://cloud-images.ubuntu.com/query/bionic/'
+    response = urllib.urlopen('http://cloud-images.ubuntu.com/query/jammy/'
                               'server/released.current.txt').readlines()
     response = [x.decode('utf-8') for x in response]
     fieldnames = ['version', 'version_type', 'release_status', 'date',
