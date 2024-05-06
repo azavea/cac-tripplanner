@@ -1,4 +1,19 @@
 {% extends "admin/base.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+  {% if title != 'Site administration' %}
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+      {% if title %}
+          {% if title|slice:'-14:' == 'administration' %}
+              &rsaquo; {{ title|slice:':-14' }}
+          {% else %}
+              &rsaquo; {{ title }}
+          {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}
 {% load cropping thumbnail %}
 {% block extrahead %}
   {{ form.media }}
