@@ -116,7 +116,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "app" do |app|
-    CAC_APP_SHARED_FOLDER_TYPE = ENV.fetch("CAC_APP_SHARED_FOLDER_TYPE", "nfs")
+    CAC_APP_SHARED_FOLDER_TYPE = ENV.fetch("CAC_APP_SHARED_FOLDER_TYPE", "virtualbox")
 
     if CAC_APP_SHARED_FOLDER_TYPE == "nfs"
       if Vagrant::Util::Platform.linux? then
