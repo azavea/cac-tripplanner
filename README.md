@@ -17,9 +17,9 @@ Development Installation
 3. (Optional) Generate a graph file with (takes approx 3 hours) `docker-compose run --rm otp otp --build /var/otp` in the deployment/graph directory.
 4. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
 5. Change into the `src/` folder and run `npm install` to install the node modules on the host machine
-6. Run `vagrant up`. You can choose to change the Virtualbox shared folder type for the `app` VM from its default NFS by:
+6. Run `vagrant up`. You can choose to change the Virtualbox shared folder type for the `app` VM from its default VirtualBox by:
 ```
-CAC_APP_SHARED_FOLDER_TYPE=virtualbox vagrant up
+CAC_APP_SHARED_FOLDER_TYPE=nfs vagrant up
 ```
 7. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
 8. Running `./scripts/serve-js-dev.sh` on the host will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `cd /opt/app/src && npm run gulp-development` can be run manually in the VM to pick up changes to the static files.
