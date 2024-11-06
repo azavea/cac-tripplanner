@@ -11,6 +11,8 @@
       - libpq-dev
       - libproj-dev
       - libjpeg-dev
+      - nodejs
+      - npm
 
 - name: Install pip packages for app
   pip: requirements={{ root_app_dir }}/requirements.txt executable=/usr/bin/pip3

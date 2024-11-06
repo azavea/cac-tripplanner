@@ -28,7 +28,7 @@
   args:
     chdir: "/tmp/postgis-{{ postgis_version | join('.') }}"
   with_items:
-    - ./configure
+    - ./configure --without-protobuf
     - make
     - make install
     - ldconfig
