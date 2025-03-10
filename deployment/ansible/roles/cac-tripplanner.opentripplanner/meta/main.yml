@@ -1,0 +1,20 @@
+---
+
+galaxy_info:
+  author: Kathryn Killebrew
+  description: An Ansible role for installing Open Trip Planner.
+  company: Azavea Inc.
+  license: Apache
+  min_ansible_version: 2.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - xenial
+  categories:
+  - system
+
+dependencies:
+  - { role: "azavea.git" }
+  - role: "azavea.java"
+    java_flavor: "openjdk"
+    java_oracle_accept_license_agreement: False

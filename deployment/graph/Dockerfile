@@ -1,6 +1,6 @@
 FROM openjdk:8u322-jre-bullseye
 
-ENV VERSION=1.4.0 \
+ENV VERSION=1.5.0 \
     JAVA_MX=15G
 
 ADD https://repo1.maven.org/maven2/org/opentripplanner/otp/$VERSION/otp-$VERSION-shaded.jar /usr/local/share/java/

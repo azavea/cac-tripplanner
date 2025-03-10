@@ -1,0 +1,16 @@
+## NOTICE: This file is written by ansible, and any changes made here will be overwritten on
+#          next provision.
+#          Modify azavea.opentripplanner/templates/otp.conf.j2 to make changes stick.
+
+[Unit]
+Description=Start OpenTripPlanner process
+After={{ otp_service_after }}
+
+[Service]
+User={{ otp_user }}
+WorkingDirectory={{ otp_bin_dir }}
+Restart=on-failure
+ExecStart=/usr/bin/java -Xmx{{otp_process_mem}} -Dotp.logging.format=json -jar {{ otp_bin_dir }}/{{ otp_jar_name }} --server --analyst --port {{ otp_web_port }} --graphs {{ otp_data_dir }}
+
+[Install]
+WantedBy={{ otp_service_wantedby }}
