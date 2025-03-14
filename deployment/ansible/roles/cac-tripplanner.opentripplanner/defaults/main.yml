@@ -10,7 +10,7 @@ otp_web_port: 8080
 otp_service_after: 'network-online.target'
 otp_service_wantedby: 'multi-user.target'
 
-java_version: "8u*"
-java_major_version: "8"
+java_version: "11*"
+java_major_version: "11"
 java_flavor: "openjdk"
 java_oracle_accept_license_agreement: False

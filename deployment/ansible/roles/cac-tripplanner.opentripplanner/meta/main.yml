@@ -13,8 +13,10 @@ galaxy_info:
   categories:
   - system
 
+# cac-tripplanner.java copied from azavea.java
+# at SHA dda62f3, brought over to upgrade java v11
 dependencies:
   - { role: "azavea.git" }
-  - role: "azavea.java"
+  - role: "cac-tripplanner.java"
     java_flavor: "openjdk"
     java_oracle_accept_license_agreement: False

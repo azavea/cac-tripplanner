@@ -1,4 +1,4 @@
-FROM openjdk:8u322-jre-bullseye
+FROM openjdk:11-jre-bullseye
 
 ENV VERSION=1.5.0 \
     JAVA_MX=15G
