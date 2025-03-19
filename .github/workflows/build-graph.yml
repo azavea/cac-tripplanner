@@ -1,0 +1,28 @@
+name: Build Graph
+
+on:
+  # Temporary branch trigger, can only manually dispatch from develop
+  push:
+      branches:
+        - rm/**
+  workflow_dispatch:
+
+jobs:
+  docker-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub Repo
+        uses: actions/checkout@v4
+
+      - name: Run Docker Compose
+        run: |
+          cd deployment/graph
+          docker compose run --rm otp otp --build /var/otp
+
+      - name: Upload graph object
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-artifact
+          path: otp_data/Graph.obj
+          retention-days: 30
