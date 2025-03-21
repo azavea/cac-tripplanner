@@ -10,19 +10,25 @@ on:
 jobs:
   docker-compose:
     runs-on: ubuntu-latest
-
+    env:
+      CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
     steps:
       - name: Checkout GitHub Repo
         uses: actions/checkout@v4
 
-      - name: Run Docker Compose
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Download latest GTFS, OSM, and elevation files from S3
+        run: aws s3 sync --exclude "Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/" "otp_data"
+
+      - name: Build graph
         run: |
           cd deployment/graph
           docker compose run --rm otp otp --build /var/otp
 
-      - name: Upload graph object
-        uses: actions/upload-artifact@v4
-        with:
-          name: graph-artifact
-          path: otp_data/Graph.obj
-          retention-days: 30
+      - name: Upload graph object to S3
+        run: aws s3 cp "otp_data/Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/Graph.obj"

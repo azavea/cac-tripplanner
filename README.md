@@ -13,16 +13,17 @@ Development Installation
 ------------------------
 
 1. Make sure you have the development dependencies installed
-2. Place GTFS .zip files, OSM files, and elevation .tif files (optional) in the root of the otp_data folder
-3. (Optional) Generate a graph file with (takes approx 3 hours) `docker-compose run --rm otp otp --build /var/otp` in the deployment/graph directory.
-4. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
-5. Change into the `src/` folder and run `npm install` to install the node modules on the host machine
-6. Run `vagrant up`. You can choose to change the Virtualbox shared folder type for the `app` VM from its default VirtualBox by:
+2. Download the latest Graph.obj for OTP: `scripts/download-latest-graph.sh`
+     - This will take ~10 minutes to download
+     - If you already have a local graph file but want the latest from S3, run `scripts/download-latest-graph.sh --force`
+3. Copy `deployment/ansible/group_vars/development_template` to `deployment/ansible/group_vars/development`
+4. Change into the `src/` folder and run `npm install` to install the node modules on the host machine
+5. Run `vagrant up`. You can choose to change the Virtualbox shared folder type for the `app` VM from its default VirtualBox by:
 ```
 CAC_APP_SHARED_FOLDER_TYPE=nfs vagrant up
 ```
-7. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
-8. Running `./scripts/serve-js-dev.sh` on the host will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `cd /opt/app/src && npm run gulp-development` can be run manually in the VM to pick up changes to the static files.
+6. See the app at http://localhost:8024! See OpenTripPlanner at http://localhost:9090.
+7. Running `./scripts/serve-js-dev.sh` on the host will rebuild the front-end app on file change (the browser must be reloaded manually to pick up the change). Alternatively, `cd /opt/app/src && npm run gulp-development` can be run manually in the VM to pick up changes to the static files.
 
 Note that if there is an existing build Graph.obj in `otp_data`, vagrant provisioning in development mode will not attempt to rebuild the graph, but will use the one already present.
 
