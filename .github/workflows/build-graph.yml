@@ -31,4 +31,4 @@ jobs:
           docker compose run --rm otp otp --build /var/otp
 
       - name: Upload graph object to S3
-        run: aws s3 cp otp_data/Graph.obj "s3://$CAC_OTP_DATA_BUCKET/Graph.obj"
+        run: aws s3 cp "otp_data/Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/Graph.obj"
