@@ -1,0 +1,16 @@
+---
+otp_bin_dir: /opt/opentripplanner
+otp_data_dir: /var/otp
+otp_user: opentripplanner
+otp_version: "1.5.0"
+otp_jar_suffix: "-shaded"
+otp_jar_sha1: "012f1a6d41222f3b54e3d03e587a52e34f93f8e6"
+otp_process_mem: 3G
+otp_web_port: 8080
+otp_service_after: 'network-online.target'
+otp_service_wantedby: 'multi-user.target'
+
+java_version: "11*"
+java_major_version: "11"
+java_flavor: "openjdk"
+java_oracle_accept_license_agreement: False
