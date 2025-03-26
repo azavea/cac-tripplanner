@@ -1,0 +1,8 @@
+version: "3"
+services:
+  gtfs-feed-fetcher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/local/src
