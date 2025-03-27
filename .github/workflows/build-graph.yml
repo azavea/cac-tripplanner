@@ -3,11 +3,18 @@ name: Build Graph
 on:
   workflow_dispatch:
 
+env:
+  CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
+
 jobs:
-  docker-compose:
+  get-latest-otp-data:
+    name: Fetch & process source data
+    uses: ./.github/workflows/fetch-otp-data.yml
+    secrets: inherit
+  build-graph:
+    name: Build & upload OTP graph
     runs-on: ubuntu-latest
-    env:
-      CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
+    needs: get-latest-otp-data
     steps:
       - name: Checkout GitHub Repo
         uses: actions/checkout@v4
@@ -18,8 +25,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Fetch and process GTFS, OSM and elevation data
-        uses: ./.github/actions/fetch-otp-data-action
+      - name: Download latest GTFS, OSM, and elevation files from S3
+        run: aws s3 sync --exclude "Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/" "otp_data"
+
+      - name: TEMP test if successful
+        run: ls otp_data
 
       # Skip build graph for testing
       # - name: Build graph
@@ -27,5 +37,5 @@ jobs:
       #     cd deployment/dataproc/graph
       #     docker compose run --rm otp otp --build /var/otp
 
-      - name: Upload new GTFS files, OSM files and graph object to S3
-        run: aws s3 sync "otp_data" "s3://$CAC_OTP_DATA_BUCKET"
+      # - name: Upload new GTFS files, OSM files and graph object to S3
+      #   run: aws s3 sync "otp_data" "s3://$CAC_OTP_DATA_BUCKET"
