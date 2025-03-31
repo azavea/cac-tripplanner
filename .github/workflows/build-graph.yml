@@ -6,6 +6,11 @@ on:
       branches:
         - rm/**
   workflow_dispatch:
+    inputs:
+      skip_otp_data_update:
+          description: 'Skip otp_data update and use existing GTFS & OSM source data files in S3 bucket for graph build'
+          default: false
+          type: boolean
 
 env:
   CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
@@ -13,6 +18,7 @@ env:
 jobs:
   get-latest-otp-data:
     name: Fetch & process source data
+    if: ${{ !inputs.skip_otp_data_update }}
     uses: ./.github/workflows/fetch-otp-data.yml
     secrets: inherit
   build-graph:
