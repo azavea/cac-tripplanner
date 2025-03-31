@@ -28,14 +28,10 @@ jobs:
       - name: Download latest GTFS, OSM, and elevation files from S3
         run: aws s3 sync --exclude "Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/" "otp_data"
 
-      - name: TEMP test if successful
-        run: ls otp_data
+      - name: Build graph
+        run: |
+          cd deployment/dataproc/graph
+          docker compose run --rm otp otp --build /var/otp
 
-      # Skip build graph for testing
-      # - name: Build graph
-      #   run: |
-      #     cd deployment/dataproc/graph
-      #     docker compose run --rm otp otp --build /var/otp
-
-      # - name: Upload new GTFS files, OSM files and graph object to S3
-      #   run: aws s3 sync "otp_data" "s3://$CAC_OTP_DATA_BUCKET"
+      - name: Upload graph object to S3
+        run: aws s3 cp "otp_data/Graph.obj" "s3://$CAC_OTP_DATA_BUCKET/Graph.obj"
