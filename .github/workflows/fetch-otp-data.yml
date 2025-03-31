@@ -37,7 +37,7 @@ jobs:
         # TODO 1397: Edit SEPTA bus routes.txt files to bring back to OTPv1 support,
         # Confirm no errors in .html files, run feedvalidator script
 
-      - name: Extend date range
+      - name: Extend GTFS feed date range
         working-directory: deployment/dataproc/gtfs-feed-fetcher
         run: docker compose run --rm gtfs-feed-fetcher ./extend_effective_dates.py --feeds=patco.zip,septa_bus.zip,septa_rail.zip,dart.zip
 
@@ -53,7 +53,12 @@ jobs:
         run: docker compose run --rm osm ./combine-and-clip.sh
 
       - name: Copy OSM .pbf file to otp_data
-        run: cp deployment/dataproc/osm/cac.pbf ./otp_data/
+        run: |
+          sudo chmod 644 deployment/dataproc/osm/cac.pbf
+          cp deployment/dataproc/osm/cac.pbf ./otp_data/
+      
+      - name: TEMP confirm OSM file permissions
+        run: ls -la ./otp_data/
 
       - name: Upload latest GTFS and OSM files to S3
         if:  ${{ !inputs.local_download }}
