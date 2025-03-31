@@ -5,4 +5,4 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../ansible/roles/cac-tripplanner.otp-data/files/otp_data/:/var/otp/
+      - ../../ansible/roles/cac-tripplanner.otp-data/files/otp_data/:/var/otp/
