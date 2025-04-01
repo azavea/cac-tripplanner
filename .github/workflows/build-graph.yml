@@ -1,10 +1,6 @@
 name: Build Graph
 
 on:
-  # Temporary branch trigger, can only manually dispatch from develop
-  push:
-      branches:
-        - rm/**
   workflow_dispatch:
 
 jobs:
