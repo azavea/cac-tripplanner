@@ -1,4 +1,7 @@
+# cac-tripplanner.opentripplanner copied from
+# azavea.opentripplanner at SHA 3803e73.
+# Brought over to upgrade to OTP 1.5
 ---
   dependencies:
-    - { role: "azavea.opentripplanner" }
+    - { role: "cac-tripplanner.opentripplanner" }
     - { role: "cac-tripplanner.papertrail", when: production }

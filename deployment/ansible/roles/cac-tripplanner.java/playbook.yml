@@ -1,0 +1,39 @@
+---
+- hosts: all
+  gather_facts: False
+
+  pre_tasks:
+    # Check Ubuntu release version to determine if we need to install python 2,
+    # an ansible dependency that isn't included by default in Ubuntu 16.04 and
+    # up.
+    - name: Check ubuntu release
+      raw: cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2
+      register: ubuntu_release
+      changed_when: False
+
+    - debug: msg="Running Ubuntu version {{ ubuntu_release.stdout|float }}"
+
+    # Gather facts once ansible dependencies are installed
+    - name: Gather facts
+      setup:
+
+  roles:
+    # OpenJDK 11, all Defaults
+    - role: "ansible-java"
+      when: ansible_distribution_version is version('16.04', '<')
+
+    # Version override for 16.04
+    - role: "ansible-java"
+      java_version: "11*"
+      when: ansible_distribution_version is version("16.04", ">=")
+
+    # Java_version override
+    # - role: "ansible-java"
+    #   java_version: "8u44*"
+    #   when: ansible_distribution_version is version('16.04','<')
+
+    # Java_major_version override
+    # - role: "ansible-java"
+    #   java_version: "9*"
+    #   java_major_version: 9
+    #   when: ansible_distribution_version is version('16.04','<')

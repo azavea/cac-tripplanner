@@ -1,0 +1,2 @@
+molecule==1.25
+python-vagrant>=0.5,<0.6.99
