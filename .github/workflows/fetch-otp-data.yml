@@ -30,7 +30,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Fetch GTFS zip files
+      - name: Fetch & validate GTFS zip files
         working-directory: deployment/dataproc/gtfs-feed-fetcher
         run: docker compose run --rm gtfs-feed-fetcher ./fetch_cac_feeds.py
 
