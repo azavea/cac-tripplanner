@@ -30,12 +30,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Fetch GTFS zip files
+      - name: Fetch & validate GTFS zip files
         working-directory: deployment/dataproc/gtfs-feed-fetcher
         run: docker compose run --rm gtfs-feed-fetcher ./fetch_cac_feeds.py
 
-        # TODO 1397: Edit SEPTA bus routes.txt files to bring back to OTPv1 support,
-        # Confirm no errors in .html files, run feedvalidator script
+      - name: Migrate any GTFS files to OTPv1 support
+        working-directory: deployment/dataproc/gtfs-feed-fetcher
+        run: docker compose run --rm gtfs-feed-fetcher ./migrate_feeds_to_otpv1.py
 
       - name: Extend GTFS feed date range
         working-directory: deployment/dataproc/gtfs-feed-fetcher
