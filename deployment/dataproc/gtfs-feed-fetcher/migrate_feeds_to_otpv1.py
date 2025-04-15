@@ -6,6 +6,7 @@ We can't migrate to OTPv2, so manually modify GTFS for OTPv1 support level.
 """
 import logging
 import zipfile
+import csv
 import os
 
 logging.basicConfig()
@@ -46,16 +47,30 @@ def modify_septa_bus():
     # Convert to buses to prevent error building OTP
     # Reference: https://github.com/septadev/GTFS?tab=readme-ov-file#routestxt
     txt_path_to_update = os.path.join(gtfs_dir, 'routes.txt')
-    content=''
+    column_to_update = 'route_type'
+    new_route_type = '11'
+    otpv1_supported_route_type = '3'
     try:
-        with open(txt_path_to_update, 'r') as file:
-            content = file.read()
-            content = content.replace(',,11,,', ',,3,,')
-        with open(txt_path_to_update, 'w') as file:
-            file.write(content)
+        updated_rows = []
+        with open(txt_path_to_update, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            header = reader.fieldnames
+            if column_to_update not in header:
+                raise ValueError('Column %s not found in routes.txt', column_to_update)
+            for row in reader:
+                if row[column_to_update] == str(new_route_type):
+                    row[column_to_update] = str(otpv1_supported_route_type)
+                    LOG.info('Converted route_id {} from type {} to {}'.format(row['route_id'], new_route_type, otpv1_supported_route_type))
+                updated_rows.append(row)
+
+        with open(txt_path_to_update, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(updated_rows)
+
         LOG.debug('Modified %s', txt_path_to_update)
     except Exception as e:
-        raise ValueError('Error modifying %s: %s', txt_path_to_update, e)
+        raise ValueError('Error modifying {}: {}'.format(txt_path_to_update, e))
 
 def main():
     filenames_to_modify = ['septa_bus']
