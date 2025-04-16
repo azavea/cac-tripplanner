@@ -165,13 +165,27 @@ class FeedSource(object):
             out = subprocess.Popen(process_cmd, stdout=subprocess.PIPE).communicate()
         except Exception as ex:
             LOG.error('feedvalidator.py errorred processing %s.', file_name)
-            self.set_error(file_name, 'feedvalidator.py errored processing feed')
-            return False
+            raise ValueError('Error validating %s: %s', file_name, ex)
 
-        errct = out[0].split('\n')[-2:-1][0] # output line with count of errors/warnings
+        errct = out[0].split('\n')[-2:-1][0]
         if errct.find('error') > -1:
+             # output line with count of errors/warnings
             LOG.error('Feed validator found errors in %s: %s. ' +
                       'Check transitfeedcrash.txt for details.', file_name, errct)
+            # grab error messages to display
+            errors = []
+            with open(validation_output_file, 'rb') as output:
+                soup = BeautifulSoup(output, 'html.parser')
+                error_section = soup.find('h3', class_='issueHeader', string='Errors:')
+                if error_section:
+                    error_list = error_section.find_next('ul')
+                    error_divs = error_list.find_all('div', class_='problem')
+                    for error in error_divs:
+                        error_message = error.get_text(strip=True)
+                        errors.append(error_message)
+            error_messages = ';'.join(errors)
+            raise ValueError('Error validating %s: %s' % (file_name, error_messages))
+
         elif out[0].find('this feed is in the future,') > -1:
             # will check for this again when we get the effective dates from the HTML output
             LOG.warn('Feed validator found GTFS not in service until future for %s.', file_name)
