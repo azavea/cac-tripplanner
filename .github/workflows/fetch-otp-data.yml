@@ -1,0 +1,75 @@
+name: 'Fetch and process data to build OTP graph'
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      with_elevation:
+          description: 'Include elevation file in OTP data source'
+          default: false
+          type: boolean
+      local_download:
+          description: 'Output otp_dir artifact, default uploads to S3 bucket'
+          default: false
+          type: boolean
+
+env:
+  CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
+
+jobs:
+  fetch-data:
+    name: Fetch and process GTFS, OSM and elevation data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub Repo
+        uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Fetch & validate GTFS zip files
+        working-directory: deployment/dataproc/gtfs-feed-fetcher
+        run: docker compose run --rm gtfs-feed-fetcher ./fetch_cac_feeds.py
+
+      - name: Migrate any GTFS files to OTPv1 support
+        working-directory: deployment/dataproc/gtfs-feed-fetcher
+        run: docker compose run --rm gtfs-feed-fetcher ./migrate_feeds_to_otpv1.py
+
+      - name: Extend GTFS feed date range
+        working-directory: deployment/dataproc/gtfs-feed-fetcher
+        run: docker compose run --rm gtfs-feed-fetcher ./extend_effective_dates.py --feeds=patco.zip,septa_bus.zip,septa_rail.zip,dart.zip
+
+      - name: Copy GTFS file to otp_data
+        run: cp deployment/dataproc/gtfs-feed-fetcher/gtfs/{patco_extended.zip,septa_bus_extended.zip,septa_rail_extended.zip,dart_extended.zip,nj_bus.zip,nj_rail.zip} ./otp_data/
+
+      - name: Fetch OSM files
+        working-directory: deployment/dataproc/osm
+        run: docker compose run --rm osm ./download-osm-data.sh
+
+      - name: Process OSM files
+        working-directory: deployment/dataproc/osm
+        run: docker compose run --rm osm ./combine-and-clip.sh
+
+      - name: Copy OSM .pbf file to otp_data
+        run: |
+          sudo chmod 644 deployment/dataproc/osm/cac.pbf
+          cp deployment/dataproc/osm/cac.pbf ./otp_data/
+
+      - name: Upload latest GTFS and OSM files to S3
+        if:  ${{ !inputs.local_download }}
+        run: aws s3 sync "otp_data" "s3://$CAC_OTP_DATA_BUCKET/"
+
+      - name: Fetch elevation file from S3
+        if:  ${{ !inputs.local_download && inputs.with_elevation }}
+        run: aws s3 cp "s3://$CAC_OTP_DATA_BUCKET/cac.tif" "otp_data/cac.tif"
+
+      - name: Output otp_dir artifact for local download
+        if:  ${{ inputs.local_download }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: otp-dir-artifact
+          path: otp_data
+          retention-days: 14
