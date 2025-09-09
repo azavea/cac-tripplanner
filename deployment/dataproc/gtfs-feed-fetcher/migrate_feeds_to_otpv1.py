@@ -26,7 +26,9 @@ def unzip_file(filename):
         LOG.warn('File %s does not look like a valid zip file.', filename)
 
 def clean_up_txt_files():
-    for root, _, files in os.walk(gtfs_dir):
+    for root, dirs, files in os.walk(gtfs_dir):
+        if '__MACOSX' in dirs:
+            dirs.remove('__MACOSX')
         for file in files:
             if file.endswith('.txt'):
                 os.remove(os.path.join(root, file))
@@ -35,7 +37,9 @@ def clean_up_txt_files():
 def re_zip_files(filename):
     feed_path = gtfs_dir + "/" + filename + ".zip"
     with zipfile.ZipFile(feed_path, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
-        for root, _, files in os.walk(gtfs_dir):
+        for root, dirs, files in os.walk(gtfs_dir):
+            if '__MACOSX' in dirs:
+                dirs.remove('__MACOSX')
             for file in files:
                 if file.endswith('.txt'):
                     file_path = os.path.join(root, file)

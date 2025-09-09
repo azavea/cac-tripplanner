@@ -61,7 +61,9 @@ def extend_feed(feed_path, effective_days):
                                           file_name[:-4] + '_extended.zip'),
                              'w',
                              zipfile.ZIP_DEFLATED) as feedzip:
-            for _, _, files in os.walk(tmpdir):
+            for _, dirs, files in os.walk(tmpdir):
+                if '__MACOSX' in dirs:
+                    dirs.remove('__MACOSX')
                 for filename in files:
                     if filename.endswith('.txt'):
                         feedzip.write(filename)
