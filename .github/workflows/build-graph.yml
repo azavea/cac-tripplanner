@@ -2,6 +2,10 @@ name: Build Graph
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'test/**'
+
 
 env:
   CAC_OTP_DATA_BUCKET: 'cleanair-otp-data'
