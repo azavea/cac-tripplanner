@@ -181,7 +181,17 @@
                 jQuery('.nav-banner').removeClass('hidden');
             };
 
+            jQuery('.banner-link').on('click', function(e) {
+                // hyperlink handled by wrapping banner event listener
+                e.preventDefault();
+            });
+
             jQuery('.nav-banner').on('click', function(e) {
+                e.stopPropagation();
+                window.open('https://cleanaircouncil.salsalabs.org/signup/index.html', '_blank');
+            });
+
+            jQuery('.btn-dismiss-nav-banner').on('click', function(e) {
                 e.stopPropagation();
                 localStorage.setItem(alertId, true);
                 jQuery('.nav-banner').addClass('hidden');
